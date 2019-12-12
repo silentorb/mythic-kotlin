@@ -1,0 +1,17 @@
+package silentorb.mythic.scenery
+
+import mythic.spatial.Vector3
+import mythic.spatial.Vector4
+
+enum class LightType(val value: Int) {
+  point(1),
+  spot(2)
+}
+
+data class Light(
+    val type: LightType,
+    val color: Vector4, // w is brightness
+    val position: Vector3,
+    val direction: Vector3? = null,
+    val range: Float
+)
