@@ -1,4 +1,4 @@
-# Mythic Game Engine
+# Mythic Game Engine - Kotlin
 
 ## Introduction
 
@@ -10,6 +10,7 @@ Mythic is a 3D game engine.  Some of its more distinctive qualities are:
 * At least 95% of its data structures are immutable
 * It uses a table-based ECS (Entity Component System)
 * Aside for a few special cases, all of its data handling is homogeneous (No mixed lists)
+* Relies heavily on the most excellent [LWJGL](https://www.lwjgl.org/)
 * No GUI tooling (if someone ever wants to make Mythic tooling, good for them)
 * Only supports OpenGL
 * Currently only supports desktop and has only been tested on Windows
