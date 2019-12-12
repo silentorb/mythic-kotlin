@@ -1,0 +1,4 @@
+
+apply from: "$rootProject.projectDir/build_kotlin.gradle"
+
+requires 'platforming', 'spatial', 'ent', 'debugging'
