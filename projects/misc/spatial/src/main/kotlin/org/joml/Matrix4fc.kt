@@ -22,7 +22,7 @@
  */
 package org.joml
 
-import mythic.spatial.Vector3m
+import silentorb.mythic.spatial.Vector3m
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 

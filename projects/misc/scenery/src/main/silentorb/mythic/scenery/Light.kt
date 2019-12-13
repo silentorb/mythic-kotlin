@@ -1,7 +1,7 @@
 package silentorb.mythic.scenery
 
-import mythic.spatial.Vector3
-import mythic.spatial.Vector4
+import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.Vector4
 
 enum class LightType(val value: Int) {
   point(1),

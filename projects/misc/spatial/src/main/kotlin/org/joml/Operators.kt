@@ -1,9 +1,9 @@
 package org.joml
 
-import mythic.spatial.Quaternion
-import mythic.spatial.Vector3m
-import mythic.spatial.Vector3
-import mythic.spatial.Vector4
+import silentorb.mythic.spatial.Quaternion
+import silentorb.mythic.spatial.Vector3m
+import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.Vector4
 
 
 /* Matrix3d */

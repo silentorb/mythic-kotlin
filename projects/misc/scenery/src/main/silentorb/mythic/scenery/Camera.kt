@@ -1,7 +1,7 @@
 package silentorb.mythic.scenery
 
-import mythic.spatial.Quaternion
-import mythic.spatial.Vector3
+import silentorb.mythic.spatial.Quaternion
+import silentorb.mythic.spatial.Vector3
 
 enum class ProjectionType {
   orthographic,

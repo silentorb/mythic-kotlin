@@ -1,9 +1,9 @@
 //import Bounds
-//import mythic.bloom.IdMap
-//import mythic.bloom.arrangeWithInitial
-//import mythic.bloom.arranging.fixedReverse
-//import mythic.bloom.arranging.hlistOld
-//import mythic.bloom.arranging.inherit
+//import silentorb.mythic.bloom.IdMap
+//import silentorb.mythic.bloom.arrangeWithInitial
+//import silentorb.mythic.bloom.arranging.fixedReverse
+//import silentorb.mythic.bloom.arranging.hlistOld
+//import silentorb.mythic.bloom.arranging.inherit
 //import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 

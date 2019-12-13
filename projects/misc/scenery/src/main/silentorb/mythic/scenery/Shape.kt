@@ -1,7 +1,7 @@
 package silentorb.mythic.scenery
 
-import mythic.spatial.Matrix
-import mythic.spatial.Vector3
+import silentorb.mythic.spatial.Matrix
+import silentorb.mythic.spatial.Vector3
 import kotlin.math.max
 
 interface Shape {

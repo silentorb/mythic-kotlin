@@ -22,7 +22,7 @@
  */
 package org.joml.internal
 
-import mythic.spatial.Vector3m
+import silentorb.mythic.spatial.Vector3m
 import org.joml.*
 
 import java.io.IOException

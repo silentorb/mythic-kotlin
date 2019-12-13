@@ -22,7 +22,7 @@
  */
 package org.joml
 
-import mythic.spatial.Vector2
+import silentorb.mythic.spatial.Vector2
 import org.joml.internal.MemUtil
 import org.joml.internal.Options
 import org.joml.internal.Runtime

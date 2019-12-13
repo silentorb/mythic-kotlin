@@ -22,9 +22,9 @@
  */
 package org.joml
 
-import mythic.spatial.Pi
-import mythic.spatial.Vector3m
-import mythic.spatial.Vector3
+import silentorb.mythic.spatial.Pi
+import silentorb.mythic.spatial.Vector3m
+import silentorb.mythic.spatial.Vector3
 import org.joml.internal.MemUtil
 import org.joml.internal.Options
 import org.joml.internal.Runtime
