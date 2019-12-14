@@ -1,1 +1,5 @@
 apply from: "$rootProject.projectDir/build_kotlin.gradle"
+
+dependencies {
+  compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+}
