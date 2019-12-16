@@ -87,7 +87,6 @@ fun firstRayHitNotMe(dynamicsWorld: btDiscreteDynamicsWorld, start: Vector3, end
   return callback
 }
 
-
 fun allRayHits(dynamicsWorld: btDiscreteDynamicsWorld, start: Vector3, end: Vector3): AllHitsRayResultCallback {
   val callback = AllHitsRayResultCallback(com.badlogic.gdx.math.Vector3.Zero, com.badlogic.gdx.math.Vector3.Z)
   dynamicsWorld.collisionWorld.rayTest(toGdxVector3(start), toGdxVector3(end), callback)

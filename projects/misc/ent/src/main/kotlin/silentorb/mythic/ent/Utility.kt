@@ -98,6 +98,17 @@ fun <T> replace(collection: Collection<T>, condition: (T) -> Boolean, transform:
         item
     }
 
+fun <K, V> replaceMapValues(condition: (K, V) -> Boolean): (Map<K, V>, (K, V) -> V) -> Map<K, V> = { map, transform ->
+  map.mapValues { (key, value) ->
+    if (condition(key, value))
+      transform(key, value)
+    else
+      value
+  }
+}
+
+fun <K, V> replacebyKey(keys: Set<K>) =
+    replaceMapValues<K, V> { key, _ -> keys.contains(key) }
 
 fun <T> replaceIndex(collection: Collection<T>, index: Int, newValue: T) =
     collection.mapIndexed { i, item ->

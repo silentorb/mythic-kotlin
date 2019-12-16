@@ -1,4 +1,4 @@
-package silentorb.mythic.quartz
+package silentorb.mythic.debugging
 
 class Profiler {
   var lastName: String = ""
