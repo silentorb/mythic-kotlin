@@ -238,9 +238,9 @@ fun transformVertices(matrix: Matrix, vertices: Vertices3m): Vertices3m {
   return vertices
 }
 
-fun transformFaces(matrix: Matrix, faces: Faces3m): Vertices3m {
-  return transformVertices(matrix, distinctVertices(faces.flatMap { it.vertices }))
-}
+//fun transformFaces(matrix: Matrix, faces: Faces3m): Vertices3m {
+//  return transformVertices(matrix, distinctVertices(faces.flatMap { it.vertices }))
+//}
 
 //fun transformVertices2D(matrix: Matrix, vertices: List<Vector2>) {
 ////  vertices.forEach { it.set(it.transform(matrix)) }
@@ -249,35 +249,35 @@ fun transformFaces(matrix: Matrix, faces: Faces3m): Vertices3m {
 //  }
 //}
 
-fun distortedTranslatePosition(offset: Vector3m, vertices: List<Vector3m>) {
-  transformVertices(Matrix().translate(offset), vertices)
-}
+//fun distortedTranslatePosition(offset: Vector3m, vertices: List<Vector3m>) {
+//  transformVertices(Matrix().translate(offset), vertices)
+//}
 
-fun distortedTranslatePosition(offset: Vector3m, mesh: FlexibleMesh) {
-  transformVertices(Matrix().translate(offset), mesh.redundantVertices)
-}
+//fun distortedTranslatePosition(offset: Vector3m, mesh: FlexibleMesh) {
+//  transformVertices(Matrix().translate(offset), mesh.redundantVertices)
+//}
 
-fun transformMesh(mesh: FlexibleMesh, matrix: Matrix) {
-  transformVertices(matrix, mesh.distinctVertices)
-}
+//fun transformMesh(mesh: FlexibleMesh, matrix: Matrix) {
+//  transformVertices(matrix, mesh.distinctVertices)
+//}
 
-fun translateMesh(mesh: FlexibleMesh, offset: Vector3) {
-  transformVertices(Matrix().translate(offset), mesh.distinctVertices)
-}
+//fun translateMesh(mesh: FlexibleMesh, offset: Vector3) {
+//  transformVertices(Matrix().translate(offset), mesh.distinctVertices)
+//}
 
-fun alignToFloor(vertices: List<Vector3m>, floor: Float = 0f) {
-  val lowest = vertices.map { it.z }.sorted().first()
-  distortedTranslatePosition(Vector3m(0f, 0f, floor - lowest), vertices)
-}
+//fun alignToFloor(vertices: List<Vector3m>, floor: Float = 0f) {
+//  val lowest = vertices.map { it.z }.sorted().first()
+//  distortedTranslatePosition(Vector3m(0f, 0f, floor - lowest), vertices)
+//}
 
-fun alignToFloor(mesh: FlexibleMesh, floor: Float = 0f) {
-  alignToFloor(mesh.distinctVertices, floor)
-}
+//fun alignToFloor(mesh: FlexibleMesh, floor: Float = 0f) {
+//  alignToFloor(mesh.distinctVertices, floor)
+//}
 
-fun alignToCeiling(vertices: List<Vector3m>, ceiling: Float = 0f) {
-  val highest = vertices.map { it.z }.sorted().last()
-  distortedTranslatePosition(Vector3m(0f, 0f, ceiling - highest), vertices)
-}
+//fun alignToCeiling(vertices: List<Vector3m>, ceiling: Float = 0f) {
+//  val highest = vertices.map { it.z }.sorted().last()
+//  distortedTranslatePosition(Vector3m(0f, 0f, ceiling - highest), vertices)
+//}
 
 data class VerticalDimensions(
     val top: Float,
@@ -300,21 +300,21 @@ fun flipVertical(vertices: Vertices3m): Vertices3m {
   return vertices.map { Vector3m(it.x, it.y, middle - (it.z - middle)) }
 }
 
-fun joinPaths(verticalGap: Float, first: Vertices3m, second: Vertices3m): Vertices3m {
-  val firstCopy = cloneVertices(first)
-  val secondCopy = cloneVertices(second)
-  val half = verticalGap * 2
-  alignToFloor(firstCopy, half)
-  alignToCeiling(secondCopy, -half)
-  return firstCopy.plus(secondCopy)
-}
+//fun joinPaths(verticalGap: Float, first: Vertices3m, second: Vertices3m): Vertices3m {
+//  val firstCopy = cloneVertices(first)
+//  val secondCopy = cloneVertices(second)
+//  val half = verticalGap * 2
+//  alignToFloor(firstCopy, half)
+//  alignToCeiling(secondCopy, -half)
+//  return firstCopy.plus(secondCopy)
+//}
 
-fun convertAsXZ(vertices: List<Vector2>) =
-    vertices.map { Vector3m(it.x, 0f, it.y) }
-
-fun setAnchor(anchor: Vector3m, vertices: Vertices3m) {
-  distortedTranslatePosition(-anchor, vertices)
-}
+//fun convertAsXZ(vertices: List<Vector2>) =
+//    vertices.map { Vector3m(it.x, 0f, it.y) }
+//
+//fun setAnchor(anchor: Vector3m, vertices: Vertices3m) {
+//  distortedTranslatePosition(-anchor, vertices)
+//}
 
 fun stitchEdges(a: EdgeReference, b: EdgeReference) {
   throw Error("Needs new code.")

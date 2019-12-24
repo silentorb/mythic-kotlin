@@ -45,10 +45,11 @@ fun renderBillboard(renderer: Renderer, camera: Camera, billboards: List<Texture
 
     renderer.uniformBuffers.instance.load(createInstanceBuffer { buffer ->
       for (billboard in billboards) {
-        val transform = Matrix()
+        val transform = toMatrix(MutableMatrix()
             .billboardCylindrical(billboard.position, camera.position, Vector3(0f, 0f, 1f))
+        )
             .scale(billboard.scale)
-        buffer.putMatrix(transform)
+        writeMatrixToBuffer(buffer, transform)
         buffer.putVector4(billboard.color)
         buffer.putFloat(billboard.step.toFloat() / steps)
         buffer.putFloat(0f)

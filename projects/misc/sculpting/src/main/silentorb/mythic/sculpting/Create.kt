@@ -48,7 +48,7 @@ fun createCircle2(mesh: FlexibleMesh, radius: Float, count: Int): FlexibleFace {
 fun createCylinder(mesh: FlexibleMesh, radius: Float, count: Int, length: Float): List<FlexibleFace> {
   val circle = createCircle2(mesh, radius, count)
   return listOf(circle).plus(
-      extrudeBasic(mesh, circle, Matrix().translate(Vector3m(0f, 0f, length)))
+      extrudeBasic(mesh, circle, Matrix().translate(Vector3(0f, 0f, length)))
   )
 }
 

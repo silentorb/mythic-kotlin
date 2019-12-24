@@ -1,13 +1,10 @@
 package silentorb.mythic.glowing
 
 import org.lwjgl.BufferUtils
-import silentorb.mythic.spatial.Matrix
-import silentorb.mythic.spatial.Vector2
-import silentorb.mythic.spatial.Vector3m
-import silentorb.mythic.spatial.Vector4
 import org.lwjgl.opengl.GL20.*
 import org.lwjgl.opengl.GL30.glBindBufferRange
 import org.lwjgl.opengl.GL31.*
+import silentorb.mythic.spatial.*
 
 private val matrixBuffer = BufferUtils.createFloatBuffer(16)
 
@@ -16,7 +13,8 @@ class MatrixProperty(private val program: ShaderProgram, name: String) {
 
   fun setValue(value: Matrix) {
     program.activate()
-    glUniformMatrix4fv(location, false, value.get(matrixBuffer))
+    writeMatrixToBuffer(matrixBuffer, value)
+    glUniformMatrix4fv(location, false, matrixBuffer)
   }
 }
 

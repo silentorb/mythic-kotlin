@@ -10,21 +10,15 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 typealias Vector4 = org.joml.Vector4f
-typealias Matrix = org.joml.Matrix4f
 typealias Quaternion = org.joml.Quaternionf
-
-val identityMatrix = Matrix()
+typealias MutableMatrix = org.joml.Matrix4f
 
 private val initialQuaternion = Quaternion()
 
-operator fun Vector3m.times(other: Matrix): Vector3m = mulDirection(other)
-//operator fun Vector2.times(other: Vector2): Vector2 = mul(other, Vector2())
-//operator fun Vector2.times(other: Float): Vector2 = mul(other, Vector2())
+//operator fun Vector3m.times(other: Matrix): Vector3m = mulDirection(other)
 operator fun Vector3m.times(other: Float): Vector3m = mul(other, Vector3m())
 
 operator fun Vector3m.times(other: Vector3m): Vector3m = mul(other, Vector3m())
-
-//operator fun Matrix.times(other: Matrix): Matrix = Matrix(this).mul(other)
 
 fun FloatBuffer.put(value: Vector3m) {
   put(value.x)
@@ -69,11 +63,6 @@ fun ByteBuffer.putVector4(value: Vector4) {
   putFloat(value.y)
   putFloat(value.z)
   putFloat(value.w)
-}
-
-fun ByteBuffer.putMatrix(value: Matrix) {
-  value.get(this)
-  position(position() + 16 * 4)
 }
 
 const val Pi = PI.toFloat()
@@ -249,8 +238,8 @@ fun transformVector(m: Matrix): Vector3m {
 fun getVector3Center(first: Vector3, second: Vector3) =
     first + (second - first) * 0.5f
 
-fun getRotationMatrix(matrix: Matrix) =
-    Matrix().rotation(matrix.getUnnormalizedRotation(initialQuaternion))
+fun getRotationMatrix(matrix: Matrix): Matrix =
+    toMatrix(MutableMatrix().rotation(toMutableMatrix(matrix).getUnnormalizedRotation(initialQuaternion)))
 
 fun Vector2.toVector2i() = Vector2i(x.toInt(), y.toInt())
 fun Vector2i.toVector2() = Vector2(x.toFloat(), y.toFloat())

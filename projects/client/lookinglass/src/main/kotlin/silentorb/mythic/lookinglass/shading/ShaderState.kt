@@ -79,7 +79,7 @@ private val sceneMemoryBuffer = BufferUtils.createByteBuffer(sceneBufferSize)
 private val sceneBufferCustodian = BufferCustodian(sceneMemoryBuffer)
 
 fun createSceneBuffer(effectsData: EffectsData): ByteBuffer {
-  sceneMemoryBuffer.putMatrix(effectsData.camera.transform)
+  writeMatrixToBuffer(sceneMemoryBuffer, effectsData.camera.transform)
   sceneMemoryBuffer.putVector3(effectsData.camera.direction)
   sceneBufferCustodian.finish()
   return sceneMemoryBuffer

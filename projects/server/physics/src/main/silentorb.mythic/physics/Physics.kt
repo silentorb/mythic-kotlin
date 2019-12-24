@@ -10,6 +10,7 @@ import silentorb.mythic.ent.Id
 import silentorb.mythic.ent.Table
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.toMutableMatrix
 import com.badlogic.gdx.math.Vector3 as GdxVector3
 
 // TODO: Migrate to LWJGL Bullet Bindings if it ever seems a little more used and documented.
@@ -26,10 +27,12 @@ data class BulletState(
 fun toGdxVector3(vector: Vector3) = GdxVector3(vector.x, vector.y, vector.z)
 fun toVector3(vector: GdxVector3) = Vector3(vector.x, vector.y, vector.z)
 
+// TODO: This could be optimized but half of the need for optimization is using libGDX in the first place.
+// It would probably be best to wait until libGDX Bullet is replaced.
 fun toGdxMatrix4(matrix: Matrix): Matrix4 {
   val result = Matrix4()
   val values = FloatArray(16)
-  matrix.get(values)
+  toMutableMatrix(matrix).get(values)
   result.set(values)
   return result
 }
@@ -74,38 +77,6 @@ data class BaseRayCastResult(
     val collisionObject: Id,
     val hitPoint: Vector3
 )
-
-//private var firstRayHitCallback: ClosestRayResultCallback? = null
-//private var firstRayHitCallbackIsInUse = false
-//fun firstRayHit(dynamicsWorld: btDiscreteDynamicsWorld, start: Vector3, end: Vector3): BaseRayCastResult? {
-//  val start2 = toGdxVector3(start)
-//  val end2 = toGdxVector3(end)
-//  assert(!firstRayHitCallbackIsInUse)
-//  firstRayHitCallbackIsInUse = true
-//  if (firstRayHitCallback == null)
-//    firstRayHitCallback = ClosestRayResultCallback(start2, end2)
-//  else {
-//    firstRayHitCallback!!.setRayFromWorld(start2)
-//    firstRayHitCallback!!.setRayToWorld(end2)
-//  }
-////  firstRayHitCallback = ClosestRayResultCallback(start2, end2)
-//  dynamicsWorld.collisionWorld.rayTest(start2, end2, firstRayHitCallback)
-//  firstRayHitCallbackIsInUse = false
-//  val callback = firstRayHitCallback!!
-//  val hasHit = callback.hasHit()
-//  return if(hasHit) {
-//    val collisionObject = callback.collisionObject
-//    val collisionObjectId = collisionObject.userData as Id
-//    val hitPoint = com.badlogic.gdx.math.Vector3()
-//    callback.getHitPointWorld(hitPoint)
-//    BaseRayCastResult(
-//        collisionObject = collisionObjectId,
-//        hitPoint = toVector3(hitPoint)
-//    )
-//  }
-//  else
-//    null
-//}
 
 fun firstRayHit(dynamicsWorld: btDiscreteDynamicsWorld, start: Vector3, end: Vector3): BaseRayCastResult? {
   val start2 = toGdxVector3(start)

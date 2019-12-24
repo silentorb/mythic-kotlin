@@ -151,8 +151,8 @@ fun transformAnimatedSkeleton(bones: List<Bone>, animations: List<MultiAnimation
     transformAnimatedSkeleton(bones, animation.animation, animation.timeOffset)
         .map { transform ->
           IntermediateTransform(
-              translation = Vector3(transform.getTranslation(Vector3m())),
-              rotation = transform.getUnnormalizedRotation(Quaternion())
+              translation = Vector3(toMutableMatrix(transform).getTranslation(Vector3m())),
+              rotation = toMutableMatrix(transform).getUnnormalizedRotation(Quaternion())
           )
         }
   }
@@ -190,7 +190,7 @@ fun <T> animatedValueSource(channelMap: ChannelMap?, timePassed: Float): ValueSo
 
 fun projectBoneTail(matrix: Matrix, bone: Bone) =
 //    Matrix().translate(Vector3(bone.length, 0f, 0f)).mul(matrix)
-    Matrix(matrix).translate(bone.length, 0f, 0f)
+    matrix.translate(bone.length, 0f, 0f)
 
 fun getBoneIndex(bones: Bones, name: String): Int =
     bones.first { it.name == name }.index

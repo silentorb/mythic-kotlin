@@ -4,7 +4,6 @@ import silentorb.mythic.glowing.*
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector4
-import silentorb.mythic.spatial.identityMatrix
 
 class PerspectiveFeature(program: ShaderProgram) {
   val modelTransform = MatrixProperty(program, "modelTransform")
@@ -52,7 +51,7 @@ data class ShaderFeatureConfig(
 )
 
 data class ObjectShaderConfig(
-    val transform: Matrix = identityMatrix,
+    val transform: Matrix = Matrix.identity,
     val texture: Texture? = null,
     val color: Vector4? = null,
     val glow: Float = 0f,
