@@ -1,7 +1,6 @@
 package silentorb.mythic.ent
 
 typealias Id = Long
-typealias Table<T> = Map<Id, T>
 
 typealias IdSource = () -> Id
 

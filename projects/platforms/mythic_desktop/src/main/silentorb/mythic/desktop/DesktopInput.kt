@@ -16,7 +16,7 @@ fun enumerateActiveGamepadIds(): List<Int> =
         .filter { glfwJoystickPresent(it) }
 
 //val deadZone = 0.15f
-val deadZone = 0.2f
+val deadZone = 0.25f
 
 fun getGamepadAxes(device: Int, axisDirIndex: Int): Float {
   val axes = glfwGetJoystickAxes(device)

@@ -6,8 +6,8 @@ import silentorb.mythic.ent.Id
 import silentorb.mythic.ent.Table
 import silentorb.mythic.physics.*
 import silentorb.mythic.spatial.*
-import silentorb.mythic.commanding.Commands
-import silentorb.mythic.commanding.filterCommands
+import silentorb.mythic.happenings.Commands
+import silentorb.mythic.happenings.filterCommands
 import silentorb.mythic.ent.firstFloatSortedBy
 import kotlin.math.min
 
@@ -38,7 +38,7 @@ data class CharacterRig(
   val facingQuaternion: Quaternion
     get() = Quaternion()
         .rotateZ(facingRotation.z)
-        .rotateY(facingRotation.y)
+        .rotateY(-facingRotation.y)
 
   val facingVector: Vector3
     get() = facingQuaternion * Vector3(1f, 0f, 0f)
@@ -209,7 +209,11 @@ fun updateCharacterRigFacing(commands: Commands, delta: Float): (CharacterRig) -
 
   characterRig.copy(
       lookVelocity = lookVelocity,
-      facingRotation = Vector3(0f, facingRotation.y, facingRotation.z)
+       facingRotation = Vector3(
+          0f,
+          minMax(facingRotation.y, -1.1f, 1.1f),
+          facingRotation.z
+      )
   )
 }
 

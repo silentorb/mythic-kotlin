@@ -113,13 +113,13 @@ fun mapEventsToCommands(deviceStates: List<InputDeviceState>, getBinding: Bindin
       }
 }
 
-fun getBindingSimple(bindings: List<Binding>): BindingSource = { event ->
+fun getBindingSimple(bindings: List<Binding>, strokes: Set<Any>): BindingSource = { event ->
   val binding = bindings.firstOrNull {
     val values = DeviceIndex.values()
     it.device == values[Math.min(2, event.device)] && it.trigger == event.index
   }
   if (binding != null)
-    Triple(binding, 0, true)
+    Triple(binding, 0, strokes.contains(binding.command))
   else
     null
 }

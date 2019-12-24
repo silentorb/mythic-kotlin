@@ -4,23 +4,19 @@ import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld
 import silentorb.mythic.ent.Id
 import silentorb.mythic.spatial.Vector3
 
-data class RaycastResult(
+data class DistanceRaycastResult(
     val distance: Float,
     val collisionObject: Id
 )
 
-fun castCollisionRay(dynamicsWorld: btDiscreteDynamicsWorld, start: Vector3, end: Vector3): RaycastResult? {
+fun castCollisionRay(dynamicsWorld: btDiscreteDynamicsWorld, start: Vector3, end: Vector3): DistanceRaycastResult? {
   val callback = firstRayHit(dynamicsWorld, start, end)
-  return if (callback.hasHit()) {
-    val collisionObject = callback.collisionObject
-    val collisionObjectId = collisionObject.userData as Id
-    val hitPoint = com.badlogic.gdx.math.Vector3()
-    callback.getHitPointWorld(hitPoint)
-    val distance = start.z - hitPoint.z
+  return if (callback != null) {
+    val distance = start.z - callback.hitPoint.z
 //    println(" $collisionObjectId $distance")
-    return RaycastResult(
+    return DistanceRaycastResult(
         distance = distance,
-        collisionObject = collisionObjectId
+        collisionObject = callback.collisionObject
     )
   } else
     null

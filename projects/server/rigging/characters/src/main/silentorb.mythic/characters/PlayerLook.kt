@@ -1,8 +1,8 @@
 package silentorb.mythic.characters
 
-import silentorb.mythic.commanding.CommandName
-import silentorb.mythic.commanding.CommonCharacterCommands
-import silentorb.mythic.commanding.Commands
+import silentorb.mythic.happenings.CommandName
+import silentorb.mythic.happenings.CommonCharacterCommands
+import silentorb.mythic.happenings.Commands
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
 
@@ -38,16 +38,11 @@ private val thirdPersonLookMomentum = MomentumConfig2(
     MomentumConfig(1f, 4f, 1f)
 )
 
-//private val firstPersonLookMomentum = MomentumConfig2(
-//    MomentumConfig(3f, 4f),
-//    MomentumConfig(1f, 4f)
-//)
-
 val firstPersonLookMap = mapOf(
     CommonCharacterCommands.lookLeft to Vector3(0f, 0f, 1f),
     CommonCharacterCommands.lookRight to Vector3(0f, 0f, -1f),
-    CommonCharacterCommands.lookUp to Vector3(0f, -1f, 0f),
-    CommonCharacterCommands.lookDown to Vector3(0f, 1f, 0f)
+    CommonCharacterCommands.lookUp to Vector3(0f, 1f, 0f),
+    CommonCharacterCommands.lookDown to Vector3(0f, -1f, 0f)
 )
 
 val cameraLookMap = mapOf(

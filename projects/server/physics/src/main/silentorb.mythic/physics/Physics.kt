@@ -13,7 +13,7 @@ import silentorb.mythic.spatial.Vector3
 import com.badlogic.gdx.math.Vector3 as GdxVector3
 
 // TODO: Migrate to LWJGL Bullet Bindings if it ever seems a little more used and documented.
-// libGDX is incredibly inefficient.  Bad Logic Games is aptly named.
+// libGDX is inefficient.
 
 data class BulletState(
     var dynamicsWorld: btDiscreteDynamicsWorld,
@@ -70,12 +70,64 @@ fun releaseBulletState(bulletState: BulletState) {
   bulletState.dynamicBodies = mapOf()
 }
 
-fun firstRayHit(dynamicsWorld: btDiscreteDynamicsWorld, start: Vector3, end: Vector3): ClosestRayResultCallback {
+data class BaseRayCastResult(
+    val collisionObject: Id,
+    val hitPoint: Vector3
+)
+
+//private var firstRayHitCallback: ClosestRayResultCallback? = null
+//private var firstRayHitCallbackIsInUse = false
+//fun firstRayHit(dynamicsWorld: btDiscreteDynamicsWorld, start: Vector3, end: Vector3): BaseRayCastResult? {
+//  val start2 = toGdxVector3(start)
+//  val end2 = toGdxVector3(end)
+//  assert(!firstRayHitCallbackIsInUse)
+//  firstRayHitCallbackIsInUse = true
+//  if (firstRayHitCallback == null)
+//    firstRayHitCallback = ClosestRayResultCallback(start2, end2)
+//  else {
+//    firstRayHitCallback!!.setRayFromWorld(start2)
+//    firstRayHitCallback!!.setRayToWorld(end2)
+//  }
+////  firstRayHitCallback = ClosestRayResultCallback(start2, end2)
+//  dynamicsWorld.collisionWorld.rayTest(start2, end2, firstRayHitCallback)
+//  firstRayHitCallbackIsInUse = false
+//  val callback = firstRayHitCallback!!
+//  val hasHit = callback.hasHit()
+//  return if(hasHit) {
+//    val collisionObject = callback.collisionObject
+//    val collisionObjectId = collisionObject.userData as Id
+//    val hitPoint = com.badlogic.gdx.math.Vector3()
+//    callback.getHitPointWorld(hitPoint)
+//    BaseRayCastResult(
+//        collisionObject = collisionObjectId,
+//        hitPoint = toVector3(hitPoint)
+//    )
+//  }
+//  else
+//    null
+//}
+
+fun firstRayHit(dynamicsWorld: btDiscreteDynamicsWorld, start: Vector3, end: Vector3): BaseRayCastResult? {
   val start2 = toGdxVector3(start)
   val end2 = toGdxVector3(end)
   val callback = ClosestRayResultCallback(start2, end2)
   dynamicsWorld.collisionWorld.rayTest(start2, end2, callback)
-  return callback
+  val hasHit = callback.hasHit()
+  val result = if (hasHit) {
+    val collisionObject = callback.collisionObject
+    val collisionObjectId = collisionObject.userData as Id
+    val hitPoint = com.badlogic.gdx.math.Vector3()
+    callback.getHitPointWorld(hitPoint)
+    BaseRayCastResult(
+        collisionObject = collisionObjectId,
+        hitPoint = toVector3(hitPoint)
+    )
+  } else
+    null
+
+  callback.dispose()
+
+  return result
 }
 
 // ClosestNotMeRayResultCallback is REAAAALLY slow.  Must be horribly unoptimized.

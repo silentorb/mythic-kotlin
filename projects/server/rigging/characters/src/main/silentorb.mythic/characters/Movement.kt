@@ -1,12 +1,12 @@
 package silentorb.mythic.characters
 
 import org.joml.Vector2fMinimal
-import silentorb.mythic.commanding.CommandName
+import silentorb.mythic.happenings.CommandName
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.getAngle
-import silentorb.mythic.commanding.CommonCharacterCommands
-import silentorb.mythic.commanding.Commands
+import silentorb.mythic.happenings.CommonCharacterCommands
+import silentorb.mythic.happenings.Commands
 
 val playerMoveMap = mapOf(
     CommonCharacterCommands.moveLeft to Vector3(-1f, 0f, 0f),
@@ -37,5 +37,8 @@ fun joinInputVector(commands: Commands, commandMap: Map<CommandName, Vector3>): 
   }
 }
 
-fun getLookAtAngle(lookAt: Vector2fMinimal) =
+fun getHorizontalLookAtAngle(lookAt: Vector2fMinimal) =
     getAngle(Vector2(1f, 0f), lookAt.xy())
+
+fun getVerticalLookAtAngle(lookAt: Vector3) =
+    getAngle(Vector2(1f, 0f), Vector2(lookAt.xy().length(), lookAt.z))

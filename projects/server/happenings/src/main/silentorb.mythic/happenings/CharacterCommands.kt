@@ -1,7 +1,8 @@
-package silentorb.mythic.commanding
+package silentorb.mythic.happenings
 
 import silentorb.mythic.ent.Id
 import silentorb.mythic.ent.reflectProperties
+import silentorb.mythic.ent.singleValueCache
 
 typealias CommandName = String
 
@@ -9,7 +10,7 @@ data class CharacterCommand(
     val type: CommandName,
     val target: Id,
     val value: Float = 1f
-)
+) : GameEvent
 
 typealias Commands = List<CharacterCommand>
 
@@ -65,3 +66,7 @@ val gameStrokes = setOf(
 
 fun filterCommands(id: Id, commands: Commands) =
     commands.filter({ it.target == id })
+
+val filterCharacterCommandsFromEvents = singleValueCache<Events, List<CharacterCommand>> { events ->
+  events.filterIsInstance<CharacterCommand>()
+}

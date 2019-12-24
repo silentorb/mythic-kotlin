@@ -32,18 +32,19 @@ fun <Key, Value> mappedCache(source: (Key) -> Value): (Key) -> Value {
   }
 }
 
-// Only stores one value at a time.  Using a different key overwrites the previously mappedCache value.
-fun <Key, Value> singleCache(source: (Key) -> Value): (Key) -> Value {
-  var lastKey: Key? = null
-  var value: Value? = null
-  return { key ->
-    if (key == lastKey)
-      value!!
+// Only stores one value at a time.  Using a different input value overwrites the previously stored output value.
+fun <Input, Output> singleValueCache(source: (Input) -> Output): (Input) -> Output {
+  var lastInput: Int? = null
+  var lastOutput: Output? = null
+  return { input ->
+    val hashCode = input.hashCode()
+    if (hashCode == lastInput)
+      lastOutput!!
     else {
-      lastKey = key
-      val newValue = source(key)
-      value = newValue
-      newValue
+      lastInput = hashCode
+      val newOutput = source(input)
+      lastOutput = newOutput
+      newOutput
     }
   }
 }
