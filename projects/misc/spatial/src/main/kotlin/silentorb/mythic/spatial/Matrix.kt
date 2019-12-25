@@ -1,9 +1,6 @@
 package silentorb.mythic.spatial
 
-import org.joml.Math
-import org.joml.Matrix4fc
-import org.joml.Vector3fc
-import org.joml.Vector4f
+import org.joml.*
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 
@@ -226,8 +223,55 @@ data class Matrix(
     )
   }
 
-  fun rotateAffine(quaternion: Quaternion): Matrix =
-      rotateAffine(quaternion.x, quaternion.y, quaternion.z, quaternion.w)
+//  fun rotateAffine(quaternion: Quaternion): Matrix =
+//      rotateAffine(quaternion.x, quaternion.y, quaternion.z, quaternion.w)
+
+  fun rotateAffine(quaternion: Quaternion): Matrix {
+    val w2 = quaternion.w * quaternion.w
+    val x2 = quaternion.x * quaternion.x
+    val y2 = quaternion.y * quaternion.y
+    val z2 = quaternion.z * quaternion.z
+    val zw = quaternion.z * quaternion.w
+    val xy = quaternion.x * quaternion.y
+    val xz = quaternion.x * quaternion.z
+    val yw = quaternion.y * quaternion.w
+    val yz = quaternion.y * quaternion.z
+    val xw = quaternion.x * quaternion.w
+    val rm00 = w2 + x2 - z2 - y2
+    val rm01 = xy + zw + zw + xy
+    val rm02 = xz - yw + xz - yw
+    val rm10 = -zw + xy - zw + xy
+    val rm11 = y2 - z2 + w2 - x2
+    val rm12 = yz + yz + xw + xw
+    val rm20 = yw + xz + xz + yw
+    val rm21 = yz + yz - xw - xw
+    val rm22 = z2 - y2 - x2 + w2
+    val nm00 = m00 * rm00 + m10 * rm01 + m20 * rm02
+    val nm01 = m01 * rm00 + m11 * rm01 + m21 * rm02
+    val nm02 = m02 * rm00 + m12 * rm01 + m22 * rm02
+    val nm10 = m00 * rm10 + m10 * rm11 + m20 * rm12
+    val nm11 = m01 * rm10 + m11 * rm11 + m21 * rm12
+    val nm12 = m02 * rm10 + m12 * rm11 + m22 * rm12
+    return Matrix(
+        m20 = m00 * rm20 + m10 * rm21 + m20 * rm22,
+        m21 = m01 * rm20 + m11 * rm21 + m21 * rm22,
+        m22 = m02 * rm20 + m12 * rm21 + m22 * rm22,
+        m23 = 0.0f,
+        m00 = nm00,
+        m01 = nm01,
+        m02 = nm02,
+        m03 = 0.0f,
+        m10 = nm10,
+        m11 = nm11,
+        m12 = nm12,
+        m13 = 0.0f,
+        m30 = m30,
+        m31 = m31,
+        m32 = m32,
+        m33 = m33,
+        properties = properties and (Matrix4fc.PROPERTY_PERSPECTIVE or Matrix4fc.PROPERTY_IDENTITY or Matrix4fc.PROPERTY_TRANSLATION).inv()
+    )
+  }
 
   fun rotateGeneric(quaternion: Quaternion): Matrix {
     val w2 = quaternion.w * quaternion.w
@@ -333,13 +377,43 @@ data class Matrix(
     return rotateTowards(dir.x, dir.y, dir.z, up.x, up.y, up.z)
   }
 
-  fun rotateTowardsXY(dirX: Float, dirY: Float): Matrix {
-    return identityOrThis().copy(
+  fun rotationTowardsXY(dirX: Float, dirY: Float): Matrix {
+    return this.copy(
         m00 = dirY,
         m01 = dirX,
         m10 = -dirX,
         m11 = dirY,
         properties = Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL
+    )
+  }
+
+  fun rotateTowardsXY(dirX: Float, dirY: Float): Matrix {
+    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+      return rotationTowardsXY(dirX, dirY)
+
+    val rm10 = -dirX
+    val nm00 = m00 * dirY + m10 * dirX
+    val nm01 = m01 * dirY + m11 * dirX
+    val nm02 = m02 * dirY + m12 * dirX
+    val nm03 = m03 * dirY + m13 * dirX
+    return Matrix(
+        m10 = m00 * rm10 + m10 * dirY,
+        m11 = m01 * rm10 + m11 * dirY,
+        m12 = m02 * rm10 + m12 * dirY,
+        m13 = m03 * rm10 + m13 * dirY,
+        m00 = nm00,
+        m01 = nm01,
+        m02 = nm02,
+        m03 = nm03,
+        m20 = m20,
+        m21 = m21,
+        m22 = m22,
+        m23 = m23,
+        m30 = m30,
+        m31 = m31,
+        m32 = m32,
+        m33 = m33,
+        properties = properties and (Matrix4fc.PROPERTY_PERSPECTIVE or Matrix4fc.PROPERTY_IDENTITY or Matrix4fc.PROPERTY_TRANSLATION).inv()
     )
   }
 
