@@ -57,7 +57,7 @@ fun lathe(mesh: FlexibleMesh, path: List<Vector3m>, count: Int, sweep: Float = P
   val increment = sweep / count
   var previous = path
   for (i in 1 until count) {
-    val matrix = Matrix().rotateZ(i * increment)
+    val matrix = Matrix.identity.rotateZ(i * increment)
     val next = path.map { keepOrRotate(matrix, it) }
     skin(mesh, previous, next)
     previous = next
@@ -189,7 +189,7 @@ fun createLatheCourse(resolution: Int, sweep: Float = Pi * 2): LatheCourse {
   val increment = sweep / (count - 1)
   return LatheCourse(
       stepCount = count,
-      transformer = { i: Int -> Matrix().rotateZ(i * increment) },
+      transformer = { i: Int -> Matrix.identity.rotateZ(i * increment) },
       wrap = sweep == Pi * 2
   )
 }
@@ -250,11 +250,11 @@ fun transformVertices(matrix: Matrix, vertices: Vertices3m): Vertices3m {
 //}
 
 //fun distortedTranslatePosition(offset: Vector3m, vertices: List<Vector3m>) {
-//  transformVertices(Matrix().translate(offset), vertices)
+//  transformVertices(Matrix.identity.translate(offset), vertices)
 //}
 
 //fun distortedTranslatePosition(offset: Vector3m, mesh: FlexibleMesh) {
-//  transformVertices(Matrix().translate(offset), mesh.redundantVertices)
+//  transformVertices(Matrix.identity.translate(offset), mesh.redundantVertices)
 //}
 
 //fun transformMesh(mesh: FlexibleMesh, matrix: Matrix) {
@@ -262,7 +262,7 @@ fun transformVertices(matrix: Matrix, vertices: Vertices3m): Vertices3m {
 //}
 
 //fun translateMesh(mesh: FlexibleMesh, offset: Vector3) {
-//  transformVertices(Matrix().translate(offset), mesh.distinctVertices)
+//  transformVertices(Matrix.identity.translate(offset), mesh.distinctVertices)
 //}
 
 //fun alignToFloor(vertices: List<Vector3m>, floor: Float = 0f) {

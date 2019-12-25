@@ -18,7 +18,7 @@ fun getUnitScaling(dimensions: Vector2i) =
       Vector2(dimensions.y.toFloat() / dimensions.x, 1f)
 
 fun prepareTextMatrix(pixelsToScalar: Matrix, position: Vector2) =
-    Matrix()
+    Matrix.identity
     .mul(pixelsToScalar)
     .translate(position.x, position.y, 0f)
 

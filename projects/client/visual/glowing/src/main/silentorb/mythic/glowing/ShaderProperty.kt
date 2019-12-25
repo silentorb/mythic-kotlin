@@ -10,10 +10,11 @@ private val matrixBuffer = BufferUtils.createFloatBuffer(16)
 
 class MatrixProperty(private val program: ShaderProgram, name: String) {
   private val location = glGetUniformLocation(program.id, name)
-
   fun setValue(value: Matrix) {
     program.activate()
+    matrixBuffer.rewind()
     writeMatrixToBuffer(matrixBuffer, value)
+    matrixBuffer.rewind()
     glUniformMatrix4fv(location, false, matrixBuffer)
   }
 }

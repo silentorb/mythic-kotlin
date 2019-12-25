@@ -37,4 +37,4 @@ fun isMoving(body: Body) =
     body.velocity != Vector3.zero
 
 fun getBodyTransform(body: Body) =
-    Matrix().translate(body.position).rotate(body.orientation)
+    Matrix.identity.translate(body.position).rotate(body.orientation)

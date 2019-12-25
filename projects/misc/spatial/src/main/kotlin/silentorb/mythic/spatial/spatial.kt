@@ -238,6 +238,9 @@ fun transformVector(m: Matrix): Vector3m {
 fun getVector3Center(first: Vector3, second: Vector3) =
     first + (second - first) * 0.5f
 
+fun getRotationMatrix(matrix: MutableMatrix): MutableMatrix =
+    MutableMatrix().rotation(matrix.getUnnormalizedRotation(initialQuaternion))
+
 fun getRotationMatrix(matrix: Matrix): Matrix =
     toMatrix(MutableMatrix().rotation(toMutableMatrix(matrix).getUnnormalizedRotation(initialQuaternion)))
 

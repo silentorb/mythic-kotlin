@@ -70,7 +70,7 @@ fun createStaticFaceBody(face: ImmutableFace): btCollisionObject {
   val shape = btBvhTriangleMeshShape(triangleMesh, true)
   val btBody = btCollisionObject()
   btBody.collisionShape = shape
-  btBody.worldTransform = toGdxMatrix4(Matrix().translate(center))
+  btBody.worldTransform = toGdxMatrix4(Matrix.identity.translate(center))
   return btBody
 }
 

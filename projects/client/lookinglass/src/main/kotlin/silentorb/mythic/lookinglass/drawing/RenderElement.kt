@@ -61,7 +61,7 @@ fun getElementTransform(element: MeshElement, primitive: Primitive, transforms: 
   return if (primitive.transform != null)
     element.transform * primitive.transform
   else if (primitive.parentBone != null && transforms != null)
-    element.transform * transforms[primitive.parentBone] * MutableMatrix().rotateX(-Pi / 2f)
+    element.transform * transforms[primitive.parentBone] * Matrix.identity.rotateX(-Pi / 2f)
   else
     element.transform
 }

@@ -41,7 +41,7 @@ fun loadBoundingShape(getTriangles: GetTriangles): (Map<String, Any>) -> Shape? 
     null
 
   if (shape != null && offset != null)
-    ShapeTransform(transform = Matrix().translate(offset), shape = shape)
+    ShapeTransform(transform = Matrix.identity.translate(offset), shape = shape)
   else
     shape
 }

@@ -10,10 +10,6 @@ import silentorb.mythic.ent.Id
 import silentorb.mythic.glowing.*
 import silentorb.mythic.platforming.PlatformDisplayConfig
 import silentorb.mythic.platforming.WindowInfo
-import silentorb.mythic.spatial.Matrix
-import silentorb.mythic.spatial.Vector2
-import silentorb.mythic.spatial.Vector3
-import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.typography.*
 import org.joml.Vector2i
 import org.joml.Vector4i
@@ -29,6 +25,7 @@ import silentorb.mythic.lookinglass.meshes.createVertexSchemas
 import silentorb.mythic.lookinglass.shading.*
 import silentorb.mythic.lookinglass.texturing.*
 import silentorb.mythic.scenery.ArmatureName
+import silentorb.mythic.spatial.*
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 
@@ -52,7 +49,8 @@ data class DisplayConfig(
 fun gatherEffectsData(dimensions: Vector2i, lights: List<Light>, cameraEffectsData: CameraEffectsData): EffectsData {
   return EffectsData(
       cameraEffectsData,
-      Matrix().ortho(0.0f, dimensions.x.toFloat(), 0.0f, dimensions.y.toFloat(), 0f, 100f),
+      toMatrix(MutableMatrix().
+          ortho(0.0f, dimensions.x.toFloat(), 0.0f, dimensions.y.toFloat(), 0f, 100f)),
       lights
   )
 }
@@ -314,7 +312,7 @@ fun createSceneRenderer(renderer: Renderer, scene: GameScene, viewport: Vector4i
 }
 
 fun rasterizeCoordinates(position: Vector3, cameraEffectsData: CameraEffectsData, dimensions: Vector2i): Vector2 {
-  val modelTransform = Matrix()
+  val modelTransform = Matrix.identity
       .translate(position)
 
   val transform2 = cameraEffectsData.transform * modelTransform

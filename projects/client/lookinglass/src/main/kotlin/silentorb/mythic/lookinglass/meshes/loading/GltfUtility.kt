@@ -81,32 +81,32 @@ fun getQuaternions(buffer: ByteBuffer, offset: Int, count: Int): List<Quaternion
   return result.toList()
 }
 
-fun getMatrices(buffer: ByteBuffer, offset: Int, count: Int): List<Matrix> {
-  buffer.position(offset)
-  val valueBuffer = buffer.asFloatBuffer()
-  val result = mutableListOf<Matrix>()
-  for (i in 0 until count) {
-    result.add(Matrix(
-        valueBuffer.get(),
-        valueBuffer.get(),
-        valueBuffer.get(),
-        valueBuffer.get(),
-        valueBuffer.get(),
-        valueBuffer.get(),
-        valueBuffer.get(),
-        valueBuffer.get(),
-        valueBuffer.get(),
-        valueBuffer.get(),
-        valueBuffer.get(),
-        valueBuffer.get(),
-        valueBuffer.get(),
-        valueBuffer.get(),
-        valueBuffer.get(),
-        valueBuffer.get()
-    ))
-  }
-  return result.toList()
-}
+//fun getMatrices(buffer: ByteBuffer, offset: Int, count: Int): List<Matrix> {
+//  buffer.position(offset)
+//  val valueBuffer = buffer.asFloatBuffer()
+//  val result = mutableListOf<Matrix>()
+//  for (i in 0 until count) {
+//    result.add(Matrix(
+//        valueBuffer.get(),
+//        valueBuffer.get(),
+//        valueBuffer.get(),
+//        valueBuffer.get(),
+//        valueBuffer.get(),
+//        valueBuffer.get(),
+//        valueBuffer.get(),
+//        valueBuffer.get(),
+//        valueBuffer.get(),
+//        valueBuffer.get(),
+//        valueBuffer.get(),
+//        valueBuffer.get(),
+//        valueBuffer.get(),
+//        valueBuffer.get(),
+//        valueBuffer.get(),
+//        valueBuffer.get()
+//    ))
+//  }
+//  return result.toList()
+//}
 
 fun selectBufferIterator(componentType: Int): BufferIterator =
     when (componentType) {

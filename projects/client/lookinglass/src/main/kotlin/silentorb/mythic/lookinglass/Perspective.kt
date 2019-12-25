@@ -11,15 +11,17 @@ data class CameraEffectsData(
 )
 
 fun createViewMatrix(position: Vector3, lookAt: Vector3): Matrix {
-  return Matrix()
-      .setLookAt(position, lookAt, Vector3(0f, 0f, 1f))
+  return toMatrix(
+      MutableMatrix()
+          .setLookAt(position, lookAt, Vector3(0f, 0f, 1f))
+  )
 }
 
 fun createViewMatrix(position: Vector3, orientation: Quaternion): Matrix {
 //  val forward = Quaternion(orientation) * Vector3(1f, 0f, 0f)
 //  val lookAt = position + forward
 //  return createViewMatrix(position, lookAt)
-  return Matrix()
+  return Matrix.identity
       //      .rotateZ(-Pi / 2f)
       .rotateZ(Pi / 2f)
       .rotateY(Pi / 2f)
@@ -30,9 +32,9 @@ fun createViewMatrix(position: Vector3, orientation: Quaternion): Matrix {
 //fun createViewMatrix(position: Vector3, orientation: Quaternion): Matrix {
 //  val forward = Quaternion(-0.271f, 0.271f, 0.653f, 0.653f) * Vector3(1f, 0f, 0f)
 //  val look_at = position + forward
-//  return Matrix().setLookAt(Vector3(1f, -10.70593596f, 10.707852f), Vector3(), Vector3(0f, 0f, 1f))
+//  return Matrix.identity.setLookAt(Vector3(1f, -10.70593596f, 10.707852f), Vector3(), Vector3(0f, 0f, 1f))
 //
-////  return lookAt3(position, look_at, Vector3(0f, 0f, 1f), Matrix())
+////  return lookAt3(position, look_at, Vector3(0f, 0f, 1f), Matrix.identity)
 //}
 
 fun getAspectRatio(dimensions: Vector2i): Float {
@@ -42,14 +44,14 @@ fun getAspectRatio(dimensions: Vector2i): Float {
 fun createPerspectiveMatrix(dimensions: Vector2i, angle: Float, nearClip: Float, farClip: Float): Matrix {
   val ratio = getAspectRatio(dimensions)
   val radians = Math.toRadians(angle.toDouble()).toFloat()
-  return Matrix()
-      .setPerspective(radians, ratio, nearClip, farClip)
+  return toMatrix(MutableMatrix()
+      .setPerspective(radians, ratio, nearClip, farClip))
 }
 
 fun createOrthographicMatrix(dimensions: Vector2i, zoom: Float, nearClip: Float, farClip: Float): Matrix {
   val ratio = getAspectRatio(dimensions)
-  return Matrix()
-      .setOrtho(-1f * zoom, 1f * zoom, -1f * zoom, 1f * zoom, nearClip, farClip)
+  return toMatrix(MutableMatrix()
+      .setOrtho(-1f * zoom, 1f * zoom, -1f * zoom, 1f * zoom, nearClip, farClip))
 }
 
 fun createCameraMatrix(dimensions: Vector2i, camera: Camera): Matrix {

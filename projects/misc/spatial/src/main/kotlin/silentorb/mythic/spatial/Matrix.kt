@@ -1,7 +1,9 @@
 package silentorb.mythic.spatial
 
-import org.joml.*
-import org.joml.internal.MemUtil
+import org.joml.Math
+import org.joml.Matrix4fc
+import org.joml.Vector3fc
+import org.joml.Vector4f
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 
@@ -68,27 +70,48 @@ fun scaleGeneric(matrix: Matrix, x: Float, y: Float, z: Float): Matrix {
   )
 }
 
+fun zeroMatrix(): Matrix =
+    Matrix(
+        m00 = 0f,
+        m01 = 0f,
+        m02 = 0f,
+        m03 = 0f,
+        m10 = 0f,
+        m11 = 0f,
+        m12 = 0f,
+        m13 = 0f,
+        m20 = 0f,
+        m21 = 0f,
+        m22 = 0f,
+        m23 = 0f,
+        m30 = 0f,
+        m31 = 0f,
+        m32 = 0f,
+        m33 = 0f,
+        properties = 0
+    )
+
 data class Matrix(
-    val m00: Float = 0f,
-    val m01: Float = 0f,
-    val m02: Float = 0f,
-    val m03: Float = 0f,
-    val m10: Float = 0f,
-    val m11: Float = 0f,
-    val m12: Float = 0f,
-    val m13: Float = 0f,
-    val m20: Float = 0f,
-    val m21: Float = 0f,
-    val m22: Float = 0f,
-    val m23: Float = 0f,
-    val m30: Float = 0f,
-    val m31: Float = 0f,
-    val m32: Float = 0f,
-    val m33: Float = 0f,
-    val properties: Int = 0
+    val m00: Float,
+    val m01: Float,
+    val m02: Float,
+    val m03: Float,
+    val m10: Float,
+    val m11: Float,
+    val m12: Float,
+    val m13: Float,
+    val m20: Float,
+    val m21: Float,
+    val m22: Float,
+    val m23: Float,
+    val m30: Float,
+    val m31: Float,
+    val m32: Float,
+    val m33: Float,
+    val properties: Int
 ) {
   companion object {
-    val identity: Matrix = Matrix()
+    val identity: Matrix = zeroMatrix()
         .copy(
             m00 = 1.0f,
             m11 = 1.0f,
@@ -361,6 +384,54 @@ data class Matrix(
     )
   }
 
+  fun rotationX(ang: Float): Matrix {
+    val sin = Math.sin(ang.toDouble()).toFloat()
+    val cos = Math.cosFromSin(sin.toDouble(), ang.toDouble()).toFloat()
+    return identityOrThis().copy(
+        m11 = cos,
+        m12 = sin,
+        m21 = -sin,
+        m22 = cos,
+        properties = Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL
+    )
+  }
+
+  fun rotateX(ang: Float): Matrix {
+    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+      return rotationX(ang)
+
+    val sin = Math.sin(ang.toDouble()).toFloat()
+    val cos = Math.cosFromSin(sin.toDouble(), ang.toDouble()).toFloat()
+    val rm21 = -sin
+
+    // add temporaries for dependent values
+    val nm10 = m10 * cos + m20 * sin
+    val nm11 = m11 * cos + m21 * sin
+    val nm12 = m12 * cos + m22 * sin
+    val nm13 = m13 * cos + m23 * sin
+    // set non-dependent values directly
+    return Matrix(
+        m20 = m10 * rm21 + m20 * cos,
+        m21 = m11 * rm21 + m21 * cos,
+        m22 = m12 * rm21 + m22 * cos,
+        m23 = m13 * rm21 + m23 * cos,
+        // set other values
+        m10 = nm10,
+        m11 = nm11,
+        m12 = nm12,
+        m13 = nm13,
+        m00 = m00,
+        m01 = m01,
+        m02 = m02,
+        m03 = m03,
+        m30 = m30,
+        m31 = m31,
+        m32 = m32,
+        m33 = m33,
+        properties = properties and (Matrix4fc.PROPERTY_PERSPECTIVE or Matrix4fc.PROPERTY_IDENTITY or Matrix4fc.PROPERTY_TRANSLATION).inv()
+    )
+  }
+
   fun rotationY(angle: Float): Matrix {
     val sin: Float
     val cos: Float
@@ -527,25 +598,28 @@ fun writeMatrixToBuffer(buffer: FloatBuffer, matrix: Matrix) {
   buffer.put(matrix.m33)
 }
 
-fun toMutableMatrix(matrix: Matrix): MutableMatrix =
-    MutableMatrix(
-        matrix.m00,
-        matrix.m01,
-        matrix.m02,
-        matrix.m03,
-        matrix.m10,
-        matrix.m11,
-        matrix.m12,
-        matrix.m13,
-        matrix.m20,
-        matrix.m21,
-        matrix.m22,
-        matrix.m23,
-        matrix.m30,
-        matrix.m31,
-        matrix.m32,
-        matrix.m33
-    )
+fun toMutableMatrix(matrix: Matrix): MutableMatrix {
+  val result = MutableMatrix(
+      matrix.m00,
+      matrix.m01,
+      matrix.m02,
+      matrix.m03,
+      matrix.m10,
+      matrix.m11,
+      matrix.m12,
+      matrix.m13,
+      matrix.m20,
+      matrix.m21,
+      matrix.m22,
+      matrix.m23,
+      matrix.m30,
+      matrix.m31,
+      matrix.m32,
+      matrix.m33
+  )
+  result.properties = matrix.properties
+  return result
+}
 
 fun toMatrix(matrix: MutableMatrix): Matrix =
     Matrix(
@@ -564,5 +638,6 @@ fun toMatrix(matrix: MutableMatrix): Matrix =
         matrix.m30,
         matrix.m31,
         matrix.m32,
-        matrix.m33
+        matrix.m33,
+        properties = matrix.properties
     )

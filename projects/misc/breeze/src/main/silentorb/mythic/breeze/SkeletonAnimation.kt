@@ -89,7 +89,7 @@ fun staticMatrixSource(bones: Bones): MatrixSource = { i ->
 }
 
 fun transformSkeleton(bones: Bones, matrixSource: MatrixSource = staticMatrixSource(bones)): List<Matrix> {
-  val init = Matrix()
+  val init = Matrix.identity
   val result = Array(bones.size, { init })
   for (i in 0 until bones.size) {
     val bone = bones[i]
@@ -170,7 +170,7 @@ fun transformAnimatedSkeleton(bones: List<Bone>, animations: List<MultiAnimation
 }
 
 fun transformBone(translation: Vector3, rotation: Quaternion) =
-    Matrix()
+    Matrix.identity
         .translate(translation)
         .rotate(rotation)
 
@@ -189,7 +189,7 @@ fun <T> animatedValueSource(channelMap: ChannelMap?, timePassed: Float): ValueSo
       }
 
 fun projectBoneTail(matrix: Matrix, bone: Bone) =
-//    Matrix().translate(Vector3(bone.length, 0f, 0f)).mul(matrix)
+//    Matrix.identity.translate(Vector3(bone.length, 0f, 0f)).mul(matrix)
     matrix.translate(bone.length, 0f, 0f)
 
 fun getBoneIndex(bones: Bones, name: String): Int =

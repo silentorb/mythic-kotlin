@@ -118,10 +118,10 @@ class Canvas(
   val dynamicMesh = dependencies.dynamicMesh
   val dynamicTexturedMesh = dependencies.dynamicTexturedMesh
   val viewportDimensions = Vector2(dimensions.x.toFloat(), dimensions.y.toFloat())
-  val pixelsToScalar = Matrix().scale(1f / dimensions.x, 1f / dimensions.y, 1f)
+  val pixelsToScalar = Matrix.identity.scale(1f / dimensions.x, 1f / dimensions.y, 1f)
 
   fun transformScalar(position: Vector2, dimensions: Vector2) =
-      Matrix()
+      Matrix.identity
           .mul(pixelsToScalar)
           .translate(position.x, position.y, 0f)
           .scale(dimensions.x, dimensions.y, 1f)
@@ -168,7 +168,7 @@ class Canvas(
 
   fun drawLine(startX: Float, startY: Float, endX: Float, endY: Float, color: Vector4, thickness: Float) {
     dynamicMesh.load(listOf(startX, startY, endX, endY))
-    outline(color, thickness)(Matrix().mul(pixelsToScalar), dynamicMesh)
+    outline(color, thickness)(Matrix.identity.mul(pixelsToScalar), dynamicMesh)
   }
 
   fun drawLine(start: Vector2, end: Vector2, color: Vector4, thickness: Float) {

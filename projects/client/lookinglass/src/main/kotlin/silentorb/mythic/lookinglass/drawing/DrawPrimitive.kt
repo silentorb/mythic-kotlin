@@ -19,7 +19,7 @@ fun drawPrimitive(renderer: Renderer, primitive: Primitive, transform: Matrix, c
       transform,
       color = color ?: material.color,
       glow = material.glow,
-      normalTransform = Matrix(),
+      normalTransform = Matrix.identity,
       texture = texture
   ))
   drawMesh(primitive.mesh, DrawMethod.triangleFan)
