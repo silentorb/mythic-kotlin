@@ -34,6 +34,11 @@ fun getDebugSetting(name: String): String? {
   return dotEnv!![name]
 }
 
+fun isDebugSet(name: String): Boolean {
+  val value = getDebugSetting(name)
+  return value == "1"
+}
+
 fun debugLog(message: String) {
   println("($privateLoopNumber) $message")
 }

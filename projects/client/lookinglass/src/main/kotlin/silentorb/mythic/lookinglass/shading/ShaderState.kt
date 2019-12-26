@@ -2,7 +2,6 @@ package silentorb.mythic.lookinglass.shading
 
 import silentorb.mythic.glowing.BufferCustodian
 import silentorb.mythic.spatial.*
-import org.joml.times
 import org.lwjgl.BufferUtils
 import silentorb.mythic.lookinglass.CameraEffectsData
 import silentorb.mythic.scenery.Light
@@ -45,7 +44,7 @@ fun createLightBuffer(config: LightingConfig, lights: List<Light>): ByteBuffer {
     buffer.putInt(5)
     padBuffer(buffer, 3)
     buffer.putVector4(light.color)
-    buffer.putVector3(light.position)
+    buffer.putVector3(light.offset)
     padBuffer(buffer, 1)
     buffer.putVector3(light.direction ?: Vector3.zero)
     buffer.putFloat(light.range)

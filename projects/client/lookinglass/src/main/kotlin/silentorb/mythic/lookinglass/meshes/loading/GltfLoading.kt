@@ -57,9 +57,9 @@ fun gatherChildLights(info: GltfInfo, node: Node): List<Light> {
         Light(
             type = LightType.values().first { it.name == light.type.name },
             color = Vector4f(light.color, light.intensity / 100f),
-            position = childNode.translation ?: Vector3.zero,
+            offset = childNode.translation ?: Vector3.zero,
             direction = null,
-            range = 15f
+            range = light.range
         )
       }
     }

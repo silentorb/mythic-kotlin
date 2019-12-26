@@ -169,7 +169,8 @@ enum class GltfLightType {
 data class GltfLight(
     val color: Vector3,
     val intensity: Float,
-    val type: GltfLightType
+    val type: GltfLightType,
+    val range: Float
 )
 
 data class LightExtension(

@@ -14,13 +14,11 @@ import silentorb.mythic.typography.*
 import org.joml.Vector2i
 import org.joml.Vector4i
 import org.joml.div
-import org.joml.times
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL30.*
 import org.lwjgl.opengl.GL32.GL_TEXTURE_2D_MULTISAMPLE
 import org.lwjgl.opengl.GL32.glTexImage2DMultisample
-import silentorb.mythic.glowing.*
 import silentorb.mythic.lookinglass.meshes.createVertexSchemas
 import silentorb.mythic.lookinglass.shading.*
 import silentorb.mythic.lookinglass.texturing.*
@@ -182,7 +180,7 @@ fun gatherChildLights(meshes: ModelMeshMap, groups: ElementGroups): List<Light> 
       val mesh = meshes[meshElement.mesh]!!
       mesh.lights.map { light ->
         light.copy(
-            position = light.position.transform(meshElement.transform)
+            offset = light.offset.transform(meshElement.transform)
         )
       }
     }
@@ -191,7 +189,7 @@ fun gatherChildLights(meshes: ModelMeshMap, groups: ElementGroups): List<Light> 
 
 fun gatherSceneLights(meshes: ModelMeshMap, scene: GameScene): List<Light> {
   return scene.lights
-      .plus(gatherChildLights(meshes, scene.opaqueElementGroups))
+//      .plus(gatherChildLights(meshes, scene.opaqueElementGroups))
 }
 
 class Renderer(
