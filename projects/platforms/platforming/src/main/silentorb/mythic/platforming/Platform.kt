@@ -55,11 +55,17 @@ interface PlatformDisplay {
   val loadImage: ImageLoader
 }
 
+data class LoadSoundResult(
+    val buffer: Int,
+    val duration: Float
+)
+
 interface PlatformAudio {
   fun start(latency: Int)
-  val availableBuffer: Int
-  fun update(bytes: ByteArray): Int
-  fun loadSound(filename: String): ShortBuffer
+  fun play(buffer: Int, volume: Float, x: Float, y: Float, z: Float): Int
+  fun playingSounds(): Set<Int>
+  fun update()
+  fun loadSound(filename: String): LoadSoundResult
   fun stop()
 }
 

@@ -1,44 +1,49 @@
 package silentorb.mythic.desktop
 
-import silentorb.mythic.platforming.PlatformAudio
+import org.lwjgl.openal.AL
+import org.lwjgl.openal.AL10.*
+import org.lwjgl.openal.ALC
+import org.lwjgl.openal.ALC10.*
+import org.lwjgl.openal.ALCCapabilities
+import org.lwjgl.openal.ALCapabilities
 import org.lwjgl.stb.STBVorbis.stb_vorbis_decode_filename
 import org.lwjgl.system.MemoryStack.*
-import java.nio.ShortBuffer
-import javax.sound.sampled.AudioFormat
-import javax.sound.sampled.AudioSystem
-import javax.sound.sampled.SourceDataLine
+import org.lwjgl.system.libc.LibCStdlib.free
+import silentorb.mythic.platforming.LoadSoundResult
+import silentorb.mythic.platforming.PlatformAudio
 
-fun defaultAudioFormat(): AudioFormat =
-    AudioFormat(
-        44100f,
-        16,
-        2,
-        true,
-        true // big endian like Java
-    )
-
-fun loadSoundFromFile(filename: String): ShortBuffer {
-
-//Allocate space to store return information from the function
+fun loadSoundFromFile(filename: String): LoadSoundResult {
+  // Allocate space to store return information from the function
   stackPush()
   val channelsBuffer = stackMallocInt(1)
   stackPush()
   val sampleRateBuffer = stackMallocInt(1)
 
-  val rawAudioBuffer = stb_vorbis_decode_filename(filename, channelsBuffer, sampleRateBuffer)
+  val inputBuffer = stb_vorbis_decode_filename(filename, channelsBuffer, sampleRateBuffer)
 
-//Retreive the extra information that was stored in the buffers by the function
+  // Retreive the extra information that was stored in the buffers by the function
   val channels = channelsBuffer.get()
   val sampleRate = sampleRateBuffer.get()
 
-//Free the space we allocated earlier
+  // Free the space we allocated earlier
   stackPop()
   stackPop()
 
-  assert(rawAudioBuffer != null)
-  assert(channels == 1)
-  assert(sampleRate == 44100)
-  return rawAudioBuffer
+  assert(inputBuffer != null)
+  val format = when (channels) {
+    1 -> AL_FORMAT_MONO16
+    2 -> AL_FORMAT_STEREO16
+    else -> throw Error("Invalid channel count for audio file $filename: $channels")
+  }
+  val duration = inputBuffer.limit().toFloat() / channels.toFloat() / sampleRate.toFloat()
+  val buffer: Int = alGenBuffers()
+  alBufferData(buffer, format, inputBuffer, sampleRate)
+
+  free(inputBuffer)
+  return LoadSoundResult(
+      buffer = buffer,
+      duration = duration
+  )
 }
 
 fun millisecondsToBytes(milliseconds: Int): Int {
@@ -49,48 +54,54 @@ fun millisecondsToBytes(milliseconds: Int): Int {
 }
 
 class DesktopAudio : PlatformAudio {
-  var sourceLine: SourceDataLine? = null
-  val format = defaultAudioFormat()
+  var device: Long = 0L
+  var context: Long = 0L
+  val buffers: MutableSet<Int> = mutableSetOf()
+  val sources: MutableSet<Int> = mutableSetOf()
 
   override fun start(latency: Int) {
-    val source = AudioSystem.getSourceDataLine(format)
-    if (source != null) {
-      val bufferSize = millisecondsToBytes(20)
-//      source.open(format)
-      source.open(format, bufferSize)
-      source.start()
-      val actualSize = source.getBufferSize()
-      println("Audio buffer size: $actualSize, ${actualSize / 4}")
-      sourceLine = source
-    }
+    val defaultDeviceName: String = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER)
+    device = alcOpenDevice(defaultDeviceName)
+
+    val attributes = intArrayOf(0)
+    context = alcCreateContext(device, attributes)
+    alcMakeContextCurrent(context)
+
+    val alcCapabilities: ALCCapabilities = ALC.createCapabilities(device)
+    val alCapabilities: ALCapabilities = AL.createCapabilities(alcCapabilities)
   }
 
-  override val availableBuffer: Int
-    get() {
-      val source = sourceLine
-      return if (source != null) {
-        val result = source.available()
-        result
-      } else
-        0
-    }
+  override fun play(buffer: Int, volume: Float, x: Float, y: Float, z: Float): Int {
+    val source = alGenSources()
+    alSourcei(source, AL_BUFFER, buffer)
+    alSourcePlay(source)
+    return source
+  }
 
-  override fun update(bytes: ByteArray): Int {
-    val source = sourceLine
-    return if (source != null) {
-      source.write(bytes, 0, bytes.size)
-    } else
-      0
+  override fun playingSounds(): Set<Int> =
+      sources
+
+  override fun update() {
+    val finished = sources.filter { source ->
+      alGetSourcei(source, AL_SOURCE_STATE) == AL_STOPPED
+    }
+    finished.forEach(::alDeleteSources)
+    sources.removeAll(sources)
   }
 
   override fun stop() {
-    val source = sourceLine
-    if (source != null) {
-      source.drain()
-      source.close()
-    }
+    sources.forEach(::alDeleteSources)
+    sources.clear()
+    buffers.forEach(::alDeleteBuffers)
+    buffers.clear()
+    alcDestroyContext(context)
+    alcCloseDevice(device)
+    device = 0
   }
 
-  override fun loadSound(filename: String): ShortBuffer =
-      loadSoundFromFile(filename)
+  override fun loadSound(filename: String): LoadSoundResult {
+    val result = loadSoundFromFile(filename)
+    buffers.add(result.buffer)
+    return result
+  }
 }

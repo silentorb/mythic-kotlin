@@ -17,9 +17,9 @@ fun getMixBuffer(bufferSize: Int): ByteBuffer {
   return mixBuffer!!
 }
 
-fun updateAudioDeviceBuffer(audio: PlatformAudio, buffer: ByteBuffer, bufferSize: Int) {
-  val b = ByteArray(bufferSize)
-  buffer.position(0)
-  buffer.get(b, 0, bufferSize)
-  audio.update(b)
-}
+//fun updateAudioDeviceBuffer(audio: PlatformAudio, buffer: ByteBuffer, bufferSize: Int) {
+//  val b = ByteArray(bufferSize)
+//  buffer.position(0)
+//  buffer.get(b, 0, bufferSize)
+//  audio.update(b)
+//}

@@ -1,52 +1,39 @@
 package silentorb.mythic.aura
 
-import silentorb.mythic.ent.WithId
 import silentorb.mythic.ent.Id
 import silentorb.mythic.ent.Table
-import silentorb.mythic.ent.pipe2
 import silentorb.mythic.platforming.PlatformAudio
 import silentorb.mythic.spatial.Vector3
-import java.nio.ByteBuffer
-import java.nio.ShortBuffer
 
+typealias SoundBuffer = Int
+
+typealias SoundType = String
+typealias SoundDurations = Map<SoundType, Float>
 data class SoundData(
-   override val id: Id,
-    val buffer: ShortBuffer,
-    val duration: Long
-) : WithId
-
-data class Sound(
-    override val id: Id,
-    val type: Id,
-    val progress: Long = 0L,
-    val position: Vector3? = null
-) : WithId
-
-data class BufferState(
-    val maxSize: Int,
-    val bufferedBytes: Int
+    val type: SoundType,
+    val buffer: SoundBuffer,
+    val duration: Float
 )
 
-fun newBufferState(audio: PlatformAudio) =
-    BufferState(
-        maxSize = audio.availableBuffer,
-        bufferedBytes = 0
-    )
+typealias SoundMap = Map<Id, SoundBuffer>
 
-typealias SoundTable = Table<Sound>
-typealias SoundLibrary = Table<SoundData>
+data class Sound(
+    val type: SoundType,
+    val volume: Float,
+    val progress: Float,
+    val position: Vector3? = null
+)
+
+typealias SoundLibrary = Map<SoundType, SoundData>
 
 data class AudioState(
-    val sounds: SoundTable,
-    val buffer: BufferState,
-    val nextSoundId: Id = 0L,
+    val sounds: SoundMap,
     val volume: Float
 )
 
-fun newAudioState(audio: PlatformAudio, volume: Float) =
+fun newAudioState(volume: Float) =
     AudioState(
         sounds = mapOf(),
-        buffer = newBufferState(audio),
         volume = volume
     )
 
@@ -57,86 +44,27 @@ data class CalculatedSound(
     val gain: Float
 )
 
-fun prepareSounds(sounds: SoundTable, library: SoundLibrary, listenerPosition: Vector3?): List<CalculatedSound> =
-    sounds.values
-        .map { sound ->
-          val info = library[sound.type]!!
-          val gain = distanceAttenuation(listenerPosition, sound.position)
-
-          CalculatedSound(
-              remainingSamples = (info.duration - sound.progress).toInt(),
-              progress = sound.progress.toInt(),
-              instrument = { info.buffer.get(it) },
-              gain = gain
-          )
-        }
-        .filter { it.gain > 0f }
-
-private const val useSineTest: Boolean = false
-
-fun renderAudio(library: SoundLibrary, samples: Int, listenerPosition: Vector3?, sounds: SoundTable, buffer: ByteBuffer) {
-  val activeSounds = if (useSineTest)
-    sineTest(listenerPosition)
-  else
-    prepareSounds(sounds, library, listenerPosition)
-
-  (0 until samples).forEach { i ->
-    val value: Int = activeSounds
-        .filter { i < it.remainingSamples }
-        .map { (it.instrument(it.progress + i) * it.gain).toInt() }
-        .sum()
-
-    val finalValue = pipe2(value, listOf(
-        compress,
-        clip
-    ))
-
-    buffer.putShort(finalValue.toShort())
-    buffer.putShort(finalValue.toShort())
+fun updateSoundPlaying(audio: PlatformAudio, newSounds: Table<Sound>, library: SoundLibrary, listenerPosition: Vector3?, volume: Float): (SoundMap) -> SoundMap = { soundMap ->
+  audio.update()
+  val newSoundMappings = newSounds.mapValues { (_, sound) ->
+    val definition = library[sound.type]!!
+    val position = sound.position ?: Vector3.zero
+    audio.play(definition.buffer, sound.volume, position.x, position.y, position.z)
   }
-
-  if (useSineTest)
-    updateSineTest(samples)
+  val playingSounds = audio.playingSounds()
+  soundMap
+      .filterValues { playingSounds.contains(it) }
+      .plus(newSoundMappings)
 }
 
-fun renderSilence(samples: Int, buffer: ByteBuffer) {
-  (0 until samples).forEach { i ->
-    buffer.putShort(0.toShort())
-    buffer.putShort(0.toShort())
-  }
+fun updateSound(delta: Float): (Sound) -> Sound = { sound ->
+  sound.copy(
+      progress = sound.progress + delta
+  )
 }
 
-fun updateSounds(library: SoundLibrary, samples: Int): (SoundTable) -> SoundTable = { sounds ->
-  pipe2(sounds, listOf(
-      { s ->
-        s.mapValues { (_, sound) ->
-          sound.copy(
-              progress = sound.progress + samples
-          )
-        }
-      },
-      { s ->
-        s.filterValues { sound ->
-          val info = library[sound.type]!!
-          sound.progress < info.duration
-        }
-      }
-  ))
-}
-
-fun getBufferSize(samples: Int): Int {
-  val bytesPerSample = 2 * 2
-  return bytesPerSample * samples
-}
-
-fun updateSounds(audio: PlatformAudio, library: SoundLibrary, samples: Int, listenerPosition: Vector3?, volume: Float): (SoundTable) -> SoundTable = { sounds ->
-  val bufferSize = getBufferSize(samples)
-  val buffer = getMixBuffer(bufferSize)
-  if (volume == 0f) {
-    renderSilence(samples, buffer)
-  } else {
-    renderAudio(library, samples, listenerPosition, sounds, buffer)
-  }
-  updateAudioDeviceBuffer(audio, buffer, bufferSize)
-  updateSounds(library, samples)(sounds)
+fun finishedSounds(soundDurations: SoundDurations): (Table<Sound>) -> Set<Id> = { sounds ->
+  sounds
+      .filterValues { it.progress >= soundDurations[it.type]!! }
+      .keys
 }
