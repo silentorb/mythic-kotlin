@@ -11,6 +11,7 @@ import org.lwjgl.system.MemoryStack.*
 import org.lwjgl.system.libc.LibCStdlib.free
 import silentorb.mythic.platforming.LoadSoundResult
 import silentorb.mythic.platforming.PlatformAudio
+import silentorb.mythic.spatial.Vector3
 
 fun loadSoundFromFile(filename: String): LoadSoundResult {
   // Allocate space to store return information from the function
@@ -71,9 +72,12 @@ class DesktopAudio : PlatformAudio {
     val alCapabilities: ALCapabilities = AL.createCapabilities(alcCapabilities)
   }
 
-  override fun play(buffer: Int, volume: Float, x: Float, y: Float, z: Float): Int {
+  override fun play(buffer: Int, volume: Float, position: Vector3?): Int {
     val source = alGenSources()
     alSourcei(source, AL_BUFFER, buffer)
+    if (position != null) {
+      alSource3f(source, AL_POSITION, position.x, position.y, position.z)
+    }
     alSourcePlay(source)
     return source
   }
@@ -81,10 +85,14 @@ class DesktopAudio : PlatformAudio {
   override fun playingSounds(): Set<Int> =
       sources
 
-  override fun update() {
+  override fun update(listenerPosition: Vector3?) {
     val finished = sources.filter { source ->
       alGetSourcei(source, AL_SOURCE_STATE) == AL_STOPPED
     }
+    if (listenerPosition != null) {
+      alListener3f(AL_POSITION, listenerPosition.x, listenerPosition.y, listenerPosition.z)
+    }
+
     finished.forEach(::alDeleteSources)
     sources.removeAll(sources)
   }

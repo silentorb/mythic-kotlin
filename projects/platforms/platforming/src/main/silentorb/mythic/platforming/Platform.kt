@@ -2,6 +2,7 @@ package silentorb.mythic.platforming
 
 import silentorb.mythic.spatial.Vector2
 import org.joml.Vector2i
+import silentorb.mythic.spatial.Vector3
 import java.nio.ByteBuffer
 import java.nio.ShortBuffer
 
@@ -62,9 +63,9 @@ data class LoadSoundResult(
 
 interface PlatformAudio {
   fun start(latency: Int)
-  fun play(buffer: Int, volume: Float, x: Float, y: Float, z: Float): Int
+  fun play(buffer: Int, volume: Float, position: Vector3?): Int
   fun playingSounds(): Set<Int>
-  fun update()
+  fun update(listenerPosition: Vector3?)
   fun loadSound(filename: String): LoadSoundResult
   fun stop()
 }

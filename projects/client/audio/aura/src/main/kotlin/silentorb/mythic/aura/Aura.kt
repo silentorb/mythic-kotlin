@@ -45,11 +45,11 @@ data class CalculatedSound(
 )
 
 fun updateSoundPlaying(audio: PlatformAudio, newSounds: Table<Sound>, library: SoundLibrary, listenerPosition: Vector3?, volume: Float): (SoundMap) -> SoundMap = { soundMap ->
-  audio.update()
+  audio.update(listenerPosition)
   val newSoundMappings = newSounds.mapValues { (_, sound) ->
     val definition = library[sound.type]!!
     val position = sound.position ?: Vector3.zero
-    audio.play(definition.buffer, sound.volume, position.x, position.y, position.z)
+    audio.play(definition.buffer, sound.volume, position)
   }
   val playingSounds = audio.playingSounds()
   soundMap
