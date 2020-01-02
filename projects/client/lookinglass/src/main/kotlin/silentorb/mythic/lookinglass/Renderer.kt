@@ -19,6 +19,7 @@ import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL30.*
 import org.lwjgl.opengl.GL32.GL_TEXTURE_2D_MULTISAMPLE
 import org.lwjgl.opengl.GL32.glTexImage2DMultisample
+import silentorb.mythic.breeze.AnimationName
 import silentorb.mythic.lookinglass.meshes.createVertexSchemas
 import silentorb.mythic.lookinglass.shading.*
 import silentorb.mythic.lookinglass.texturing.*
@@ -124,12 +125,6 @@ fun createMultiSampler(glow: Glow, config: PlatformDisplayConfig): Multisampler 
 
 typealias AnimationDurationMap = Map<ArmatureName, Map<AnimationName, Float>>
 
-fun mapAnimationDurations(armatures: Map<ArmatureName, Armature>): AnimationDurationMap =
-    armatures
-        .mapValues { (_, armature) ->
-          armature.animations.mapValues { it.value.duration }
-        }
-
 typealias AnimationMap = Map<AnimationName, SkeletonAnimation>
 
 typealias SocketMap = Map<String, Int>
@@ -214,7 +209,6 @@ class Renderer(
   val drawing = createDrawingEffects()
   val meshes: ModelMeshMap
   val armatures: Map<ArmatureName, Armature>
-  val animationDurations: AnimationDurationMap
   val textures: DynamicTextureLibrary = mutableMapOf()
   val textureLoader = AsyncTextureLoader(textures)
   val offscreenBuffers: List<OffscreenBuffer> = (0..0).map {
@@ -234,7 +228,6 @@ class Renderer(
     val (loadedMeshes, loadedArmatures) = createMeshes(vertexSchemas)
     meshes = loadedMeshes
     armatures = loadedArmatures.associate { Pair(it.id, it) }
-    animationDurations = mapAnimationDurations(armatures)
   }
 
   fun updateShaders(lights: List<Light>, dimensions: Vector2i, cameraEffectsData: CameraEffectsData) {

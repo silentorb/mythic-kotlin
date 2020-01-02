@@ -1,13 +1,12 @@
 package silentorb.mythic.lookinglass
 
+import silentorb.mythic.breeze.AnimationName
 import silentorb.mythic.scenery.MeshName
 import silentorb.mythic.scenery.TextureName
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.scenery.ArmatureName
-
-typealias AnimationName = String
 
 data class ElementAnimation(
     val animationId: AnimationName,

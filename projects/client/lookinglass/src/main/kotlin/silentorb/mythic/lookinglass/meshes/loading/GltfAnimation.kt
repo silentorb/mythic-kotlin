@@ -80,7 +80,6 @@ fun loadAnimation(buffer: ByteBuffer, info: GltfInfo, source: IndexedAnimation, 
       }
 
   return SkeletonAnimation(
-      name = source.name,
       channels = channels,
       channelMap = mapChannels(channels),
       duration = duration,

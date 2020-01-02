@@ -37,7 +37,6 @@ data class SkeletonAnimationChannel(
 }
 
 data class SkeletonAnimation(
-    val name: String,
     val duration: Float,
     val channels: List<SkeletonAnimationChannel>,
     val channelMap: ChannelTypeMap,
@@ -143,7 +142,7 @@ fun transformAnimatedSkeleton(bones: List<Bone>, animations: List<MultiAnimation
   if (animations.size > 2)
     throw Error("Mixing any number other than two animations is not currently supported.")
 
-  val sum = animations.map {it.strength}.sum()
+  val sum = animations.map { it.strength }.sum()
   assert(sum <= 1f)
   assert(sum > 0.999f)
 

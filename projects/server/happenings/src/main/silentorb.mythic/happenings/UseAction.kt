@@ -4,5 +4,6 @@ import silentorb.mythic.ent.Id
 
 data class UseAction(
     val actor: Id,
-    val action: Id
+    val action: Id,
+    val deferredEvents: Map<String, GameEvent>
 ) : GameEvent
