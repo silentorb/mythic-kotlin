@@ -28,14 +28,20 @@ fun newDotEnv() = dotenv {
   ignoreIfMissing = true
 }
 
-fun getDebugSetting(name: String): String? {
+fun getDebugString(name: String): String? {
   dotEnv = dotEnv
       ?: newDotEnv()
   return dotEnv!![name]
 }
 
+fun getDebugInt(name: String): Int? =
+    getDebugString(name)?.toIntOrNull()
+
+fun getDebugFloat(name: String): Float? =
+    getDebugString(name)?.toFloatOrNull()
+
 fun isDebugSet(name: String): Boolean {
-  val value = getDebugSetting(name)
+  val value = getDebugString(name)
   return value == "1"
 }
 

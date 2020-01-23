@@ -1,5 +1,0 @@
-apply from: "$rootProject.projectDir/build_kotlin.gradle"
-
-dependencies {
-  compile 'io.github.cdimascio:java-dotenv:5.1.3'
-}

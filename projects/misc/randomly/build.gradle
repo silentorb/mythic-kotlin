@@ -1,5 +1,0 @@
-apply from: "$rootProject.projectDir/build_kotlin.gradle"
-
-dependencies {
-    compile project(":spatial")
-}

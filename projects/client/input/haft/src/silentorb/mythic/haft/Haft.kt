@@ -1,11 +1,12 @@
 package silentorb.mythic.haft
 
 import silentorb.mythic.debugging.debugLog
+import silentorb.mythic.debugging.getDebugString
 import silentorb.mythic.platforming.InputEvent
 import silentorb.mythic.spatial.Vector2
 
-val DEBUG_INPUT = System.getenv("DEBUG_INPUT") != null
-val DEBUG_INPUT_COUNTS = System.getenv("DEBUG_INPUT_COUNTS") != null
+val DEBUG_INPUT = getDebugString("DEBUG_INPUT") != null
+val DEBUG_INPUT_COUNTS = getDebugString("DEBUG_INPUT_COUNTS") != null
 
 enum class DeviceIndex {
   keyboard,
