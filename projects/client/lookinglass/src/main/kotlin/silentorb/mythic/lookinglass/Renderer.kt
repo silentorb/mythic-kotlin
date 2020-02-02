@@ -13,7 +13,7 @@ import silentorb.mythic.platforming.WindowInfo
 import silentorb.mythic.typography.*
 import org.joml.Vector2i
 import org.joml.Vector4i
-import org.joml.div
+import silentorb.mythic.spatial.div
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL30.*

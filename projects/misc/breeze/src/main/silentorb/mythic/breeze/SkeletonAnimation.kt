@@ -1,7 +1,7 @@
 package silentorb.mythic.breeze
 
 import silentorb.mythic.spatial.*
-import org.joml.times
+import silentorb.mythic.spatial.times
 
 data class ChannelTarget2(
     val bone: Bone,

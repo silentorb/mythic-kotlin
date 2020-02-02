@@ -22,6 +22,8 @@
  */
 package org.joml
 
+import silentorb.mythic.spatial.Quaternionf
+import silentorb.mythic.spatial.Quaternionfc
 import silentorb.mythic.spatial.Vector3m
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
@@ -762,7 +764,7 @@ import java.nio.FloatBuffer
  * the destination [Quaternionf]
  * @return the passed in destination
  */
-     fun getUnnormalizedRotation(dest:Quaternionf):Quaternionf
+     fun getUnnormalizedRotation(dest: Quaternionf): Quaternionf
 
 /**
  * Get the current values of `this` matrix and store the represented rotation
@@ -776,7 +778,7 @@ import java.nio.FloatBuffer
  * the destination [Quaternionf]
  * @return the passed in destination
  */
-     fun getNormalizedRotation(dest:Quaternionf):Quaternionf
+     fun getNormalizedRotation(dest: Quaternionf): Quaternionf
 
 /**
  * Get the current values of `this` matrix and store the represented rotation
@@ -3017,7 +3019,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun rotate(quat:Quaternionfc, dest:Matrix4f):Matrix4f
+     fun rotate(quat: Quaternionfc, dest:Matrix4f):Matrix4f
 
 /**
  * Apply the rotation - and possibly scaling - transformation of the given [Quaternionfc] to this [affine][.isAffine] matrix and store
@@ -3046,7 +3048,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun rotateAffine(quat:Quaternionfc, dest:Matrix4f):Matrix4f
+     fun rotateAffine(quat: Quaternionfc, dest:Matrix4f):Matrix4f
 
 /**
  * Apply the rotation - and possibly scaling - ransformation of the given [Quaternionfc] to this matrix, which is assumed to only contain a translation, and store
@@ -3075,7 +3077,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun rotateTranslation(quat:Quaternionfc, dest:Matrix4f):Matrix4f
+     fun rotateTranslation(quat: Quaternionfc, dest:Matrix4f):Matrix4f
 
 /**
  * Apply the rotation - and possibly scaling - transformation of the given [Quaternionfc] to this matrix while using <tt>(ox, oy, oz)</tt> as the rotation origin,
@@ -3110,7 +3112,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun rotateAround(quat:Quaternionfc, ox:Float, oy:Float, oz:Float, dest:Matrix4f):Matrix4f
+     fun rotateAround(quat: Quaternionfc, ox:Float, oy:Float, oz:Float, dest:Matrix4f):Matrix4f
 
 /**
  * Pre-multiply the rotation - and possibly scaling - transformation of the given [Quaternionfc] to this matrix and store
@@ -3136,7 +3138,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun rotateLocal(quat:Quaternionfc, dest:Matrix4f):Matrix4f
+     fun rotateLocal(quat: Quaternionfc, dest:Matrix4f):Matrix4f
 
 /**
  * Pre-multiply the rotation - and possibly scaling - transformation of the given [Quaternionfc] to this matrix while using <tt>(ox, oy, oz)</tt>
@@ -3171,7 +3173,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun rotateAroundLocal(quat:Quaternionfc, ox:Float, oy:Float, oz:Float, dest:Matrix4f):Matrix4f
+     fun rotateAroundLocal(quat: Quaternionfc, ox:Float, oy:Float, oz:Float, dest:Matrix4f):Matrix4f
 
 /**
  * Apply a rotation transformation, rotating about the given [AxisAngle4f] and store the result in `dest`.
@@ -3729,7 +3731,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun reflect(orientation:Quaternionfc, point:Vector3fc, dest:Matrix4f):Matrix4f
+     fun reflect(orientation: Quaternionfc, point:Vector3fc, dest:Matrix4f):Matrix4f
 
 /**
  * Apply a mirror/reflection transformation to this matrix that reflects about the given plane

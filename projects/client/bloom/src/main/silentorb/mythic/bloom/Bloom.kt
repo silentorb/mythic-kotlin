@@ -10,7 +10,7 @@ import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.spatial.toVector2
 import org.joml.Vector2i
 import org.joml.Vector4i
-import org.joml.plus
+import silentorb.mythic.spatial.plus
 import org.lwjgl.opengl.GL11
 
 data class Bounds(

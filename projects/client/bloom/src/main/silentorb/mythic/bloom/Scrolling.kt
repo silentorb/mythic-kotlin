@@ -3,8 +3,7 @@ package silentorb.mythic.bloom
 import silentorb.mythic.bloom.next.*
 import silentorb.mythic.spatial.*
 import org.joml.Vector2i
-import org.joml.plus
-import silentorb.mythic.bloom.next.*
+import silentorb.mythic.spatial.plus
 
 private const val scrollbarWidth = 15
 

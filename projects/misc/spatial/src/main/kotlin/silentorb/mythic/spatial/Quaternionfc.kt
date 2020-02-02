@@ -20,9 +20,9 @@
  THE SOFTWARE.
 
  */
-package org.joml
+package silentorb.mythic.spatial
 
-import silentorb.mythic.spatial.Vector3m
+import org.joml.*
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 
@@ -100,62 +100,12 @@ interface Quaternionfc {
   /**
    * Set the given destination matrix to the rotation represented by `this`.
    *
-   * @see Matrix3f.set
-   * @param dest
-   * the matrix to write the rotation into
-   * @return the passed in destination
-   */
-  operator fun get(dest: Matrix3f): Matrix3f
-
-  /**
-   * Set the given destination matrix to the rotation represented by `this`.
-   *
-   * @see Matrix3d.set
-   * @param dest
-   * the matrix to write the rotation into
-   * @return the passed in destination
-   */
-  operator fun get(dest: Matrix3d): Matrix3d
-
-  /**
-   * Set the given destination matrix to the rotation represented by `this`.
-   *
    * @see Matrix4f.set
    * @param dest
    * the matrix to write the rotation into
    * @return the passed in destination
    */
   operator fun get(dest: Matrix4f): Matrix4f
-
-  /**
-   * Set the given destination matrix to the rotation represented by `this`.
-   *
-   * @see Matrix4d.set
-   * @param dest
-   * the matrix to write the rotation into
-   * @return the passed in destination
-   */
-  operator fun get(dest: Matrix4d): Matrix4d
-
-  /**
-   * Set the given destination matrix to the rotation represented by `this`.
-   *
-   * @see Matrix4x3f.set
-   * @param dest
-   * the matrix to write the rotation into
-   * @return the passed in destination
-   */
-  operator fun get(dest: Matrix4x3f): Matrix4x3f
-
-  /**
-   * Set the given destination matrix to the rotation represented by `this`.
-   *
-   * @see Matrix4x3d.set
-   * @param dest
-   * the matrix to write the rotation into
-   * @return the passed in destination
-   */
-  operator fun get(dest: Matrix4x3d): Matrix4x3d
 
   /**
    * Set the given [AxisAngle4f] to represent the rotation of
@@ -166,16 +116,6 @@ interface Quaternionfc {
    * @return the passed in destination
    */
   operator fun get(dest: AxisAngle4f): AxisAngle4f
-
-  /**
-   * Set the given [Quaterniond] to the values of `this`.
-   *
-   * @see Quaterniond.set
-   * @param dest
-   * the [Quaterniond] to set
-   * @return the passed in destination
-   */
-  operator fun get(dest: Quaterniond): Quaterniond
 
   /**
    * Set the given [Quaternionf] to the values of `this`.
@@ -954,7 +894,7 @@ interface Quaternionfc {
    * will hold the result
    * @return dest
    */
-  fun rotateTo(fromDir: Vector3fc, toDir: Vector3fc, dest: Quaternionf): Quaternionf
+//  fun rotateTo(fromDir: Vector3, toDir: Vector3, dest: Quaternionf): Quaternionf
 
   /**
    * Apply a rotation to `this` quaternion rotating the given radians about the basis unit axes of the

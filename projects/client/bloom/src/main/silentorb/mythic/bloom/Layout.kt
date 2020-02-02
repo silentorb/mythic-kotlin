@@ -1,7 +1,7 @@
 package silentorb.mythic.bloom
 
 import org.joml.Vector2i
-import org.joml.plus
+import silentorb.mythic.spatial.plus
 
 typealias BloomId = Long
 typealias BloomKey = String

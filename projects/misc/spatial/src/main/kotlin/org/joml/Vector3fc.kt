@@ -22,6 +22,8 @@
  */
 package org.joml
 
+import silentorb.mythic.spatial.Quaternionf
+import silentorb.mythic.spatial.Quaternionfc
 import silentorb.mythic.spatial.Vector3m
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer

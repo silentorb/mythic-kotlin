@@ -1,7 +1,7 @@
 package silentorb.mythic.characters
 
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld
-import org.joml.times
+import silentorb.mythic.spatial.times
 import silentorb.mythic.ent.Id
 import silentorb.mythic.ent.Table
 import silentorb.mythic.physics.*

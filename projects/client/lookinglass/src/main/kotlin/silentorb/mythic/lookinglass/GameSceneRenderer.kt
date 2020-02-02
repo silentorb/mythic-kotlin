@@ -9,7 +9,6 @@ import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 import org.joml.Vector2i
 import org.joml.Vector4i
-import org.joml.times
 import silentorb.mythic.lookinglass.drawing.armatureTransforms
 import silentorb.mythic.lookinglass.shading.Shaders
 

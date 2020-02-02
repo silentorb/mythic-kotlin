@@ -24,6 +24,7 @@ package org.joml.internal
 
 import silentorb.mythic.spatial.Vector3m
 import org.joml.*
+import silentorb.mythic.spatial.Quaternionf
 
 import java.io.IOException
 import java.lang.reflect.Field

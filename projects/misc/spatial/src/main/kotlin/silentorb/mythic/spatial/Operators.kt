@@ -1,9 +1,6 @@
-package org.joml
+package silentorb.mythic.spatial
 
-import silentorb.mythic.spatial.Quaternion
-import silentorb.mythic.spatial.Vector3m
-import silentorb.mythic.spatial.Vector3
-import silentorb.mythic.spatial.Vector4
+import org.joml.*
 
 
 /* Matrix3d */
@@ -76,16 +73,16 @@ infix fun Matrix4f.transformDirection(v: Vector3m) = transformDirection(v)
 
 /* Vector2f */
 
-operator fun Vector2f.get(e: Int): Float = get(e)
-operator fun Vector2f.minus(v: Vector2fc) = sub(v, Vector2f())
-operator fun Vector2f.minus(v: Vector2f) = Vector2f(x - v.x, y - v.y)
+//operator fun Vector2f.get(e: Int): Float = get(e)
+//operator fun Vector2f.minus(v: Vector2fc) = sub(v, Vector2f())
+//operator fun Vector2f.minus(v: Vector2f) = Vector2f(x - v.x, y - v.y)
 operator fun Vector2f.plus(v: Vector2fc) = add(v, Vector2f())
 operator fun Vector2f.plus(v: Float) = Vector2f(x + v, y + v)
 operator fun Vector2f.unaryMinus() = negate()
 operator fun Vector2f.div(v: Float) = Vector2f(x / v, y / v)
 operator fun Vector2f.div(v: Vector2f) = Vector2f(x / v.x, y / v.y)
 
-operator fun Vector2i.get(e: Int): Int = get(e)
+//operator fun Vector2i.get(e: Int): Int = get(e)
 operator fun Vector2i.minus(v: Vector2ic) = sub(v, Vector2i())
 operator fun Vector2i.minus(v: Vector2i) = Vector2i(x - v.x, y - v.y)
 operator fun Vector2i.plus(v: Vector2ic) = add(v, Vector2i())

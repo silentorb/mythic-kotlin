@@ -4,8 +4,8 @@ import silentorb.mythic.bloom.next.Box
 import silentorb.mythic.bloom.next.Flower
 import silentorb.mythic.bloom.next.Seed
 import org.joml.Vector2i
-import org.joml.minus
-import org.joml.plus
+import silentorb.mythic.spatial.minus
+import silentorb.mythic.spatial.plus
 
 typealias FixedChildArranger = (Vector2i) -> List<Bounds>
 typealias ParentFlower = (List<Flower>) -> Flower

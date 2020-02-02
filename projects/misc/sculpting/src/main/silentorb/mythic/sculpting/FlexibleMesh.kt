@@ -3,7 +3,7 @@ package silentorb.mythic.sculpting
 import silentorb.mythic.spatial.Vector3m
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.times
-import org.joml.plus
+import silentorb.mythic.spatial.plus
 
 class FlexibleEdge(
     var first: Vector3m,

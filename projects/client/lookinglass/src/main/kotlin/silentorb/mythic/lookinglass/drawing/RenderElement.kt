@@ -5,7 +5,6 @@ import silentorb.mythic.breeze.transformAnimatedSkeleton
 import silentorb.mythic.glowing.DrawMethod
 import silentorb.mythic.glowing.drawMesh
 import silentorb.mythic.spatial.*
-import org.joml.times
 import silentorb.mythic.lookinglass.*
 import silentorb.mythic.lookinglass.meshes.Primitive
 import silentorb.mythic.lookinglass.shading.ObjectShaderConfig

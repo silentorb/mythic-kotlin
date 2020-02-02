@@ -2,9 +2,8 @@ package silentorb.mythic.bloom.next
 
 import silentorb.mythic.bloom.*
 import org.joml.Vector2i
-import org.joml.minus
-import org.joml.plus
-import silentorb.mythic.bloom.*
+import silentorb.mythic.spatial.minus
+import silentorb.mythic.spatial.plus
 
 private val emptyBoxList: List<Box> = listOf()
 

@@ -26,6 +26,7 @@ import silentorb.mythic.spatial.Vector3
 import org.joml.internal.MemUtil
 import org.joml.internal.Options
 import org.joml.internal.Runtime
+import silentorb.mythic.spatial.Quaternionfc
 
 import java.io.Externalizable
 import java.io.IOException

@@ -3,7 +3,7 @@ package silentorb.mythic.sculpting
 import silentorb.mythic.spatial.BoundingBox
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector3m
-import org.joml.plus
+import silentorb.mythic.spatial.plus
 
 typealias EdgeExplorer = (EdgeReference) -> EdgeReference?
 

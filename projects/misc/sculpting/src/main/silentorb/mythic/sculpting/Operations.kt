@@ -1,7 +1,6 @@
 package silentorb.mythic.sculpting
 
 import silentorb.mythic.spatial.*
-import org.joml.unaryMinus
 
 typealias Vertices3m = List<Vector3m>
 typealias Edges3m = List<FlexibleEdge>

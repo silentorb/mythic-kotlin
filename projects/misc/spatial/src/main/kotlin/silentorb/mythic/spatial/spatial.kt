@@ -10,7 +10,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 typealias Vector4 = org.joml.Vector4f
-typealias Quaternion = org.joml.Quaternionf
+typealias Quaternion = Quaternionf
 typealias MutableMatrix = org.joml.Matrix4f
 
 private val initialQuaternion = Quaternion()
@@ -298,11 +298,11 @@ fun rotateToward(matrix: Matrix, dir: Vector3m): Matrix =
     else
       matrix.rotateTowards(dir, Vector3m(0f, 0f, 1f))
 
-fun rotateToward(dir: Vector3m): Quaternion =
-//    if (dir.x == 0f && dir.y == 0f)
-    Quaternion().rotateTo(Vector3m(1f, 0f, 0f), dir)
-//    else
-//      Quaternion().rotateTo(dir, Vector3m(0f, 0f, 1f))
+//fun rotateToward(dir: Vector3m): Quaternion =
+////    if (dir.x == 0f && dir.y == 0f)
+//    Quaternion().rotateTo(Vector3m(1f, 0f, 0f), dir)
+////    else
+////      Quaternion().rotateTo(dir, Vector3m(0f, 0f, 1f))
 
 fun sum(vertices: Collection<Vector3m>): Vector3m {
   var result = Vector3m()

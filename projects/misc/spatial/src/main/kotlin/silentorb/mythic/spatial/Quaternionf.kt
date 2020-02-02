@@ -20,11 +20,9 @@
  THE SOFTWARE.
 
  */
-package org.joml
+package silentorb.mythic.spatial
 
-import silentorb.mythic.spatial.Pi
-import silentorb.mythic.spatial.Vector3m
-import silentorb.mythic.spatial.Vector3
+import org.joml.*
 import org.joml.internal.MemUtil
 import org.joml.internal.Options
 import org.joml.internal.Runtime
@@ -215,44 +213,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#get(org.joml.Matrix3f)
-     */
-  override fun get(dest: Matrix3f): Matrix3f {
-    return dest.set(this)
-  }
-
-  /* (non-Javadoc)
-     * @see Quaternionfc#get(org.joml.Matrix3d)
-     */
-  override fun get(dest: Matrix3d): Matrix3d {
-    return dest.set(this)
-  }
-
-  /* (non-Javadoc)
      * @see Quaternionfc#get(Matrix4f)
      */
   override fun get(dest: Matrix4f): Matrix4f {
-    return dest.set(this)
-  }
-
-  /* (non-Javadoc)
-     * @see Quaternionfc#get(org.joml.Matrix4d)
-     */
-  override fun get(dest: Matrix4d): Matrix4d {
-    return dest.set(this)
-  }
-
-  /* (non-Javadoc)
-     * @see Quaternionfc#get(org.joml.Matrix4x3f)
-     */
-  override fun get(dest: Matrix4x3f): Matrix4x3f {
-    return dest.set(this)
-  }
-
-  /* (non-Javadoc)
-     * @see Quaternionfc#get(org.joml.Matrix4x3d)
-     */
-  override fun get(dest: Matrix4x3d): Matrix4x3d {
     return dest.set(this)
   }
 
@@ -284,13 +247,6 @@ class Quaternionf : Externalizable, Quaternionfc {
       dest.z = z * s
     }
     return dest
-  }
-
-  /* (non-Javadoc)
-     * @see Quaternionfc#get(org.joml.Quaterniond)
-     */
-  override fun get(dest: Quaterniond): Quaterniond {
-    return dest.set(this)
   }
 
   /**
@@ -2272,9 +2228,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   /* (non-Javadoc)
      * @see Quaternionfc#rotateTo(Vector3fc, Vector3fc, Quaternionf)
      */
-  override fun rotateTo(fromDir: Vector3fc, toDir: Vector3fc, dest: Quaternionf): Quaternionf {
-    return rotateTo(fromDir.x, fromDir.y, fromDir.z, toDir.x, toDir.y, toDir.z, dest)
-  }
+//  override fun rotateTo(fromDir: Vector3fc, toDir: Vector3fc, dest: Quaternionf): Quaternionf {
+//    return rotateTo(fromDir.x, fromDir.y, fromDir.z, toDir.x, toDir.y, toDir.z, dest)
+//  }
 
   /**
    * Apply a rotation to `this` that rotates the `fromDir` vector to point along `toDir`.
@@ -2295,9 +2251,9 @@ class Quaternionf : Externalizable, Quaternionfc {
    * the destination direction
    * @return this
    */
-  fun rotateTo(fromDir: Vector3fc, toDir: Vector3fc): Quaternionf {
-    return rotateTo(fromDir.x, fromDir.y, fromDir.z, toDir.x, toDir.y, toDir.z, this)
-  }
+//  fun rotateTo(fromDir: Vector3fc, toDir: Vector3fc): Quaternionf {
+//    return rotateTo(fromDir.x, fromDir.y, fromDir.z, toDir.x, toDir.y, toDir.z, this)
+//  }
 
   fun rotateTo(fromDir: Vector3, toDir: Vector3): Quaternionf {
     return rotateTo(fromDir.x, fromDir.y, fromDir.z, toDir.x, toDir.y, toDir.z, this)
