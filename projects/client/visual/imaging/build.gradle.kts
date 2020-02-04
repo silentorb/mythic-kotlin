@@ -3,7 +3,6 @@ plugins {
 }
 
 dependencies {
-  implementation("silentorb.imp.core:1.0")
   implementation("silentorb.imp.execution:1.0")
 }
 

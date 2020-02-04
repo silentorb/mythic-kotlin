@@ -28,13 +28,17 @@ fun allocateFloatBuffer(size: Int): FloatBuffer =
 //  mappedCache<Id, FloatBuffer> { id2 -> singleValueCache(::allocateFloatBuffer)(size) }(id)
 //}
 
-fun fillBuffer(depth: Int, dimensions: Vector2i, action: (FloatBuffer) -> Unit): FloatBuffer {
+fun fillBuffer(depth: Int, dimensions: Vector2i, action: (FloatBuffer) -> Unit): Bitmap {
 //  val buffer = BufferUtils.createFloatBuffer(dimensions.x * dimensions.y * depth)
 //  val buffer = bufferCache(id, dimensions.x * dimensions.y * depth)
   val buffer = allocateFloatBuffer(dimensions.x * dimensions.y * depth)
   action(buffer)
   buffer.rewind()
-  return buffer
+  return Bitmap(
+      dimensions = dimensions,
+      depth = depth,
+      buffer = buffer
+  )
 }
 
 data class BufferInfo<T>(
@@ -42,16 +46,27 @@ data class BufferInfo<T>(
     val setter: (FloatBuffer, T) -> Unit
 )
 
-fun <T> withBuffer(bufferInfo: BufferInfo<T>, function: (Arguments) -> (Float, Float) -> T): TextureFunction =
-    { dimensions ->
-      { arguments ->
-        fillBuffer(bufferInfo.depth, dimensions) { buffer ->
-          val getter = function(arguments)
-          for (y in 0 until dimensions.y) {
-            for (x in 0 until dimensions.x) {
-              val value = getter(x.toFloat() / dimensions.x, 1f - y.toFloat() / dimensions.y)
-              bufferInfo.setter(buffer, value)
-            }
+data class Bitmap(
+    val buffer: FloatBuffer,
+    val depth: Int,
+    val dimensions: Vector2i
+)
+
+fun <T> withBuffer(dimensionsField: String, bufferInfo: BufferInfo<T>, function: (Arguments) -> (Float, Float) -> T): FunctionImplementation =
+    { arguments ->
+      val dimensionsArgument = arguments[dimensionsField]!!
+      val dimensions: Vector2i = if (dimensionsArgument is Vector2i)
+        dimensionsArgument
+      else if (dimensionsArgument is Bitmap)
+        dimensionsArgument.dimensions
+      else throw Error("Invalid dimensions argument $dimensionsArgument")
+
+      fillBuffer(bufferInfo.depth, dimensions) { buffer ->
+        val getter = function(arguments)
+        for (y in 0 until dimensions.y) {
+          for (x in 0 until dimensions.x) {
+            val value = getter(x.toFloat() / dimensions.x, 1f - y.toFloat() / dimensions.y)
+            bufferInfo.setter(buffer, value)
           }
         }
       }
@@ -76,22 +91,22 @@ fun convertColor(value: Vector3): Vector3i =
         (value.z * 255).toInt()
     )
 
-val solidColor: TextureFunction = withBuffer(withBitmapBuffer) { arguments ->
+val solidColor: FunctionImplementation = withBuffer("dimensions", withBitmapBuffer) { arguments ->
   val color = arguments["color"]!! as SolidColor
   { _, _ -> color }
 }
 
-val coloredCheckers: TextureFunction = withBuffer(withBitmapBuffer) { arguments ->
+val coloredCheckers: FunctionImplementation = withBuffer("dimensions", withBitmapBuffer) { arguments ->
   val first = arguments["firstColor"]!! as SolidColor
   val second = arguments["secondColor"]!! as SolidColor
   checkerPattern(first, second)
 }
 
-val grayscaleCheckers: TextureFunction = withBuffer(withGrayscaleBuffer) { arguments ->
+val grayscaleCheckers: FunctionImplementation = withBuffer("dimensions", withGrayscaleBuffer) { arguments ->
   checkerOp(0f, 1f)
 }
 
-val colorize: TextureFunction = withBuffer(withBitmapBuffer) { arguments ->
+val colorize: FunctionImplementation = withBuffer("grayscale", withBitmapBuffer) { arguments ->
   val grayscale = arguments["grayscale"]!! as FloatBuffer
   grayscale.rewind()
   val first = arguments["firstColor"]!! as SolidColor
@@ -103,12 +118,12 @@ val colorize: TextureFunction = withBuffer(withBitmapBuffer) { arguments ->
 }
 
 fun floatBufferArgument(arguments: Arguments, name: String): FloatBuffer {
-  val result = arguments[name]!! as FloatBuffer
-  result.rewind()
-  return result
+  val result = arguments[name]!! as Bitmap
+  result.buffer.rewind()
+  return result.buffer
 }
 
-val maskOperator: TextureFunction = withBuffer(withBitmapBuffer) { arguments ->
+val maskOperator: FunctionImplementation = withBuffer("first", withBitmapBuffer) { arguments ->
   val first = floatBufferArgument(arguments, "first")
   val second = floatBufferArgument(arguments, "second")
   val mask = floatBufferArgument(arguments, "mask")
@@ -119,7 +134,7 @@ val maskOperator: TextureFunction = withBuffer(withBitmapBuffer) { arguments ->
   }
 }
 
-val mixBitmaps: TextureFunction = withBuffer(withBitmapBuffer) { arguments ->
+val mixBitmaps: FunctionImplementation = withBuffer("first", withBitmapBuffer) { arguments ->
   val degree = arguments["degree"]!! as Float
   val first = floatBufferArgument(arguments, "first")
   val second = floatBufferArgument(arguments, "second")
@@ -129,19 +144,19 @@ val mixBitmaps: TextureFunction = withBuffer(withBitmapBuffer) { arguments ->
   }
 }
 
-val mixGrayscales: TextureFunction = withBuffer(withGrayscaleBuffer) { arguments ->
-  val weights = arguments["weights"]!! as List<Float>
-  val buffers = weights.mapIndexed { index, value ->
-    Pair(floatBufferArgument(arguments, (index + 1).toString()), value)
-  }
-//  val first = floatBufferArgument(arguments, "first")
-//  val second = floatBufferArgument(arguments, "second")
-  val k = 0
-  { x, y ->
-    buffers.fold(0f) { a, b -> a + b.first.get() * b.second }
-//    first.get() * (1f - degrees) + second.get() * degrees
-  }
-}
+//val mixGrayscales: FunctionImplementation = withBuffer(withGrayscaleBuffer) { arguments ->
+//  val weights = arguments["weights"]!! as List<Float>
+//  val buffers = weights.mapIndexed { index, value ->
+//    Pair(floatBufferArgument(arguments, (index + 1).toString()), value)
+//  }
+////  val first = floatBufferArgument(arguments, "first")
+////  val second = floatBufferArgument(arguments, "second")
+//  val k = 0
+//  { x, y ->
+//    buffers.fold(0f) { a, b -> a + b.first.get() * b.second }
+////    first.get() * (1f - degrees) + second.get() * degrees
+//  }
+//}
 
 //val noiseSource = OpenSimplexNoiseKotlin(1)
 
@@ -150,7 +165,7 @@ val mixGrayscales: TextureFunction = withBuffer(withGrayscaleBuffer) { arguments
 //      noiseSource.eval(x * scale, y * scale)
 //    }
 
-val simpleNoiseOperator: TextureFunction = withBuffer(withGrayscaleBuffer) { arguments ->
+val simpleNoiseOperator: FunctionImplementation = withBuffer("dimensions", withGrayscaleBuffer) { arguments ->
   val offset = arguments["offset"]!! as Int
   val periods = arguments["periods"]!! as Int
   val grid = dotGridGradient(periods, offset)
@@ -161,7 +176,7 @@ val simpleNoiseOperator: TextureFunction = withBuffer(withGrayscaleBuffer) { arg
   }
 }
 
-val voronoiBoundaryOperator: TextureFunction = withBuffer(withGrayscaleBuffer) { arguments ->
+val voronoiBoundaryOperator: FunctionImplementation = withBuffer("dimensions", withGrayscaleBuffer) { arguments ->
   val dice = Dice(1)
   val length = 10
   val grid = newAnchorGrid(dice, length, 10)
@@ -179,7 +194,7 @@ private val textureFunctions = mapOf(
     "solidColor" to solidColor,
     "mask" to maskOperator,
     "mixBitmaps" to mixBitmaps,
-    "mixGrayscales" to mixGrayscales,
+//    "mixGrayscales" to mixGrayscales,
     "perlinNoise" to simpleNoiseOperator,
     "voronoiBoundaries" to voronoiBoundaryOperator
 )
@@ -193,6 +208,7 @@ val transparentColorKey = PathKey(texturingPath, "TransparentColor")
 val solidColorBitmapKey = PathKey(texturingPath, "SolidColorBitmap")
 val transparentColorBitmapKey = PathKey(texturingPath, "TransparentColorBitmap")
 val grayscaleBitmapKey = PathKey(texturingPath, "GrayscaleBitmap")
+val dimensionsKey = PathKey(texturingPath, "Dimensions")
 
 // Function Keys
 val coloredCheckersKey = PathKey(texturingPath, "coloredCheckers")
@@ -205,53 +221,56 @@ val mixGrayscalesKey = PathKey(texturingPath, "mixGrayscales")
 val perlinNoiseKey = PathKey(texturingPath, "perlinNoise")
 val voronoiBoundariesKey = PathKey(texturingPath, "voronoiBoundaries")
 
-fun completeTexturingFunctions(size: Vector2i) = listOf(
+fun completeTexturingFunctions() = listOf(
     CompleteFunction(
         path = coloredCheckersKey,
-        signature = listOf(solidColorKey, solidColorKey, solidColorBitmapKey),
-        parameters = listOf("firstColor", "secondColor"),
-        implementation = coloredCheckers(size)
+        signature = listOf(dimensionsKey, solidColorKey, solidColorKey, solidColorBitmapKey),
+        parameters = listOf("dimensions", "firstColor", "secondColor"),
+        implementation = coloredCheckers
     ),
     CompleteFunction(
         path = fromSolidColorKey,
-        signature = listOf(solidColorKey, solidColorBitmapKey),
-        parameters = listOf("color"),
-        implementation = solidColor(size)
+        signature = listOf(dimensionsKey, solidColorKey, solidColorBitmapKey),
+        parameters = listOf("dimensions", "color"),
+        implementation = solidColor
     ),
     CompleteFunction(
         path = colorizeKey,
         signature = listOf(grayscaleBitmapKey, solidColorKey, solidColorKey),
         parameters = listOf("grayscale", "firstColor", "secondColor"),
-        implementation = colorize(size)
+        implementation = colorize
     ),
     CompleteFunction(
         path = checkersKey,
-        signature = listOf(solidColorBitmapKey),
-        parameters = listOf(),
-        implementation = grayscaleCheckers(size)
+        signature = listOf(dimensionsKey, solidColorBitmapKey),
+        parameters = listOf("dimensions"),
+        implementation = grayscaleCheckers
     ),
     CompleteFunction(
         path = maskKey,
         signature = listOf(solidColorBitmapKey, solidColorBitmapKey, grayscaleBitmapKey, solidColorBitmapKey),
         parameters = listOf("first", "second", "mask"),
-        implementation = maskOperator(size)
+        implementation = maskOperator
     ),
     CompleteFunction(
         path = mixBitmapsKey,
         signature = listOf(floatKey, solidColorBitmapKey, solidColorBitmapKey, solidColorBitmapKey),
         parameters = listOf("degree", "first", "second"),
-        implementation = mixBitmaps(size)
+        implementation = mixBitmaps
     ),
     CompleteFunction(
         path = perlinNoiseKey,
-        signature = listOf(intKey, intKey, grayscaleBitmapKey),
-        parameters = listOf("offset", "periods"),
-        implementation = simpleNoiseOperator(size)
+        signature = listOf(dimensionsKey, intKey, intKey, grayscaleBitmapKey),
+        parameters = listOf("dimensions", "offset", "periods"),
+        implementation = simpleNoiseOperator
     ),
     CompleteFunction(
         path = voronoiBoundariesKey,
-        signature = listOf(grayscaleBitmapKey),
-        parameters = listOf(),
-        implementation = voronoiBoundaryOperator(size)
+        signature = listOf(dimensionsKey, grayscaleBitmapKey),
+        parameters = listOf("dimensions"),
+        implementation = voronoiBoundaryOperator
     )
 )
+
+fun texturingFunctions() =
+    partitionFunctions(completeTexturingFunctions())
