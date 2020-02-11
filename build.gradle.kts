@@ -1,5 +1,5 @@
 plugins {
-  kotlin("jvm") version Versions.kotlin
+  kotlin("jvm") version Versions.kotlin apply false
 }
 
 allprojects {
@@ -9,5 +9,15 @@ allprojects {
   repositories {
     jcenter()
     mavenCentral()
+  }
+
+}
+
+subprojects {
+  apply(plugin = "org.jetbrains.kotlin.jvm")
+
+  dependencies {
+    val implementation by configurations
+    implementation(kotlin("stdlib"))
   }
 }
