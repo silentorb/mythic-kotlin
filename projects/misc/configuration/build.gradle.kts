@@ -1,7 +1,6 @@
 plugins {
     kotlin("jvm")
 }
-apply(from = "${rootProject.projectDir}/build_kotlin.gradle")
 
 dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.9.9.3")

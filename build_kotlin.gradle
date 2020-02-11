@@ -1,0 +1,44 @@
+buildscript {
+//  val kotlinVersion = "1.3.61"
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+  }
+  dependencies {
+//    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+  }
+
+}
+apply plugin: "idea"
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+apply plugin: 'kotlin'
+
+sourceSets {
+  main.kotlin.srcDirs += file('src/main').exists() ? (file('src/main/kotlin').exists() ? 'src/main/kotlin' : 'src/main'): 'src'
+  test.kotlin.srcDirs += 'src/test'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}"
+}
+
+compileKotlin {
+  kotlinOptions.jvmTarget = sourceCompatibility
+}
+
+compileTestKotlin {
+  kotlinOptions.jvmTarget = sourceCompatibility
+}
+
+//buildDir = new File(rootProject.projectDir, "build/" + project.name)

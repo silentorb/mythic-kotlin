@@ -2,7 +2,6 @@ package silentorb.mythic.lookinglass.meshes.loading
 
 import silentorb.mythic.breeze.*
 import silentorb.mythic.spatial.Vector3
-import silentorb.mythic.breeze.*
 import silentorb.mythic.lookinglass.AnimationMap
 import silentorb.mythic.lookinglass.Armature
 import silentorb.mythic.lookinglass.SocketMap

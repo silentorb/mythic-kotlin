@@ -1,4 +1,4 @@
-apply(from = "${rootProject.projectDir}/build_kotlin.gradle")
+plugins { kotlin("jvm") }
 
 if (file("debug.txt").exists())
   requires(project, "debugging_debug")

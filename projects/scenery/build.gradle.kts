@@ -1,5 +1,3 @@
-plugins {
-  kotlin("jvm")
-}
+plugins { kotlin("jvm") }
 
 requires(project, "spatial")

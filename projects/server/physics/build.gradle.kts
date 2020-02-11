@@ -2,8 +2,6 @@ plugins {
   kotlin("jvm")
 }
 
-apply(from = "${rootProject.projectDir}/build_kotlin.gradle")
-
 requires(project, "ent", "spatial", "scenery", "sculpting")
 
 dependencies {

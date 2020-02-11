@@ -2,8 +2,6 @@ plugins {
     kotlin("jvm")
 }
 
-apply(from = "${rootProject.projectDir}/build_kotlin.gradle")
-
 dependencies {
     api("org.lwjgl:lwjgl:${Versions.lwjgl}")
     api("org.lwjgl:lwjgl:${Versions.lwjgl}:${Natives.lwjgl}")

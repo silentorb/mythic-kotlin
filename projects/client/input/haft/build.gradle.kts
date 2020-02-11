@@ -1,4 +1,4 @@
 
-apply(from = "${rootProject.projectDir}/build_kotlin.gradle")
+plugins { kotlin("jvm") }
 
 requires(project, "platforming", "spatial", "ent", "debugging")
