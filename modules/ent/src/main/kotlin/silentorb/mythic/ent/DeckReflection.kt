@@ -51,9 +51,9 @@ fun <Deck : Any, Hand : Any> genericRemoveEntities(deckReflection: DeckReflectio
 
 fun <Deck : Any, Hand : Any> genericMergeDecks(deckReflection: DeckReflection<Deck, Hand>): (Deck, Deck) -> Deck = { first, second ->
   val additions = deckReflection.deckProperties.map { property ->
-    val first = property.get(first) as Table<Any>
-    val second = property.get(second) as Table<Any>
-    first.plus(second)
+    val a = property.get(first) as Table<Any>
+    val b = property.get(second) as Table<Any>
+    a.plus(b)
   }
   newReflectedDeck(deckReflection.deckConstructor, additions)
 }
@@ -72,7 +72,7 @@ fun <T> nullableList(id: Id, entity: T?): Table<T> =
 
 fun <Deck : Any, Hand : Any> genericHandToDeck(deckReflection: DeckReflection<Deck, Hand>): (Id, Hand) -> Deck = { id, hand ->
   val additions = deckReflection.handProperties.map { property ->
-    val value = property.get(hand) as Any?
+    val value = property.get(hand)
     nullableList(id, value)
   }
   newReflectedDeck(deckReflection.deckConstructor, additions)
@@ -81,7 +81,7 @@ fun <Deck : Any, Hand : Any> genericHandToDeck(deckReflection: DeckReflection<De
 fun <Deck : Any, Hand : Any> genericHandToDeckWithIdSource(deckReflection: DeckReflection<Deck, Hand>): (IdSource, Hand) -> Deck = { nextId, hand ->
   val id = nextId()
   val additions = deckReflection.handProperties.map { property ->
-    val value = property.get(hand) as Any?
+    val value = property.get(hand)
     nullableList(id, value)
   }
   val deck = newReflectedDeck(deckReflection.deckConstructor, additions)

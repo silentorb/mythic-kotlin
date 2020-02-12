@@ -23,6 +23,7 @@
 package org.joml
 
 import silentorb.mythic.spatial.Vector3m
+import silentorb.mythic.spatial.Vector4
 
 /**
  * Contains intersection and distance tests for some 2D and 3D geometric primitives.
@@ -240,7 +241,7 @@ object Intersectionf {
   fun intersectPlaneSphere(
       a: Float, b: Float, c: Float, d: Float,
       centerX: Float, centerY: Float, centerZ: Float, radius: Float,
-      intersectionCenterAndRadius: Vector4f): Boolean {
+      intersectionCenterAndRadius: Vector4): Boolean {
     val invDenom = 1.0f / Math.sqrt((a * a + b * b + c * c).toDouble()).toFloat()
     val dist = (a * centerX + b * centerY + c * centerZ + d) * invDenom
     if (-radius <= dist && dist <= radius) {
@@ -294,7 +295,7 @@ object Intersectionf {
       a: Float, b: Float, c: Float, d: Float,
       cX: Float, cY: Float, cZ: Float, radius: Float,
       vX: Float, vY: Float, vZ: Float,
-      pointAndTime: Vector4f): Boolean {
+      pointAndTime: Vector4): Boolean {
     // Compute distance of sphere center to plane
     val dist = a * cX + b * cY + c * cZ - d
     if (Math.abs(dist) <= radius) {
@@ -785,7 +786,7 @@ object Intersectionf {
   fun intersectSphereSphere(
       aX: Float, aY: Float, aZ: Float, radiusSquaredA: Float,
       bX: Float, bY: Float, bZ: Float, radiusSquaredB: Float,
-      centerAndRadiusOfIntersectionCircle: Vector4f): Boolean {
+      centerAndRadiusOfIntersectionCircle: Vector4): Boolean {
     val dX = bX - aX
     val dY = bY - aY
     val dZ = bZ - aZ
@@ -825,7 +826,7 @@ object Intersectionf {
    * will hold the center of the circle of intersection in the <tt>(x, y, z)</tt> components and the radius in the w component
    * @return `true` iff both spheres intersect; `false` otherwise
    */
-  fun intersectSphereSphere(centerA: Vector3fc, radiusSquaredA: Float, centerB: Vector3fc, radiusSquaredB: Float, centerAndRadiusOfIntersectionCircle: Vector4f): Boolean {
+  fun intersectSphereSphere(centerA: Vector3fc, radiusSquaredA: Float, centerB: Vector3fc, radiusSquaredB: Float, centerAndRadiusOfIntersectionCircle: Vector4): Boolean {
     return intersectSphereSphere(centerA.x, centerA.y, centerA.z, radiusSquaredA, centerB.x, centerB.y, centerB.z, radiusSquaredB, centerAndRadiusOfIntersectionCircle)
   }
 
@@ -847,7 +848,7 @@ object Intersectionf {
    * will hold the center of the circle of intersection in the <tt>(x, y, z)</tt> components and the radius in the w component
    * @return `true` iff both spheres intersect; `false` otherwise
    */
-  fun intersectSphereSphere(sphereA: Spheref, sphereB: Spheref, centerAndRadiusOfIntersectionCircle: Vector4f): Boolean {
+  fun intersectSphereSphere(sphereA: Spheref, sphereB: Spheref, centerAndRadiusOfIntersectionCircle: Vector4): Boolean {
     return intersectSphereSphere(sphereA.x, sphereA.y, sphereA.z, sphereA.r * sphereA.r, sphereB.x, sphereB.y, sphereB.z, sphereB.r * sphereB.r, centerAndRadiusOfIntersectionCircle)
   }
 
@@ -1911,7 +1912,7 @@ object Intersectionf {
 //  fun intersectSweptSphereTriangle(
 //      centerX: Float, centerY: Float, centerZ: Float, radius: Float, velX: Float, velY: Float, velZ: Float,
 //      v0X: Float, v0Y: Float, v0Z: Float, v1X: Float, v1Y: Float, v1Z: Float, v2X: Float, v2Y: Float, v2Z: Float,
-//      epsilon: Float, maxT: Float, pointAndTime: Vector4f): Int {
+//      epsilon: Float, maxT: Float, pointAndTime: Vector4): Int {
 //    val v10X = v1X - v0X
 //    val v10Y = v1Y - v0Y
 //    val v10Z = v1Z - v0Z

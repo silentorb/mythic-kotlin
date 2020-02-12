@@ -323,7 +323,7 @@ interface Quaternionfc {
    * will hold the result
    * @return dest
    */
-  fun transformPositiveX(dest: Vector4f): Vector4f
+  fun transformPositiveX(dest: Vector4): Vector4
 
   /**
    * Transform the vector <tt>(1, 0, 0)</tt> by this unit quaternion.
@@ -356,7 +356,7 @@ interface Quaternionfc {
    * will hold the result
    * @return dest
    */
-  fun transformUnitPositiveX(dest: Vector4f): Vector4f
+  fun transformUnitPositiveX(dest: Vector4): Vector4
 
   /**
    * Transform the vector <tt>(0, 1, 0)</tt> by this quaternion.
@@ -377,7 +377,7 @@ interface Quaternionfc {
    * will hold the result
    * @return dest
    */
-  fun transformPositiveY(dest: Vector4f): Vector4f
+  fun transformPositiveY(dest: Vector4): Vector4
 
   /**
    * Transform the vector <tt>(0, 1, 0)</tt> by this unit quaternion.
@@ -410,7 +410,7 @@ interface Quaternionfc {
    * will hold the result
    * @return dest
    */
-  fun transformUnitPositiveY(dest: Vector4f): Vector4f
+  fun transformUnitPositiveY(dest: Vector4): Vector4
 
   /**
    * Transform the vector <tt>(0, 0, 1)</tt> by this quaternion.
@@ -431,7 +431,7 @@ interface Quaternionfc {
    * will hold the result
    * @return dest
    */
-  fun transformPositiveZ(dest: Vector4f): Vector4f
+  fun transformPositiveZ(dest: Vector4): Vector4
 
   /**
    * Transform the vector <tt>(0, 0, 1)</tt> by this unit quaternion.
@@ -464,7 +464,7 @@ interface Quaternionfc {
    * will hold the result
    * @return dest
    */
-  fun transformUnitPositiveZ(dest: Vector4f): Vector4f
+  fun transformUnitPositiveZ(dest: Vector4): Vector4
 
   /**
    * Transform the given vector by this quaternion.
@@ -477,7 +477,7 @@ interface Quaternionfc {
    * the vector to transform
    * @return vec
    */
-  fun transform(vec: Vector4f): Vector4f
+  fun transform(vec: Vector4): Vector4
 
   /**
    * Transform the given vector by this quaternion and store the result in `dest`.
@@ -520,7 +520,7 @@ interface Quaternionfc {
    * will hold the result
    * @return dest
    */
-  fun transform(vec: Vector4fc, dest: Vector4f): Vector4f
+  fun transform(vec: Vector4c, dest: Vector4): Vector4
 
   /**
    * Transform the given vector <tt>(x, y, z)</tt> by this quaternion and store the result in `dest`.
@@ -536,7 +536,7 @@ interface Quaternionfc {
    * will hold the result
    * @return dest
    */
-  fun transform(x: Float, y: Float, z: Float, dest: Vector4f): Vector4f
+  fun transform(x: Float, y: Float, z: Float, dest: Vector4): Vector4
 
   /**
    * Invert this quaternion and store the [normalized][.normalize] result in `dest`.

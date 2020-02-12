@@ -43,12 +43,12 @@ operator fun Matrix4f.minus(m: Matrix4f) = sub(m)
 operator fun Matrix4f.plus(m: Matrix4fc) = add(m)
 operator fun Matrix4f.times(m: Matrix4fc) = Matrix4f(this).mul(m)
 operator fun Matrix4f.times(m: Matrix4x3fc) = mul(m, this)
-operator fun Matrix4f.times(v: Vector4f) = transform(v)
+operator fun Matrix4f.times(v: Vector4) = transform(v)
 operator fun Matrix4f.times(q: Quaternionfc) = rotate(q)
 infix fun Matrix4f.mulAffine(m: Matrix4fc) = this.mulAffine(m)
 infix fun Matrix4f.mulAffineR(m: Matrix4fc) = this.mulAffineR(m)
 infix fun Matrix4f.rotate(q: Quaternionfc) = rotate(q)
-infix fun Matrix4f.transform(v: Vector4f) = transform(v)
+infix fun Matrix4f.transform(v: Vector4) = transform(v)
 infix fun Matrix4f.transformPosition(v: Vector3m) = transformPosition(v)
 infix fun Matrix4f.transformDirection(v: Vector3m) = transformDirection(v)
 
@@ -131,20 +131,20 @@ fun Vector4.toVector4i() = Vector4i(x.toInt(), y.toInt(), z.toInt(), w.toInt())
 //operator fun Vector3d.plus(v: Vector3dc) = add(v)
 //operator fun Vector3d.unaryMinus() = negate()
 
-/* Vector4f */
+/* Vector4 */
 
-//operator fun Vector4f.get(e: Int): Float = get(e)
-operator fun Vector4f.minus(v: Vector4fc) = sub(v)
+//operator fun Vector4.get(e: Int): Float = get(e)
+operator fun Vector4.minus(v: Vector4c) = sub(v)
 
-operator fun Vector4f.plus(v: Vector4fc) = add(v)
-operator fun Vector4f.unaryMinus() = negate()
+operator fun Vector4.plus(v: Vector4c) = add(v)
+operator fun Vector4.unaryMinus() = negate()
 
 /* Vector4d */
 
 //operator fun Vector4d.get(e: Int): Double = get(e)
-//operator fun Vector4d.minus(v: Vector4fc) = sub(v)
+//operator fun Vector4d.minus(v: Vector4c) = sub(v)
 //operator fun Vector4d.minus(v: Vector4dc) = sub(v)
-//operator fun Vector4d.plus(v: Vector4fc) = add(v)
+//operator fun Vector4d.plus(v: Vector4c) = add(v)
 //operator fun Vector4d.plus(v: Vector4dc) = add(v)
 //operator fun Vector4d.unaryMinus() = negate()
 
@@ -156,7 +156,7 @@ operator fun Quaternionf.unaryMinus() = conjugate()
 operator fun Quaternionf.times(v: Vector3m) = transform(v, Vector3m())
 operator fun Quaternionf.times(v: Vector3) = Vector3(transform(v, Vector3m()))
 operator fun Quaternionf.times(q: Quaternionf) = mul(q, Quaternion())
-//operator fun Quaternionf.times(v: Vector4f) = transform(v)
+//operator fun Quaternionf.times(v: Vector4) = transform(v)
 
 /* Quaterniond */
 

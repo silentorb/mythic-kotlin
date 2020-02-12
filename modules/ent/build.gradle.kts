@@ -2,9 +2,6 @@ plugins {
   kotlin("jvm") version "1.3.61"
 }
 
-//dependencies {
-//  implementation(kotlin("stdlib"))
-//}
 group = "silentorb.mythic"
 
 repositories {
@@ -13,6 +10,15 @@ repositories {
 }
 
 dependencies {
+  implementation(kotlin("stdlib-jdk8"))
   implementation("org.jetbrains.kotlin:kotlin-reflect")
 }
-//project.dependencies.add("implementation", "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
+
+tasks {
+  compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+  }
+  compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+  }
+}

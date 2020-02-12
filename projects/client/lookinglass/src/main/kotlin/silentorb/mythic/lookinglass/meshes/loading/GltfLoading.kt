@@ -1,7 +1,7 @@
 package silentorb.mythic.lookinglass.meshes.loading
 
 import silentorb.mythic.spatial.Vector3
-import org.joml.Vector4f
+import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.lookinglass.Armature
 import silentorb.mythic.lookinglass.Material
 import silentorb.mythic.lookinglass.ModelMesh
@@ -56,7 +56,7 @@ fun gatherChildLights(info: GltfInfo, node: Node): List<Light> {
         val light = lights[lightIndex]
         Light(
             type = LightType.values().first { it.name == light.type.name },
-            color = Vector4f(light.color, light.intensity / 100f),
+            color = Vector4(light.color, light.intensity / 100f),
             offset = childNode.translation ?: Vector3.zero,
             direction = null,
             range = light.range

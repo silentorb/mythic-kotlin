@@ -14,7 +14,7 @@ fun mulAffine(matrix: Matrix, vector: Vector4): Vector4 {
   return Vector4(rx, ry, rz, vector.w)
 }
 
-private fun mulGeneric(matrix: Matrix, vector: Vector4): Vector4f {
+private fun mulGeneric(matrix: Matrix, vector: Vector4): Vector4 {
   val rx = matrix.m00 * vector.x + matrix.m10 * vector.y + matrix.m20 * vector.z + matrix.m30 * vector.w
   val ry = matrix.m01 * vector.x + matrix.m11 * vector.y + matrix.m21 * vector.z + matrix.m31 * vector.w
   val rz = matrix.m02 * vector.x + matrix.m12 * vector.y + matrix.m22 * vector.z + matrix.m32 * vector.w
@@ -631,7 +631,7 @@ data class Matrix(
   }
 
   operator fun times(m: Matrix) = mul(m)
-  operator fun times(v: Vector4f) = transform(v)
+  operator fun times(v: Vector4) = transform(v)
 }
 
 fun writeMatrixToBuffer(buffer: ByteBuffer, matrix: Matrix) {

@@ -1083,7 +1083,7 @@ class Quaternionf : Externalizable, Quaternionfc {
     return dest
   }
 
-  override fun transformPositiveX(dest: Vector4f): Vector4f {
+  override fun transformPositiveX(dest: Vector4): Vector4 {
     val w2 = this.w * this.w
     val x2 = this.x * this.x
     val y2 = this.y * this.y
@@ -1111,7 +1111,7 @@ class Quaternionf : Externalizable, Quaternionfc {
     return dest
   }
 
-  override fun transformUnitPositiveX(dest: Vector4f): Vector4f {
+  override fun transformUnitPositiveX(dest: Vector4): Vector4 {
     val y2 = y * y
     val z2 = z * z
     val xy = x * y
@@ -1139,7 +1139,7 @@ class Quaternionf : Externalizable, Quaternionfc {
     return dest
   }
 
-  override fun transformPositiveY(dest: Vector4f): Vector4f {
+  override fun transformPositiveY(dest: Vector4): Vector4 {
     val w2 = this.w * this.w
     val x2 = this.x * this.x
     val y2 = this.y * this.y
@@ -1154,7 +1154,7 @@ class Quaternionf : Externalizable, Quaternionfc {
     return dest
   }
 
-  override fun transformUnitPositiveY(dest: Vector4f): Vector4f {
+  override fun transformUnitPositiveY(dest: Vector4): Vector4 {
     val x2 = x * x
     val z2 = z * z
     val xy = x * y
@@ -1195,7 +1195,7 @@ class Quaternionf : Externalizable, Quaternionfc {
     return dest
   }
 
-  override fun transformPositiveZ(dest: Vector4f): Vector4f {
+  override fun transformPositiveZ(dest: Vector4): Vector4 {
     val w2 = this.w * this.w
     val x2 = this.x * this.x
     val y2 = this.y * this.y
@@ -1210,7 +1210,7 @@ class Quaternionf : Externalizable, Quaternionfc {
     return dest
   }
 
-  override fun transformUnitPositiveZ(dest: Vector4f): Vector4f {
+  override fun transformUnitPositiveZ(dest: Vector4): Vector4 {
     val x2 = x * x
     val y2 = y * y
     val xz = x * z
@@ -1237,9 +1237,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#transform(Vector4f)
+     * @see Quaternionfc#transform(Vector4)
      */
-  override fun transform(vec: Vector4f): Vector4f {
+  override fun transform(vec: Vector4): Vector4 {
     return transform(vec, vec)
   }
 
@@ -1313,16 +1313,16 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#transform(Vector4fc, Vector4f)
+     * @see Quaternionfc#transform(Vector4c, Vector4)
      */
-  override fun transform(vec: Vector4fc, dest: Vector4f): Vector4f {
+  override fun transform(vec: Vector4c, dest: Vector4): Vector4 {
     return transform(vec.x, vec.y, vec.z, dest)
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#transform(float, float, float, Vector4f)
+     * @see Quaternionfc#transform(float, float, float, Vector4)
      */
-  override fun transform(x: Float, y: Float, z: Float, dest: Vector4f): Vector4f {
+  override fun transform(x: Float, y: Float, z: Float, dest: Vector4): Vector4 {
     val w2 = this.w * this.w
     val x2 = this.x * this.x
     val y2 = this.y * this.y

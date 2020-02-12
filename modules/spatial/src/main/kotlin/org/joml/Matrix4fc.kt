@@ -25,6 +25,7 @@ package org.joml
 import silentorb.mythic.spatial.Quaternionf
 import silentorb.mythic.spatial.Quaternionfc
 import silentorb.mythic.spatial.Vector3m
+import silentorb.mythic.spatial.Vector4
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 
@@ -1056,24 +1057,24 @@ import java.nio.FloatBuffer
 /**
  * Transform/multiply the given vector by this matrix and store the result in that vector.
  *
- * @see Vector4f.mul
+ * @see Vector4.mul
  * @param v
  * the vector to transform and to hold the final result
  * @return v
  */
-     fun transform(v:Vector4f):Vector4f
+     fun transform(v: Vector4): Vector4
 
 /**
  * Transform/multiply the given vector by this matrix and store the result in `dest`.
  *
- * @see Vector4f.mul
+ * @see Vector4.mul
  * @param v
  * the vector to transform
  * @param dest
  * will contain the result
  * @return dest
  */
-     fun transform(v:Vector4fc, dest:Vector4f):Vector4f
+     fun transform(v:Vector4c, dest: Vector4): Vector4
 
 /**
  * Transform/multiply the vector <tt>(x, y, z, w)</tt> by this matrix and store the result in `dest`.
@@ -1090,29 +1091,29 @@ import java.nio.FloatBuffer
  * will contain the result
  * @return dest
  */
-     fun transform(x:Float, y:Float, z:Float, w:Float, dest:Vector4f):Vector4f
+     fun transform(x:Float, y:Float, z:Float, w:Float, dest: Vector4): Vector4
 
 /**
  * Transform/multiply the given vector by this matrix, perform perspective divide and store the result in that vector.
  *
- * @see Vector4f.mulProject
+ * @see Vector4.mulProject
  * @param v
  * the vector to transform and to hold the final result
  * @return v
  */
-     fun transformProject(v:Vector4f):Vector4f
+     fun transformProject(v: Vector4): Vector4
 
 /**
  * Transform/multiply the given vector by this matrix, perform perspective divide and store the result in `dest`.
  *
- * @see Vector4f.mulProject
+ * @see Vector4.mulProject
  * @param v
  * the vector to transform
  * @param dest
  * will contain the result
  * @return dest
  */
-     fun transformProject(v:Vector4fc, dest:Vector4f):Vector4f
+     fun transformProject(v:Vector4c, dest: Vector4): Vector4
 
 /**
  * Transform/multiply the vector <tt>(x, y, z, w)</tt> by this matrix, perform perspective divide and store the result in `dest`.
@@ -1129,7 +1130,7 @@ import java.nio.FloatBuffer
  * will contain the result
  * @return dest
  */
-     fun transformProject(x:Float, y:Float, z:Float, w:Float, dest:Vector4f):Vector4f
+     fun transformProject(x:Float, y:Float, z:Float, w:Float, dest: Vector4): Vector4
 
 /**
  * Transform/multiply the given vector by this matrix, perform perspective divide and store the result in that vector.
@@ -1326,7 +1327,7 @@ import java.nio.FloatBuffer
  * the vector to transform and to hold the final result
  * @return v
  */
-     fun transformAffine(v:Vector4f):Vector4f
+     fun transformAffine(v: Vector4): Vector4
 
 /**
  * Transform/multiply the given 4D-vector by assuming that `this` matrix represents an [affine][.isAffine] transformation
@@ -1342,7 +1343,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun transformAffine(v:Vector4fc, dest:Vector4f):Vector4f
+     fun transformAffine(v:Vector4c, dest: Vector4): Vector4
 
 /**
  * Transform/multiply the 4D-vector <tt>(x, y, z, w)</tt> by assuming that `this` matrix represents an [affine][.isAffine] transformation
@@ -1360,7 +1361,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun transformAffine(x:Float, y:Float, z:Float, w:Float, dest:Vector4f):Vector4f
+     fun transformAffine(x:Float, y:Float, z:Float, w:Float, dest: Vector4): Vector4
 
 /**
  * Apply scaling to `this` matrix by scaling the base axes by the given <tt>xyz.x</tt>,
@@ -3261,7 +3262,7 @@ import java.nio.FloatBuffer
  * will hold the unprojected position
  * @return dest
  */
-     fun unproject(winX:Float, winY:Float, winZ:Float, viewport:IntArray, dest:Vector4f):Vector4f
+     fun unproject(winX:Float, winY:Float, winZ:Float, viewport:IntArray, dest: Vector4): Vector4
 
 /**
  * Unproject the given window coordinates <tt>(winX, winY, winZ)</tt> by `this` matrix using the specified viewport.
@@ -3320,7 +3321,7 @@ import java.nio.FloatBuffer
  * will hold the unprojected position
  * @return dest
  */
-     fun unproject(winCoords:Vector3fc, viewport:IntArray, dest:Vector4f):Vector4f
+     fun unproject(winCoords:Vector3fc, viewport:IntArray, dest: Vector4): Vector4
 
 /**
  * Unproject the given window coordinates `winCoords` by `this` matrix using the specified viewport.
@@ -3430,7 +3431,7 @@ import java.nio.FloatBuffer
  * will hold the unprojected position
  * @return dest
  */
-     fun unprojectInv(winCoords:Vector3fc, viewport:IntArray, dest:Vector4f):Vector4f
+     fun unprojectInv(winCoords:Vector3fc, viewport:IntArray, dest: Vector4): Vector4
 
 /**
  * Unproject the given window coordinates <tt>(winX, winY, winZ)</tt> by `this` matrix using the specified viewport.
@@ -3456,7 +3457,7 @@ import java.nio.FloatBuffer
  * will hold the unprojected position
  * @return dest
  */
-     fun unprojectInv(winX:Float, winY:Float, winZ:Float, viewport:IntArray, dest:Vector4f):Vector4f
+     fun unprojectInv(winX:Float, winY:Float, winZ:Float, viewport:IntArray, dest: Vector4): Vector4
 
 /**
  * Unproject the given window coordinates `winCoords` by `this` matrix using the specified viewport
@@ -3576,7 +3577,7 @@ import java.nio.FloatBuffer
  * will hold the projected window coordinates
  * @return winCoordsDest
  */
-     fun project(x:Float, y:Float, z:Float, viewport:IntArray, winCoordsDest:Vector4f):Vector4f
+     fun project(x:Float, y:Float, z:Float, viewport:IntArray, winCoordsDest: Vector4): Vector4
 
 /**
  * Project the given <tt>(x, y, z)</tt> position via `this` matrix using the specified viewport
@@ -3625,7 +3626,7 @@ import java.nio.FloatBuffer
  * will hold the projected window coordinates
  * @return winCoordsDest
  */
-     fun project(position:Vector3fc, viewport:IntArray, winCoordsDest:Vector4f):Vector4f
+     fun project(position:Vector3fc, viewport:IntArray, winCoordsDest: Vector4): Vector4
 
 /**
  * Project the given `position` via `this` matrix using the specified viewport
@@ -3764,7 +3765,7 @@ import java.nio.FloatBuffer
  * @throws IndexOutOfBoundsException if `row` is not in <tt>[0..3]</tt>
  */
     @Throws(IndexOutOfBoundsException::class)
- fun getRow(row:Int, dest:Vector4f):Vector4f
+ fun getRow(row:Int, dest: Vector4): Vector4
 
 /**
  * Get the column at the given `column` index, starting with `0`.
@@ -3777,7 +3778,7 @@ import java.nio.FloatBuffer
  * @throws IndexOutOfBoundsException if `column` is not in <tt>[0..3]</tt>
  */
     @Throws(IndexOutOfBoundsException::class)
- fun getColumn(column:Int, dest:Vector4f):Vector4f
+ fun getColumn(column:Int, dest: Vector4): Vector4
 
 /**
  * Compute a normal matrix from the upper left 3x3 submatrix of `this`
@@ -3848,7 +3849,7 @@ import java.nio.FloatBuffer
  *
  *
  * The frustum plane will be given in the form of a general plane equation:
- * <tt>a*x + b*y + c*z + d = 0</tt>, where the given [Vector4f] components will
+ * <tt>a*x + b*y + c*z + d = 0</tt>, where the given [Vector4] components will
  * hold the <tt>(a, b, c, d)</tt> values of the equation.
  *
  *
@@ -3874,7 +3875,7 @@ import java.nio.FloatBuffer
  * The plane equation will be normalized, meaning that <tt>(a, b, c)</tt> will be a unit vector
  * @return planeEquation
  */
-     fun frustumPlane(plane:Int, planeEquation:Vector4f):Vector4f
+     fun frustumPlane(plane:Int, planeEquation: Vector4): Vector4
 
 /**
  * Calculate a frustum plane of `this` matrix, which
@@ -4252,7 +4253,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun shadow(light:Vector4f, a:Float, b:Float, c:Float, d:Float, dest:Matrix4f):Matrix4f
+     fun shadow(light: Vector4, a:Float, b:Float, c:Float, d:Float, dest:Matrix4f):Matrix4f
 
 /**
  * Apply a projection transformation to this matrix that projects onto the plane specified via the general plane equation
@@ -4318,7 +4319,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun shadow(light:Vector4f, planeTransform:Matrix4fc, dest:Matrix4f):Matrix4f
+     fun shadow(light: Vector4, planeTransform:Matrix4fc, dest:Matrix4f):Matrix4f
 
 /**
  * Apply a projection transformation to this matrix that projects onto the plane with the general plane equation

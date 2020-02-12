@@ -28,6 +28,7 @@ import org.joml.internal.MemUtil
 import org.joml.internal.Options
 import silentorb.mythic.spatial.Quaternionf
 import silentorb.mythic.spatial.Quaternionfc
+import silentorb.mythic.spatial.Vector4
 
 import java.io.Externalizable
 import java.io.IOException
@@ -264,14 +265,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    * @param col3
    * the fourth column
    */
-  constructor(col0: Vector4fc, col1: Vector4fc, col2: Vector4fc, col3: Vector4fc) {
-    if (col0 is Vector4f &&
-        col1 is Vector4f &&
-        col2 is Vector4f &&
-        col3 is Vector4f) {
+  constructor(col0: Vector4c, col1: Vector4c, col2: Vector4c, col3: Vector4c) {
+    if (col0 is Vector4 &&
+        col1 is Vector4 &&
+        col2 is Vector4 &&
+        col3 is Vector4) {
       MemUtil.INSTANCE.set(this, col0, col1, col2, col3)
     } else {
-      setVector4fc(col0, col1, col2, col3)
+      setVector4c(col0, col1, col2, col3)
     }
   }
 
@@ -2354,20 +2355,20 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the fourth column
    * @return this
    */
-  operator fun set(col0: Vector4fc, col1: Vector4fc, col2: Vector4fc, col3: Vector4fc): Matrix4f {
-    if (col0 is Vector4f &&
-        col1 is Vector4f &&
-        col2 is Vector4f &&
-        col3 is Vector4f) {
+  operator fun set(col0: Vector4c, col1: Vector4c, col2: Vector4c, col3: Vector4c): Matrix4f {
+    if (col0 is Vector4 &&
+        col1 is Vector4 &&
+        col2 is Vector4 &&
+        col3 is Vector4) {
       MemUtil.INSTANCE.set(this, col0, col1, col2, col3)
     } else {
-      setVector4fc(col0, col1, col2, col3)
+      setVector4c(col0, col1, col2, col3)
     }
     _properties(0)
     return this
   }
 
-  private fun setVector4fc(col0: Vector4fc, col1: Vector4fc, col2: Vector4fc, col3: Vector4fc) {
+  private fun setVector4c(col0: Vector4c, col1: Vector4c, col2: Vector4c, col3: Vector4c) {
     this.m00 = col0.x
     this.m01 = col0.y
     this.m02 = col0.z
@@ -4589,23 +4590,23 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transform(Vector4f)
+     * @see Matrix4fc#transform(Vector4)
      */
-  override fun transform(v: Vector4f): Vector4f {
+  override fun transform(v: Vector4): Vector4 {
     return v.mul(this)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transform(Vector4fc, Vector4f)
+     * @see Matrix4fc#transform(Vector4c, Vector4)
      */
-  override fun transform(v: Vector4fc, dest: Vector4f): Vector4f {
+  override fun transform(v: Vector4c, dest: Vector4): Vector4 {
     return v.mul(this, dest)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transform(float, float, float, float, Vector4f)
+     * @see Matrix4fc#transform(float, float, float, float, Vector4)
      */
-  override fun transform(x: Float, y: Float, z: Float, w: Float, dest: Vector4f): Vector4f {
+  override fun transform(x: Float, y: Float, z: Float, w: Float, dest: Vector4): Vector4 {
     dest.x = x
     dest.y = y
     dest.z = z
@@ -4614,23 +4615,23 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformProject(Vector4f)
+     * @see Matrix4fc#transformProject(Vector4)
      */
-  override fun transformProject(v: Vector4f): Vector4f {
+  override fun transformProject(v: Vector4): Vector4 {
     return v.mulProject(this)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformProject(Vector4fc, Vector4f)
+     * @see Matrix4fc#transformProject(Vector4c, Vector4)
      */
-  override fun transformProject(v: Vector4fc, dest: Vector4f): Vector4f {
+  override fun transformProject(v: Vector4c, dest: Vector4): Vector4 {
     return v.mulProject(this, dest)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformProject(float, float, float, float, Vector4f)
+     * @see Matrix4fc#transformProject(float, float, float, float, Vector4)
      */
-  override fun transformProject(x: Float, y: Float, z: Float, w: Float, dest: Vector4f): Vector4f {
+  override fun transformProject(x: Float, y: Float, z: Float, w: Float, dest: Vector4): Vector4 {
     dest.x = x
     dest.y = y
     dest.z = z
@@ -4711,23 +4712,23 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformAffine(Vector4f)
+     * @see Matrix4fc#transformAffine(Vector4)
      */
-  override fun transformAffine(v: Vector4f): Vector4f {
+  override fun transformAffine(v: Vector4): Vector4 {
     return v.mulAffine(this, v)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformAffine(Vector4fc, Vector4f)
+     * @see Matrix4fc#transformAffine(Vector4c, Vector4)
      */
-  override fun transformAffine(v: Vector4fc, dest: Vector4f): Vector4f {
+  override fun transformAffine(v: Vector4c, dest: Vector4): Vector4 {
     return transformAffine(v.x, v.y, v.z, v.w, dest)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformAffine(float, float, float, float, Vector4f)
+     * @see Matrix4fc#transformAffine(float, float, float, float, Vector4)
      */
-  override fun transformAffine(x: Float, y: Float, z: Float, w: Float, dest: Vector4f): Vector4f {
+  override fun transformAffine(x: Float, y: Float, z: Float, w: Float, dest: Vector4): Vector4 {
     dest.x = x
     dest.y = y
     dest.z = z
@@ -11079,9 +11080,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#unproject(float, float, float, int[], Vector4f)
+     * @see Matrix4fc#unproject(float, float, float, int[], Vector4)
      */
-  override fun unproject(winX: Float, winY: Float, winZ: Float, viewport: IntArray, dest: Vector4f): Vector4f {
+  override fun unproject(winX: Float, winY: Float, winZ: Float, viewport: IntArray, dest: Vector4): Vector4 {
     val a = m00 * m11 - m01 * m10
     val b = m00 * m12 - m02 * m10
     val c = m00 * m13 - m03 * m10
@@ -11168,9 +11169,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#unproject(Vector3fc, int[], Vector4f)
+     * @see Matrix4fc#unproject(Vector3fc, int[], Vector4)
      */
-  override fun unproject(winCoords: Vector3fc, viewport: IntArray, dest: Vector4f): Vector4f {
+  override fun unproject(winCoords: Vector3fc, viewport: IntArray, dest: Vector4): Vector4 {
     return unproject(winCoords.x, winCoords.y, winCoords.z, viewport, dest)
   }
 
@@ -11245,16 +11246,16 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#unprojectInv(Vector3fc, int[], Vector4f)
+     * @see Matrix4fc#unprojectInv(Vector3fc, int[], Vector4)
      */
-  override fun unprojectInv(winCoords: Vector3fc, viewport: IntArray, dest: Vector4f): Vector4f {
+  override fun unprojectInv(winCoords: Vector3fc, viewport: IntArray, dest: Vector4): Vector4 {
     return unprojectInv(winCoords.x, winCoords.y, winCoords.z, viewport, dest)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#unprojectInv(float, float, float, int[], Vector4f)
+     * @see Matrix4fc#unprojectInv(float, float, float, int[], Vector4)
      */
-  override fun unprojectInv(winX: Float, winY: Float, winZ: Float, viewport: IntArray, dest: Vector4f): Vector4f {
+  override fun unprojectInv(winX: Float, winY: Float, winZ: Float, viewport: IntArray, dest: Vector4): Vector4 {
     val ndcX = (winX - viewport[0]) / viewport[2] * 2.0f - 1.0f
     val ndcY = (winY - viewport[1]) / viewport[3] * 2.0f - 1.0f
     val ndcZ = winZ + winZ - 1.0f
@@ -11321,9 +11322,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#project(float, float, float, int[], Vector4f)
+     * @see Matrix4fc#project(float, float, float, int[], Vector4)
      */
-  override fun project(x: Float, y: Float, z: Float, viewport: IntArray, winCoordsDest: Vector4f): Vector4f {
+  override fun project(x: Float, y: Float, z: Float, viewport: IntArray, winCoordsDest: Vector4): Vector4 {
     val invW = 1.0f / (m03 * x + m13 * y + m23 * z + m33)
     val nx = (m00 * x + m10 * y + m20 * z + m30) * invW
     val ny = (m01 * x + m11 * y + m21 * z + m31) * invW
@@ -11350,9 +11351,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#project(Vector3fc, int[], Vector4f)
+     * @see Matrix4fc#project(Vector3fc, int[], Vector4)
      */
-  override fun project(position: Vector3fc, viewport: IntArray, winCoordsDest: Vector4f): Vector4f {
+  override fun project(position: Vector3fc, viewport: IntArray, winCoordsDest: Vector4): Vector4 {
     return project(position.x, position.y, position.z, viewport, winCoordsDest)
   }
 
@@ -11711,10 +11712,10 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#getRow(int, Vector4f)
+     * @see Matrix4fc#getRow(int, Vector4)
      */
   @Throws(IndexOutOfBoundsException::class)
-  override fun getRow(row: Int, dest: Vector4f): Vector4f {
+  override fun getRow(row: Int, dest: Vector4): Vector4 {
     when (row) {
       0 -> {
         dest.x = m00
@@ -11756,7 +11757,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * @throws IndexOutOfBoundsException if `row` is not in <tt>[0..3]</tt>
    */
   @Throws(IndexOutOfBoundsException::class)
-  fun setRow(row: Int, src: Vector4fc): Matrix4f {
+  fun setRow(row: Int, src: Vector4c): Matrix4f {
     when (row) {
       0 -> {
         this._m00(src.x)
@@ -11789,10 +11790,10 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#getColumn(int, Vector4f)
+     * @see Matrix4fc#getColumn(int, Vector4)
      */
   @Throws(IndexOutOfBoundsException::class)
-  override fun getColumn(column: Int, dest: Vector4f): Vector4f {
+  override fun getColumn(column: Int, dest: Vector4): Vector4 {
     when (column) {
       0 -> MemUtil.INSTANCE.putColumn0(this, dest)
       1 -> MemUtil.INSTANCE.putColumn1(this, dest)
@@ -11814,9 +11815,9 @@ class Matrix4f : Externalizable, Matrix4fc {
    * @throws IndexOutOfBoundsException if `column` is not in <tt>[0..3]</tt>
    */
   @Throws(IndexOutOfBoundsException::class)
-  fun setColumn(column: Int, src: Vector4fc): Matrix4f {
+  fun setColumn(column: Int, src: Vector4c): Matrix4f {
     when (column) {
-      0 -> if (src is Vector4f) {
+      0 -> if (src is Vector4) {
         MemUtil.INSTANCE.getColumn0(this, src)
       } else {
         this._m00(src.x)
@@ -11824,7 +11825,7 @@ class Matrix4f : Externalizable, Matrix4fc {
         this._m02(src.z)
         this._m03(src.w)
       }
-      1 -> if (src is Vector4f) {
+      1 -> if (src is Vector4) {
         MemUtil.INSTANCE.getColumn1(this, src)
       } else {
         this._m10(src.x)
@@ -11832,7 +11833,7 @@ class Matrix4f : Externalizable, Matrix4fc {
         this._m12(src.z)
         this._m13(src.w)
       }
-      2 -> if (src is Vector4f) {
+      2 -> if (src is Vector4) {
         MemUtil.INSTANCE.getColumn2(this, src)
       } else {
         this._m20(src.x)
@@ -11840,7 +11841,7 @@ class Matrix4f : Externalizable, Matrix4fc {
         this._m22(src.z)
         this._m23(src.w)
       }
-      3 -> if (src is Vector4f) {
+      3 -> if (src is Vector4) {
         MemUtil.INSTANCE.getColumn3(this, src)
       } else {
         this._m30(src.x)
@@ -12052,9 +12053,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#frustumPlane(int, Vector4f)
+     * @see Matrix4fc#frustumPlane(int, Vector4)
      */
-  override fun frustumPlane(plane: Int, planeEquation: Vector4f): Vector4f {
+  override fun frustumPlane(plane: Int, planeEquation: Vector4): Vector4 {
     when (plane) {
       Matrix4fc.PLANE_NX -> planeEquation.set(m03 + m00, m13 + m10, m23 + m20, m33 + m30).normalize3(planeEquation)
       Matrix4fc.PLANE_PX -> planeEquation.set(m03 - m00, m13 - m10, m23 - m20, m33 - m30).normalize3(planeEquation)
@@ -12572,14 +12573,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the constant in the plane equation
    * @return a matrix holding the result
    */
-  fun shadow(light: Vector4f, a: Float, b: Float, c: Float, d: Float): Matrix4f {
+  fun shadow(light: Vector4, a: Float, b: Float, c: Float, d: Float): Matrix4f {
     return shadow(light.x, light.y, light.z, light.w, a, b, c, d, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#shadow(Vector4f, float, float, float, float, Matrix4f)
+     * @see Matrix4fc#shadow(Vector4, float, float, float, float, Matrix4f)
      */
-  override fun shadow(light: Vector4f, a: Float, b: Float, c: Float, d: Float, dest: Matrix4f): Matrix4f {
+  override fun shadow(light: Vector4, a: Float, b: Float, c: Float, d: Float, dest: Matrix4f): Matrix4f {
     return shadow(light.x, light.y, light.z, light.w, a, b, c, d, dest)
   }
 
@@ -12687,9 +12688,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#shadow(Vector4f, Matrix4fc, Matrix4f)
+     * @see Matrix4fc#shadow(Vector4, Matrix4fc, Matrix4f)
      */
-  override fun shadow(light: Vector4f, planeTransform: Matrix4fc, dest: Matrix4f): Matrix4f {
+  override fun shadow(light: Vector4, planeTransform: Matrix4fc, dest: Matrix4f): Matrix4f {
     // compute plane equation by transforming (y = 0)
     val a = planeTransform.m10()
     val b = planeTransform.m11()
@@ -12720,7 +12721,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the transformation to transform the implied plane <tt>y = 0</tt> before applying the projection
    * @return a matrix holding the result
    */
-  fun shadow(light: Vector4f, planeTransform: Matrix4f): Matrix4f {
+  fun shadow(light: Vector4, planeTransform: Matrix4f): Matrix4f {
     return shadow(light, planeTransform, thisOrNew())
   }
 

@@ -9,4 +9,4 @@ dependencies {
     api("org.lwjgl:lwjgl-opengl:${Versions.lwjgl}:${Natives.lwjgl}")
 }
 
-requires(project, "spatial", "glowing", "typography")
+requires(project, "spatial")

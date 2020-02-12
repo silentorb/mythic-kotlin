@@ -10,5 +10,15 @@ repositories {
 }
 
 dependencies {
+  implementation(kotlin("stdlib-jdk8"))
   api("silentorb.mythic:spatial")
+}
+
+tasks {
+  compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+  }
+  compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+  }
 }

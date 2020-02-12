@@ -9,9 +9,9 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
-typealias Vector4 = org.joml.Vector4f
 typealias Quaternion = Quaternionf
 typealias MutableMatrix = org.joml.Matrix4f
+typealias Vector4New = Vector4
 
 private val initialQuaternion = Quaternion()
 

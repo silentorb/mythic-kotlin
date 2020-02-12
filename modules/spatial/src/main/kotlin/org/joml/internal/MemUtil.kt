@@ -25,6 +25,7 @@ package org.joml.internal
 import silentorb.mythic.spatial.Vector3m
 import org.joml.*
 import silentorb.mythic.spatial.Quaternionf
+import silentorb.mythic.spatial.Vector4
 
 import java.io.IOException
 import java.lang.reflect.Field
@@ -94,8 +95,8 @@ abstract class MemUtil {
   abstract fun put(m: Matrix3x2d, offset: Int, dest: ByteBuffer)
   abstract fun put(src: Vector4d, offset: Int, dest: DoubleBuffer)
   abstract fun put(src: Vector4d, offset: Int, dest: ByteBuffer)
-  abstract fun put(src: Vector4f, offset: Int, dest: FloatBuffer)
-  abstract fun put(src: Vector4f, offset: Int, dest: ByteBuffer)
+  abstract fun put(src: Vector4, offset: Int, dest: FloatBuffer)
+  abstract fun put(src: Vector4, offset: Int, dest: ByteBuffer)
   abstract fun put(src: Vector4i, offset: Int, dest: IntBuffer)
   abstract fun put(src: Vector4i, offset: Int, dest: ByteBuffer)
   abstract fun put(src: Vector3m, offset: Int, dest: FloatBuffer)
@@ -134,8 +135,8 @@ abstract class MemUtil {
   abstract fun getf(m: Matrix3d, offset: Int, src: ByteBuffer)
   abstract operator fun get(dst: Vector4d, offset: Int, src: DoubleBuffer)
   abstract operator fun get(dst: Vector4d, offset: Int, src: ByteBuffer)
-  abstract operator fun get(dst: Vector4f, offset: Int, src: FloatBuffer)
-  abstract operator fun get(dst: Vector4f, offset: Int, src: ByteBuffer)
+  abstract operator fun get(dst: Vector4, offset: Int, src: FloatBuffer)
+  abstract operator fun get(dst: Vector4, offset: Int, src: ByteBuffer)
   abstract operator fun get(dst: Vector4i, offset: Int, src: IntBuffer)
   abstract operator fun get(dst: Vector4i, offset: Int, src: ByteBuffer)
   abstract operator fun get(dst: Vector3m, offset: Int, src: FloatBuffer)
@@ -167,7 +168,7 @@ abstract class MemUtil {
   abstract fun copy3x3(src: Matrix3f, dest: Matrix4f)
   abstract fun copy4x3(src: Matrix4f, dest: Matrix4f)
   abstract fun copy4x3(src: Matrix4x3f, dest: Matrix4f)
-  abstract fun copy(src: Vector4f, dst: Vector4f)
+  abstract fun copy(src: Vector4, dst: Vector4)
   abstract fun copy(src: Vector4i, dst: Vector4i)
   abstract fun copy(src: Quaternionf, dst: Quaternionf)
   abstract fun copy(arr: FloatArray, off: Int, dest: Matrix4f)
@@ -201,7 +202,7 @@ abstract class MemUtil {
   abstract fun zero(dest: Matrix3f)
   abstract fun zero(dest: Matrix3x2f)
   abstract fun zero(dest: Matrix3x2d)
-  abstract fun zero(dest: Vector4f)
+  abstract fun zero(dest: Vector4)
   abstract fun zero(dest: Vector4i)
 
   abstract fun putMatrix3f(q: Quaternionf, position: Int, dest: ByteBuffer)
@@ -211,21 +212,21 @@ abstract class MemUtil {
   abstract fun putMatrix4x3f(q: Quaternionf, position: Int, dest: ByteBuffer)
   abstract fun putMatrix4x3f(q: Quaternionf, position: Int, dest: FloatBuffer)
 
-  abstract operator fun set(dest: Matrix4f, col0: Vector4f, col1: Vector4f, col2: Vector4f, col3: Vector4f)
+  abstract operator fun set(dest: Matrix4f, col0: Vector4, col1: Vector4, col2: Vector4, col3: Vector4)
   abstract operator fun set(dest: Matrix4x3f, col0: Vector3m, col1: Vector3m, col2: Vector3m, col3: Vector3m)
   abstract operator fun set(dest: Matrix3f, col0: Vector3m, col1: Vector3m, col2: Vector3m)
 
-  abstract fun putColumn0(src: Matrix4f, dest: Vector4f)
-  abstract fun putColumn1(src: Matrix4f, dest: Vector4f)
-  abstract fun putColumn2(src: Matrix4f, dest: Vector4f)
-  abstract fun putColumn3(src: Matrix4f, dest: Vector4f)
+  abstract fun putColumn0(src: Matrix4f, dest: Vector4)
+  abstract fun putColumn1(src: Matrix4f, dest: Vector4)
+  abstract fun putColumn2(src: Matrix4f, dest: Vector4)
+  abstract fun putColumn3(src: Matrix4f, dest: Vector4)
 
-  abstract fun getColumn0(dest: Matrix4f, src: Vector4f)
-  abstract fun getColumn1(dest: Matrix4f, src: Vector4f)
-  abstract fun getColumn2(dest: Matrix4f, src: Vector4f)
-  abstract fun getColumn3(dest: Matrix4f, src: Vector4f)
+  abstract fun getColumn0(dest: Matrix4f, src: Vector4)
+  abstract fun getColumn1(dest: Matrix4f, src: Vector4)
+  abstract fun getColumn2(dest: Matrix4f, src: Vector4)
+  abstract fun getColumn3(dest: Matrix4f, src: Vector4)
 
-  abstract fun broadcast(c: Float, dest: Vector4f)
+  abstract fun broadcast(c: Float, dest: Vector4)
   abstract fun broadcast(c: Int, dest: Vector4i)
 
   open class MemUtilNIO : MemUtil() {
@@ -1139,14 +1140,14 @@ abstract class MemUtil {
       dest.putDouble(offset + 24, src.w)
     }
 
-    override fun put(src: Vector4f, offset: Int, dest: FloatBuffer) {
+    override fun put(src: Vector4, offset: Int, dest: FloatBuffer) {
       dest.put(offset, src.x)
       dest.put(offset + 1, src.y)
       dest.put(offset + 2, src.z)
       dest.put(offset + 3, src.w)
     }
 
-    override fun put(src: Vector4f, offset: Int, dest: ByteBuffer) {
+    override fun put(src: Vector4, offset: Int, dest: ByteBuffer) {
       dest.putFloat(offset, src.x)
       dest.putFloat(offset + 4, src.y)
       dest.putFloat(offset + 8, src.z)
@@ -1559,14 +1560,14 @@ abstract class MemUtil {
       dst.w = src.getDouble(offset + 24)
     }
 
-    override fun get(dst: Vector4f, offset: Int, src: FloatBuffer) {
+    override fun get(dst: Vector4, offset: Int, src: FloatBuffer) {
       dst.x = src.get(offset)
       dst.y = src.get(offset + 1)
       dst.z = src.get(offset + 2)
       dst.w = src.get(offset + 3)
     }
 
-    override fun get(dst: Vector4f, offset: Int, src: ByteBuffer) {
+    override fun get(dst: Vector4, offset: Int, src: ByteBuffer) {
       dst.x = src.getFloat(offset)
       dst.y = src.getFloat(offset + 4)
       dst.z = src.getFloat(offset + 8)
@@ -1799,7 +1800,7 @@ abstract class MemUtil {
       dest._m32(src.m32())
     }
 
-    override fun copy(src: Vector4f, dst: Vector4f) {
+    override fun copy(src: Vector4, dst: Vector4) {
       dst.x = src.x
       dst.y = src.y
       dst.z = src.z
@@ -2401,7 +2402,7 @@ abstract class MemUtil {
       dest._m21(0.0)
     }
 
-    override fun zero(dest: Vector4f) {
+    override fun zero(dest: Vector4) {
       dest.x = 0.0f
       dest.y = 0.0f
       dest.z = 0.0f
@@ -2564,7 +2565,7 @@ abstract class MemUtil {
       dest.put(position + 11, 0.0f)
     }
 
-    override fun set(m: Matrix4f, col0: Vector4f, col1: Vector4f, col2: Vector4f, col3: Vector4f) {
+    override fun set(m: Matrix4f, col0: Vector4, col1: Vector4, col2: Vector4, col3: Vector4) {
       m._m00(col0.x)
       m._m01(col0.y)
       m._m02(col0.z)
@@ -2610,63 +2611,63 @@ abstract class MemUtil {
       m._m22(col2.z)
     }
 
-    override fun putColumn0(src: Matrix4f, dest: Vector4f) {
+    override fun putColumn0(src: Matrix4f, dest: Vector4) {
       dest.x = src.m00()
       dest.y = src.m01()
       dest.z = src.m02()
       dest.w = src.m03()
     }
 
-    override fun putColumn1(src: Matrix4f, dest: Vector4f) {
+    override fun putColumn1(src: Matrix4f, dest: Vector4) {
       dest.x = src.m10()
       dest.y = src.m11()
       dest.z = src.m12()
       dest.w = src.m13()
     }
 
-    override fun putColumn2(src: Matrix4f, dest: Vector4f) {
+    override fun putColumn2(src: Matrix4f, dest: Vector4) {
       dest.x = src.m20()
       dest.y = src.m21()
       dest.z = src.m22()
       dest.w = src.m23()
     }
 
-    override fun putColumn3(src: Matrix4f, dest: Vector4f) {
+    override fun putColumn3(src: Matrix4f, dest: Vector4) {
       dest.x = src.m30()
       dest.y = src.m31()
       dest.z = src.m32()
       dest.w = src.m33()
     }
 
-    override fun getColumn0(dest: Matrix4f, src: Vector4f) {
+    override fun getColumn0(dest: Matrix4f, src: Vector4) {
       dest._m00(src.x)
       dest._m01(src.y)
       dest._m02(src.z)
       dest._m03(src.w)
     }
 
-    override fun getColumn1(dest: Matrix4f, src: Vector4f) {
+    override fun getColumn1(dest: Matrix4f, src: Vector4) {
       dest._m10(src.x)
       dest._m11(src.y)
       dest._m12(src.z)
       dest._m13(src.w)
     }
 
-    override fun getColumn2(dest: Matrix4f, src: Vector4f) {
+    override fun getColumn2(dest: Matrix4f, src: Vector4) {
       dest._m20(src.x)
       dest._m21(src.y)
       dest._m22(src.z)
       dest._m23(src.w)
     }
 
-    override fun getColumn3(dest: Matrix4f, src: Vector4f) {
+    override fun getColumn3(dest: Matrix4f, src: Vector4) {
       dest._m30(src.x)
       dest._m31(src.y)
       dest._m32(src.z)
       dest._m33(src.w)
     }
 
-    override fun broadcast(c: Float, dest: Vector4f) {
+    override fun broadcast(c: Float, dest: Vector4) {
       dest.x = c
       dest.y = c
       dest.z = c
@@ -3043,7 +3044,7 @@ abstract class MemUtil {
       UNSAFE.putDouble(null, destAddr + 24, src.w)
     }
 
-    fun put(src: Vector4f, destAddr: Long) {
+    fun put(src: Vector4, destAddr: Long) {
       UNSAFE.putFloat(null, destAddr, src.x)
       UNSAFE.putFloat(null, destAddr + 4, src.y)
       UNSAFE.putFloat(null, destAddr + 8, src.z)
@@ -3223,7 +3224,7 @@ abstract class MemUtil {
       dst.w = UNSAFE.getLong(null, srcAddr + 24).toDouble()
     }
 
-    operator fun get(dst: Vector4f, srcAddr: Long) {
+    operator fun get(dst: Vector4, srcAddr: Long) {
       dst.x = UNSAFE.getFloat(null, srcAddr)
       dst.y = UNSAFE.getFloat(null, srcAddr + 4)
       dst.z = UNSAFE.getFloat(null, srcAddr + 8)
@@ -3772,14 +3773,14 @@ abstract class MemUtil {
       put(src, addressOf(dest) + offset)
     }
 
-    override fun put(src: Vector4f, offset: Int, dest: FloatBuffer) {
+    override fun put(src: Vector4, offset: Int, dest: FloatBuffer) {
       if (Options.DEBUG && !dest.isDirect) {
         throwNoDirectBufferException()
       }
       put(src, addressOf(dest) + (offset shl 2))
     }
 
-    override fun put(src: Vector4f, offset: Int, dest: ByteBuffer) {
+    override fun put(src: Vector4, offset: Int, dest: ByteBuffer) {
       if (Options.DEBUG && !dest.isDirect) {
         throwNoDirectBufferException()
       }
@@ -4052,14 +4053,14 @@ abstract class MemUtil {
       get(dst, addressOf(src) + offset)
     }
 
-    override fun get(dst: Vector4f, offset: Int, src: FloatBuffer) {
+    override fun get(dst: Vector4, offset: Int, src: FloatBuffer) {
       if (Options.DEBUG && !src.isDirect) {
         throwNoDirectBufferException()
       }
       get(dst, addressOf(src) + (offset shl 2))
     }
 
-    override fun get(dst: Vector4f, offset: Int, src: ByteBuffer) {
+    override fun get(dst: Vector4, offset: Int, src: ByteBuffer) {
       if (Options.DEBUG && !src.isDirect) {
         throwNoDirectBufferException()
       }
@@ -4172,7 +4173,7 @@ abstract class MemUtil {
       val Matrix4f_m00: Long
       val Matrix4x3f_m00: Long
       val Matrix3x2f_m00: Long
-      val Vector4f_x: Long
+      val Vector4_x: Long
       val Vector4d_x: Long
       val Vector4i_x: Long
       val Vector3f_x: Long
@@ -4203,7 +4204,7 @@ abstract class MemUtil {
           Matrix4x3f_m00 = checkMatrix4x3f()
           Matrix3f_m00 = checkMatrix3f()
           Matrix3x2f_m00 = checkMatrix3x2f()
-          Vector4f_x = checkVector4f()
+          Vector4_x = checkVector4()
           Vector4d_x = checkVector4d()
           Vector4i_x = checkVector4i()
           Vector3f_x = checkVector3f()
@@ -4339,18 +4340,18 @@ abstract class MemUtil {
       }
 
       @Throws(NoSuchFieldException::class, SecurityException::class)
-      private fun checkVector4f(): Long {
-        var f = Vector4f::class.java.getDeclaredField("x")
-        val Vector4f_x = UNSAFE.objectFieldOffset(f)
+      private fun checkVector4(): Long {
+        var f = Vector4::class.java.getDeclaredField("x")
+        val Vector4_x = UNSAFE.objectFieldOffset(f)
         // Validate expected field offsets
         val names = arrayOf("y", "z", "w")
         for (i in 1..3) {
-          f = Vector4f::class.java.getDeclaredField(names[i - 1])
+          f = Vector4::class.java.getDeclaredField(names[i - 1])
           val offset = UNSAFE.objectFieldOffset(f)
-          if (offset != Vector4f_x + (i shl 2))
-            throw UnsupportedOperationException("Unexpected Vector4f element offset")
+          if (offset != Vector4_x + (i shl 2))
+            throw UnsupportedOperationException("Unexpected Vector4 element offset")
         }
-        return Vector4f_x
+        return Vector4_x
       }
 
       @Throws(NoSuchFieldException::class, SecurityException::class)

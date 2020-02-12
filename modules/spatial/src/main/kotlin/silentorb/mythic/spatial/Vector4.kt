@@ -20,13 +20,12 @@
  THE SOFTWARE.
 
  */
-package org.joml
+package silentorb.mythic.spatial
 
-import silentorb.mythic.spatial.Vector3
+import org.joml.*
 import org.joml.internal.MemUtil
 import org.joml.internal.Options
 import org.joml.internal.Runtime
-import silentorb.mythic.spatial.Quaternionfc
 
 import java.io.Externalizable
 import java.io.IOException
@@ -44,7 +43,7 @@ import java.text.NumberFormat
  * @author Richard Greenlees
  * @author Kai Burjack
  */
-class Vector4f : Externalizable, Vector4fc {
+class Vector4 : Externalizable, Vector4c {
 
   /**
    * The x component of the vector.
@@ -64,20 +63,20 @@ class Vector4f : Externalizable, Vector4fc {
   override var w: Float = 0.toFloat()
 
   /**
-   * Create a new [Vector4f] of `(0, 0, 0, 1)`.
+   * Create a new [Vector4] of `(0, 0, 0, 1)`.
    */
   constructor() {
     this.w = 1.0f
   }
 
   /**
-   * Create a new [Vector4f] with the same values as `v`.
+   * Create a new [Vector4] with the same values as `v`.
    *
    * @param v
-   * the [Vector4fc] to copy the values from
+   * the [Vector4c] to copy the values from
    */
-  constructor(v: Vector4fc) {
-    if (v is Vector4f) {
+  constructor(v: Vector4c) {
+    if (v is Vector4) {
       MemUtil.INSTANCE.copy(v, this)
     } else {
       this.x = v.x
@@ -88,7 +87,7 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /**
-   * Create a new [Vector4f] with the first three components from the
+   * Create a new [Vector4] with the first three components from the
    * given `v` and the given `w`.
    *
    * @param v
@@ -100,7 +99,7 @@ class Vector4f : Externalizable, Vector4fc {
   constructor(v: Vector3, w: Float) : this(v.x, v.y, v.z, w) {}
 
   /**
-   * Create a new [Vector4f] with the first two components from the
+   * Create a new [Vector4] with the first two components from the
    * given `v` and the given `z`, and `w`.
    *
    * @param v
@@ -113,7 +112,7 @@ class Vector4f : Externalizable, Vector4fc {
   constructor(v: Vector2fc, z: Float, w: Float) : this(v.x, v.y, z, w) {}
 
   /**
-   * Create a new [Vector4f] with the first two components from the
+   * Create a new [Vector4] with the first two components from the
    * given `v` and the given `z`, and `w`.
    *
    * @param v
@@ -126,7 +125,7 @@ class Vector4f : Externalizable, Vector4fc {
   constructor(v: Vector2ic, z: Float, w: Float) : this(v.x.toFloat(), v.y.toFloat(), z, w) {}
 
   /**
-   * Create a new [Vector4f] and initialize all four components with the given value.
+   * Create a new [Vector4] and initialize all four components with the given value.
    *
    * @param d
    * the value of all four components
@@ -136,7 +135,7 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /**
-   * Create a new [Vector4f] with the given component values.
+   * Create a new [Vector4] with the given component values.
    *
    * @param x
    * the x component
@@ -155,7 +154,7 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /**
-   * Create a new [Vector4f] and read this vector from the supplied [ByteBuffer]
+   * Create a new [Vector4] and read this vector from the supplied [ByteBuffer]
    * at the current buffer [position][ByteBuffer.position].
    *
    *
@@ -163,17 +162,17 @@ class Vector4f : Externalizable, Vector4fc {
    *
    *
    * In order to specify the offset into the ByteBuffer at which
-   * the vector is read, use [.Vector4f], taking
+   * the vector is read, use [.Vector4], taking
    * the absolute position as parameter.
    *
    * @param buffer
    * values will be read in <tt>x, y, z, w</tt> order
-   * @see .Vector4f
+   * @see .Vector4
    */
   constructor(buffer: ByteBuffer) : this(buffer.position(), buffer) {}
 
   /**
-   * Create a new [Vector4f] and read this vector from the supplied [ByteBuffer]
+   * Create a new [Vector4] and read this vector from the supplied [ByteBuffer]
    * starting at the specified absolute buffer position/index.
    *
    *
@@ -189,7 +188,7 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /**
-   * Create a new [Vector4f] and read this vector from the supplied [FloatBuffer]
+   * Create a new [Vector4] and read this vector from the supplied [FloatBuffer]
    * at the current buffer [position][FloatBuffer.position].
    *
    *
@@ -197,17 +196,17 @@ class Vector4f : Externalizable, Vector4fc {
    *
    *
    * In order to specify the offset into the FloatBuffer at which
-   * the vector is read, use [.Vector4f], taking
+   * the vector is read, use [.Vector4], taking
    * the absolute position as parameter.
    *
    * @param buffer
    * values will be read in <tt>x, y, z, w</tt> order
-   * @see .Vector4f
+   * @see .Vector4
    */
   constructor(buffer: FloatBuffer) : this(buffer.position(), buffer) {}
 
   /**
-   * Create a new [Vector4f] and read this vector from the supplied [FloatBuffer]
+   * Create a new [Vector4] and read this vector from the supplied [FloatBuffer]
    * starting at the specified absolute buffer position/index.
    *
    *
@@ -222,19 +221,19 @@ class Vector4f : Externalizable, Vector4fc {
     MemUtil.INSTANCE.get(this, index, buffer)
   }
 
-  private fun thisOrNew(): Vector4f {
+  private fun thisOrNew(): Vector4 {
     return this
   }
 
   /**
-   * Set this [Vector4f] to the values of the given `v`.
+   * Set this [Vector4] to the values of the given `v`.
    *
    * @param v
    * the vector whose values will be copied into this
    * @return this
    */
-  fun set(v: Vector4fc): Vector4f {
-    if (v is Vector4f) {
+  fun set(v: Vector4c): Vector4 {
+    if (v is Vector4) {
       MemUtil.INSTANCE.copy(v, this)
     } else {
       this.x = v.x
@@ -255,7 +254,7 @@ class Vector4f : Externalizable, Vector4fc {
    * the w component
    * @return this
    */
-  operator fun set(v: Vector3fc, w: Float): Vector4f {
+  operator fun set(v: Vector3fc, w: Float): Vector4 {
     return set(v.x, v.y, v.z, w)
   }
 
@@ -271,7 +270,7 @@ class Vector4f : Externalizable, Vector4fc {
    * the w component
    * @return this
    */
-  operator fun set(v: Vector2fc, z: Float, w: Float): Vector4f {
+  operator fun set(v: Vector2fc, z: Float, w: Float): Vector4 {
     return set(v.x, v.y, z, w)
   }
 
@@ -287,7 +286,7 @@ class Vector4f : Externalizable, Vector4fc {
    * the w component
    * @return this
    */
-  operator fun set(v: Vector2ic, z: Float, w: Float): Vector4f {
+  operator fun set(v: Vector2ic, z: Float, w: Float): Vector4 {
     return set(v.x.toFloat(), v.y.toFloat(), z, w)
   }
 
@@ -298,7 +297,7 @@ class Vector4f : Externalizable, Vector4fc {
    * the value of all four components
    * @return this
    */
-  fun set(d: Float): Vector4f {
+  fun set(d: Float): Vector4 {
     MemUtil.INSTANCE.broadcast(d, this)
     return this
   }
@@ -316,7 +315,7 @@ class Vector4f : Externalizable, Vector4fc {
    * the w component
    * @return this
    */
-  operator fun set(x: Float, y: Float, z: Float, w: Float): Vector4f {
+  operator fun set(x: Float, y: Float, z: Float, w: Float): Vector4 {
     this.x = x
     this.y = y
     this.z = z
@@ -341,7 +340,7 @@ class Vector4f : Externalizable, Vector4fc {
    * @return this
    * @see .set
    */
-  fun set(buffer: ByteBuffer): Vector4f {
+  fun set(buffer: ByteBuffer): Vector4 {
     return set(buffer.position(), buffer)
   }
 
@@ -358,7 +357,7 @@ class Vector4f : Externalizable, Vector4fc {
    * values will be read in <tt>x, y, z, w</tt> order
    * @return this
    */
-  operator fun set(index: Int, buffer: ByteBuffer): Vector4f {
+  operator fun set(index: Int, buffer: ByteBuffer): Vector4 {
     MemUtil.INSTANCE.get(this, index, buffer)
     return this
   }
@@ -380,7 +379,7 @@ class Vector4f : Externalizable, Vector4fc {
    * @return this
    * @see .set
    */
-  fun set(buffer: FloatBuffer): Vector4f {
+  fun set(buffer: FloatBuffer): Vector4 {
     return set(buffer.position(), buffer)
   }
 
@@ -397,7 +396,7 @@ class Vector4f : Externalizable, Vector4fc {
    * values will be read in <tt>x, y, z, w</tt> order
    * @return this
    */
-  operator fun set(index: Int, buffer: FloatBuffer): Vector4f {
+  operator fun set(index: Int, buffer: FloatBuffer): Vector4 {
     MemUtil.INSTANCE.get(this, index, buffer)
     return this
   }
@@ -416,7 +415,7 @@ class Vector4f : Externalizable, Vector4fc {
    * the off-heap memory address to read the vector values from
    * @return this
    */
-  fun setFromAddress(address: Long): Vector4f {
+  fun setFromAddress(address: Long): Vector4 {
     if (Options.NO_UNSAFE)
       throw UnsupportedOperationException("Not supported when using joml.nounsafe")
     val unsafe = MemUtil.INSTANCE as MemUtil.MemUtilUnsafe
@@ -435,7 +434,7 @@ class Vector4f : Externalizable, Vector4fc {
    * @throws IllegalArgumentException if `component` is not within <tt>[0..3]</tt>
    */
   @Throws(IllegalArgumentException::class)
-  fun setComponent(component: Int, value: Float): Vector4f {
+  fun setComponent(component: Int, value: Float): Vector4 {
     when (component) {
       0 -> x = value
       1 -> y = value
@@ -447,14 +446,14 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#get(java.nio.FloatBuffer)
+     * @see Vector4c#get(java.nio.FloatBuffer)
      */
   override fun get(buffer: FloatBuffer): FloatBuffer {
     return get(buffer.position(), buffer)
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#get(int, java.nio.FloatBuffer)
+     * @see Vector4c#get(int, java.nio.FloatBuffer)
      */
   override fun get(index: Int, buffer: FloatBuffer): FloatBuffer {
     MemUtil.INSTANCE.put(this, index, buffer)
@@ -462,21 +461,21 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#get(java.nio.ByteBuffer)
+     * @see Vector4c#get(java.nio.ByteBuffer)
      */
   override fun get(buffer: ByteBuffer): ByteBuffer {
     return get(buffer.position(), buffer)
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#get(int, java.nio.ByteBuffer)
+     * @see Vector4c#get(int, java.nio.ByteBuffer)
      */
   override fun get(index: Int, buffer: ByteBuffer): ByteBuffer {
     MemUtil.INSTANCE.put(this, index, buffer)
     return buffer
   }
 
-  override fun getToAddress(address: Long): Vector4fc {
+  override fun getToAddress(address: Long): Vector4c {
     if (Options.NO_UNSAFE)
       throw UnsupportedOperationException("Not supported when using joml.nounsafe")
     val unsafe = MemUtil.INSTANCE as MemUtil.MemUtilUnsafe
@@ -491,7 +490,7 @@ class Vector4f : Externalizable, Vector4fc {
    * the vector to subtract
    * @return a vector holding the result
    */
-  fun sub(v: Vector4fc): Vector4f {
+  fun sub(v: Vector4c): Vector4 {
     return sub(v, thisOrNew())
   }
 
@@ -508,21 +507,21 @@ class Vector4f : Externalizable, Vector4fc {
    * the w component to subtract
    * @return a vector holding the result
    */
-  fun sub(x: Float, y: Float, z: Float, w: Float): Vector4f {
+  fun sub(x: Float, y: Float, z: Float, w: Float): Vector4 {
     return sub(x, y, z, w, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#sub(Vector4fc, Vector4f)
+     * @see Vector4c#sub(Vector4c, Vector4)
      */
-  override fun sub(v: Vector4fc, dest: Vector4f): Vector4f {
+  override fun sub(v: Vector4c, dest: Vector4): Vector4 {
     return sub(v.x, v.y, v.z, v.w, dest)
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#sub(float, float, float, float, Vector4f)
+     * @see Vector4c#sub(float, float, float, float, Vector4)
      */
-  override fun sub(x: Float, y: Float, z: Float, w: Float, dest: Vector4f): Vector4f {
+  override fun sub(x: Float, y: Float, z: Float, w: Float, dest: Vector4): Vector4 {
     dest.x = this.x - x
     dest.y = this.y - y
     dest.z = this.z - z
@@ -537,14 +536,14 @@ class Vector4f : Externalizable, Vector4fc {
    * the vector to add
    * @return a vector holding the result
    */
-  fun add(v: Vector4fc): Vector4f {
+  fun add(v: Vector4c): Vector4 {
     return add(v, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#add(Vector4fc, Vector4f)
+     * @see Vector4c#add(Vector4c, Vector4)
      */
-  override fun add(v: Vector4fc, dest: Vector4f): Vector4f {
+  override fun add(v: Vector4c, dest: Vector4): Vector4 {
     dest.x = x + v.x
     dest.y = y + v.y
     dest.z = z + v.z
@@ -565,14 +564,14 @@ class Vector4f : Externalizable, Vector4fc {
    * the w component to add
    * @return a vector holding the result
    */
-  fun add(x: Float, y: Float, z: Float, w: Float): Vector4f {
+  fun add(x: Float, y: Float, z: Float, w: Float): Vector4 {
     return add(x, y, z, w, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#add(float, float, float, float, Vector4f)
+     * @see Vector4c#add(float, float, float, float, Vector4)
      */
-  override fun add(x: Float, y: Float, z: Float, w: Float, dest: Vector4f): Vector4f {
+  override fun add(x: Float, y: Float, z: Float, w: Float, dest: Vector4): Vector4 {
     dest.x = this.x + x
     dest.y = this.y + y
     dest.z = this.z + z
@@ -589,7 +588,7 @@ class Vector4f : Externalizable, Vector4fc {
    * the second multiplicand
    * @return a vector holding the result
    */
-  fun fma(a: Vector4fc, b: Vector4fc): Vector4f {
+  fun fma(a: Vector4c, b: Vector4c): Vector4 {
     return fma(a, b, thisOrNew())
   }
 
@@ -602,14 +601,14 @@ class Vector4f : Externalizable, Vector4fc {
    * the second multiplicand
    * @return a vector holding the result
    */
-  fun fma(a: Float, b: Vector4fc): Vector4f {
+  fun fma(a: Float, b: Vector4c): Vector4 {
     return fma(a, b, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#fma(Vector4fc, Vector4fc, Vector4f)
+     * @see Vector4c#fma(Vector4c, Vector4c, Vector4)
      */
-  override fun fma(a: Vector4fc, b: Vector4fc, dest: Vector4f): Vector4f {
+  override fun fma(a: Vector4c, b: Vector4c, dest: Vector4): Vector4 {
     dest.x = x + a.x * b.x
     dest.y = y + a.y * b.y
     dest.z = z + a.z * b.z
@@ -618,9 +617,9 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#fma(float, Vector4fc, Vector4f)
+     * @see Vector4c#fma(float, Vector4c, Vector4)
      */
-  override fun fma(a: Float, b: Vector4fc, dest: Vector4f): Vector4f {
+  override fun fma(a: Float, b: Vector4c, dest: Vector4): Vector4 {
     dest.x = x + a * b.x
     dest.y = y + a * b.y
     dest.z = z + a * b.z
@@ -629,20 +628,20 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /**
-   * Multiply this Vector4f component-wise by another Vector4f.
+   * Multiply this Vector4 component-wise by another Vector4.
    *
    * @param v
    * the other vector
    * @return a vector holding the result
    */
-  fun mul(v: Vector4fc): Vector4f {
+  fun mul(v: Vector4c): Vector4 {
     return mul(v, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#mul(Vector4fc, Vector4f)
+     * @see Vector4c#mul(Vector4c, Vector4)
      */
-  override fun mul(v: Vector4fc, dest: Vector4f): Vector4f {
+  override fun mul(v: Vector4c, dest: Vector4): Vector4 {
     dest.x = x * v.x
     dest.y = y * v.y
     dest.z = z * v.z
@@ -651,20 +650,20 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /**
-   * Divide this Vector4f component-wise by another Vector4f.
+   * Divide this Vector4 component-wise by another Vector4.
    *
    * @param v
    * the vector to divide by
    * @return a vector holding the result
    */
-  operator fun div(v: Vector4fc): Vector4f {
+  operator fun div(v: Vector4c): Vector4 {
     return div(v, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#div(Vector4fc, Vector4f)
+     * @see Vector4c#div(Vector4c, Vector4)
      */
-  override fun div(v: Vector4fc, dest: Vector4f): Vector4f {
+  override fun div(v: Vector4c, dest: Vector4): Vector4 {
     dest.x = x / v.x
     dest.y = y / v.y
     dest.z = z / v.z
@@ -673,28 +672,28 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /**
-   * Multiply the given matrix mat with this Vector4f and store the result in
+   * Multiply the given matrix mat with this Vector4 and store the result in
    * `this`.
    *
    * @param mat
    * the matrix to multiply the vector with
    * @return a vector holding the result
    */
-  fun mul(mat: Matrix4fc): Vector4f {
+  fun mul(mat: Matrix4fc): Vector4 {
     return mul(mat, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#mul(Matrix4fc, Vector4f)
+     * @see Vector4c#mul(Matrix4fc, Vector4)
      */
-  override fun mul(mat: Matrix4fc, dest: Vector4f): Vector4f {
+  override fun mul(mat: Matrix4fc, dest: Vector4): Vector4 {
     return if (mat.properties() and Matrix4fc.PROPERTY_AFFINE != 0) mulAffine(mat, dest) else mulGeneric(mat, dest)
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#mulAffine(Matrix4fc, Vector4f)
+     * @see Vector4c#mulAffine(Matrix4fc, Vector4)
      */
-  override fun mulAffine(mat: Matrix4fc, dest: Vector4f): Vector4f {
+  override fun mulAffine(mat: Matrix4fc, dest: Vector4): Vector4 {
     val rx = mat.m00() * x + mat.m10() * y + mat.m20() * z + mat.m30() * w
     val ry = mat.m01() * x + mat.m11() * y + mat.m21() * z + mat.m31() * w
     val rz = mat.m02() * x + mat.m12() * y + mat.m22() * z + mat.m32() * w
@@ -705,7 +704,7 @@ class Vector4f : Externalizable, Vector4fc {
     return dest
   }
 
-  private fun mulGeneric(mat: Matrix4fc, dest: Vector4f): Vector4f {
+  private fun mulGeneric(mat: Matrix4fc, dest: Vector4): Vector4 {
     val rx = mat.m00() * x + mat.m10() * y + mat.m20() * z + mat.m30() * w
     val ry = mat.m01() * x + mat.m11() * y + mat.m21() * z + mat.m31() * w
     val rz = mat.m02() * x + mat.m12() * y + mat.m22() * z + mat.m32() * w
@@ -718,21 +717,21 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /**
-   * Multiply the given matrix mat with this Vector4f and store the result in
+   * Multiply the given matrix mat with this Vector4 and store the result in
    * `this`.
    *
    * @param mat
    * the matrix to multiply the vector with
    * @return a vector holding the result
    */
-  fun mul(mat: Matrix4x3fc): Vector4f {
+  fun mul(mat: Matrix4x3fc): Vector4 {
     return mul(mat, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#mul(org.joml.Matrix4x3fc, Vector4f)
+     * @see Vector4c#mul(org.joml.Matrix4x3fc, Vector4)
      */
-  override fun mul(mat: Matrix4x3fc, dest: Vector4f): Vector4f {
+  override fun mul(mat: Matrix4x3fc, dest: Vector4): Vector4 {
     val rx = mat.m00() * x + mat.m10() * y + mat.m20() * z + mat.m30() * w
     val ry = mat.m01() * x + mat.m11() * y + mat.m21() * z + mat.m31() * w
     val rz = mat.m02() * x + mat.m12() * y + mat.m22() * z + mat.m32() * w
@@ -744,9 +743,9 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#mulProject(Matrix4fc, Vector4f)
+     * @see Vector4c#mulProject(Matrix4fc, Vector4)
      */
-  override fun mulProject(mat: Matrix4fc, dest: Vector4f): Vector4f {
+  override fun mulProject(mat: Matrix4fc, dest: Vector4): Vector4 {
     val invW = 1.0f / (mat.m03() * x + mat.m13() * y + mat.m23() * z + mat.m33() * w)
     val rx = (mat.m00() * x + mat.m10() * y + mat.m20() * z + mat.m30()) * invW
     val ry = (mat.m01() * x + mat.m11() * y + mat.m21() * z + mat.m31()) * invW
@@ -759,32 +758,32 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /**
-   * Multiply the given matrix `mat` with this Vector4f, perform perspective division.
+   * Multiply the given matrix `mat` with this Vector4, perform perspective division.
    *
    * @param mat
    * the matrix to multiply this vector by
    * @return a vector holding the result
    */
-  fun mulProject(mat: Matrix4fc): Vector4f {
+  fun mulProject(mat: Matrix4fc): Vector4 {
     return mulProject(mat, thisOrNew())
   }
 
   /**
-   * Multiply all components of this [Vector4f] by the given scalar
+   * Multiply all components of this [Vector4] by the given scalar
    * value.
    *
    * @param scalar
    * the scalar to multiply by
    * @return a vector holding the result
    */
-  fun mul(scalar: Float): Vector4f {
+  fun mul(scalar: Float): Vector4 {
     return mul(scalar, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#mul(float, Vector4f)
+     * @see Vector4c#mul(float, Vector4)
      */
-  override fun mul(scalar: Float, dest: Vector4f): Vector4f {
+  override fun mul(scalar: Float, dest: Vector4): Vector4 {
     dest.x = x * scalar
     dest.y = y * scalar
     dest.z = z * scalar
@@ -793,7 +792,7 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /**
-   * Multiply the components of this Vector4f by the given scalar values and store the result in `this`.
+   * Multiply the components of this Vector4 by the given scalar values and store the result in `this`.
    *
    * @param x
    * the x component to multiply by
@@ -805,14 +804,14 @@ class Vector4f : Externalizable, Vector4fc {
    * the w component to multiply by
    * @return a vector holding the result
    */
-  fun mul(x: Float, y: Float, z: Float, w: Float): Vector4f {
+  fun mul(x: Float, y: Float, z: Float, w: Float): Vector4 {
     return mul(x, y, z, w, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#mul(float, float, float, float, Vector4f)
+     * @see Vector4c#mul(float, float, float, float, Vector4)
      */
-  override fun mul(x: Float, y: Float, z: Float, w: Float, dest: Vector4f): Vector4f {
+  override fun mul(x: Float, y: Float, z: Float, w: Float, dest: Vector4): Vector4 {
     dest.x = this.x * x
     dest.y = this.y * y
     dest.z = this.z * z
@@ -821,21 +820,21 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /**
-   * Divide all components of this [Vector4f] by the given scalar
+   * Divide all components of this [Vector4] by the given scalar
    * value.
    *
    * @param scalar
    * the scalar to divide by
    * @return a vector holding the result
    */
-  operator fun div(scalar: Float): Vector4f {
+  operator fun div(scalar: Float): Vector4 {
     return div(scalar, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#div(float, Vector4f)
+     * @see Vector4c#div(float, Vector4)
      */
-  override fun div(scalar: Float, dest: Vector4f): Vector4f {
+  override fun div(scalar: Float, dest: Vector4): Vector4 {
     val inv = 1.0f / scalar
     dest.x = x * inv
     dest.y = y * inv
@@ -845,7 +844,7 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /**
-   * Divide the components of this Vector4f by the given scalar values and store the result in `this`.
+   * Divide the components of this Vector4 by the given scalar values and store the result in `this`.
    *
    * @param x
    * the x component to divide by
@@ -857,14 +856,14 @@ class Vector4f : Externalizable, Vector4fc {
    * the w component to divide by
    * @return a vector holding the result
    */
-  fun div(x: Float, y: Float, z: Float, w: Float): Vector4f {
+  fun div(x: Float, y: Float, z: Float, w: Float): Vector4 {
     return div(x, y, z, w, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#div(float, float, float, float, Vector4f)
+     * @see Vector4c#div(float, float, float, float, Vector4)
      */
-  override fun div(x: Float, y: Float, z: Float, w: Float, dest: Vector4f): Vector4f {
+  override fun div(x: Float, y: Float, z: Float, w: Float, dest: Vector4): Vector4 {
     dest.x = this.x / x
     dest.y = this.y / y
     dest.z = this.z / z
@@ -880,14 +879,14 @@ class Vector4f : Externalizable, Vector4fc {
    * the quaternion to rotate this vector
    * @return a vector holding the result
    */
-  fun rotate(quat: Quaternionfc): Vector4f {
+  fun rotate(quat: Quaternionfc): Vector4 {
     return rotate(quat, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#rotate(Quaternionf, Vector4f)
+     * @see Vector4c#rotate(Quaternionf, Vector4)
      */
-  override fun rotate(quat: Quaternionfc, dest: Vector4f): Vector4f {
+  override fun rotate(quat: Quaternionfc, dest: Vector4): Vector4 {
     return quat.transform(this, dest)
   }
 
@@ -904,14 +903,14 @@ class Vector4f : Externalizable, Vector4fc {
    * the z component of the rotation axis
    * @return a vector holding the result
    */
-  fun rotateAbout(angle: Float, x: Float, y: Float, z: Float): Vector4f {
+  fun rotateAbout(angle: Float, x: Float, y: Float, z: Float): Vector4 {
     return rotateAxis(angle, x, y, z, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#rotateAxis(float, float, float, float, Vector4f)
+     * @see Vector4c#rotateAxis(float, float, float, float, Vector4)
      */
-  override fun rotateAxis(angle: Float, aX: Float, aY: Float, aZ: Float, dest: Vector4f): Vector4f {
+  override fun rotateAxis(angle: Float, aX: Float, aY: Float, aZ: Float, dest: Vector4): Vector4 {
     val hangle = angle * 0.5f
     val sinAngle = Math.sin(hangle.toDouble()).toFloat()
     val qx = aX * sinAngle
@@ -944,14 +943,14 @@ class Vector4f : Externalizable, Vector4fc {
    * the angle in radians
    * @return a vector holding the result
    */
-  fun rotateX(angle: Float): Vector4f {
+  fun rotateX(angle: Float): Vector4 {
     return rotateX(angle, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#rotateX(float, Vector4f)
+     * @see Vector4c#rotateX(float, Vector4)
      */
-  override fun rotateX(angle: Float, dest: Vector4f): Vector4f {
+  override fun rotateX(angle: Float, dest: Vector4): Vector4 {
     val sin = Math.sin(angle.toDouble()).toFloat()
     val cos = Math.cosFromSin(sin.toDouble(), angle.toDouble()).toFloat()
     val y = this.y * cos - this.z * sin
@@ -970,14 +969,14 @@ class Vector4f : Externalizable, Vector4fc {
    * the angle in radians
    * @return a vector holding the result
    */
-  fun rotateY(angle: Float): Vector4f {
+  fun rotateY(angle: Float): Vector4 {
     return rotateY(angle, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#rotateY(float, Vector4f)
+     * @see Vector4c#rotateY(float, Vector4)
      */
-  override fun rotateY(angle: Float, dest: Vector4f): Vector4f {
+  override fun rotateY(angle: Float, dest: Vector4): Vector4 {
     val sin = Math.sin(angle.toDouble()).toFloat()
     val cos = Math.cosFromSin(sin.toDouble(), angle.toDouble()).toFloat()
     val x = this.x * cos + this.z * sin
@@ -996,14 +995,14 @@ class Vector4f : Externalizable, Vector4fc {
    * the angle in radians
    * @return a vector holding the result
    */
-  fun rotateZ(angle: Float): Vector4f {
+  fun rotateZ(angle: Float): Vector4 {
     return rotateZ(angle, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#rotateZ(float, Vector4f)
+     * @see Vector4c#rotateZ(float, Vector4)
      */
-  override fun rotateZ(angle: Float, dest: Vector4f): Vector4f {
+  override fun rotateZ(angle: Float, dest: Vector4): Vector4 {
     val sin = Math.sin(angle.toDouble()).toFloat()
     val cos = Math.cosFromSin(sin.toDouble(), angle.toDouble()).toFloat()
     val x = this.x * cos - this.y * sin
@@ -1016,14 +1015,14 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#lengthSquared()
+     * @see Vector4c#lengthSquared()
      */
   override fun lengthSquared(): Float {
     return x * x + y * y + z * z + w * w
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#length()
+     * @see Vector4c#length()
      */
   override fun length(): Float {
     return Math.sqrt(lengthSquared().toDouble()).toFloat()
@@ -1034,14 +1033,14 @@ class Vector4f : Externalizable, Vector4fc {
    *
    * @return a vector holding the result
    */
-  fun normalize(): Vector4f {
+  fun normalize(): Vector4 {
     return normalize(thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#normalize(Vector4f)
+     * @see Vector4c#normalize(Vector4)
      */
-  override fun normalize(dest: Vector4f): Vector4f {
+  override fun normalize(dest: Vector4): Vector4 {
     val invLength = 1.0f / length()
     dest.x = x * invLength
     dest.y = y * invLength
@@ -1057,14 +1056,14 @@ class Vector4f : Externalizable, Vector4fc {
    * the desired length
    * @return a vector holding the result
    */
-  fun normalize(length: Float): Vector4f {
+  fun normalize(length: Float): Vector4 {
     return normalize(length, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#normalize(float, Vector4f)
+     * @see Vector4c#normalize(float, Vector4)
      */
-  override fun normalize(length: Float, dest: Vector4f): Vector4f {
+  override fun normalize(length: Float, dest: Vector4): Vector4 {
     val invLength = 1.0f / length() * length
     dest.x = x * invLength
     dest.y = y * invLength
@@ -1074,10 +1073,10 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#normalize3(Vector4f)
+     * @see Vector4c#normalize3(Vector4)
      */
   @JvmOverloads
-  fun normalize3(dest: Vector4f = thisOrNew()): Vector4f {
+  fun normalize3(dest: Vector4 = thisOrNew()): Vector4 {
     val invLength = 1.0f / Math.sqrt((x * x + y * y + z * z).toDouble()).toFloat()
     dest.x = x * invLength
     dest.y = y * invLength
@@ -1087,14 +1086,14 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#distance(Vector4fc)
+     * @see Vector4c#distance(Vector4c)
      */
-  override fun distance(v: Vector4fc): Float {
+  override fun distance(v: Vector4c): Float {
     return distance(v.x, v.y, v.z, v.w)
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#distance(float, float, float, float)
+     * @see Vector4c#distance(float, float, float, float)
      */
   override fun distance(x: Float, y: Float, z: Float, w: Float): Float {
     val dx = this.x - x
@@ -1105,23 +1104,23 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#dot(Vector4fc)
+     * @see Vector4c#dot(Vector4c)
      */
-  override fun dot(v: Vector4fc): Float {
+  override fun dot(v: Vector4c): Float {
     return x * v.x + y * v.y + z * v.z + w * v.w
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#dot(float, float, float, float)
+     * @see Vector4c#dot(float, float, float, float)
      */
   override fun dot(x: Float, y: Float, z: Float, w: Float): Float {
     return this.x * x + this.y * y + this.z * z + this.w * w
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#angleCos(Vector4fc)
+     * @see Vector4c#angleCos(Vector4c)
      */
-  override fun angleCos(v: Vector4fc): Float {
+  override fun angleCos(v: Vector4c): Float {
     val length1Sqared = (x * x + y * y + z * z + w * w).toDouble()
     val length2Sqared = (v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w).toDouble()
     val dot = (x * v.x + y * v.y + z * v.z + w * v.w).toDouble()
@@ -1129,9 +1128,9 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#angle(Vector4fc)
+     * @see Vector4c#angle(Vector4c)
      */
-  override fun angle(v: Vector4fc): Float {
+  override fun angle(v: Vector4c): Float {
     var cos = angleCos(v)
     // This is because sometimes cos goes above 1 or below -1 because of lost precision
     cos = if (cos < 1) cos else 1f
@@ -1144,7 +1143,7 @@ class Vector4f : Externalizable, Vector4fc {
    *
    * @return a vector holding the result
    */
-  fun zero(): Vector4f {
+  fun zero(): Vector4 {
     val dest = thisOrNew()
     MemUtil.INSTANCE.zero(dest)
     return dest
@@ -1155,14 +1154,14 @@ class Vector4f : Externalizable, Vector4fc {
    *
    * @return a vector holding the result
    */
-  fun negate(): Vector4f {
+  fun negate(): Vector4 {
     return negate(thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#negate(Vector4f)
+     * @see Vector4c#negate(Vector4)
      */
-  override fun negate(dest: Vector4f): Vector4f {
+  override fun negate(dest: Vector4): Vector4 {
     dest.x = -x
     dest.y = -y
     dest.z = -z
@@ -1216,11 +1215,11 @@ class Vector4f : Externalizable, Vector4fc {
    * the other vector
    * @return a vector holding the result
    */
-  fun min(v: Vector4fc): Vector4f {
+  fun min(v: Vector4c): Vector4 {
     return min(v, thisOrNew())
   }
 
-  override fun min(v: Vector4fc, dest: Vector4f): Vector4f {
+  override fun min(v: Vector4c, dest: Vector4): Vector4 {
     dest.x = if (x < v.x) x else v.x
     dest.y = if (y < v.y) y else v.y
     dest.z = if (z < v.z) z else v.z
@@ -1235,11 +1234,11 @@ class Vector4f : Externalizable, Vector4fc {
    * the other vector
    * @return a vector holding the result
    */
-  fun max(v: Vector4fc): Vector4f {
+  fun max(v: Vector4c): Vector4 {
     return max(v, thisOrNew())
   }
 
-  override fun max(v: Vector4fc, dest: Vector4f): Vector4f {
+  override fun max(v: Vector4c, dest: Vector4): Vector4 {
     dest.x = if (x > v.x) x else v.x
     dest.y = if (y > v.y) y else v.y
     dest.z = if (z > v.z) z else v.z
@@ -1264,7 +1263,7 @@ class Vector4f : Externalizable, Vector4fc {
       return false
     if (javaClass != obj.javaClass)
       return false
-    val other = obj as Vector4f?
+    val other = obj as Vector4?
     if (java.lang.Float.floatToIntBits(w) != java.lang.Float.floatToIntBits(other!!.w))
       return false
     if (java.lang.Float.floatToIntBits(x) != java.lang.Float.floatToIntBits(other.x))
@@ -1275,9 +1274,9 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#smoothStep(Vector4fc, float, Vector4f)
+     * @see Vector4c#smoothStep(Vector4c, float, Vector4)
      */
-  override fun smoothStep(v: Vector4fc, t: Float, dest: Vector4f): Vector4f {
+  override fun smoothStep(v: Vector4c, t: Float, dest: Vector4): Vector4 {
     val t2 = t * t
     val t3 = t2 * t
     dest.x = (x + x - v.x - v.x) * t3 + (3.0f * v.x - 3.0f * x) * t2 + x * t + x
@@ -1288,9 +1287,9 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#hermite(Vector4fc, Vector4fc, Vector4fc, float, Vector4f)
+     * @see Vector4c#hermite(Vector4c, Vector4c, Vector4c, float, Vector4)
      */
-  override fun hermite(t0: Vector4fc, v1: Vector4fc, t1: Vector4fc, t: Float, dest: Vector4f): Vector4f {
+  override fun hermite(t0: Vector4c, v1: Vector4c, t1: Vector4c, t: Float, dest: Vector4): Vector4 {
     val t2 = t * t
     val t3 = t2 * t
     dest.x = (x + x - v1.x - v1.x + t1.x + t0.x) * t3 + (3.0f * v1.x - 3.0f * x - t0.x - t0.x - t1.x) * t2 + x * t + x
@@ -1314,14 +1313,14 @@ class Vector4f : Externalizable, Vector4fc {
    * the interpolation factor between 0.0 and 1.0
    * @return a vector holding the result
    */
-  fun lerp(other: Vector4fc, t: Float): Vector4f {
+  fun lerp(other: Vector4c, t: Float): Vector4 {
     return lerp(other, t, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#lerp(Vector4fc, float, Vector4f)
+     * @see Vector4c#lerp(Vector4c, float, Vector4)
      */
-  override fun lerp(other: Vector4fc, t: Float, dest: Vector4f): Vector4f {
+  override fun lerp(other: Vector4c, t: Float, dest: Vector4): Vector4 {
     dest.x = x + (other.x - x) * t
     dest.y = y + (other.y - y) * t
     dest.z = z + (other.z - z) * t
@@ -1330,7 +1329,7 @@ class Vector4f : Externalizable, Vector4fc {
   }
 
   /* (non-Javadoc)
-     * @see Vector4fc#get(int)
+     * @see Vector4c#get(int)
      */
   @Throws(IllegalArgumentException::class)
   override fun get(component: Int): Float {

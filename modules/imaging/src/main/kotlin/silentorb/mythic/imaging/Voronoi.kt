@@ -6,6 +6,7 @@ import silentorb.mythic.spatial.toVector2
 import silentorb.mythic.spatial.toVector2i
 import org.joml.Vector2i
 import silentorb.mythic.randomly.Dice
+import silentorb.mythic.spatial.plus
 
 data class AnchorGrid(
     val length: Int,

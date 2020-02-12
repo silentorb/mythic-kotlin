@@ -23,6 +23,7 @@
 package org.joml
 
 import silentorb.mythic.spatial.Quaternionfc
+import silentorb.mythic.spatial.Vector4
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 
@@ -31,7 +32,7 @@ import java.nio.FloatBuffer
  *
  * @author Kai Burjack
  */
-interface Vector4fc {
+interface Vector4c {
 
   /**
    * @return the value of the x component
@@ -134,7 +135,7 @@ interface Vector4fc {
    * the off-heap address where to store this vector
    * @return this
    */
-  fun getToAddress(address: Long): Vector4fc
+  fun getToAddress(address: Long): Vector4c
 
   /**
    * Subtract the supplied vector from this one and store the result in `dest`.
@@ -145,7 +146,7 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun sub(v: Vector4fc, dest: Vector4f): Vector4f
+  fun sub(v: Vector4c, dest: Vector4): Vector4
 
   /**
    * Subtract <tt>(x, y, z, w)</tt> from this and store the result in `dest`.
@@ -162,7 +163,7 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun sub(x: Float, y: Float, z: Float, w: Float, dest: Vector4f): Vector4f
+  fun sub(x: Float, y: Float, z: Float, w: Float, dest: Vector4): Vector4
 
   /**
    * Add the supplied vector to this one and store the result in `dest`.
@@ -173,7 +174,7 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun add(v: Vector4fc, dest: Vector4f): Vector4f
+  fun add(v: Vector4c, dest: Vector4): Vector4
 
   /**
    * Increment the components of this vector by the given values and store the result in `dest`.
@@ -190,7 +191,7 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun add(x: Float, y: Float, z: Float, w: Float, dest: Vector4f): Vector4f
+  fun add(x: Float, y: Float, z: Float, w: Float, dest: Vector4): Vector4
 
   /**
    * Add the component-wise multiplication of `a * b` to this vector
@@ -204,7 +205,7 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun fma(a: Vector4fc, b: Vector4fc, dest: Vector4f): Vector4f
+  fun fma(a: Vector4c, b: Vector4c, dest: Vector4): Vector4
 
   /**
    * Add the component-wise multiplication of `a * b` to this vector
@@ -218,10 +219,10 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun fma(a: Float, b: Vector4fc, dest: Vector4f): Vector4f
+  fun fma(a: Float, b: Vector4c, dest: Vector4): Vector4
 
   /**
-   * Multiply this Vector4f component-wise by another Vector4f and store the result in `dest`.
+   * Multiply this Vector4 component-wise by another Vector4 and store the result in `dest`.
    *
    * @param v
    * the other vector
@@ -229,10 +230,10 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun mul(v: Vector4fc, dest: Vector4f): Vector4f
+  fun mul(v: Vector4c, dest: Vector4): Vector4
 
   /**
-   * Divide this Vector4f component-wise by another Vector4f and store the result in `dest`.
+   * Divide this Vector4 component-wise by another Vector4 and store the result in `dest`.
    *
    * @param v
    * the vector to divide by
@@ -240,10 +241,10 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun div(v: Vector4fc, dest: Vector4f): Vector4f
+  fun div(v: Vector4c, dest: Vector4): Vector4
 
   /**
-   * Multiply the given matrix mat with this Vector4f and store the result in
+   * Multiply the given matrix mat with this Vector4 and store the result in
    * `dest`.
    *
    * @param mat
@@ -252,10 +253,10 @@ interface Vector4fc {
    * the destination vector to hold the result
    * @return dest
    */
-  fun mul(mat: Matrix4fc, dest: Vector4f): Vector4f
+  fun mul(mat: Matrix4fc, dest: Vector4): Vector4
 
   /**
-   * Multiply the given affine matrix mat with this Vector4f and store the result in
+   * Multiply the given affine matrix mat with this Vector4 and store the result in
    * `dest`.
    *
    * @param mat
@@ -264,10 +265,10 @@ interface Vector4fc {
    * the destination vector to hold the result
    * @return dest
    */
-  fun mulAffine(mat: Matrix4fc, dest: Vector4f): Vector4f
+  fun mulAffine(mat: Matrix4fc, dest: Vector4): Vector4
 
   /**
-   * Multiply the given matrix mat with this Vector4f and store the result in
+   * Multiply the given matrix mat with this Vector4 and store the result in
    * `dest`.
    *
    * @param mat
@@ -276,10 +277,10 @@ interface Vector4fc {
    * the destination vector to hold the result
    * @return dest
    */
-  fun mul(mat: Matrix4x3fc, dest: Vector4f): Vector4f
+  fun mul(mat: Matrix4x3fc, dest: Vector4): Vector4
 
   /**
-   * Multiply the given matrix `mat` with this Vector4f, perform perspective division
+   * Multiply the given matrix `mat` with this Vector4, perform perspective division
    * and store the result in `dest`.
    *
    * @param mat
@@ -288,10 +289,10 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun mulProject(mat: Matrix4fc, dest: Vector4f): Vector4f
+  fun mulProject(mat: Matrix4fc, dest: Vector4): Vector4
 
   /**
-   * Multiply all components of this [Vector4f] by the given scalar
+   * Multiply all components of this [Vector4] by the given scalar
    * value and store the result in `dest`.
    *
    * @param scalar
@@ -300,10 +301,10 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun mul(scalar: Float, dest: Vector4f): Vector4f
+  fun mul(scalar: Float, dest: Vector4): Vector4
 
   /**
-   * Multiply the components of this Vector4f by the given scalar values and store the result in `dest`.
+   * Multiply the components of this Vector4 by the given scalar values and store the result in `dest`.
    *
    * @param x
    * the x component to multiply by
@@ -317,10 +318,10 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun mul(x: Float, y: Float, z: Float, w: Float, dest: Vector4f): Vector4f
+  fun mul(x: Float, y: Float, z: Float, w: Float, dest: Vector4): Vector4
 
   /**
-   * Divide all components of this [Vector4f] by the given scalar
+   * Divide all components of this [Vector4] by the given scalar
    * value and store the result in `dest`.
    *
    * @param scalar
@@ -329,10 +330,10 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun div(scalar: Float, dest: Vector4f): Vector4f
+  fun div(scalar: Float, dest: Vector4): Vector4
 
   /**
-   * Divide the components of this Vector4f by the given scalar values and store the result in `dest`.
+   * Divide the components of this Vector4 by the given scalar values and store the result in `dest`.
    *
    * @param x
    * the x component to divide by
@@ -346,7 +347,7 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun div(x: Float, y: Float, z: Float, w: Float, dest: Vector4f): Vector4f
+  fun div(x: Float, y: Float, z: Float, w: Float, dest: Vector4): Vector4
 
   /**
    * Rotate this vector by the given quaternion `quat` and store the result in `dest`.
@@ -358,7 +359,7 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun rotate(quat: Quaternionfc, dest: Vector4f): Vector4f
+  fun rotate(quat: Quaternionfc, dest: Vector4): Vector4
 
   /**
    * Rotate this vector the specified radians around the given rotation axis and store the result
@@ -376,7 +377,7 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun rotateAxis(angle: Float, aX: Float, aY: Float, aZ: Float, dest: Vector4f): Vector4f
+  fun rotateAxis(angle: Float, aX: Float, aY: Float, aZ: Float, dest: Vector4): Vector4
 
   /**
    * Rotate this vector the specified radians around the X axis and store the result
@@ -388,7 +389,7 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun rotateX(angle: Float, dest: Vector4f): Vector4f
+  fun rotateX(angle: Float, dest: Vector4): Vector4
 
   /**
    * Rotate this vector the specified radians around the Y axis and store the result
@@ -400,7 +401,7 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun rotateY(angle: Float, dest: Vector4f): Vector4f
+  fun rotateY(angle: Float, dest: Vector4): Vector4
 
   /**
    * Rotate this vector the specified radians around the Z axis and store the result
@@ -412,7 +413,7 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun rotateZ(angle: Float, dest: Vector4f): Vector4f
+  fun rotateZ(angle: Float, dest: Vector4): Vector4
 
   /**
    * Return the length squared of this vector.
@@ -435,7 +436,7 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun normalize(dest: Vector4f): Vector4f
+  fun normalize(dest: Vector4): Vector4
 
   /**
    * Scale this vector to have the given length and store the result in `dest`.
@@ -446,7 +447,7 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun normalize(length: Float, dest: Vector4f): Vector4f
+  fun normalize(length: Float, dest: Vector4): Vector4
 
   /**
    * Return the distance between `this` vector and `v`.
@@ -455,7 +456,7 @@ interface Vector4fc {
    * the other vector
    * @return the euclidean distance
    */
-  fun distance(v: Vector4fc): Float
+  fun distance(v: Vector4c): Float
 
   /**
    * Return the distance between `this` vector and <tt>(x, y, z, w)</tt>.
@@ -480,7 +481,7 @@ interface Vector4fc {
    * the other vector
    * @return the dot product
    */
-  fun dot(v: Vector4fc): Float
+  fun dot(v: Vector4c): Float
 
   /**
    * Compute the dot product (inner product) of this vector and <tt>(x, y, z, w)</tt>.
@@ -505,7 +506,7 @@ interface Vector4fc {
    * the other vector
    * @return the cosine of the angle
    */
-  fun angleCos(v: Vector4fc): Float
+  fun angleCos(v: Vector4c): Float
 
   /**
    * Return the angle between this vector and the supplied vector.
@@ -515,7 +516,7 @@ interface Vector4fc {
    * the other vector
    * @return the angle, in radians
    */
-  fun angle(v: Vector4fc): Float
+  fun angle(v: Vector4c): Float
 
   /**
    * Negate this vector and store the result in `dest`.
@@ -524,7 +525,7 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun negate(dest: Vector4f): Vector4f
+  fun negate(dest: Vector4): Vector4
 
   /**
    * Set the components of `dest` to be the component-wise minimum of this and the other vector.
@@ -535,7 +536,7 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun min(v: Vector4fc, dest: Vector4f): Vector4f
+  fun min(v: Vector4c, dest: Vector4): Vector4
 
   /**
    * Set the components of `dest` to be the component-wise maximum of this and the other vector.
@@ -546,7 +547,7 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun max(v: Vector4fc, dest: Vector4f): Vector4f
+  fun max(v: Vector4c, dest: Vector4): Vector4
 
   /**
    * Linearly interpolate `this` and `other` using the given interpolation factor `t`
@@ -564,7 +565,7 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun lerp(other: Vector4fc, t: Float, dest: Vector4f): Vector4f
+  fun lerp(other: Vector4c, t: Float, dest: Vector4): Vector4
 
   /**
    * Compute a smooth-step (i.e. hermite with zero tangents) interpolation
@@ -579,7 +580,7 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun smoothStep(v: Vector4fc, t: Float, dest: Vector4f): Vector4f
+  fun smoothStep(v: Vector4c, t: Float, dest: Vector4): Vector4
 
   /**
    * Compute a hermite interpolation between `this` vector and its
@@ -599,7 +600,7 @@ interface Vector4fc {
    * will hold the result
    * @return dest
    */
-  fun hermite(t0: Vector4fc, v1: Vector4fc, t1: Vector4fc, t: Float, dest: Vector4f): Vector4f
+  fun hermite(t0: Vector4c, v1: Vector4c, t1: Vector4c, t: Float, dest: Vector4): Vector4
 
   /**
    * Get the value of the specified component of this vector.
