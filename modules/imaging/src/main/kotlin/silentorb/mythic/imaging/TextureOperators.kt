@@ -187,6 +187,14 @@ val voronoiBoundaryOperator: FunctionImplementation = withBuffer("dimensions", w
 //  }
 }
 
+val newSolidColor: FunctionImplementation = { arguments ->
+  Vector3(arguments["red"] as Float, arguments["green"] as Float, arguments["blue"] as Float)
+}
+
+val newDimensions: FunctionImplementation = { arguments ->
+  Vector2i(arguments["width"] as Int, arguments["height"] as Int)
+}
+
 private val textureFunctions = mapOf(
     "coloredCheckers" to coloredCheckers,
     "checkers" to grayscaleCheckers,
@@ -212,7 +220,7 @@ val dimensionsKey = PathKey(texturingPath, "Dimensions")
 
 // Function Keys
 val coloredCheckersKey = PathKey(texturingPath, "coloredCheckers")
-val fromSolidColorKey = PathKey(texturingPath, "fromSolidColor")
+val fromSolidColorKey = PathKey(texturingPath, "solidColorToBitmap")
 val colorizeKey = PathKey(texturingPath, "colorize")
 val checkersKey = PathKey(texturingPath, "checkers")
 val maskKey = PathKey(texturingPath, "mask")
@@ -222,6 +230,18 @@ val perlinNoiseKey = PathKey(texturingPath, "perlinNoise")
 val voronoiBoundariesKey = PathKey(texturingPath, "voronoiBoundaries")
 
 fun completeTexturingFunctions() = listOf(
+    CompleteFunction(
+        path = solidColorKey,
+        signature = listOf(floatKey, floatKey, floatKey, solidColorKey),
+        parameters = listOf("red", "green", "blue"),
+        implementation = newSolidColor
+    ),
+    CompleteFunction(
+        path = dimensionsKey,
+        signature = listOf(intKey, intKey, dimensionsKey),
+        parameters = listOf("width", "height"),
+        implementation = newDimensions
+    ),
     CompleteFunction(
         path = coloredCheckersKey,
         signature = listOf(dimensionsKey, solidColorKey, solidColorKey, solidColorBitmapKey),
