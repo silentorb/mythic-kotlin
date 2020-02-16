@@ -1,6 +1,6 @@
 package silentorb.mythic.glowing
 
-import org.joml.Vector2i
+import silentorb.mythic.spatial.Vector2i
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL11.GL_LINEAR
 import org.lwjgl.opengl.GL11.GL_NEAREST

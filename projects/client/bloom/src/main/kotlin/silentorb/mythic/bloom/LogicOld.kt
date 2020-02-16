@@ -1,8 +1,7 @@
 package silentorb.mythic.bloom
 
 import silentorb.mythic.bloom.next.*
-import org.joml.Vector2i
-import silentorb.mythic.bloom.next.*
+import silentorb.mythic.spatial.Vector2i
 
 data class BloomState(
     val bag: StateBag,

@@ -3,7 +3,7 @@ package silentorb.mythic.drawing
 import silentorb.mythic.glowing.*
 import silentorb.mythic.spatial.*
 import silentorb.mythic.typography.*
-import org.joml.Vector2i
+import silentorb.mythic.spatial.Vector2i
 import org.joml.Vector4i
 import kotlin.math.cos
 import kotlin.math.sin

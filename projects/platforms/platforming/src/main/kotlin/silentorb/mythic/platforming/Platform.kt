@@ -1,10 +1,9 @@
 package silentorb.mythic.platforming
 
 import silentorb.mythic.spatial.Vector2
-import org.joml.Vector2i
+import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector3
 import java.nio.ByteBuffer
-import java.nio.ShortBuffer
 
 data class WindowInfo(val dimensions: Vector2i)
 

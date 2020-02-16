@@ -4,7 +4,7 @@ import silentorb.mythic.ent.mappedCache
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.toVector2
 import silentorb.mythic.spatial.toVector2i
-import org.joml.Vector2i
+import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.randomly.Dice
 import silentorb.mythic.spatial.plus
 

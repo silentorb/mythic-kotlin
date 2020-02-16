@@ -3,7 +3,7 @@ package silentorb.mythic.bloom
 import silentorb.mythic.bloom.next.Box
 import silentorb.mythic.bloom.next.Flower
 import silentorb.mythic.bloom.next.Seed
-import org.joml.Vector2i
+import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.minus
 import silentorb.mythic.spatial.plus
 

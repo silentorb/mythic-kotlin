@@ -1,6 +1,6 @@
 package silentorb.mythic.bloom
 
-import org.joml.Vector2i
+import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.plus
 
 typealias BloomId = Long

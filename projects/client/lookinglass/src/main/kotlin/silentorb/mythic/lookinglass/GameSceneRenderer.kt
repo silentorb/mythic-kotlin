@@ -7,7 +7,7 @@ import silentorb.mythic.glowing.globalState
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
-import org.joml.Vector2i
+import silentorb.mythic.spatial.Vector2i
 import org.joml.Vector4i
 import silentorb.mythic.lookinglass.drawing.armatureTransforms
 import silentorb.mythic.lookinglass.shading.Shaders

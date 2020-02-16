@@ -11,7 +11,7 @@ import silentorb.mythic.glowing.*
 import silentorb.mythic.platforming.PlatformDisplayConfig
 import silentorb.mythic.platforming.WindowInfo
 import silentorb.mythic.typography.*
-import org.joml.Vector2i
+import silentorb.mythic.spatial.Vector2i
 import org.joml.Vector4i
 import silentorb.mythic.spatial.div
 import org.lwjgl.BufferUtils

@@ -1,7 +1,7 @@
 package silentorb.mythic.desktop
 
 import silentorb.mythic.platforming.*
-import org.joml.Vector2i
+import silentorb.mythic.spatial.Vector2i
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.stb.STBImage.*
 import org.lwjgl.system.MemoryStack

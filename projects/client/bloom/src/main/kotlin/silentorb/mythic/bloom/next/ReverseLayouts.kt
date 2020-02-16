@@ -1,7 +1,6 @@
 package silentorb.mythic.bloom.next
 
-import silentorb.mythic.bloom.*
-import org.joml.Vector2i
+import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.bloom.ReversePlanePositioner
 import silentorb.mythic.bloom.horizontalPlaneMap
 import silentorb.mythic.bloom.verticalPlaneMap

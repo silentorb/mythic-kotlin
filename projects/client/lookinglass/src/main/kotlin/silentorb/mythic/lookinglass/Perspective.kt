@@ -4,6 +4,7 @@ import silentorb.mythic.spatial.*
 import org.joml.*
 import silentorb.mythic.scenery.Camera
 import silentorb.mythic.scenery.ProjectionType
+import silentorb.mythic.spatial.Vector2i
 
 data class CameraEffectsData(
     val transform: Matrix,

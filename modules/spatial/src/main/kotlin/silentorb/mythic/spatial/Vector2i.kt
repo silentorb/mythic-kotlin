@@ -20,8 +20,10 @@
  * THE SOFTWARE.
  *
  */
-package org.joml
+package silentorb.mythic.spatial
 
+import org.joml.Math
+import org.joml.Vector2ic
 import org.joml.internal.MemUtil
 import org.joml.internal.Options
 import org.joml.internal.Runtime

@@ -22,6 +22,7 @@
  */
 package org.joml
 
+import silentorb.mythic.spatial.Vector2i
 import java.nio.ByteBuffer
 import java.nio.IntBuffer
 

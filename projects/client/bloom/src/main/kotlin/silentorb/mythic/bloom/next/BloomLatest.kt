@@ -1,7 +1,7 @@
 package silentorb.mythic.bloom.next
 
 import silentorb.mythic.bloom.*
-import org.joml.Vector2i
+import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.minus
 import silentorb.mythic.spatial.plus
 

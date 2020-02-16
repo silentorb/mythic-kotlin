@@ -1,6 +1,6 @@
 package silentorb.mythic.imaging
 
-import org.joml.Vector2i
+import silentorb.mythic.spatial.Vector2i
 import org.joml.Vector3i
 import org.lwjgl.BufferUtils
 import silentorb.imp.core.*
@@ -36,7 +36,7 @@ fun fillBuffer(depth: Int, dimensions: Vector2i, action: (FloatBuffer) -> Unit):
   buffer.rewind()
   return Bitmap(
       dimensions = dimensions,
-      depth = depth,
+      channels = depth,
       buffer = buffer
   )
 }
@@ -48,7 +48,7 @@ data class BufferInfo<T>(
 
 data class Bitmap(
     val buffer: FloatBuffer,
-    val depth: Int,
+    val channels: Int,
     val dimensions: Vector2i
 )
 
@@ -292,5 +292,5 @@ fun completeTexturingFunctions() = listOf(
     )
 )
 
-fun texturingFunctions() =
+fun texturingLibrary() =
     partitionFunctions(completeTexturingFunctions())

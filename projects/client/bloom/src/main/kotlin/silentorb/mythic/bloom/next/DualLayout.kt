@@ -4,7 +4,7 @@ import silentorb.mythic.bloom.Bounds
 import silentorb.mythic.bloom.PlanePositioner
 import silentorb.mythic.bloom.horizontalPlaneMap
 import silentorb.mythic.bloom.verticalPlaneMap
-import org.joml.Vector2i
+import silentorb.mythic.spatial.Vector2i
 
 typealias DualLayout = (Seed, Flower) -> Pair<Box, Bounds>
 

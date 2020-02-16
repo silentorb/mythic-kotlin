@@ -10,8 +10,12 @@ repositories {
 }
 
 dependencies {
+  testImplementation("junit:junit:4.13")
   implementation(kotlin("stdlib-jdk8"))
   implementation("silentorb.imp:execution")
+  implementation("silentorb.imp:libraries_standard")
+  implementation("silentorb.imp:libraries_standard_implementation")
+  testImplementation("silentorb.imp:testing")
   api("silentorb.mythic:ent")
   api("silentorb.mythic:spatial")
   api("silentorb.mythic:randomly")

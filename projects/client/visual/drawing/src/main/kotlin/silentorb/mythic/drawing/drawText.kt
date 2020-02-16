@@ -8,7 +8,7 @@ import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.typography.TextConfiguration
 import silentorb.mythic.typography.TextPackage
 import silentorb.mythic.typography.prepareText
-import org.joml.Vector2i
+import silentorb.mythic.spatial.Vector2i
 import org.lwjgl.opengl.GL11.*
 
 fun getUnitScaling(dimensions: Vector2i) =
