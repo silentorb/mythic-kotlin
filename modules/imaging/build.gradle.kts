@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-  testImplementation("junit:junit:4.13")
+  testApi("junit:junit:4.13")
   implementation(kotlin("stdlib-jdk8"))
   implementation("silentorb.imp:execution")
   implementation("silentorb.imp:libraries_standard")

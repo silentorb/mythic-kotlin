@@ -1,13 +1,20 @@
 package silentorb.mythic.imaging
 
-import silentorb.mythic.spatial.Vector2i
 import org.joml.Vector3i
 import org.lwjgl.BufferUtils
-import silentorb.imp.core.*
-import silentorb.imp.execution.*
+import silentorb.imp.core.PathKey
+import silentorb.imp.core.floatKey
+import silentorb.imp.core.intKey
+import silentorb.imp.execution.Arguments
+import silentorb.imp.execution.CompleteFunction
+import silentorb.imp.execution.FunctionImplementation
+import silentorb.imp.execution.partitionFunctions
 import silentorb.mythic.ent.mappedCache
 import silentorb.mythic.randomly.Dice
+import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.minMax
+import thirdparty.noise.OpenSimplexNoise
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 
@@ -52,7 +59,9 @@ data class Bitmap(
     val dimensions: Vector2i
 )
 
-fun <T> withBuffer(dimensionsField: String, bufferInfo: BufferInfo<T>, function: (Arguments) -> (Float, Float) -> T): FunctionImplementation =
+typealias GetPixel<T> = (Float, Float) -> T
+
+fun <T> withBuffer(dimensionsField: String, bufferInfo: BufferInfo<T>, function: (Arguments) -> GetPixel<T>): FunctionImplementation =
     { arguments ->
       val dimensionsArgument = arguments[dimensionsField]!!
       val dimensions: Vector2i = if (dimensionsArgument is Vector2i)
@@ -102,18 +111,27 @@ val coloredCheckers: FunctionImplementation = withBuffer("dimensions", withBitma
   checkerPattern(first, second)
 }
 
-val grayscaleCheckers: FunctionImplementation = withBuffer("dimensions", withGrayscaleBuffer) { arguments ->
+val grayscaleCheckers: FunctionImplementation = withBuffer("dimensions", withGrayscaleBuffer) { _ ->
   checkerOp(0f, 1f)
 }
 
-val colorize: FunctionImplementation = withBuffer("grayscale", withBitmapBuffer) { arguments ->
+fun colorizeValue(arguments: Arguments): (Float) -> Vector3 {
+  val first = arguments["firstColor"]!! as SolidColor
+  val second = arguments["secondColor"]!! as SolidColor
+  return { unit ->
+    first * (1f - unit) + second * unit
+  }
+}
+
+val colorizeOperator: FunctionImplementation = withBuffer("grayscale", withBitmapBuffer) { arguments ->
   val grayscale = arguments["grayscale"]!! as FloatBuffer
   grayscale.rewind()
   val first = arguments["firstColor"]!! as SolidColor
   val second = arguments["secondColor"]!! as SolidColor
-  { x, y ->
-    val unit = grayscale.get()
-    first * (1f - unit) + second * unit
+  val colorize = colorizeValue(arguments)
+  ;
+  { _, _ ->
+    colorize(grayscale.get())
   }
 }
 
@@ -127,8 +145,8 @@ val maskOperator: FunctionImplementation = withBuffer("first", withBitmapBuffer)
   val first = floatBufferArgument(arguments, "first")
   val second = floatBufferArgument(arguments, "second")
   val mask = floatBufferArgument(arguments, "mask")
-  val k = 0
-  { x, y ->
+  ;
+  { _, _ ->
     val degree = mask.get()
     first.getVector3() * (1f - degree) + second.getVector3() * degree
   }
@@ -138,8 +156,8 @@ val mixBitmaps: FunctionImplementation = withBuffer("first", withBitmapBuffer) {
   val degree = arguments["degree"]!! as Float
   val first = floatBufferArgument(arguments, "first")
   val second = floatBufferArgument(arguments, "second")
-  val k = 0
-  { x, y ->
+  ;
+  { _, _ ->
     first.getVector3() * (1f - degree) + second.getVector3() * degree
   }
 }
@@ -165,14 +183,39 @@ val mixBitmaps: FunctionImplementation = withBuffer("first", withBitmapBuffer) {
 //      noiseSource.eval(x * scale, y * scale)
 //    }
 
-val simpleNoiseOperator: FunctionImplementation = withBuffer("dimensions", withGrayscaleBuffer) { arguments ->
-  val offset = arguments["offset"]!! as Int
-  val periods = arguments["periods"]!! as Int
-  val grid = dotGridGradient(periods, offset)
-  val k = 0
-  { x, y ->
-    perlin2d(grid, x * periods.toFloat(), y * periods.toFloat())
+fun noise(arguments: Arguments): GetPixel<Float> {
+  val scale = (arguments["scale"] as Float? ?: 10f)
+  val roughness = (arguments["roughness"] as Float? ?: 0.8f)
+  val octaveCount = arguments["octaves"]!! as Int? ?: 1
+  val generator = OpenSimplexNoise(1)
+  val amplitudeMod = roughness
+  val (octaves) = (0 until octaveCount)
+      .fold(Triple(listOf<Pair<Float, Float>>(), 1f, 1f)) { (accumulator, amplitude, frequency), b ->
+        val octave = Pair(frequency, amplitude)
+        Triple(accumulator.plus(octave), amplitude * amplitudeMod, frequency * 2f)
+      }
+  return { x, y ->
+    val rawValue = octaves.fold(0f) { a, (frequency, amplitude) ->
+      (generator.eval((x * frequency).toDouble(), (y * frequency).toDouble()).toFloat() * 0.5f + 0.5f) * amplitude
+    }
+    minMax(rawValue, 0f, 1f)
+  }
+}
 
+val simpleNoiseOperator: FunctionImplementation = withBuffer("dimensions", withGrayscaleBuffer) { arguments ->
+  val getNoise = noise(arguments)
+  ;
+  { x, y ->
+    getNoise(x, y)
+  }
+}
+
+val colorizedNoiseOperator: FunctionImplementation = withBuffer("dimensions", withBitmapBuffer) { arguments ->
+  val getNoise = noise(arguments)
+  val colorize = colorizeValue(arguments)
+  ;
+  { x, y ->
+    colorize(getNoise(x, y))
   }
 }
 
@@ -182,9 +225,6 @@ val voronoiBoundaryOperator: FunctionImplementation = withBuffer("dimensions", w
   val grid = newAnchorGrid(dice, length, 10)
   val nearestCells = mappedCache(getNearestCells(grid, 2))
   voronoi(length, nearestCells, voronoiBoundaries(0.05f * grid.length.toFloat()))
-//  { x, y ->
-//0f
-//  }
 }
 
 val newSolidColor: FunctionImplementation = { arguments ->
@@ -194,18 +234,6 @@ val newSolidColor: FunctionImplementation = { arguments ->
 val newDimensions: FunctionImplementation = { arguments ->
   Vector2i(arguments["width"] as Int, arguments["height"] as Int)
 }
-
-private val textureFunctions = mapOf(
-    "coloredCheckers" to coloredCheckers,
-    "checkers" to grayscaleCheckers,
-    "colorize" to colorize,
-    "solidColor" to solidColor,
-    "mask" to maskOperator,
-    "mixBitmaps" to mixBitmaps,
-//    "mixGrayscales" to mixGrayscales,
-    "perlinNoise" to simpleNoiseOperator,
-    "voronoiBoundaries" to voronoiBoundaryOperator
-)
 
 const val texturingPath = "silentorb.mythic.generation.texturing"
 
@@ -226,7 +254,8 @@ val checkersKey = PathKey(texturingPath, "checkers")
 val maskKey = PathKey(texturingPath, "mask")
 val mixBitmapsKey = PathKey(texturingPath, "mixBitmaps")
 val mixGrayscalesKey = PathKey(texturingPath, "mixGrayscales")
-val perlinNoiseKey = PathKey(texturingPath, "perlinNoise")
+val perlinNoiseGrayscaleKey = PathKey(texturingPath, "perlinNoiseGrayscale")
+val perlinNoiseColorKey = PathKey(texturingPath, "perlinNoiseColor")
 val voronoiBoundariesKey = PathKey(texturingPath, "voronoiBoundaries")
 
 fun completeTexturingFunctions() = listOf(
@@ -258,7 +287,7 @@ fun completeTexturingFunctions() = listOf(
         path = colorizeKey,
         signature = listOf(grayscaleBitmapKey, solidColorKey, solidColorKey),
         parameters = listOf("grayscale", "firstColor", "secondColor"),
-        implementation = colorize
+        implementation = colorizeOperator
     ),
     CompleteFunction(
         path = checkersKey,
@@ -279,10 +308,16 @@ fun completeTexturingFunctions() = listOf(
         implementation = mixBitmaps
     ),
     CompleteFunction(
-        path = perlinNoiseKey,
-        signature = listOf(dimensionsKey, intKey, intKey, grayscaleBitmapKey),
-        parameters = listOf("dimensions", "offset", "periods"),
+        path = perlinNoiseGrayscaleKey,
+        signature = listOf(dimensionsKey, floatKey, intKey, grayscaleBitmapKey),
+        parameters = listOf("dimensions", "scale", "octaves"),
         implementation = simpleNoiseOperator
+    ),
+    CompleteFunction(
+        path = perlinNoiseColorKey,
+        signature = listOf(dimensionsKey, floatKey, intKey, floatKey, solidColorKey, solidColorKey, grayscaleBitmapKey),
+        parameters = listOf("dimensions", "scale", "octaves", "roughness", "firstColor", "secondColor"),
+        implementation = colorizedNoiseOperator
     ),
     CompleteFunction(
         path = voronoiBoundariesKey,
