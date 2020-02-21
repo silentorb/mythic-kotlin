@@ -194,11 +194,13 @@ fun noise(arguments: Arguments): GetPixel<Float> {
         val octave = Pair(frequency / scale, amplitude)
         Triple(accumulator.plus(octave), amplitude * amplitudeMod, frequency * 2f)
       }
+  val amplitudeMax = octaves.fold(0f) { a, b -> a + b.second}
   return { x, y ->
     val rawValue = octaves.fold(0f) { a, (frequency, amplitude) ->
       a + (generator.eval((x * frequency).toDouble(), (y * frequency).toDouble()).toFloat() * 0.5f + 0.5f) * amplitude
     }
-    minMax(rawValue, 0f, 1f)
+    rawValue / amplitudeMax
+//    minMax(rawValue, 0f, 1f)
   }
 }
 
