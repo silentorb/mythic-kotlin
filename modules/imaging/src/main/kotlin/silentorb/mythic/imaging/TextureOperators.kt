@@ -2,9 +2,7 @@ package silentorb.mythic.imaging
 
 import org.joml.Vector3i
 import org.lwjgl.BufferUtils
-import silentorb.imp.core.PathKey
-import silentorb.imp.core.floatKey
-import silentorb.imp.core.intKey
+import silentorb.imp.core.*
 import silentorb.imp.execution.Arguments
 import silentorb.imp.execution.CompleteFunction
 import silentorb.imp.execution.FunctionImplementation
@@ -194,7 +192,7 @@ fun noise(arguments: Arguments): GetPixel<Float> {
         val octave = Pair(frequency / scale, amplitude)
         Triple(accumulator.plus(octave), amplitude * amplitudeMod, frequency * 2f)
       }
-  val amplitudeMax = octaves.fold(0f) { a, b -> a + b.second}
+  val amplitudeMax = octaves.fold(0f) { a, b -> a + b.second }
   return { x, y ->
     val rawValue = octaves.fold(0f) { a, (frequency, amplitude) ->
       a + (generator.eval((x * frequency).toDouble(), (y * frequency).toDouble()).toFloat() * 0.5f + 0.5f) * amplitude
@@ -263,68 +261,131 @@ val voronoiBoundariesKey = PathKey(texturingPath, "voronoiBoundaries")
 fun completeTexturingFunctions() = listOf(
     CompleteFunction(
         path = solidColorKey,
-        signature = listOf(floatKey, floatKey, floatKey, solidColorKey),
-        parameters = listOf("red", "green", "blue"),
+        signature = Signature(
+            parameters = listOf(
+                Parameter("red", floatKey),
+                Parameter("green", floatKey),
+                Parameter("blue", floatKey)
+            ),
+            output = solidColorKey
+        ),
         implementation = newSolidColor
     ),
     CompleteFunction(
         path = dimensionsKey,
-        signature = listOf(intKey, intKey, dimensionsKey),
-        parameters = listOf("width", "height"),
+        signature = Signature(
+            parameters = listOf(
+                Parameter("width", intKey),
+                Parameter("height", intKey)
+            ),
+            output = dimensionsKey
+        ),
         implementation = newDimensions
     ),
     CompleteFunction(
         path = coloredCheckersKey,
-        signature = listOf(dimensionsKey, solidColorKey, solidColorKey, solidColorBitmapKey),
-        parameters = listOf("dimensions", "firstColor", "secondColor"),
+        signature = Signature(
+            parameters = listOf(
+                Parameter("dimensions", dimensionsKey),
+                Parameter("firstColor", solidColorKey),
+                Parameter("secondColor", solidColorKey)
+            ),
+            output = solidColorBitmapKey
+        ),
         implementation = coloredCheckers
     ),
     CompleteFunction(
         path = fromSolidColorKey,
-        signature = listOf(dimensionsKey, solidColorKey, solidColorBitmapKey),
-        parameters = listOf("dimensions", "color"),
+        signature = Signature(
+            parameters = listOf(
+                Parameter("dimensions", dimensionsKey),
+                Parameter("color", solidColorKey)
+            ),
+            output = solidColorBitmapKey
+        ),
         implementation = solidColor
     ),
     CompleteFunction(
         path = colorizeKey,
-        signature = listOf(grayscaleBitmapKey, solidColorKey, solidColorKey),
-        parameters = listOf("grayscale", "firstColor", "secondColor"),
+        signature = Signature(
+            parameters = listOf(
+                Parameter("grayscale", grayscaleBitmapKey),
+                Parameter("firstColor", solidColorKey),
+                Parameter("secondColor", solidColorKey)
+            ),
+            output = solidColorBitmapKey
+        ),
         implementation = colorizeOperator
     ),
     CompleteFunction(
         path = checkersKey,
-        signature = listOf(dimensionsKey, solidColorBitmapKey),
-        parameters = listOf("dimensions"),
+        signature = Signature(
+            parameters = listOf(
+                Parameter("dimensions", dimensionsKey)
+            ),
+            output = solidColorBitmapKey
+        ),
         implementation = grayscaleCheckers
     ),
     CompleteFunction(
         path = maskKey,
-        signature = listOf(solidColorBitmapKey, solidColorBitmapKey, grayscaleBitmapKey, solidColorBitmapKey),
-        parameters = listOf("first", "second", "mask"),
+        signature = Signature(
+            parameters = listOf(
+                Parameter("first", solidColorBitmapKey),
+                Parameter("second", solidColorBitmapKey),
+                Parameter("mask", grayscaleBitmapKey)
+            ),
+            output = solidColorBitmapKey
+        ),
         implementation = maskOperator
     ),
     CompleteFunction(
         path = mixBitmapsKey,
-        signature = listOf(floatKey, solidColorBitmapKey, solidColorBitmapKey, solidColorBitmapKey),
-        parameters = listOf("degree", "first", "second"),
+        signature = Signature(
+            parameters = listOf(
+                Parameter("degree", floatKey),
+                Parameter("first", solidColorBitmapKey),
+                Parameter("second", grayscaleBitmapKey)
+            ),
+            output = solidColorBitmapKey
+        ),
         implementation = mixBitmaps
     ),
     CompleteFunction(
         path = perlinNoiseGrayscaleKey,
-        signature = listOf(dimensionsKey, floatKey, intKey, grayscaleBitmapKey),
-        parameters = listOf("dimensions", "scale", "octaves"),
+        signature = Signature(
+            parameters = listOf(
+                Parameter("dimensions", dimensionsKey),
+                Parameter("scale", floatKey),
+                Parameter("octaves", intKey)
+            ),
+            output = grayscaleBitmapKey
+        ),
         implementation = simpleNoiseOperator
     ),
     CompleteFunction(
         path = perlinNoiseColorKey,
-        signature = listOf(dimensionsKey, floatKey, intKey, floatKey, solidColorKey, solidColorKey, grayscaleBitmapKey),
-        parameters = listOf("dimensions", "scale", "octaves", "roughness", "firstColor", "secondColor"),
+        signature = Signature(
+            parameters = listOf(
+                Parameter("dimensions", dimensionsKey),
+                Parameter("scale", floatKey),
+                Parameter("octaves", intKey),
+                Parameter("roughness", floatKey),
+                Parameter("firstColor", solidColorKey),
+                Parameter("secondColor", solidColorKey)
+            ),
+            output = solidColorBitmapKey
+        ),
         implementation = colorizedNoiseOperator
     ),
     CompleteFunction(
         path = voronoiBoundariesKey,
-        signature = listOf(dimensionsKey, grayscaleBitmapKey),
-        parameters = listOf("dimensions"),
+        signature = Signature(
+            parameters = listOf(
+                Parameter("dimensions", dimensionsKey)
+            ),
+            output = grayscaleBitmapKey
+        ),
         implementation = voronoiBoundaryOperator
     )
 )
