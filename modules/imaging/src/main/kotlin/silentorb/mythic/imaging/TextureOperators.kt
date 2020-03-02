@@ -11,8 +11,9 @@ import silentorb.mythic.ent.mappedCache
 import silentorb.mythic.randomly.Dice
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector3
-import silentorb.mythic.spatial.minMax
 import thirdparty.noise.OpenSimplexNoise
+import java.lang.Float.max
+import java.lang.Float.min
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 
@@ -32,6 +33,12 @@ fun allocateFloatBuffer(size: Int): FloatBuffer =
 //val bufferCache = { id:size: Int ->
 //  mappedCache<Id, FloatBuffer> { id2 -> singleValueCache(::allocateFloatBuffer)(size) }(id)
 //}
+
+fun mix(first: Vector3, second: Vector3, weight: Float): Vector3 =
+    first * (1f - weight) + second * weight
+
+fun mix(first: Float, second: Float, weight: Float): Float =
+    first * (1f - weight) + second * weight
 
 fun fillBuffer(depth: Int, dimensions: Vector2i, action: (FloatBuffer) -> Unit): Bitmap {
 //  val buffer = BufferUtils.createFloatBuffer(dimensions.x * dimensions.y * depth)
@@ -160,6 +167,33 @@ val mixBitmaps: FunctionImplementation = withBuffer("first", withBitmapBuffer) {
   }
 }
 
+val seamlessOperator: FunctionImplementation = withBuffer("input", withBitmapBuffer) { arguments ->
+  val input = floatBufferArgument(arguments, "input")
+  val dimensions = (arguments["input"]!! as Bitmap).dimensions
+  ;
+  { x, y ->
+    val weight = min(1f, max(0f, (y - 0.75f) * 4f) + max(0f, (x - 0.75f) * 4f))
+    val offsetX = (x + 0.25f) % 1f
+    val offsetY = (y + 0.25f) % 1f
+    val intX = (offsetX * dimensions.x).toInt()
+    val intY = (offsetY * dimensions.y).toInt()
+    val otherIndex = (intX + intY * dimensions.x) * 3
+    val other = Vector3(input.get(otherIndex), input.get(otherIndex + 1), input.get(otherIndex + 2))
+    mix(input.getVector3(), other, weight)
+  }
+}
+
+val seamlessFunction = CompleteFunction(
+    path = PathKey(texturingPath, "seamless"),
+    signature = Signature(
+        parameters = listOf(
+            Parameter("input", solidColorBitmapKey)
+        ),
+        output = solidColorBitmapKey
+    ),
+    implementation = seamlessOperator
+)
+
 //val mixGrayscales: FunctionImplementation = withBuffer(withGrayscaleBuffer) { arguments ->
 //  val weights = arguments["weights"]!! as List<Float>
 //  val buffers = weights.mapIndexed { index, value ->
@@ -181,11 +215,10 @@ val mixBitmaps: FunctionImplementation = withBuffer("first", withBitmapBuffer) {
 //      noiseSource.eval(x * scale, y * scale)
 //    }
 
-fun noise(arguments: Arguments): GetPixel<Float> {
+fun noise(arguments: Arguments, algorithm: GetPixel<Float>): GetPixel<Float> {
   val scale = (arguments["scale"] as Float? ?: 10f)
   val roughness = (arguments["roughness"] as Float? ?: 0.8f)
   val octaveCount = arguments["octaves"]!! as Int? ?: 1
-  val generator = OpenSimplexNoise(1)
   val amplitudeMod = roughness
   val (octaves) = (0 until octaveCount)
       .fold(Triple(listOf<Pair<Float, Float>>(), 1f, 1f)) { (accumulator, amplitude, frequency), b ->
@@ -195,15 +228,23 @@ fun noise(arguments: Arguments): GetPixel<Float> {
   val amplitudeMax = octaves.fold(0f) { a, b -> a + b.second }
   return { x, y ->
     val rawValue = octaves.fold(0f) { a, (frequency, amplitude) ->
-      a + (generator.eval((x * frequency).toDouble(), (y * frequency).toDouble()).toFloat() * 0.5f + 0.5f) * amplitude
+      a + (algorithm(x * frequency, y * frequency) * 0.5f + 0.5f) * amplitude
     }
     rawValue / amplitudeMax
 //    minMax(rawValue, 0f, 1f)
   }
 }
 
+fun nonTilingOpenSimplex2D(): GetPixel<Float> {
+  val generator = OpenSimplexNoise(1)
+  return { x, y ->
+    generator.eval(x.toDouble(), y.toDouble()).toFloat()
+  }
+}
+
 val simpleNoiseOperator: FunctionImplementation = withBuffer("dimensions", withGrayscaleBuffer) { arguments ->
-  val getNoise = noise(arguments)
+  val generator = OpenSimplexNoise(1)
+  val getNoise = noise(arguments, nonTilingOpenSimplex2D())
   ;
   { x, y ->
     getNoise(x, y)
@@ -211,13 +252,74 @@ val simpleNoiseOperator: FunctionImplementation = withBuffer("dimensions", withG
 }
 
 val colorizedNoiseOperator: FunctionImplementation = withBuffer("dimensions", withBitmapBuffer) { arguments ->
-  val getNoise = noise(arguments)
+  val getNoise = noise(arguments, nonTilingOpenSimplex2D())
   val colorize = colorizeValue(arguments)
   ;
   { x, y ->
     colorize(getNoise(x, y))
   }
 }
+
+fun clip(threshold: Float, value: Float): Float =
+    if (value >= threshold)
+      1f
+    else
+      0f
+
+fun flipClip(threshold: Float, value: Float): Float =
+    if (value >= threshold)
+      0f
+    else
+      1f
+
+val seamlessColorizedNoiseOperator: FunctionImplementation = withBuffer("dimensions", withBitmapBuffer) { arguments ->
+  val getNoise = noise(arguments, nonTilingOpenSimplex2D())
+  val colorize = colorizeValue(arguments)
+  ;
+  { x, y ->
+    if (x < 0.75f && y <= 0.75f) {
+      colorize(getNoise(x, y))
+    } else {
+      val value = getNoise(x, y)
+
+      val otherX = getNoise(x - 1f, y)
+      val weightX = max(0f, (x - 0.75f) * 4f)
+
+      val firstMix = mix(value, otherX, weightX)
+
+      val value2 = getNoise(x - 1f, y - 1f)
+      val otherY2 = mix(getNoise(x, y - 1f), value2, weightX)
+
+      val weightY = max(0f, (y - 0.75f) * 4f)
+
+      colorize(mix(firstMix, otherY2, weightY))
+    }
+  }
+}
+
+val coloredNoiseSignature = Signature(
+    parameters = listOf(
+        Parameter("dimensions", dimensionsKey),
+        Parameter("scale", floatKey),
+        Parameter("octaves", intKey),
+        Parameter("roughness", floatKey),
+        Parameter("firstColor", solidColorKey),
+        Parameter("secondColor", solidColorKey)
+    ),
+    output = solidColorBitmapKey
+)
+
+val coloredNoiseFunction = CompleteFunction(
+    path = PathKey(texturingPath, "coloredNoise"),
+    signature = coloredNoiseSignature,
+    implementation = colorizedNoiseOperator
+)
+
+val seamlessColoredNoiseFunction = CompleteFunction(
+    path = PathKey(texturingPath, "seamlessColoredNoise"),
+    signature = coloredNoiseSignature,
+    implementation = seamlessColorizedNoiseOperator
+)
 
 val voronoiBoundaryOperator: FunctionImplementation = withBuffer("dimensions", withGrayscaleBuffer) { arguments ->
   val dice = Dice(1)
@@ -235,17 +337,6 @@ val newDimensions: FunctionImplementation = { arguments ->
   Vector2i(arguments["width"] as Int, arguments["height"] as Int)
 }
 
-const val texturingPath = "silentorb.mythic.generation.texturing"
-
-// Type Keys
-val solidColorKey = PathKey(texturingPath, "SolidColor")
-val transparentColorKey = PathKey(texturingPath, "TransparentColor")
-
-val solidColorBitmapKey = PathKey(texturingPath, "SolidColorBitmap")
-val transparentColorBitmapKey = PathKey(texturingPath, "TransparentColorBitmap")
-val grayscaleBitmapKey = PathKey(texturingPath, "GrayscaleBitmap")
-val dimensionsKey = PathKey(texturingPath, "Dimensions")
-
 // Function Keys
 val coloredCheckersKey = PathKey(texturingPath, "coloredCheckers")
 val fromSolidColorKey = PathKey(texturingPath, "solidColorToBitmap")
@@ -255,7 +346,6 @@ val maskKey = PathKey(texturingPath, "mask")
 val mixBitmapsKey = PathKey(texturingPath, "mixBitmaps")
 val mixGrayscalesKey = PathKey(texturingPath, "mixGrayscales")
 val perlinNoiseGrayscaleKey = PathKey(texturingPath, "perlinNoiseGrayscale")
-val perlinNoiseColorKey = PathKey(texturingPath, "perlinNoiseColor")
 val voronoiBoundariesKey = PathKey(texturingPath, "voronoiBoundaries")
 
 fun completeTexturingFunctions() = listOf(
@@ -363,21 +453,8 @@ fun completeTexturingFunctions() = listOf(
         ),
         implementation = simpleNoiseOperator
     ),
-    CompleteFunction(
-        path = perlinNoiseColorKey,
-        signature = Signature(
-            parameters = listOf(
-                Parameter("dimensions", dimensionsKey),
-                Parameter("scale", floatKey),
-                Parameter("octaves", intKey),
-                Parameter("roughness", floatKey),
-                Parameter("firstColor", solidColorKey),
-                Parameter("secondColor", solidColorKey)
-            ),
-            output = solidColorBitmapKey
-        ),
-        implementation = colorizedNoiseOperator
-    ),
+    seamlessColoredNoiseFunction,
+    coloredNoiseFunction,
     CompleteFunction(
         path = voronoiBoundariesKey,
         signature = Signature(

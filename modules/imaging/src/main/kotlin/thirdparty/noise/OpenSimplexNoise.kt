@@ -250,7 +250,7 @@ class OpenSimplexNoise {
           dz_ext0 = dz_ext1
         }
       } else { //(0,0,0) is not one of the closest two tetrahedral vertices.
-        val c = (aPoint.toInt() or bPoint.toInt()) as Byte //Our two extra vertices are determined by the closest two.
+        val c = (aPoint.toInt() or bPoint.toInt()).toByte() //Our two extra vertices are determined by the closest two.
         if (c.toInt() and 0x01 == 0) {
           xsv_ext0 = xsb
           xsv_ext1 = xsb - 1
@@ -374,7 +374,7 @@ class OpenSimplexNoise {
           dz_ext0 = dz_ext1
         }
       } else { //(1,1,1) is not one of the closest two tetrahedral vertices.
-        val c = (aPoint.toInt() and bPoint.toInt()) as Byte //Our two extra vertices are determined by the closest two.
+        val c = (aPoint.toInt() and bPoint.toInt()).toByte() //Our two extra vertices are determined by the closest two.
         if (c.toInt() and 0x01 != 0) {
           xsv_ext0 = xsb + 1
           xsv_ext1 = xsb + 2
@@ -507,7 +507,7 @@ class OpenSimplexNoise {
           ysv_ext0 = ysb + 1
           zsv_ext0 = zsb + 1
           //Other extra point is based on the shared axis.
-          val c = (aPoint.toInt() and bPoint.toInt()) as Byte
+          val c = (aPoint.toInt() and bPoint.toInt()).toByte()
           if (c.toInt() and 0x01 != 0) {
             dx_ext1 = dx0 - 2 - 2 * SQUISH_CONSTANT_3D
             dy_ext1 = dy0 - 2 * SQUISH_CONSTANT_3D
@@ -539,7 +539,7 @@ class OpenSimplexNoise {
           ysv_ext0 = ysb
           zsv_ext0 = zsb
           //Other extra point is based on the omitted axis.
-          val c = (aPoint.toInt() or bPoint.toInt()) as Byte
+          val c = (aPoint.toInt() or bPoint.toInt()).toByte()
           if (c.toInt() and 0x01 == 0) {
             dx_ext1 = dx0 + 1 - SQUISH_CONSTANT_3D
             dy_ext1 = dy0 - 1 - SQUISH_CONSTANT_3D
@@ -839,7 +839,7 @@ class OpenSimplexNoise {
           dw_ext0 = dw_ext1
         }
       } else { //(0,0,0,0) is not one of the closest two pentachoron vertices.
-        val c = (aPoint.toInt() or bPoint.toInt()) as Byte //Our three extra vertices are determined by the closest two.
+        val c = (aPoint.toInt() or bPoint.toInt()).toByte() //Our three extra vertices are determined by the closest two.
         if (c.toInt() and 0x01 == 0) {
           xsv_ext2 = xsb
           xsv_ext0 = xsv_ext2
@@ -1058,7 +1058,7 @@ class OpenSimplexNoise {
           dw_ext0 = dw_ext1
         }
       } else { //(1,1,1,1) is not one of the closest two pentachoron vertices.
-        val c = (aPoint.toInt() and bPoint.toInt()) as Byte //Our three extra vertices are determined by the closest two.
+        val c = (aPoint.toInt() and bPoint.toInt()).toByte() //Our three extra vertices are determined by the closest two.
         if (c.toInt() and 0x01 != 0) {
           xsv_ext2 = xsb + 1
           xsv_ext0 = xsv_ext2
@@ -1266,8 +1266,8 @@ class OpenSimplexNoise {
       //Where each of the two closest points are determines how the extra three vertices are calculated.
       if (aIsBiggerSide == bIsBiggerSide) {
         if (aIsBiggerSide) { //Both closest points on the bigger side
-          val c1 = (aPoint.toInt() or bPoint.toInt()) as Byte
-          val c2 = (aPoint.toInt() and bPoint.toInt()) as Byte
+          val c1 = (aPoint.toInt() or bPoint.toInt()).toByte()
+          val c2 = (aPoint.toInt() and bPoint.toInt()).toByte()
           if (c1.toInt() and 0x01 == 0) {
             xsv_ext0 = xsb
             xsv_ext1 = xsb - 1
@@ -1345,7 +1345,7 @@ class OpenSimplexNoise {
           dz_ext2 = dz0
           dw_ext2 = dw0
           //Other two points are based on the omitted axes.
-          val c = (aPoint.toInt() or bPoint.toInt()) as Byte
+          val c = (aPoint.toInt() or bPoint.toInt()).toByte()
           if (c.toInt() and 0x01 == 0) {
             xsv_ext0 = xsb - 1
             xsv_ext1 = xsb
@@ -1679,8 +1679,8 @@ class OpenSimplexNoise {
       //Where each of the two closest points are determines how the extra three vertices are calculated.
       if (aIsBiggerSide == bIsBiggerSide) {
         if (aIsBiggerSide) { //Both closest points on the bigger side
-          val c1 = (aPoint.toInt() and bPoint.toInt()) as Byte
-          val c2 = (aPoint.toInt() or bPoint.toInt()) as Byte
+          val c1 = (aPoint.toInt() and bPoint.toInt()).toByte()
+          val c2 = (aPoint.toInt() or bPoint.toInt()).toByte()
           //Two contributions are permutations of (0,0,0,1) and (0,0,0,2) based on c1
           xsv_ext1 = xsb
           xsv_ext0 = xsv_ext1
@@ -1752,7 +1752,7 @@ class OpenSimplexNoise {
           dz_ext2 = dz0 - 1 - 4 * SQUISH_CONSTANT_4D
           dw_ext2 = dw0 - 1 - 4 * SQUISH_CONSTANT_4D
           //Other two points are based on the shared axes.
-          val c = (aPoint.toInt() and bPoint.toInt()) as Byte
+          val c = (aPoint.toInt() and bPoint.toInt()).toByte()
           if (c.toInt() and 0x01 != 0) {
             xsv_ext0 = xsb + 2
             xsv_ext1 = xsb + 1
