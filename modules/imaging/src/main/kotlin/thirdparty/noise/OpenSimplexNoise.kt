@@ -51,15 +51,15 @@ class OpenSimplexNoise {
   }
 
   //2D OpenSimplex Noise.
-  fun eval(x: Double, y: Double): Double { //Place input coordinates onto grid.
-    val stretchOffset = (x + y) * STRETCH_CONSTANT_2D
+  fun eval(x: Float, y: Float): Float { //Place input coordinates onto grid.
+    val stretchOffset = (x + y) * STRETCH_CONSTANT_2DF
     val xs = x + stretchOffset
     val ys = y + stretchOffset
     //Floor to get grid coordinates of rhombus (stretched square) super-cell origin.
     var xsb = fastFloor(xs)
     var ysb = fastFloor(ys)
     //Skew out to get actual coordinates of rhombus origin. We'll need these later.
-    val squishOffset = (xsb + ysb) * SQUISH_CONSTANT_2D
+    val squishOffset = (xsb + ysb) * SQUISH_CONSTANT_2DF
     val xb = xsb + squishOffset
     val yb = ysb + squishOffset
     //Compute grid coordinates relative to rhombus origin.
@@ -71,22 +71,22 @@ class OpenSimplexNoise {
     var dx0 = x - xb
     var dy0 = y - yb
     //We'll be defining these inside the next block and using them afterwards.
-    val dx_ext: Double
-    val dy_ext: Double
+    val dx_ext: Float
+    val dy_ext: Float
     val xsv_ext: Int
     val ysv_ext: Int
-    var value = 0.0
+    var value = 0f
     //Contribution (1,0)
-    val dx1 = dx0 - 1 - SQUISH_CONSTANT_2D
-    val dy1 = dy0 - 0 - SQUISH_CONSTANT_2D
+    val dx1 = dx0 - 1 - SQUISH_CONSTANT_2DF
+    val dy1 = dy0 - 0 - SQUISH_CONSTANT_2DF
     var attn1 = 2 - dx1 * dx1 - dy1 * dy1
     if (attn1 > 0) {
       attn1 *= attn1
       value += attn1 * attn1 * extrapolate(xsb + 1, ysb + 0, dx1, dy1)
     }
     //Contribution (0,1)
-    val dx2 = dx0 - 0 - SQUISH_CONSTANT_2D
-    val dy2 = dy0 - 1 - SQUISH_CONSTANT_2D
+    val dx2 = dx0 - 0 - SQUISH_CONSTANT_2DF
+    val dy2 = dy0 - 1 - SQUISH_CONSTANT_2DF
     var attn2 = 2 - dx2 * dx2 - dy2 * dy2
     if (attn2 > 0) {
       attn2 *= attn2
@@ -109,8 +109,8 @@ class OpenSimplexNoise {
       } else { //(1,0) and (0,1) are the closest two vertices.
         xsv_ext = xsb + 1
         ysv_ext = ysb + 1
-        dx_ext = dx0 - 1 - 2 * SQUISH_CONSTANT_2D
-        dy_ext = dy0 - 1 - 2 * SQUISH_CONSTANT_2D
+        dx_ext = dx0 - 1 - 2 * SQUISH_CONSTANT_2DF
+        dy_ext = dy0 - 1 - 2 * SQUISH_CONSTANT_2DF
       }
     } else { //We're inside the triangle (2-Simplex) at (1,1)
       val zins = 2 - inSum
@@ -118,13 +118,13 @@ class OpenSimplexNoise {
         if (xins > yins) {
           xsv_ext = xsb + 2
           ysv_ext = ysb + 0
-          dx_ext = dx0 - 2 - 2 * SQUISH_CONSTANT_2D
-          dy_ext = dy0 + 0 - 2 * SQUISH_CONSTANT_2D
+          dx_ext = dx0 - 2 - 2 * SQUISH_CONSTANT_2DF
+          dy_ext = dy0 + 0 - 2 * SQUISH_CONSTANT_2DF
         } else {
           xsv_ext = xsb + 0
           ysv_ext = ysb + 2
-          dx_ext = dx0 + 0 - 2 * SQUISH_CONSTANT_2D
-          dy_ext = dy0 - 2 - 2 * SQUISH_CONSTANT_2D
+          dx_ext = dx0 + 0 - 2 * SQUISH_CONSTANT_2DF
+          dy_ext = dy0 - 2 - 2 * SQUISH_CONSTANT_2DF
         }
       } else { //(1,0) and (0,1) are the closest two vertices.
         dx_ext = dx0
@@ -134,8 +134,8 @@ class OpenSimplexNoise {
       }
       xsb += 1
       ysb += 1
-      dx0 = dx0 - 1 - 2 * SQUISH_CONSTANT_2D
-      dy0 = dy0 - 1 - 2 * SQUISH_CONSTANT_2D
+      dx0 = dx0 - 1 - 2 * SQUISH_CONSTANT_2DF
+      dy0 = dy0 - 1 - 2 * SQUISH_CONSTANT_2DF
     }
     //Contribution (0,0) or (1,1)
     var attn0 = 2 - dx0 * dx0 - dy0 * dy0
@@ -149,7 +149,7 @@ class OpenSimplexNoise {
       attn_ext *= attn_ext
       value += attn_ext * attn_ext * extrapolate(xsv_ext, ysv_ext, dx_ext, dy_ext)
     }
-    return value / NORM_CONSTANT_2D
+    return value / NORM_CONSTANT_2DF
   }
 
   //3D OpenSimplex Noise.
@@ -2024,6 +2024,11 @@ class OpenSimplexNoise {
         + gradients2D[index + 1] * dy)
   }
 
+  private fun extrapolate(xsb: Int, ysb: Int, dx: Float, dy: Float): Float {
+    val index: Int = perm[perm[xsb and 0xFF] + ysb and 0xFF].toInt() and 0x0E
+    return (gradients2D[index] * dx
+        + gradients2D[index + 1] * dy)
+  }
   private fun extrapolate(xsb: Int, ysb: Int, zsb: Int, dx: Double, dy: Double, dz: Double): Double {
     val index = permGradIndex3D[perm[perm[xsb and 0xFF] + ysb and 0xFF] + zsb and 0xFF].toInt()
     return gradients3D[index] * dx + gradients3D[index + 1] * dy + gradients3D[index + 2] * dz
@@ -2036,16 +2041,23 @@ class OpenSimplexNoise {
 
   companion object {
     private const val STRETCH_CONSTANT_2D = -0.211324865405187 //(1/Math.sqrt(2+1)-1)/2;
+    private const val STRETCH_CONSTANT_2DF = -0.211324865405187f //(1/Math.sqrt(2+1)-1)/2;
     private const val SQUISH_CONSTANT_2D = 0.366025403784439 //(Math.sqrt(2+1)-1)/2;
+    private const val SQUISH_CONSTANT_2DF = 0.366025403784439f //(Math.sqrt(2+1)-1)/2;
     private const val STRETCH_CONSTANT_3D = -1.0 / 6 //(1/Math.sqrt(3+1)-1)/3;
     private const val SQUISH_CONSTANT_3D = 1.0 / 3 //(Math.sqrt(3+1)-1)/3;
     private const val STRETCH_CONSTANT_4D = -0.138196601125011 //(1/Math.sqrt(4+1)-1)/4;
     private const val SQUISH_CONSTANT_4D = 0.309016994374947 //(Math.sqrt(4+1)-1)/4;
     private const val NORM_CONSTANT_2D = 47.0
+    private const val NORM_CONSTANT_2DF = 47.0f
     private const val NORM_CONSTANT_3D = 103.0
     private const val NORM_CONSTANT_4D = 30.0
     private const val DEFAULT_SEED: Long = 0
     private fun fastFloor(x: Double): Int {
+      val xi = x.toInt()
+      return if (x < xi) xi - 1 else xi
+    }
+    private fun fastFloor(x: Float): Int {
       val xi = x.toInt()
       return if (x < xi) xi - 1 else xi
     }

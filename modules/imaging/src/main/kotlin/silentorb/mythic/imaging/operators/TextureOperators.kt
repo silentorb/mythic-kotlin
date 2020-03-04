@@ -1,4 +1,4 @@
-package silentorb.mythic.imaging
+package silentorb.mythic.imaging.operators
 
 import org.joml.Vector3i
 import org.lwjgl.BufferUtils
@@ -8,6 +8,7 @@ import silentorb.imp.execution.CompleteFunction
 import silentorb.imp.execution.FunctionImplementation
 import silentorb.imp.execution.partitionFunctions
 import silentorb.mythic.ent.mappedCache
+import silentorb.mythic.imaging.*
 import silentorb.mythic.randomly.Dice
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector3
@@ -21,15 +22,6 @@ typealias SolidColor = Vector3
 
 typealias TextureFunction = (Vector2i) -> FunctionImplementation
 
-fun allocateFloatTextureBuffer(length: Int): FloatBuffer =
-    BufferUtils.createFloatBuffer(length * length * 3)
-
-fun allocateByteTextureBuffer(length: Int): ByteBuffer =
-    BufferUtils.createByteBuffer(length * length * 3)
-
-fun allocateFloatBuffer(size: Int): FloatBuffer =
-    BufferUtils.createFloatBuffer(size)
-
 //val bufferCache = { id:size: Int ->
 //  mappedCache<Id, FloatBuffer> { id2 -> singleValueCache(::allocateFloatBuffer)(size) }(id)
 //}
@@ -39,19 +31,6 @@ fun mix(first: Vector3, second: Vector3, weight: Float): Vector3 =
 
 fun mix(first: Float, second: Float, weight: Float): Float =
     first * (1f - weight) + second * weight
-
-fun fillBuffer(depth: Int, dimensions: Vector2i, action: (FloatBuffer) -> Unit): Bitmap {
-//  val buffer = BufferUtils.createFloatBuffer(dimensions.x * dimensions.y * depth)
-//  val buffer = bufferCache(id, dimensions.x * dimensions.y * depth)
-  val buffer = allocateFloatBuffer(dimensions.x * dimensions.y * depth)
-  action(buffer)
-  buffer.rewind()
-  return Bitmap(
-      dimensions = dimensions,
-      channels = depth,
-      buffer = buffer
-  )
-}
 
 data class BufferInfo<T>(
     val depth: Int,
@@ -65,34 +44,6 @@ data class Bitmap(
 )
 
 typealias GetPixel<T> = (Float, Float) -> T
-
-fun <T> withBuffer(dimensionsField: String, bufferInfo: BufferInfo<T>, function: (Arguments) -> GetPixel<T>): FunctionImplementation =
-    { arguments ->
-      val dimensionsArgument = arguments[dimensionsField]!!
-      val dimensions: Vector2i = if (dimensionsArgument is Vector2i)
-        dimensionsArgument
-      else if (dimensionsArgument is Bitmap)
-        dimensionsArgument.dimensions
-      else throw Error("Invalid dimensions argument $dimensionsArgument")
-
-      fillBuffer(bufferInfo.depth, dimensions) { buffer ->
-        val getter = function(arguments)
-        for (y in 0 until dimensions.y) {
-          for (x in 0 until dimensions.x) {
-            val value = getter(x.toFloat() / dimensions.x, 1f - y.toFloat() / dimensions.y)
-            bufferInfo.setter(buffer, value)
-          }
-        }
-      }
-    }
-
-val withBitmapBuffer = BufferInfo<Vector3>(3) { buffer, value ->
-  buffer.put(value)
-}
-
-val withGrayscaleBuffer = BufferInfo<Float>(1) { buffer, value ->
-  buffer.put(value)
-}
 
 //val withGrayscaleBuffer = fillBuffer<Float>(1) { buffer, value ->
 //  buffer.put(value)
@@ -167,33 +118,6 @@ val mixBitmaps: FunctionImplementation = withBuffer("first", withBitmapBuffer) {
   }
 }
 
-val seamlessOperator: FunctionImplementation = withBuffer("input", withBitmapBuffer) { arguments ->
-  val input = floatBufferArgument(arguments, "input")
-  val dimensions = (arguments["input"]!! as Bitmap).dimensions
-  ;
-  { x, y ->
-    val weight = min(1f, max(0f, (y - 0.75f) * 4f) + max(0f, (x - 0.75f) * 4f))
-    val offsetX = (x + 0.25f) % 1f
-    val offsetY = (y + 0.25f) % 1f
-    val intX = (offsetX * dimensions.x).toInt()
-    val intY = (offsetY * dimensions.y).toInt()
-    val otherIndex = (intX + intY * dimensions.x) * 3
-    val other = Vector3(input.get(otherIndex), input.get(otherIndex + 1), input.get(otherIndex + 2))
-    mix(input.getVector3(), other, weight)
-  }
-}
-
-val seamlessFunction = CompleteFunction(
-    path = PathKey(texturingPath, "seamless"),
-    signature = Signature(
-        parameters = listOf(
-            Parameter("input", solidColorBitmapKey)
-        ),
-        output = solidColorBitmapKey
-    ),
-    implementation = seamlessOperator
-)
-
 //val mixGrayscales: FunctionImplementation = withBuffer(withGrayscaleBuffer) { arguments ->
 //  val weights = arguments["weights"]!! as List<Float>
 //  val buffers = weights.mapIndexed { index, value ->
@@ -215,51 +139,6 @@ val seamlessFunction = CompleteFunction(
 //      noiseSource.eval(x * scale, y * scale)
 //    }
 
-fun noise(arguments: Arguments, algorithm: GetPixel<Float>): GetPixel<Float> {
-  val scale = (arguments["scale"] as Float? ?: 10f)
-  val roughness = (arguments["roughness"] as Float? ?: 0.8f)
-  val octaveCount = arguments["octaves"]!! as Int? ?: 1
-  val amplitudeMod = roughness
-  val (octaves) = (0 until octaveCount)
-      .fold(Triple(listOf<Pair<Float, Float>>(), 1f, 1f)) { (accumulator, amplitude, frequency), b ->
-        val octave = Pair(frequency / scale, amplitude)
-        Triple(accumulator.plus(octave), amplitude * amplitudeMod, frequency * 2f)
-      }
-  val amplitudeMax = octaves.fold(0f) { a, b -> a + b.second }
-  return { x, y ->
-    val rawValue = octaves.fold(0f) { a, (frequency, amplitude) ->
-      a + (algorithm(x * frequency, y * frequency) * 0.5f + 0.5f) * amplitude
-    }
-    rawValue / amplitudeMax
-//    minMax(rawValue, 0f, 1f)
-  }
-}
-
-fun nonTilingOpenSimplex2D(): GetPixel<Float> {
-  val generator = OpenSimplexNoise(1)
-  return { x, y ->
-    generator.eval(x.toDouble(), y.toDouble()).toFloat()
-  }
-}
-
-val simpleNoiseOperator: FunctionImplementation = withBuffer("dimensions", withGrayscaleBuffer) { arguments ->
-  val generator = OpenSimplexNoise(1)
-  val getNoise = noise(arguments, nonTilingOpenSimplex2D())
-  ;
-  { x, y ->
-    getNoise(x, y)
-  }
-}
-
-val colorizedNoiseOperator: FunctionImplementation = withBuffer("dimensions", withBitmapBuffer) { arguments ->
-  val getNoise = noise(arguments, nonTilingOpenSimplex2D())
-  val colorize = colorizeValue(arguments)
-  ;
-  { x, y ->
-    colorize(getNoise(x, y))
-  }
-}
-
 fun clip(threshold: Float, value: Float): Float =
     if (value >= threshold)
       1f
@@ -271,55 +150,6 @@ fun flipClip(threshold: Float, value: Float): Float =
       0f
     else
       1f
-
-val seamlessColorizedNoiseOperator: FunctionImplementation = withBuffer("dimensions", withBitmapBuffer) { arguments ->
-  val getNoise = noise(arguments, nonTilingOpenSimplex2D())
-  val colorize = colorizeValue(arguments)
-  ;
-  { x, y ->
-    if (x < 0.75f && y <= 0.75f) {
-      colorize(getNoise(x, y))
-    } else {
-      val value = getNoise(x, y)
-
-      val otherX = getNoise(x - 1f, y)
-      val weightX = max(0f, (x - 0.75f) * 4f)
-
-      val firstMix = mix(value, otherX, weightX)
-
-      val value2 = getNoise(x - 1f, y - 1f)
-      val otherY2 = mix(getNoise(x, y - 1f), value2, weightX)
-
-      val weightY = max(0f, (y - 0.75f) * 4f)
-
-      colorize(mix(firstMix, otherY2, weightY))
-    }
-  }
-}
-
-val coloredNoiseSignature = Signature(
-    parameters = listOf(
-        Parameter("dimensions", dimensionsKey),
-        Parameter("scale", floatKey),
-        Parameter("octaves", intKey),
-        Parameter("roughness", floatKey),
-        Parameter("firstColor", solidColorKey),
-        Parameter("secondColor", solidColorKey)
-    ),
-    output = solidColorBitmapKey
-)
-
-val coloredNoiseFunction = CompleteFunction(
-    path = PathKey(texturingPath, "coloredNoise"),
-    signature = coloredNoiseSignature,
-    implementation = colorizedNoiseOperator
-)
-
-val seamlessColoredNoiseFunction = CompleteFunction(
-    path = PathKey(texturingPath, "seamlessColoredNoise"),
-    signature = coloredNoiseSignature,
-    implementation = seamlessColorizedNoiseOperator
-)
 
 val voronoiBoundaryOperator: FunctionImplementation = withBuffer("dimensions", withGrayscaleBuffer) { arguments ->
   val dice = Dice(1)
