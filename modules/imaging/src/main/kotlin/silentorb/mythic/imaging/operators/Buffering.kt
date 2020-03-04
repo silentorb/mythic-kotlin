@@ -3,6 +3,7 @@ package silentorb.mythic.imaging.operators
 import org.lwjgl.BufferUtils
 import silentorb.imp.execution.Arguments
 import silentorb.imp.execution.FunctionImplementation
+import silentorb.mythic.imaging.Bitmap
 import silentorb.mythic.imaging.put
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector3

@@ -37,12 +37,6 @@ data class BufferInfo<T>(
     val setter: (FloatBuffer, T) -> Unit
 )
 
-data class Bitmap(
-    val buffer: FloatBuffer,
-    val channels: Int,
-    val dimensions: Vector2i
-)
-
 typealias GetPixel<T> = (Float, Float) -> T
 
 //val withGrayscaleBuffer = fillBuffer<Float>(1) { buffer, value ->
@@ -296,6 +290,3 @@ fun completeTexturingFunctions() = listOf(
         implementation = voronoiBoundaryOperator
     )
 )
-
-fun texturingLibrary() =
-    partitionFunctions(completeTexturingFunctions())

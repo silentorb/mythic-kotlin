@@ -3,6 +3,8 @@ package silentorb.mythic.imaging
 import silentorb.mythic.spatial.Vector3
 import org.joml.Vector3i
 import org.lwjgl.BufferUtils
+import silentorb.imp.execution.partitionFunctions
+import silentorb.mythic.imaging.operators.completeTexturingFunctions
 import java.nio.ByteBuffer
 
 typealias OpaqueColor = silentorb.mythic.spatial.Vector3
@@ -74,3 +76,6 @@ fun createTextureBuffer(algorithm: OpaqueTextureAlgorithm, width: Int, height: I
 //  val buffer = createTextureBuffer(algorithm, width, height)
 //  return Texture(width, height, buffer, geometryTextureInitializer)
 //}
+
+fun texturingLibrary() =
+  partitionFunctions(completeTexturingFunctions())
