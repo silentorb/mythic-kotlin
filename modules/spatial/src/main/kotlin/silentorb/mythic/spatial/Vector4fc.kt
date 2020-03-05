@@ -20,10 +20,10 @@
  THE SOFTWARE.
 
  */
-package org.joml
+package silentorb.mythic.spatial
 
-import silentorb.mythic.spatial.Quaternionfc
-import silentorb.mythic.spatial.Vector4
+import org.joml.Matrix4fc
+import org.joml.Matrix4x3fc
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 

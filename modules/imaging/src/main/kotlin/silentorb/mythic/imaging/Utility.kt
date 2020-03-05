@@ -2,8 +2,9 @@ package silentorb.mythic.imaging
 
 import silentorb.mythic.spatial.MutableVector3
 import silentorb.mythic.spatial.Vector3
-import org.joml.Vector3i
+import silentorb.mythic.spatial.Vector3i
 import org.lwjgl.BufferUtils
+import java.awt.image.BufferedImage
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 
@@ -31,6 +32,24 @@ fun FloatBuffer.getVector3() =
         this.get(),
         this.get()
     )
+
+fun bitmapToBufferedImage(bitmap: Bitmap): BufferedImage {
+  val buffer = bitmap.buffer
+  val dimensions = bitmap.dimensions
+  val type = when (bitmap.channels) {
+    1 -> BufferedImage.TYPE_BYTE_GRAY
+    3 -> BufferedImage.TYPE_3BYTE_BGR
+    else -> throw Error("Unsupported bitmap channel count ${bitmap.channels}")
+  }
+  buffer.rewind()
+  val array = IntArray(buffer.capacity())
+  for (i in 0 until buffer.capacity()) {
+    array[i] = (buffer.get() * 255).toInt()
+  }
+  val image = BufferedImage(dimensions.x, dimensions.y, type)
+  image.raster.setPixels(0, 0, dimensions.x, dimensions.y, array)
+  return image
+}
 
 fun rgbFloatToBytes(input: FloatBuffer, output: ByteBuffer){
   input.rewind()

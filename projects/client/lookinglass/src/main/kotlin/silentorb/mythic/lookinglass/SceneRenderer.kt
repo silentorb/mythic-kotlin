@@ -8,7 +8,7 @@ import silentorb.mythic.glowing.globalState
 import silentorb.mythic.spatial.*
 import silentorb.mythic.typography.*
 import silentorb.mythic.spatial.Vector2i
-import org.joml.Vector4i
+import silentorb.mythic.spatial.Vector4i
 import silentorb.mythic.lookinglass.drawing.renderElementGroup
 import silentorb.mythic.lookinglass.shading.GeneralPerspectiveShader
 import silentorb.mythic.lookinglass.shading.ObjectShaderConfig

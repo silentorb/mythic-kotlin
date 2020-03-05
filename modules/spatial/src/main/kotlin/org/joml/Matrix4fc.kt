@@ -22,10 +22,10 @@
  */
 package org.joml
 
+import silentorb.mythic.spatial.*
 import silentorb.mythic.spatial.Quaternionf
 import silentorb.mythic.spatial.Quaternionfc
-import silentorb.mythic.spatial.Vector3m
-import silentorb.mythic.spatial.Vector4
+import silentorb.mythic.spatial.Vector3fc
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 
@@ -1074,7 +1074,7 @@ import java.nio.FloatBuffer
  * will contain the result
  * @return dest
  */
-     fun transform(v:Vector4c, dest: Vector4): Vector4
+     fun transform(v: Vector4c, dest: Vector4): Vector4
 
 /**
  * Transform/multiply the vector <tt>(x, y, z, w)</tt> by this matrix and store the result in `dest`.
@@ -1113,7 +1113,7 @@ import java.nio.FloatBuffer
  * will contain the result
  * @return dest
  */
-     fun transformProject(v:Vector4c, dest: Vector4): Vector4
+     fun transformProject(v: Vector4c, dest: Vector4): Vector4
 
 /**
  * Transform/multiply the vector <tt>(x, y, z, w)</tt> by this matrix, perform perspective divide and store the result in `dest`.
@@ -1158,7 +1158,7 @@ import java.nio.FloatBuffer
  * will contain the result
  * @return dest
  */
-     fun transformProject(v:Vector3fc, dest: Vector3m): Vector3m
+     fun transformProject(v: Vector3fc, dest: Vector3m): Vector3m
 
 /**
  * Transform/multiply the vector <tt>(x, y, z)</tt> by this matrix, perform perspective divide and store the result in `dest`.
@@ -1226,7 +1226,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun transformPosition(v:Vector3fc, dest: Vector3m): Vector3m
+     fun transformPosition(v: Vector3fc, dest: Vector3m): Vector3m
 
 /**
  * Transform/multiply the 3D-vector <tt>(x, y, z)</tt>, as if it was a 4D-vector with w=1, by
@@ -1292,7 +1292,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun transformDirection(v:Vector3fc, dest: Vector3m): Vector3m
+     fun transformDirection(v: Vector3fc, dest: Vector3m): Vector3m
 
 /**
  * Transform/multiply the given 3D-vector <tt>(x, y, z)</tt>, as if it was a 4D-vector with w=0, by
@@ -1343,7 +1343,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun transformAffine(v:Vector4c, dest: Vector4): Vector4
+     fun transformAffine(v: Vector4c, dest: Vector4): Vector4
 
 /**
  * Transform/multiply the 4D-vector <tt>(x, y, z, w)</tt> by assuming that `this` matrix represents an [affine][.isAffine] transformation
@@ -1379,7 +1379,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun scale(xyz:Vector3fc, dest:Matrix4f):Matrix4f
+     fun scale(xyz: Vector3fc, dest:Matrix4f):Matrix4f
 
 /**
  * Apply scaling to this matrix by uniformly scaling all base axes by the given `xyz` factor
@@ -2108,7 +2108,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun translate(offset:Vector3fc, dest:Matrix4f):Matrix4f
+     fun translate(offset: Vector3fc, dest:Matrix4f):Matrix4f
 
 /**
  * Apply a translation to this matrix by translating by the given number of
@@ -2148,7 +2148,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun translateLocal(offset:Vector3fc, dest:Matrix4f):Matrix4f
+     fun translateLocal(offset: Vector3fc, dest:Matrix4f):Matrix4f
 
 /**
  * Pre-multiply a translation to this matrix by translating by the given number of
@@ -2518,7 +2518,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun lookAlong(dir:Vector3fc, up:Vector3fc, dest:Matrix4f):Matrix4f
+     fun lookAlong(dir: Vector3fc, up: Vector3fc, dest:Matrix4f):Matrix4f
 
 /**
  * Apply a rotation transformation to this matrix to make `-z` point along `dir`
@@ -2575,7 +2575,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun lookAt(eye:Vector3fc, center:Vector3fc, up:Vector3fc, dest:Matrix4f):Matrix4f
+     fun lookAt(eye: Vector3fc, center: Vector3fc, up: Vector3fc, dest:Matrix4f):Matrix4f
 
 /**
  * Apply a "lookat" transformation to this matrix for a right-handed coordinate system,
@@ -2672,7 +2672,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun lookAtLH(eye:Vector3fc, center:Vector3fc, up:Vector3fc, dest:Matrix4f):Matrix4f
+     fun lookAtLH(eye: Vector3fc, center: Vector3fc, up: Vector3fc, dest:Matrix4f):Matrix4f
 
 /**
  * Apply a "lookat" transformation to this matrix for a left-handed coordinate system,
@@ -3231,7 +3231,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun rotate(angle:Float, axis:Vector3fc, dest:Matrix4f):Matrix4f
+     fun rotate(angle:Float, axis: Vector3fc, dest:Matrix4f):Matrix4f
 
 /**
  * Unproject the given window coordinates <tt>(winX, winY, winZ)</tt> by `this` matrix using the specified viewport.
@@ -3321,7 +3321,7 @@ import java.nio.FloatBuffer
  * will hold the unprojected position
  * @return dest
  */
-     fun unproject(winCoords:Vector3fc, viewport:IntArray, dest: Vector4): Vector4
+     fun unproject(winCoords: Vector3fc, viewport:IntArray, dest: Vector4): Vector4
 
 /**
  * Unproject the given window coordinates `winCoords` by `this` matrix using the specified viewport.
@@ -3349,7 +3349,7 @@ import java.nio.FloatBuffer
  * will hold the unprojected position
  * @return dest
  */
-     fun unproject(winCoords:Vector3fc, viewport:IntArray, dest: Vector3m): Vector3m
+     fun unproject(winCoords: Vector3fc, viewport:IntArray, dest: Vector3m): Vector3m
 
 /**
  * Unproject the given 2D window coordinates <tt>(winX, winY)</tt> by `this` matrix using the specified viewport
@@ -3431,7 +3431,7 @@ import java.nio.FloatBuffer
  * will hold the unprojected position
  * @return dest
  */
-     fun unprojectInv(winCoords:Vector3fc, viewport:IntArray, dest: Vector4): Vector4
+     fun unprojectInv(winCoords: Vector3fc, viewport:IntArray, dest: Vector4): Vector4
 
 /**
  * Unproject the given window coordinates <tt>(winX, winY, winZ)</tt> by `this` matrix using the specified viewport.
@@ -3525,7 +3525,7 @@ import java.nio.FloatBuffer
  * will hold the unprojected position
  * @return dest
  */
-     fun unprojectInv(winCoords:Vector3fc, viewport:IntArray, dest: Vector3m): Vector3m
+     fun unprojectInv(winCoords: Vector3fc, viewport:IntArray, dest: Vector3m): Vector3m
 
 /**
  * Unproject the given window coordinates <tt>(winX, winY, winZ)</tt> by `this` matrix using the specified viewport.
@@ -3626,7 +3626,7 @@ import java.nio.FloatBuffer
  * will hold the projected window coordinates
  * @return winCoordsDest
  */
-     fun project(position:Vector3fc, viewport:IntArray, winCoordsDest: Vector4): Vector4
+     fun project(position: Vector3fc, viewport:IntArray, winCoordsDest: Vector4): Vector4
 
 /**
  * Project the given `position` via `this` matrix using the specified viewport
@@ -3649,7 +3649,7 @@ import java.nio.FloatBuffer
  * will hold the projected window coordinates
  * @return winCoordsDest
  */
-     fun project(position:Vector3fc, viewport:IntArray, winCoordsDest: Vector3m): Vector3m
+     fun project(position: Vector3fc, viewport:IntArray, winCoordsDest: Vector3m): Vector3m
 
 /**
  * Apply a mirror/reflection transformation to this matrix that reflects about the given plane
@@ -3732,7 +3732,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun reflect(orientation: Quaternionfc, point:Vector3fc, dest:Matrix4f):Matrix4f
+     fun reflect(orientation: Quaternionfc, point: Vector3fc, dest:Matrix4f):Matrix4f
 
 /**
  * Apply a mirror/reflection transformation to this matrix that reflects about the given plane
@@ -3752,7 +3752,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun reflect(normal:Vector3fc, point:Vector3fc, dest:Matrix4f):Matrix4f
+     fun reflect(normal: Vector3fc, point: Vector3fc, dest:Matrix4f):Matrix4f
 
 /**
  * Get the row at the given `row` index, starting with `0`.
@@ -4419,7 +4419,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun arcball(radius:Float, center:Vector3fc, angleX:Float, angleY:Float, dest:Matrix4f):Matrix4f
+     fun arcball(radius:Float, center: Vector3fc, angleX:Float, angleY:Float, dest:Matrix4f):Matrix4f
 
 /**
  * Compute the axis-aligned bounding box of the frustum described by `this` matrix and store the minimum corner
@@ -4549,7 +4549,7 @@ import java.nio.FloatBuffer
  * will hold the maximum corner of the resulting axis-aligned box
  * @return this
  */
-     fun transformAab(min:Vector3fc, max:Vector3fc, outMin: Vector3m, outMax: Vector3m):Matrix4f
+     fun transformAab(min: Vector3fc, max: Vector3fc, outMin: Vector3m, outMax: Vector3m):Matrix4f
 
 /**
  * Linearly interpolate `this` and `other` using the given interpolation factor `t`
@@ -4592,7 +4592,7 @@ import java.nio.FloatBuffer
  * will hold the result
  * @return dest
  */
-     fun rotateTowards(dir:Vector3fc, up:Vector3fc, dest:Matrix4f):Matrix4f
+     fun rotateTowards(dir: Vector3fc, up: Vector3fc, dest:Matrix4f):Matrix4f
 
 /**
  * Apply a model transformation to this matrix for a right-handed coordinate system,

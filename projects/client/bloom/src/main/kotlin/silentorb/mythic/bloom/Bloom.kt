@@ -9,7 +9,7 @@ import silentorb.mythic.glowing.globalState
 import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.spatial.toVector2
 import silentorb.mythic.spatial.Vector2i
-import org.joml.Vector4i
+import silentorb.mythic.spatial.Vector4i
 import silentorb.mythic.spatial.plus
 import org.lwjgl.opengl.GL11
 

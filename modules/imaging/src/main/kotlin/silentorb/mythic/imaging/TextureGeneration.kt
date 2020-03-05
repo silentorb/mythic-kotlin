@@ -1,7 +1,7 @@
 package silentorb.mythic.imaging
 
 import silentorb.mythic.spatial.Vector3
-import org.joml.Vector3i
+import silentorb.mythic.spatial.Vector3i
 import org.lwjgl.BufferUtils
 import silentorb.imp.execution.partitionFunctions
 import silentorb.mythic.imaging.operators.completeTexturingFunctions

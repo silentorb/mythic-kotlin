@@ -22,13 +22,12 @@
  */
 package org.joml
 
-import silentorb.mythic.spatial.Vector3m
-import silentorb.mythic.spatial.Vector3
 import org.joml.internal.MemUtil
 import org.joml.internal.Options
+import silentorb.mythic.spatial.*
 import silentorb.mythic.spatial.Quaternionf
 import silentorb.mythic.spatial.Quaternionfc
-import silentorb.mythic.spatial.Vector4
+import silentorb.mythic.spatial.Vector3fc
 
 import java.io.Externalizable
 import java.io.IOException

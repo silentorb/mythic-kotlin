@@ -2,7 +2,7 @@ plugins {
   kotlin("jvm") version "1.3.61"
 }
 
-group = "mythic.gradle"
+group = "silentorb.mythic.gradle.assets"
 version = "1.0"
 
 dependencies {

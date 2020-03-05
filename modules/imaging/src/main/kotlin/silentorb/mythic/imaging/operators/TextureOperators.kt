@@ -1,6 +1,6 @@
 package silentorb.mythic.imaging.operators
 
-import org.joml.Vector3i
+import silentorb.mythic.spatial.Vector3i
 import org.lwjgl.BufferUtils
 import silentorb.imp.core.*
 import silentorb.imp.execution.Arguments

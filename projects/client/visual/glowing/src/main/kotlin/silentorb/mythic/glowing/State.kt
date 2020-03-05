@@ -6,7 +6,7 @@ import org.lwjgl.opengl.GL15.glBindBuffer
 import org.lwjgl.opengl.GL20.glUseProgram
 
 import silentorb.mythic.spatial.Vector4
-import org.joml.Vector4i
+import silentorb.mythic.spatial.Vector4i
 import org.lwjgl.opengl.GL13.GL_MULTISAMPLE
 import org.lwjgl.opengl.GL13.glActiveTexture
 import org.lwjgl.opengl.GL14.GL_BLEND_DST_RGB

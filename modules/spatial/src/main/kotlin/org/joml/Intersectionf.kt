@@ -22,6 +22,7 @@
  */
 package org.joml
 
+import silentorb.mythic.spatial.Vector3fc
 import silentorb.mythic.spatial.Vector3m
 import silentorb.mythic.spatial.Vector4
 

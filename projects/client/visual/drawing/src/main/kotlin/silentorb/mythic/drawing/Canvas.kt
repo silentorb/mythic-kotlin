@@ -4,7 +4,7 @@ import silentorb.mythic.glowing.*
 import silentorb.mythic.spatial.*
 import silentorb.mythic.typography.*
 import silentorb.mythic.spatial.Vector2i
-import org.joml.Vector4i
+import silentorb.mythic.spatial.Vector4i
 import kotlin.math.cos
 import kotlin.math.sin
 

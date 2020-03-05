@@ -1,6 +1,6 @@
 package silentorb.mythic.glowing
 
-import org.joml.Vector4i
+import silentorb.mythic.spatial.Vector4i
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL43.*
