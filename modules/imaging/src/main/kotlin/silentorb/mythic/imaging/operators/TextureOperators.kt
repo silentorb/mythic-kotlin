@@ -1,21 +1,17 @@
 package silentorb.mythic.imaging.operators
 
 import silentorb.mythic.spatial.Vector3i
-import org.lwjgl.BufferUtils
 import silentorb.imp.core.*
 import silentorb.imp.execution.Arguments
 import silentorb.imp.execution.CompleteFunction
 import silentorb.imp.execution.FunctionImplementation
-import silentorb.imp.execution.partitionFunctions
 import silentorb.mythic.ent.mappedCache
 import silentorb.mythic.imaging.*
+import silentorb.mythic.imaging.drawing.newRectangleFunction
+import silentorb.mythic.imaging.drawing.rasterizeShapesFunction
 import silentorb.mythic.randomly.Dice
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector3
-import thirdparty.noise.OpenSimplexNoise
-import java.lang.Float.max
-import java.lang.Float.min
-import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 
 typealias SolidColor = Vector3
@@ -186,13 +182,13 @@ fun completeTexturingFunctions() = listOf(
         implementation = newSolidColor
     ),
     CompleteFunction(
-        path = dimensionsKey,
+        path = absoluteDimensionsKey,
         signature = Signature(
             parameters = listOf(
                 Parameter("width", intKey),
                 Parameter("height", intKey)
             ),
-            output = dimensionsKey
+            output = absoluteDimensionsKey
         ),
         implementation = newDimensions
     ),
@@ -200,7 +196,7 @@ fun completeTexturingFunctions() = listOf(
         path = coloredCheckersKey,
         signature = Signature(
             parameters = listOf(
-                Parameter("dimensions", dimensionsKey),
+                Parameter("dimensions", absoluteDimensionsKey),
                 Parameter("firstColor", solidColorKey),
                 Parameter("secondColor", solidColorKey)
             ),
@@ -212,7 +208,7 @@ fun completeTexturingFunctions() = listOf(
         path = fromSolidColorKey,
         signature = Signature(
             parameters = listOf(
-                Parameter("dimensions", dimensionsKey),
+                Parameter("dimensions", absoluteDimensionsKey),
                 Parameter("color", solidColorKey)
             ),
             output = solidColorBitmapKey
@@ -235,7 +231,7 @@ fun completeTexturingFunctions() = listOf(
         path = checkersKey,
         signature = Signature(
             parameters = listOf(
-                Parameter("dimensions", dimensionsKey)
+                Parameter("dimensions", absoluteDimensionsKey)
             ),
             output = solidColorBitmapKey
         ),
@@ -269,7 +265,7 @@ fun completeTexturingFunctions() = listOf(
         path = perlinNoiseGrayscaleKey,
         signature = Signature(
             parameters = listOf(
-                Parameter("dimensions", dimensionsKey),
+                Parameter("dimensions", absoluteDimensionsKey),
                 Parameter("scale", floatKey),
                 Parameter("octaves", intKey)
             ),
@@ -279,11 +275,13 @@ fun completeTexturingFunctions() = listOf(
     ),
     seamlessColoredNoiseFunction,
     coloredNoiseFunction,
+    newRectangleFunction,
+    rasterizeShapesFunction,
     CompleteFunction(
         path = voronoiBoundariesKey,
         signature = Signature(
             parameters = listOf(
-                Parameter("dimensions", dimensionsKey)
+                Parameter("dimensions", absoluteDimensionsKey)
             ),
             output = grayscaleBitmapKey
         ),

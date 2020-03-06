@@ -15,7 +15,8 @@ val transparentColorKey = PathKey(texturingPath, "TransparentColor")
 val solidColorBitmapKey = PathKey(texturingPath, "SolidColorBitmap")
 val transparentColorBitmapKey = PathKey(texturingPath, "TransparentColorBitmap")
 val grayscaleBitmapKey = PathKey(texturingPath, "GrayscaleBitmap")
-val dimensionsKey = PathKey(texturingPath, "Dimensions")
+val absoluteDimensionsKey = PathKey(texturingPath, "Dimensions")
+val relativeDimensionsKey = PathKey(texturingPath, "RelativeDimensions")
 
 data class Bitmap(
     val buffer: FloatBuffer,

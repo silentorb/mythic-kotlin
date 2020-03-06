@@ -4,7 +4,7 @@ import silentorb.imp.core.*
 import silentorb.imp.execution.Arguments
 import silentorb.imp.execution.CompleteFunction
 import silentorb.imp.execution.FunctionImplementation
-import silentorb.mythic.imaging.dimensionsKey
+import silentorb.mythic.imaging.absoluteDimensionsKey
 import silentorb.mythic.imaging.solidColorBitmapKey
 import silentorb.mythic.imaging.solidColorKey
 import silentorb.mythic.imaging.texturingPath
@@ -99,7 +99,7 @@ val seamlessColorizedNoiseOperator: FunctionImplementation = withBuffer("dimensi
 
 val coloredNoiseSignature = Signature(
     parameters = listOf(
-        Parameter("dimensions", dimensionsKey),
+        Parameter("dimensions", absoluteDimensionsKey),
         Parameter("scale", floatKey),
         Parameter("octaves", intKey),
         Parameter("roughness", floatKey),
