@@ -7,9 +7,11 @@ import silentorb.imp.execution.CompleteFunction
 import silentorb.imp.execution.FunctionImplementation
 import silentorb.mythic.ent.mappedCache
 import silentorb.mythic.imaging.*
+import silentorb.mythic.imaging.drawing.drawingFunctions
 import silentorb.mythic.imaging.drawing.newRectangleFunction
 import silentorb.mythic.imaging.drawing.rasterizeShapesFunction
 import silentorb.mythic.randomly.Dice
+import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector3
 import java.nio.FloatBuffer
@@ -153,10 +155,6 @@ val newSolidColor: FunctionImplementation = { arguments ->
   Vector3(arguments["red"] as Float, arguments["green"] as Float, arguments["blue"] as Float)
 }
 
-val newDimensions: FunctionImplementation = { arguments ->
-  Vector2i(arguments["width"] as Int, arguments["height"] as Int)
-}
-
 // Function Keys
 val coloredCheckersKey = PathKey(texturingPath, "coloredCheckers")
 val fromSolidColorKey = PathKey(texturingPath, "solidColorToBitmap")
@@ -190,7 +188,9 @@ fun completeTexturingFunctions() = listOf(
             ),
             output = absoluteDimensionsKey
         ),
-        implementation = newDimensions
+        implementation = { arguments ->
+          Vector2i(arguments["width"] as Int, arguments["height"] as Int)
+        }
     ),
     CompleteFunction(
         path = coloredCheckersKey,
@@ -275,8 +275,7 @@ fun completeTexturingFunctions() = listOf(
     ),
     seamlessColoredNoiseFunction,
     coloredNoiseFunction,
-    newRectangleFunction,
-    rasterizeShapesFunction,
+    relativeDimensionsFunction,
     CompleteFunction(
         path = voronoiBoundariesKey,
         signature = Signature(
@@ -288,3 +287,4 @@ fun completeTexturingFunctions() = listOf(
         implementation = voronoiBoundaryOperator
     )
 )
+    .plus(drawingFunctions())

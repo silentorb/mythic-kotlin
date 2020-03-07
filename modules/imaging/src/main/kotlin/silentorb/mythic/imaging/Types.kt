@@ -2,18 +2,24 @@ package silentorb.mythic.imaging
 
 import silentorb.imp.core.PathKey
 import silentorb.mythic.spatial.Vector2i
+import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.Vector4
 import java.nio.FloatBuffer
 
 typealias Sampler = (Float, Float) -> Float
 
 const val texturingPath = "silentorb.mythic.generation.texturing"
 
-// Type Keys
-val solidColorKey = PathKey(texturingPath, "SolidColor")
-val transparentColorKey = PathKey(texturingPath, "TransparentColor")
+typealias RgbColor = Vector3
+typealias RgbaColor = Vector4
+typealias GrayscaleColor = Float
 
-val solidColorBitmapKey = PathKey(texturingPath, "SolidColorBitmap")
-val transparentColorBitmapKey = PathKey(texturingPath, "TransparentColorBitmap")
+// Type Keys
+val solidColorKey = PathKey(texturingPath, "RgbColor")
+val transparentColorKey = PathKey(texturingPath, "RgbaColor")
+
+val solidColorBitmapKey = PathKey(texturingPath, "RgbBitmap")
+val transparentColorBitmapKey = PathKey(texturingPath, "RgbaBitmap")
 val grayscaleBitmapKey = PathKey(texturingPath, "GrayscaleBitmap")
 val absoluteDimensionsKey = PathKey(texturingPath, "Dimensions")
 val relativeDimensionsKey = PathKey(texturingPath, "RelativeDimensions")
