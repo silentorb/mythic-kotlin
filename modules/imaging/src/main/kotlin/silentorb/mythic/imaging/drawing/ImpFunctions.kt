@@ -4,11 +4,11 @@ import silentorb.imp.core.Parameter
 import silentorb.imp.core.PathKey
 import silentorb.imp.core.Signature
 import silentorb.imp.execution.CompleteFunction
-import silentorb.imp.execution.FunctionImplementation
 import silentorb.mythic.imaging.*
+import silentorb.mythic.imaging.math.vector2Key
+import silentorb.mythic.spatial.Matrix3
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector2i
-import silentorb.mythic.spatial.Vector3
 
 const val drawingPath = "silentorb.mythic.generation.drawing"
 
@@ -24,13 +24,7 @@ val newRectangleFunction = CompleteFunction(
     ),
     implementation = { arguments ->
       val dimensions = arguments["dimensions"] as Vector2
-      val id = 1
-      newShapes()
-          .copy(
-              ids = listOf(id),
-              functions = mapOf(id to ShapeFunction.rectangle),
-              dimensions = mapOf(id to dimensions)
-          )
+      newRectangle(dimensions)
     }
 )
 
@@ -49,6 +43,33 @@ val rgbColorFillShapeFunction = CompleteFunction(
       shapes.copy(
           rgbFills = shapes.ids
               .associateWith { color }
+      )
+    }
+)
+
+val translateShapeFunction = CompleteFunction(
+    path = PathKey(drawingPath, "translate"),
+    signature = Signature(
+        parameters = listOf(
+            Parameter("offset", vector2Key),
+            Parameter("shapes", shapesKey)
+        ),
+        output = shapesKey
+    ),
+    implementation = { arguments ->
+      val offset = arguments["offset"] as Vector2
+      val shapes = arguments["shapes"] as Shapes
+      val modifiedTransforms = shapes.transforms.mapValues { (_, transform) ->
+        transform.translate(offset)
+      }
+      val newTransformIds = shapes.ids.minus(shapes.transforms.keys)
+      val newTransforms = if (newTransformIds.any()) {
+        val transform = Matrix3().translate(offset)
+        newTransformIds.associateWith { transform }
+      } else
+        mapOf()
+      shapes.copy(
+          transforms = modifiedTransforms.plus(newTransforms)
       )
     }
 )

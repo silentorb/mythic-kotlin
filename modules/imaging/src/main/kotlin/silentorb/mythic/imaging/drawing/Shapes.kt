@@ -1,5 +1,6 @@
 package silentorb.mythic.imaging.drawing
 
+import silentorb.mythic.spatial.Matrix3
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
 
@@ -10,7 +11,7 @@ typealias ShapePoints = List<Vector2>
 typealias Table<T> = Map<Id, T>
 
 enum class ShapeFunction {
-  rectangle
+  polygon
 }
 
 data class Stroke(
@@ -20,29 +21,29 @@ data class Stroke(
 
 data class Shapes(
     val ids: List<Id>,
-    val dimensions: Table<Vector2>,
     val rgbFills: Table<Vector3>,
     val functions: Table<ShapeFunction>,
     val pointLists: Table<ShapePoints>,
-    val strokes: Table<Stroke>
+    val strokes: Table<Stroke>,
+    val transforms: Table<Matrix3>
 )
 
 fun newShapes() =
     Shapes(
         ids = listOf(),
-        dimensions = mapOf(),
         rgbFills = mapOf(),
         functions = mapOf(),
         pointLists = mapOf(),
-        strokes = mapOf()
+        strokes = mapOf(),
+        transforms = mapOf()
     )
 
 fun mergeShapes(first: Shapes, second: Shapes): Shapes =
     Shapes(
         ids = first.ids.plus(second.ids),
-        dimensions = first.dimensions.plus(second.dimensions),
         rgbFills = first.rgbFills.plus(second.rgbFills),
         functions = first.functions.plus(second.functions),
         pointLists = first.pointLists.plus(second.pointLists),
-        strokes = first.strokes.plus(second.strokes)
+        strokes = first.strokes.plus(second.strokes),
+        transforms = first.transforms.plus(second.transforms)
     )

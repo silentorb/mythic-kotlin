@@ -10,18 +10,26 @@ import silentorb.mythic.spatial.toVector2
 import java.awt.BasicStroke
 import java.awt.Graphics2D
 import java.awt.Shape
+import java.awt.geom.GeneralPath
 import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
 
-fun getRectangle(shapes: Shapes, id: Id): Shape {
-  val shapeDimensions = shapes.dimensions[id]!!
-  return Rectangle2D.Float(0f, 0f, shapeDimensions.x, shapeDimensions.y)
+fun getPolygon(shapes: Shapes, id: Id): Shape {
+  val points = shapes.pointLists[id]!!
+  assert(points.size > 1)
+  val polygon = GeneralPath(GeneralPath.WIND_EVEN_ODD, points.size)
+  val first = points.first()
+  polygon.moveTo(first.x, first.y)
+  points.drop(1).forEach { point ->
+    polygon.lineTo(point.x, point.y)
+  }
+  return polygon
 }
 
 fun rasterizeShape(canvas: Graphics2D, shapes: Shapes): (Id) -> Unit = { id ->
   val function = shapes.functions[id]!!
   val rasterize = when (function) {
-    ShapeFunction.rectangle -> ::getRectangle
+    ShapeFunction.polygon -> ::getPolygon
   }
   val shape = rasterize(shapes, id)
   val fill = shapes.rgbFills[id]
@@ -39,7 +47,25 @@ fun rasterizeShape(canvas: Graphics2D, shapes: Shapes): (Id) -> Unit = { id ->
 
 fun scaleShapes(dimensions: Vector2, shapes: Shapes): Shapes =
     shapes.copy(
-        dimensions = shapes.dimensions.mapValues { (_, value) -> value * dimensions / 100f }
+        pointLists = shapes.pointLists.mapValues { (_, points) ->
+          points.map { point ->
+            point * dimensions / 100f
+          }
+        }
+    )
+
+fun transformShapes(dimensions: Vector2, shapes: Shapes): Shapes =
+    shapes.copy(
+        pointLists = shapes.pointLists.mapValues { (id, points) ->
+          val transform = shapes.transforms[id]
+          if (transform == null)
+            points
+          else {
+            points.map { point ->
+              transform.transform(point)
+            }
+          }
+        }
     )
 
 fun rasterizeShapes(dimensions: Vector2i, shapes: Shapes, channels: Int): Bitmap {

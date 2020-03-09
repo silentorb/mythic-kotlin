@@ -10,6 +10,7 @@ import silentorb.mythic.imaging.*
 import silentorb.mythic.imaging.drawing.drawingFunctions
 import silentorb.mythic.imaging.drawing.newRectangleFunction
 import silentorb.mythic.imaging.drawing.rasterizeShapesFunction
+import silentorb.mythic.imaging.math.mathFunctions
 import silentorb.mythic.randomly.Dice
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector2i
@@ -288,3 +289,4 @@ fun completeTexturingFunctions() = listOf(
     )
 )
     .plus(drawingFunctions())
+    .plus(mathFunctions())
