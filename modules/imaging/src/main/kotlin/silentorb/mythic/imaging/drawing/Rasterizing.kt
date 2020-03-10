@@ -14,8 +14,7 @@ import java.awt.geom.GeneralPath
 import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
 
-fun getPolygon(shapes: Shapes, id: Id): Shape {
-  val points = shapes.pointLists[id]!!
+fun getPolygon(points: List<Vector2>): Shape {
   assert(points.size > 1)
   val polygon = GeneralPath(GeneralPath.WIND_EVEN_ODD, points.size)
   val first = points.first()
@@ -26,12 +25,7 @@ fun getPolygon(shapes: Shapes, id: Id): Shape {
   return polygon
 }
 
-fun rasterizeShape(canvas: Graphics2D, shapes: Shapes): (Id) -> Unit = { id ->
-  val function = shapes.functions[id]!!
-  val rasterize = when (function) {
-    ShapeFunction.polygon -> ::getPolygon
-  }
-  val shape = rasterize(shapes, id)
+fun rasterizeShape(canvas: Graphics2D, shapes: Shapes, id: Id, shape: Shape) {
   val fill = shapes.rgbFills[id]
   if (fill != null) {
     canvas.paint = toAwtColor(fill)
@@ -45,6 +39,32 @@ fun rasterizeShape(canvas: Graphics2D, shapes: Shapes): (Id) -> Unit = { id ->
   }
 }
 
+fun rasterizeShape(dimensions: Vector2, canvas: Graphics2D, shapes: Shapes): (Id) -> Unit = { id ->
+  val function = shapes.functions[id]!!
+  val rasterize = when (function) {
+    ShapeFunction.polygon -> ::getPolygon
+  }
+  val points = shapes.pointLists[id]!!
+
+  val rasterizeWithOffset = { offset: Vector2 ->
+    val shape = rasterize(points.map { it + offset })
+    rasterizeShape(canvas, shapes, id, shape)
+  }
+
+  rasterizeShape(canvas, shapes, id, rasterize(points))
+  if (points.any { it.x < 0f })
+    rasterizeWithOffset(Vector2(dimensions.x, 0f))
+
+  if (points.any { it.x >= dimensions.x })
+    rasterizeWithOffset(Vector2(-dimensions.x, 0f))
+
+  if (points.any { it.y < 0f })
+    rasterizeWithOffset(Vector2(0f, dimensions.y))
+
+  if (points.any { it.y >= dimensions.y })
+    rasterizeWithOffset(Vector2(0f, -dimensions.y))
+}
+
 fun scaleShapes(dimensions: Vector2, shapes: Shapes): Shapes =
     shapes.copy(
         pointLists = shapes.pointLists.mapValues { (_, points) ->
@@ -54,7 +74,7 @@ fun scaleShapes(dimensions: Vector2, shapes: Shapes): Shapes =
         }
     )
 
-fun transformShapes(dimensions: Vector2, shapes: Shapes): Shapes =
+fun transformShapes(shapes: Shapes): Shapes =
     shapes.copy(
         pointLists = shapes.pointLists.mapValues { (id, points) ->
           val transform = shapes.transforms[id]
@@ -71,7 +91,8 @@ fun transformShapes(dimensions: Vector2, shapes: Shapes): Shapes =
 fun rasterizeShapes(dimensions: Vector2i, shapes: Shapes, channels: Int): Bitmap {
   val image = BufferedImage(dimensions.x, dimensions.y, getBufferedImageTypeByChannels(channels).value)
   val canvas = image.createGraphics()
-  val scaledShapes = scaleShapes(dimensions.toVector2(), shapes)
-  shapes.functions.keys.forEach(rasterizeShape(canvas, scaledShapes))
+  val floatDimensions = dimensions.toVector2()
+  val scaledShapes = scaleShapes(floatDimensions, transformShapes(shapes))
+  shapes.functions.keys.forEach(rasterizeShape(floatDimensions, canvas, scaledShapes))
   return bufferedImageToBitmap(dimensions, channels, image)
 }

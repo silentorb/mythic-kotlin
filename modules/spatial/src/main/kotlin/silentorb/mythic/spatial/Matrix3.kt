@@ -29,10 +29,16 @@ data class Matrix3(
   fun translate(vector: Vector2): Matrix3 =
       translate(vector.x, vector.y)
 
-  fun transform(vector: Vector2): Vector2 {
-    throw Error("Not implemented.")
+  fun transform(x: Float, y: Float): Vector2 {
+   return Vector2(
+        x * m00 + y * m10 + m20,
+        x * m01 + y * m11 + m21
+    )
   }
-  
+
+  fun transform(vector: Vector2): Vector2 =
+      transform(vector.x, vector.y)
+
   /**
    * Multiply this matrix by the supplied `right` matrix.
    *

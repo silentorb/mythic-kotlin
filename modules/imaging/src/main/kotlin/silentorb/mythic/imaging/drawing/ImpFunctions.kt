@@ -93,5 +93,6 @@ val rasterizeShapesFunction = CompleteFunction(
 fun drawingFunctions() = listOf(
     newRectangleFunction,
     rasterizeShapesFunction,
-    rgbColorFillShapeFunction
+    rgbColorFillShapeFunction,
+    translateShapeFunction
 )
