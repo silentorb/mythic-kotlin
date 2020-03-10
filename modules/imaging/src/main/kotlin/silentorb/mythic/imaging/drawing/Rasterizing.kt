@@ -52,17 +52,29 @@ fun rasterizeShape(dimensions: Vector2, canvas: Graphics2D, shapes: Shapes): (Id
   }
 
   rasterizeShape(canvas, shapes, id, rasterize(points))
-  if (points.any { it.x < 0f })
-    rasterizeWithOffset(Vector2(dimensions.x, 0f))
 
-  if (points.any { it.x >= dimensions.x })
-    rasterizeWithOffset(Vector2(-dimensions.x, 0f))
+  val offsetX = if (points.any { it.x < 0f })
+    dimensions.x
+  else if (points.any { it.x >= dimensions.x })
+    -dimensions.x
+  else
+    0f
 
-  if (points.any { it.y < 0f })
-    rasterizeWithOffset(Vector2(0f, dimensions.y))
+  val offsetY = if (points.any { it.y < 0f })
+    dimensions.y
+  else if (points.any { it.x >= dimensions.y })
+    -dimensions.y
+  else
+    0f
 
-  if (points.any { it.y >= dimensions.y })
-    rasterizeWithOffset(Vector2(0f, -dimensions.y))
+  if (offsetX != 0f)
+    rasterizeWithOffset(Vector2(offsetX, 0f))
+
+  if (offsetY != 0f)
+    rasterizeWithOffset(Vector2(0f, offsetY))
+
+  if (offsetX != 0f && offsetY != 0f)
+    rasterizeWithOffset(Vector2(offsetX, offsetY))
 }
 
 fun scaleShapes(dimensions: Vector2, shapes: Shapes): Shapes =
