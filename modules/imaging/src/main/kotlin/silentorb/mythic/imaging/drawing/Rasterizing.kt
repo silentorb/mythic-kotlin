@@ -20,6 +20,7 @@ fun getPolygon(points: List<Vector2>): Shape {
   points.drop(1).forEach { point ->
     polygon.lineTo(point.x, point.y)
   }
+  polygon.closePath()
   return polygon
 }
 
@@ -34,7 +35,7 @@ fun rasterizeShape(canvas: Graphics2D, shapes: Shapes, id: Id, shape: Shape) {
     canvas.paint = toAwtColor(rgbFill)
     canvas.fill(shape)
   }
-  val stroke = shapes.strokes[id]
+  val stroke = shapes.rgbStrokes[id]
   if (stroke != null) {
     canvas.paint = toAwtColor(stroke.color)
     canvas.stroke = BasicStroke(stroke.width)

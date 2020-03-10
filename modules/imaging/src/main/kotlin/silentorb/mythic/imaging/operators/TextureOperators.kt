@@ -157,7 +157,6 @@ val newSolidColor: FunctionImplementation = { arguments ->
 val coloredCheckersKey = PathKey(texturingPath, "coloredCheckers")
 val colorizeKey = PathKey(texturingPath, "colorize")
 val checkersKey = PathKey(texturingPath, "checkers")
-val maskKey = PathKey(texturingPath, "mask")
 val mixBitmapsKey = PathKey(texturingPath, "mixBitmaps")
 val mixGrayscalesKey = PathKey(texturingPath, "mixGrayscales")
 val perlinNoiseGrayscaleKey = PathKey(texturingPath, "perlinNoiseGrayscale")
@@ -252,7 +251,7 @@ fun completeTexturingFunctions() = listOf(
         implementation = grayscaleCheckers
     ),
     CompleteFunction(
-        path = maskKey,
+        path = PathKey(texturingPath, "mask"),
         signature = Signature(
             parameters = listOf(
                 Parameter("first", rgbBitmapKey),
@@ -261,7 +260,16 @@ fun completeTexturingFunctions() = listOf(
             ),
             output = rgbBitmapKey
         ),
-        implementation = maskOperator
+        implementation = withBuffer("first", withBitmapBuffer) { arguments ->
+          val first = floatBufferArgument(arguments, "first")
+          val second = floatBufferArgument(arguments, "second")
+          val mask = floatBufferArgument(arguments, "mask")
+          ;
+          { _, _ ->
+            val degree = mask.get()
+            first.getVector3() * (1f - degree) + second.getVector3() * degree
+          }
+        }
     ),
     CompleteFunction(
         path = mixBitmapsKey,

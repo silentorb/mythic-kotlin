@@ -14,9 +14,14 @@ enum class ShapeFunction {
   polygon
 }
 
-data class Stroke(
+data class RgbStroke(
     val width: Float,
     val color: Vector3
+)
+
+data class GrayscaleStroke(
+    val width: Float,
+    val value: Float
 )
 
 data class Shapes(
@@ -25,7 +30,8 @@ data class Shapes(
     val rgbFills: Table<Vector3>,
     val functions: Table<ShapeFunction>,
     val pointLists: Table<ShapePoints>,
-    val strokes: Table<Stroke>,
+    val grayscaleStrokes: Table<GrayscaleStroke>,
+    val rgbStrokes: Table<RgbStroke>,
     val transforms: Table<Matrix3>
 )
 
@@ -36,7 +42,8 @@ fun newShapes() =
         rgbFills = mapOf(),
         functions = mapOf(),
         pointLists = mapOf(),
-        strokes = mapOf(),
+        rgbStrokes = mapOf(),
+        grayscaleStrokes = mapOf(),
         transforms = mapOf()
     )
 
@@ -47,6 +54,7 @@ fun mergeShapes(first: Shapes, second: Shapes): Shapes =
         rgbFills = first.rgbFills.plus(second.rgbFills),
         functions = first.functions.plus(second.functions),
         pointLists = first.pointLists.plus(second.pointLists),
-        strokes = first.strokes.plus(second.strokes),
+        rgbStrokes = first.rgbStrokes.plus(second.rgbStrokes),
+        grayscaleStrokes = first.grayscaleStrokes.plus(second.grayscaleStrokes),
         transforms = first.transforms.plus(second.transforms)
     )

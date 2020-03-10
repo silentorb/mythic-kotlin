@@ -9,6 +9,7 @@ import silentorb.mythic.imaging.*
 import silentorb.mythic.imaging.math.vector2Key
 import silentorb.mythic.spatial.Matrix3
 import silentorb.mythic.spatial.Vector2
+import silentorb.mythic.spatial.Vector3
 
 const val drawingPath = "silentorb.mythic.generation.drawing"
 
@@ -66,6 +67,48 @@ val grayscaleFillShapeFunction = CompleteFunction(
     }
 )
 
+val grayscaleStrokeShapeFunction = CompleteFunction(
+    path = PathKey(drawingPath, "grayscaleStroke"),
+    signature = Signature(
+        parameters = listOf(
+            Parameter("value", floatKey),
+            Parameter("width", floatKey),
+            Parameter("shapes", shapesKey)
+        ),
+        output = shapesKey
+    ),
+    implementation = { arguments ->
+      val value = arguments["value"] as Float
+      val width = arguments["width"] as Float
+      val shapes = arguments["shapes"] as Shapes
+      shapes.copy(
+          grayscaleStrokes = shapes.ids
+              .associateWith { GrayscaleStroke(width = width, value = value) }
+      )
+    }
+)
+
+val rgbStrokeShapeFunction = CompleteFunction(
+    path = PathKey(drawingPath, "rgbStroke"),
+    signature = Signature(
+        parameters = listOf(
+            Parameter("color", rgbColorKey),
+            Parameter("width", floatKey),
+            Parameter("shapes", shapesKey)
+        ),
+        output = shapesKey
+    ),
+    implementation = { arguments ->
+      val color = arguments["color"] as Vector3
+      val width = arguments["width"] as Float
+      val shapes = arguments["shapes"] as Shapes
+      shapes.copy(
+          rgbStrokes = shapes.ids
+              .associateWith { RgbStroke(width = width, color = color) }
+      )
+    }
+)
+
 val translateShapeFunction = CompleteFunction(
     path = PathKey(drawingPath, "translate"),
     signature = Signature(
@@ -112,6 +155,8 @@ fun rasterizeShapesFunction(bitmapType: PathKey) = CompleteFunction(
 fun drawingFunctions() = listOf(
     grayscaleFillShapeFunction,
     newRectangleFunction,
+    grayscaleStrokeShapeFunction,
+    rgbStrokeShapeFunction,
     rasterizeShapesFunction(rgbBitmapKey),
     rasterizeShapesFunction(grayscaleBitmapKey),
     rgbColorFillShapeFunction,
