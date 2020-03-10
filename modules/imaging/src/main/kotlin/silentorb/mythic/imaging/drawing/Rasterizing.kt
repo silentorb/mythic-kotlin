@@ -1,18 +1,16 @@
 package silentorb.mythic.imaging.drawing
 
 import silentorb.mythic.imaging.Bitmap
+import silentorb.mythic.imaging.bitmapToBufferedImage
 import silentorb.mythic.imaging.bufferedImageToBitmap
-import silentorb.mythic.imaging.getBufferedImageTypeByChannels
 import silentorb.mythic.imaging.toAwtColor
 import silentorb.mythic.spatial.Vector2
-import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.toVector2
 import java.awt.BasicStroke
+import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.Shape
 import java.awt.geom.GeneralPath
-import java.awt.geom.Rectangle2D
-import java.awt.image.BufferedImage
 
 fun getPolygon(points: List<Vector2>): Shape {
   assert(points.size > 1)
@@ -26,9 +24,14 @@ fun getPolygon(points: List<Vector2>): Shape {
 }
 
 fun rasterizeShape(canvas: Graphics2D, shapes: Shapes, id: Id, shape: Shape) {
-  val fill = shapes.rgbFills[id]
-  if (fill != null) {
-    canvas.paint = toAwtColor(fill)
+  val grayscaleFill = shapes.grayscaleFills[id]
+  if (grayscaleFill != null) {
+    canvas.paint = Color(grayscaleFill, grayscaleFill, grayscaleFill)
+    canvas.fill(shape)
+  }
+  val rgbFill = shapes.rgbFills[id]
+  if (rgbFill != null) {
+    canvas.paint = toAwtColor(rgbFill)
     canvas.fill(shape)
   }
   val stroke = shapes.strokes[id]
@@ -100,8 +103,11 @@ fun transformShapes(shapes: Shapes): Shapes =
         }
     )
 
-fun rasterizeShapes(dimensions: Vector2i, shapes: Shapes, channels: Int): Bitmap {
-  val image = BufferedImage(dimensions.x, dimensions.y, getBufferedImageTypeByChannels(channels).value)
+fun rasterizeShapes(shapes: Shapes, bitmap: Bitmap): Bitmap {
+//  val image = BufferedImage(dimensions.x, dimensions.y, getBufferedImageTypeByChannels(channels).value)
+  val dimensions = bitmap.dimensions
+  val channels = bitmap.channels
+  val image = bitmapToBufferedImage(bitmap)
   val canvas = image.createGraphics()
   val floatDimensions = dimensions.toVector2()
   val scaledShapes = scaleShapes(floatDimensions, transformShapes(shapes))

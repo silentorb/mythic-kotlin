@@ -8,11 +8,8 @@ import silentorb.imp.execution.FunctionImplementation
 import silentorb.mythic.ent.mappedCache
 import silentorb.mythic.imaging.*
 import silentorb.mythic.imaging.drawing.drawingFunctions
-import silentorb.mythic.imaging.drawing.newRectangleFunction
-import silentorb.mythic.imaging.drawing.rasterizeShapesFunction
 import silentorb.mythic.imaging.math.mathFunctions
 import silentorb.mythic.randomly.Dice
-import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector3
 import java.nio.FloatBuffer
@@ -158,7 +155,6 @@ val newSolidColor: FunctionImplementation = { arguments ->
 
 // Function Keys
 val coloredCheckersKey = PathKey(texturingPath, "coloredCheckers")
-val fromSolidColorKey = PathKey(texturingPath, "solidColorToBitmap")
 val colorizeKey = PathKey(texturingPath, "colorize")
 val checkersKey = PathKey(texturingPath, "checkers")
 val maskKey = PathKey(texturingPath, "mask")
@@ -169,14 +165,14 @@ val voronoiBoundariesKey = PathKey(texturingPath, "voronoiBoundaries")
 
 fun completeTexturingFunctions() = listOf(
     CompleteFunction(
-        path = solidColorKey,
+        path = rgbColorKey,
         signature = Signature(
             parameters = listOf(
                 Parameter("red", floatKey),
                 Parameter("green", floatKey),
                 Parameter("blue", floatKey)
             ),
-            output = solidColorKey
+            output = rgbColorKey
         ),
         implementation = newSolidColor
     ),
@@ -198,33 +194,50 @@ fun completeTexturingFunctions() = listOf(
         signature = Signature(
             parameters = listOf(
                 Parameter("dimensions", absoluteDimensionsKey),
-                Parameter("firstColor", solidColorKey),
-                Parameter("secondColor", solidColorKey)
+                Parameter("firstColor", rgbColorKey),
+                Parameter("secondColor", rgbColorKey)
             ),
-            output = solidColorBitmapKey
+            output = rgbBitmapKey
         ),
         implementation = coloredCheckers
     ),
     CompleteFunction(
-        path = fromSolidColorKey,
+        path = PathKey(texturingPath, "Bitmap"),
         signature = Signature(
             parameters = listOf(
                 Parameter("dimensions", absoluteDimensionsKey),
-                Parameter("color", solidColorKey)
+                Parameter("color", rgbColorKey)
             ),
-            output = solidColorBitmapKey
+            output = rgbBitmapKey
         ),
-        implementation = solidColor
+        implementation = withBuffer("dimensions", withBitmapBuffer) { arguments ->
+          val color = arguments["color"]!! as SolidColor
+          { _, _ -> color }
+        }
+    ),
+    CompleteFunction(
+        path = PathKey(texturingPath, "Bitmap"),
+        signature = Signature(
+            parameters = listOf(
+                Parameter("dimensions", absoluteDimensionsKey),
+                Parameter("value", floatKey)
+            ),
+            output = grayscaleBitmapKey
+        ),
+        implementation = withBuffer("dimensions", withGrayscaleBuffer) { arguments ->
+          val value = arguments["value"]!! as Float
+          { _, _ -> value }
+        }
     ),
     CompleteFunction(
         path = colorizeKey,
         signature = Signature(
             parameters = listOf(
                 Parameter("grayscale", grayscaleBitmapKey),
-                Parameter("firstColor", solidColorKey),
-                Parameter("secondColor", solidColorKey)
+                Parameter("firstColor", rgbColorKey),
+                Parameter("secondColor", rgbColorKey)
             ),
-            output = solidColorBitmapKey
+            output = rgbBitmapKey
         ),
         implementation = colorizeOperator
     ),
@@ -234,7 +247,7 @@ fun completeTexturingFunctions() = listOf(
             parameters = listOf(
                 Parameter("dimensions", absoluteDimensionsKey)
             ),
-            output = solidColorBitmapKey
+            output = rgbBitmapKey
         ),
         implementation = grayscaleCheckers
     ),
@@ -242,11 +255,11 @@ fun completeTexturingFunctions() = listOf(
         path = maskKey,
         signature = Signature(
             parameters = listOf(
-                Parameter("first", solidColorBitmapKey),
-                Parameter("second", solidColorBitmapKey),
+                Parameter("first", rgbBitmapKey),
+                Parameter("second", rgbBitmapKey),
                 Parameter("mask", grayscaleBitmapKey)
             ),
-            output = solidColorBitmapKey
+            output = rgbBitmapKey
         ),
         implementation = maskOperator
     ),
@@ -255,10 +268,10 @@ fun completeTexturingFunctions() = listOf(
         signature = Signature(
             parameters = listOf(
                 Parameter("degree", floatKey),
-                Parameter("first", solidColorBitmapKey),
+                Parameter("first", rgbBitmapKey),
                 Parameter("second", grayscaleBitmapKey)
             ),
-            output = solidColorBitmapKey
+            output = rgbBitmapKey
         ),
         implementation = mixBitmaps
     ),

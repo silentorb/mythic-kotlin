@@ -3,12 +3,12 @@ package silentorb.mythic.imaging.drawing
 import silentorb.imp.core.Parameter
 import silentorb.imp.core.PathKey
 import silentorb.imp.core.Signature
+import silentorb.imp.core.floatKey
 import silentorb.imp.execution.CompleteFunction
 import silentorb.mythic.imaging.*
 import silentorb.mythic.imaging.math.vector2Key
 import silentorb.mythic.spatial.Matrix3
 import silentorb.mythic.spatial.Vector2
-import silentorb.mythic.spatial.Vector2i
 
 const val drawingPath = "silentorb.mythic.generation.drawing"
 
@@ -32,7 +32,7 @@ val rgbColorFillShapeFunction = CompleteFunction(
     path = PathKey(drawingPath, "colorFill"),
     signature = Signature(
         parameters = listOf(
-            Parameter("color", solidColorKey),
+            Parameter("color", rgbColorKey),
             Parameter("shapes", shapesKey)
         ),
         output = shapesKey
@@ -43,6 +43,25 @@ val rgbColorFillShapeFunction = CompleteFunction(
       shapes.copy(
           rgbFills = shapes.ids
               .associateWith { color }
+      )
+    }
+)
+
+val grayscaleFillShapeFunction = CompleteFunction(
+    path = PathKey(drawingPath, "grayscaleFill"),
+    signature = Signature(
+        parameters = listOf(
+            Parameter("value", floatKey),
+            Parameter("shapes", shapesKey)
+        ),
+        output = shapesKey
+    ),
+    implementation = { arguments ->
+      val value = arguments["value"] as Float
+      val shapes = arguments["shapes"] as Shapes
+      shapes.copy(
+          grayscaleFills = shapes.ids
+              .associateWith { value }
       )
     }
 )
@@ -74,25 +93,27 @@ val translateShapeFunction = CompleteFunction(
     }
 )
 
-val rasterizeShapesFunction = CompleteFunction(
+fun rasterizeShapesFunction(bitmapType: PathKey) = CompleteFunction(
     path = PathKey(drawingPath, "rasterizeShapes"),
     signature = Signature(
         parameters = listOf(
-            Parameter("dimensions", absoluteDimensionsKey),
+            Parameter("bitmap", bitmapType),
             Parameter("shapes", shapesKey)
         ),
-        output = solidColorBitmapKey
+        output = bitmapType
     ),
     implementation = { arguments ->
-      val dimensions = arguments["dimensions"] as Vector2i
+      val bitmap = arguments["bitmap"] as Bitmap
       val shapes = arguments["shapes"] as Shapes
-      rasterizeShapes(dimensions, shapes, 3)
+      rasterizeShapes(shapes, bitmap)
     }
 )
 
 fun drawingFunctions() = listOf(
+    grayscaleFillShapeFunction,
     newRectangleFunction,
-    rasterizeShapesFunction,
+    rasterizeShapesFunction(rgbBitmapKey),
+    rasterizeShapesFunction(grayscaleBitmapKey),
     rgbColorFillShapeFunction,
     translateShapeFunction
 )

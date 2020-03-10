@@ -21,6 +21,7 @@ data class Stroke(
 
 data class Shapes(
     val ids: List<Id>,
+    val grayscaleFills: Table<Float>,
     val rgbFills: Table<Vector3>,
     val functions: Table<ShapeFunction>,
     val pointLists: Table<ShapePoints>,
@@ -31,6 +32,7 @@ data class Shapes(
 fun newShapes() =
     Shapes(
         ids = listOf(),
+        grayscaleFills = mapOf(),
         rgbFills = mapOf(),
         functions = mapOf(),
         pointLists = mapOf(),
@@ -41,6 +43,7 @@ fun newShapes() =
 fun mergeShapes(first: Shapes, second: Shapes): Shapes =
     Shapes(
         ids = first.ids.plus(second.ids),
+        grayscaleFills = first.grayscaleFills.plus(second.grayscaleFills),
         rgbFills = first.rgbFills.plus(second.rgbFills),
         functions = first.functions.plus(second.functions),
         pointLists = first.pointLists.plus(second.pointLists),

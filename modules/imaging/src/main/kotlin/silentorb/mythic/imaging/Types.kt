@@ -15,10 +15,10 @@ typealias RgbaColor = Vector4
 typealias GrayscaleColor = Float
 
 // Type Keys
-val solidColorKey = PathKey(texturingPath, "RgbColor")
+val rgbColorKey = PathKey(texturingPath, "RgbColor")
 val transparentColorKey = PathKey(texturingPath, "RgbaColor")
 
-val solidColorBitmapKey = PathKey(texturingPath, "RgbBitmap")
+val rgbBitmapKey = PathKey(texturingPath, "RgbBitmap")
 val transparentColorBitmapKey = PathKey(texturingPath, "RgbaBitmap")
 val grayscaleBitmapKey = PathKey(texturingPath, "GrayscaleBitmap")
 val absoluteDimensionsKey = PathKey(texturingPath, "Dimensions")

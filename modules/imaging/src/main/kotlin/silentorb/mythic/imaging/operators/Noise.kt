@@ -5,8 +5,8 @@ import silentorb.imp.execution.Arguments
 import silentorb.imp.execution.CompleteFunction
 import silentorb.imp.execution.FunctionImplementation
 import silentorb.mythic.imaging.absoluteDimensionsKey
-import silentorb.mythic.imaging.solidColorBitmapKey
-import silentorb.mythic.imaging.solidColorKey
+import silentorb.mythic.imaging.rgbBitmapKey
+import silentorb.mythic.imaging.rgbColorKey
 import silentorb.mythic.imaging.texturingPath
 import silentorb.mythic.spatial.Vector3
 import thirdparty.noise.OpenSimplexNoise
@@ -103,10 +103,10 @@ val coloredNoiseSignature = Signature(
         Parameter("scale", floatKey),
         Parameter("octaves", intKey),
         Parameter("roughness", floatKey),
-        Parameter("firstColor", solidColorKey),
-        Parameter("secondColor", solidColorKey)
+        Parameter("firstColor", rgbColorKey),
+        Parameter("secondColor", rgbColorKey)
     ),
-    output = solidColorBitmapKey
+    output = rgbBitmapKey
 )
 
 val coloredNoiseFunction = CompleteFunction(
