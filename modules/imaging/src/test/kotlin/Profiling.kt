@@ -3,6 +3,8 @@ import silentorb.imp.execution.executeToSingleValue
 import silentorb.imp.parsing.general.handleRoot
 import silentorb.imp.parsing.parser.parseTextBranching
 import silentorb.imp.testing.errored
+import silentorb.mythic.debugging.globalProfiler
+import silentorb.mythic.debugging.printProfiler
 
 // These are intended to run indefinitely until manually stopped
 class ProfilingTest {
@@ -44,9 +46,13 @@ let output = mask foreground background shapeMask
     """.trimIndent()
     handleRoot(errored, parseTextBranching(context)(code)) { result ->
       val graph = result.graph
-      while(true) {
-        executeToSingleValue(library.implementation, graph)
+      var i = 0
+      while (++i < 20) {
+        globalProfiler().wrapBlock("all") {
+          executeToSingleValue(library.implementation, graph)
+        }
       }
+      printProfiler(globalProfiler())
     }
   }
 }
