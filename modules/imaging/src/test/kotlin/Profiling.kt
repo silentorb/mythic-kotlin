@@ -1,7 +1,7 @@
 import org.junit.Test
 import silentorb.imp.execution.executeToSingleValue
 import silentorb.imp.parsing.general.handleRoot
-import silentorb.imp.parsing.parser.parseText
+import silentorb.imp.parsing.parser.parseTextBranching
 import silentorb.imp.testing.errored
 
 // These are intended to run indefinitely until manually stopped
@@ -11,18 +11,38 @@ class ProfilingTest {
   fun seamlessNoise() {
     val code = """
 import silentorb.mythic.generation.texturing.*
+import silentorb.mythic.generation.drawing.*
+import silentorb.mythic.math.*
 
-let dimensions = Dimensions 512 512
+let length = 512
+let dimensions = Dimensions length length
 
-let output = coloredNoise
+let shapes = rectangle (RelativeDimensions 40.0 30.0)
+    . translate (Vector2 -10.0 -10.0)
+
+let background = seamlessColoredNoise
+    dimensions = dimensions
+    scale = 0.5
+    octaves = 5
+    roughness = 0.75
+    firstColor = (RgbColor 1.0 0.5 0.4)
+    secondColor = (RgbColor 0.0 0.0 0.0)
+
+let foreground = seamlessColoredNoise
     dimensions = dimensions
     scale = 0.2
-    octaves = 1
+    octaves = 10
     roughness = 0.5
-    firstColor = (SolidColor 0.5 1.0 0.4)
-    secondColor = (SolidColor 0.0 0.0 0.0)
+    firstColor = (RgbColor 0.4 1.0 0.4)
+    secondColor = (RgbColor 0.0 0.0 0.0)
+
+let shapeMask = rasterizeShapes (Bitmap 0.0 dimensions) (grayscaleFill 1.0 shapes)
+
+let output = mask foreground background shapeMask
+    . rasterizeShapes (rgbStroke (RgbColor 0.0 0.0 0.0) 5.0 shapes)
+
     """.trimIndent()
-    handleRoot(errored, parseText(context)(code)) { result ->
+    handleRoot(errored, parseTextBranching(context)(code)) { result ->
       val graph = result.graph
       while(true) {
         executeToSingleValue(library.implementation, graph)

@@ -4,6 +4,7 @@ import silentorb.imp.core.*
 import silentorb.imp.execution.Arguments
 import silentorb.imp.execution.CompleteFunction
 import silentorb.imp.execution.FunctionImplementation
+import silentorb.imp.execution.TypeAlias
 import silentorb.mythic.imaging.absoluteDimensionsKey
 import silentorb.mythic.imaging.rgbBitmapKey
 import silentorb.mythic.imaging.rgbColorKey
@@ -62,46 +63,13 @@ val simpleNoiseOperator: FunctionImplementation = withBuffer("dimensions", withG
   }
 }
 
-val colorizedNoiseOperator: FunctionImplementation = withBuffer("dimensions", withBitmapBuffer) { arguments ->
-  val getNoise = noise(arguments, nonTilingOpenSimplex2D())
-  val colorize = colorizeValue(arguments)
-  ;
-  { x, y ->
-    colorize(getNoise(x, y))
-  }
-}
-
-val seamlessColorizedNoiseOperator: FunctionImplementation = withBuffer("dimensions", withBitmapBuffer) { arguments ->
-  val getNoise = noise(arguments, nonTilingOpenSimplex2D())
-  val colorize = colorizeValue(arguments)
-  val result = Vector3()
-  ;
-  { x, y ->
-    if (x < 0.75f && y <= 0.75f) {
-      colorize(getNoise(x, y))
-    } else {
-      val value = getNoise(x, y)
-
-      val otherX = getNoise(x - 1f, y)
-      val weightX = java.lang.Float.max(0f, (x - 0.75f) * 4f)
-
-      val firstMix = mix(value, otherX, weightX)
-
-      val value2 = getNoise(x - 1f, y - 1f)
-      val otherY2 = mix(getNoise(x, y - 1f), value2, weightX)
-
-      val weightY = java.lang.Float.max(0f, (y - 0.75f) * 4f)
-
-      colorize(mix(firstMix, otherY2, weightY))
-    }
-  }
-}
+val noiseOctaveKey = PathKey(texturingPath, "NoiseOctave")
 
 val coloredNoiseSignature = Signature(
     parameters = listOf(
         Parameter("dimensions", absoluteDimensionsKey),
         Parameter("scale", floatKey),
-        Parameter("octaves", intKey),
+        Parameter("octaves", noiseOctaveKey),
         Parameter("roughness", floatKey),
         Parameter("firstColor", rgbColorKey),
         Parameter("secondColor", rgbColorKey)
@@ -112,11 +80,50 @@ val coloredNoiseSignature = Signature(
 val coloredNoiseFunction = CompleteFunction(
     path = PathKey(texturingPath, "coloredNoise"),
     signature = coloredNoiseSignature,
-    implementation = colorizedNoiseOperator
+    implementation = withBuffer("dimensions", withBitmapBuffer) { arguments ->
+      val getNoise = noise(arguments, nonTilingOpenSimplex2D())
+      val colorize = colorizeValue(arguments)
+      ;
+      { x, y ->
+        colorize(getNoise(x, y))
+      }
+    }
 )
 
 val seamlessColoredNoiseFunction = CompleteFunction(
     path = PathKey(texturingPath, "seamlessColoredNoise"),
     signature = coloredNoiseSignature,
-    implementation = seamlessColorizedNoiseOperator
+    implementation = withBuffer("dimensions", withBitmapBuffer) { arguments ->
+      val getNoise = noise(arguments, nonTilingOpenSimplex2D())
+      val colorize = colorizeValue(arguments)
+      ;
+      { x, y ->
+        if (x < 0.75f && y <= 0.75f) {
+          colorize(getNoise(x, y))
+        } else {
+          val value = getNoise(x, y)
+
+          val otherX = getNoise(x - 1f, y)
+          val weightX = java.lang.Float.max(0f, (x - 0.75f) * 4f)
+
+          val firstMix = mix(value, otherX, weightX)
+
+          val value2 = getNoise(x - 1f, y - 1f)
+          val otherY2 = mix(getNoise(x, y - 1f), value2, weightX)
+
+          val weightY = java.lang.Float.max(0f, (y - 0.75f) * 4f)
+
+          colorize(mix(firstMix, otherY2, weightY))
+        }
+      }
+    }
 )
+
+fun noiseAliases() =
+    listOf(
+        TypeAlias(
+            path = noiseOctaveKey,
+            alias = intKey,
+            numericConstraint = newNumericConstraint(0, 20)
+        )
+    )

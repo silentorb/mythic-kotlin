@@ -3,7 +3,8 @@ package silentorb.mythic.imaging
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector3i
 import org.lwjgl.BufferUtils
-import silentorb.imp.execution.partitionFunctions
+import silentorb.imp.execution.newLibrary
+import silentorb.mythic.imaging.operators.completeTexturingAliases
 import silentorb.mythic.imaging.operators.completeTexturingFunctions
 import java.nio.ByteBuffer
 
@@ -78,4 +79,4 @@ fun createTextureBuffer(algorithm: OpaqueTextureAlgorithm, width: Int, height: I
 //}
 
 fun texturingLibrary() =
-  partitionFunctions(completeTexturingFunctions())
+  newLibrary(completeTexturingFunctions(), completeTexturingAliases())

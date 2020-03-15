@@ -3,7 +3,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import silentorb.imp.execution.executeToSingleValue
 import silentorb.imp.parsing.general.handleRoot
-import silentorb.imp.parsing.parser.parseText
+import silentorb.imp.parsing.parser.parseTextBranching
 import silentorb.imp.testing.errored
 import silentorb.mythic.imaging.Bitmap
 
@@ -24,7 +24,7 @@ let output = seamlessColoredNoise
     firstColor = (SolidColor 0.5 1.0 0.4)
     secondColor = (SolidColor 0.0 0.0 0.0)
     """.trimIndent()
-    handleRoot(errored, parseText(context)(code)) { result ->
+    handleRoot(errored, parseTextBranching(context)(code)) { result ->
       val graph = result.graph
       val value = executeToSingleValue(library.implementation, graph)
       assertTrue(value is Bitmap)

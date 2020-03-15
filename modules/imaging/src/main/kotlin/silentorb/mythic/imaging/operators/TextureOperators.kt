@@ -311,3 +311,6 @@ fun completeTexturingFunctions() = listOf(
 )
     .plus(drawingFunctions())
     .plus(mathFunctions())
+
+fun completeTexturingAliases() =
+    noiseAliases()
