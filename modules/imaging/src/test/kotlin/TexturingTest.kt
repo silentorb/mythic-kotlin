@@ -1,5 +1,6 @@
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Ignore
 import org.junit.Test
 import silentorb.imp.execution.executeToSingleValue
 import silentorb.imp.parsing.general.handleRoot
@@ -9,6 +10,7 @@ import silentorb.mythic.imaging.Bitmap
 
 class TexturingTest {
 
+  @Ignore
   @Test
   fun canGenerateASeamlessNoiseColorBitmap() {
     val code = """

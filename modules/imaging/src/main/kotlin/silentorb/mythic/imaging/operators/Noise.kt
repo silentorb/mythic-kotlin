@@ -105,6 +105,7 @@ val coloredNoiseFunction = CompleteFunction(
     path = PathKey(texturingPath, "coloredNoise"),
     signature = coloredNoiseSignature,
     implementation = { arguments ->
+      val testValue = NoiseNative.test()
 //      val getNoise = noise(arguments, nonTilingOpenSimplex2D())
       val getNoise = nonTilingOpenSimplex2D()
       val colorize = colorizeValue(arguments)
