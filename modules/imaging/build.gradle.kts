@@ -22,6 +22,7 @@ dependencies {
   api("silentorb.mythic:debugging")
   api("org.lwjgl:lwjgl:3.1.5")
   api("org.lwjgl:lwjgl:3.1.5:natives-windows")
+//  implementation(project(":imaging_native"))
 }
 
 tasks {

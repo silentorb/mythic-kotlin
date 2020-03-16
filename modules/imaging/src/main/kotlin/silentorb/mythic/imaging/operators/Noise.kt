@@ -5,10 +5,7 @@ import silentorb.imp.execution.Arguments
 import silentorb.imp.execution.CompleteFunction
 import silentorb.imp.execution.FunctionImplementation
 import silentorb.imp.execution.TypeAlias
-import silentorb.mythic.imaging.absoluteDimensionsKey
-import silentorb.mythic.imaging.rgbBitmapKey
-import silentorb.mythic.imaging.rgbColorKey
-import silentorb.mythic.imaging.texturingPath
+import silentorb.mythic.imaging.*
 import silentorb.mythic.spatial.Vector3
 import thirdparty.noise.OpenSimplexNoise
 
@@ -22,7 +19,12 @@ tailrec fun noiseIteration(octaves: List<Pair<Float, Float>>, x: Float, y: Float
   }
 }
 
-fun noise(arguments: Arguments, algorithm: GetPixel<Float>): GetPixel<Float> {
+data class NoiseOctaves(
+    val octaves: List<Pair<Float, Float>>,
+    val amplitudeMax: Float
+)
+
+fun getNoiseOctaves(arguments: Arguments): NoiseOctaves {
   val scale = (arguments["scale"] as Float? ?: 10f)
   val roughness = (arguments["roughness"] as Float? ?: 0.8f)
   val octaveCount = arguments["octaves"]!! as Int? ?: 1
@@ -33,6 +35,15 @@ fun noise(arguments: Arguments, algorithm: GetPixel<Float>): GetPixel<Float> {
         Triple(accumulator.plus(octave), amplitude * amplitudeMod, frequency * 2f)
       }
   val amplitudeMax = octaves.fold(0f) { a, b -> a + b.second }
+
+  return NoiseOctaves(
+      octaves = octaves,
+      amplitudeMax = amplitudeMax
+  )
+}
+
+fun noise(arguments: Arguments, algorithm: GetPixel<Float>): GetPixel<Float> {
+  val (octaves, amplitudeMax) = getNoiseOctaves(arguments)
   return { x, y ->
     //    var rawValue = 0f
 //    for ((frequency, amplitude) in octaves) {
@@ -77,7 +88,7 @@ val coloredNoiseSignature = Signature(
     output = rgbBitmapKey
 )
 
-val coloredNoiseFunction = CompleteFunction(
+val coloredNoiseFunctionNested = CompleteFunction(
     path = PathKey(texturingPath, "coloredNoise"),
     signature = coloredNoiseSignature,
     implementation = withBuffer("dimensions", withBitmapBuffer) { arguments ->
@@ -87,6 +98,34 @@ val coloredNoiseFunction = CompleteFunction(
       { x, y ->
         colorize(getNoise(x, y))
       }
+    }
+)
+
+val coloredNoiseFunction = CompleteFunction(
+    path = PathKey(texturingPath, "coloredNoise"),
+    signature = coloredNoiseSignature,
+    implementation = { arguments ->
+//      val getNoise = noise(arguments, nonTilingOpenSimplex2D())
+      val getNoise = nonTilingOpenSimplex2D()
+      val colorize = colorizeValue(arguments)
+      val dimensions = dimensionsFromArguments(arguments, "dimensions")
+      val depth = 3
+      val (octaves, amplitudeMax) = getNoiseOctaves(arguments)
+      val buffer = allocateFloatBuffer(dimensions.x * dimensions.y * depth)
+      for (octave in octaves) {
+        for (y in 0 until dimensions.y) {
+          for (x in 0 until dimensions.x) {
+            val value = getNoise(x.toFloat() / dimensions.x, 1f - y.toFloat() / dimensions.y)
+            buffer.put(value)
+          }
+        }
+        buffer.rewind()
+      }
+      Bitmap(
+          dimensions = dimensions,
+          channels = depth,
+          buffer = buffer
+      )
     }
 )
 

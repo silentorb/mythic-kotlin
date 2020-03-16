@@ -19,37 +19,33 @@ fun allocateByteTextureBuffer(length: Int): ByteBuffer =
 fun allocateFloatBuffer(size: Int): FloatBuffer =
     BufferUtils.createFloatBuffer(size)
 
-fun fillBuffer(depth: Int, dimensions: Vector2i, action: (FloatBuffer) -> Unit): Bitmap {
-//  val buffer = BufferUtils.createFloatBuffer(dimensions.x * dimensions.y * depth)
-//  val buffer = bufferCache(id, dimensions.x * dimensions.y * depth)
-  val buffer = allocateFloatBuffer(dimensions.x * dimensions.y * depth)
-  action(buffer)
-  buffer.rewind()
-  return Bitmap(
-      dimensions = dimensions,
-      channels = depth,
-      buffer = buffer
-  )
+fun dimensionsFromArguments(arguments: Arguments, dimensionsField: String): Vector2i {
+  val dimensionsArgument = arguments[dimensionsField]!!
+  return if (dimensionsArgument is Vector2i)
+    dimensionsArgument
+  else if (dimensionsArgument is Bitmap)
+    dimensionsArgument.dimensions
+  else throw Error("Invalid dimensions argument $dimensionsArgument")
 }
 
 fun <T> withBuffer(dimensionsField: String, bufferInfo: BufferInfo<T>, function: (Arguments) -> GetPixel<T>): FunctionImplementation =
     { arguments ->
-      val dimensionsArgument = arguments[dimensionsField]!!
-      val dimensions: Vector2i = if (dimensionsArgument is Vector2i)
-        dimensionsArgument
-      else if (dimensionsArgument is Bitmap)
-        dimensionsArgument.dimensions
-      else throw Error("Invalid dimensions argument $dimensionsArgument")
-
-      fillBuffer(bufferInfo.depth, dimensions) { buffer ->
-        val getter = function(arguments)
-        for (y in 0 until dimensions.y) {
-          for (x in 0 until dimensions.x) {
-            val value = getter(x.toFloat() / dimensions.x, 1f - y.toFloat() / dimensions.y)
-            bufferInfo.setter(buffer, value)
-          }
+      val dimensions = dimensionsFromArguments(arguments, dimensionsField)
+      val depth = bufferInfo.depth
+      val buffer = allocateFloatBuffer(dimensions.x * dimensions.y * depth)
+      val getter = function(arguments)
+      for (y in 0 until dimensions.y) {
+        for (x in 0 until dimensions.x) {
+          val value = getter(x.toFloat() / dimensions.x, 1f - y.toFloat() / dimensions.y)
+          bufferInfo.setter(buffer, value)
         }
       }
+      buffer.rewind()
+      Bitmap(
+          dimensions = dimensions,
+          channels = depth,
+          buffer = buffer
+      )
     }
 
 val withBitmapBuffer = BufferInfo<Vector3>(3) { buffer, value ->

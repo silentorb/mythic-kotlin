@@ -53,6 +53,7 @@ class OpenSimplexNoise {
   //2D OpenSimplex Noise.
   fun eval(x: Float, y: Float): Float { //Place input coordinates onto grid.
     val stretchOffset = (x + y) * STRETCH_CONSTANT_2DF
+    return stretchOffset
     val xs = x + stretchOffset
     val ys = y + stretchOffset
     //Floor to get grid coordinates of rhombus (stretched square) super-cell origin.

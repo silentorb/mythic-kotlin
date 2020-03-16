@@ -22,7 +22,7 @@ let dimensions = Dimensions length length
 let shapes = rectangle (RelativeDimensions 40.0 30.0)
     . translate (Vector2 -10.0 -10.0)
 
-let background = seamlessColoredNoise
+let background = coloredNoise
     dimensions = dimensions
     scale = 0.5
     octaves = 5
@@ -30,7 +30,7 @@ let background = seamlessColoredNoise
     firstColor = (RgbColor 1.0 0.5 0.4)
     secondColor = (RgbColor 0.0 0.0 0.0)
 
-let foreground = seamlessColoredNoise
+let foreground = coloredNoise
     dimensions = dimensions
     scale = 0.2
     octaves = 10
