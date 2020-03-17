@@ -34,3 +34,7 @@ tasks {
     kotlinOptions.jvmTarget = "1.8"
   }
 }
+
+//tasks.jar {
+//  from(project(":imaging_native").library.developmentBinary.flatMap { (it as ComponentWithRuntimeFile).runtimeFile })
+//}

@@ -70,14 +70,16 @@ fun colorizeValue(arguments: Arguments): (Float) -> Vector3 {
 }
 
 val colorizeOperator: FunctionImplementation = withBuffer("grayscale", withBitmapBuffer) { arguments ->
-  val grayscale = arguments["grayscale"]!! as FloatBuffer
-  grayscale.rewind()
+  val classpath = System.getProperty("java.class.path")
+  println(classpath)
+  val grayscale = arguments["grayscale"]!! as Bitmap
+  grayscale.buffer.rewind()
   val first = arguments["firstColor"]!! as SolidColor
   val second = arguments["secondColor"]!! as SolidColor
   val colorize = colorizeValue(arguments)
   ;
   { _, _ ->
-    colorize(grayscale.get())
+    colorize(grayscale.buffer.get())
   }
 }
 

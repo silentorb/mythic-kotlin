@@ -1,6 +1,7 @@
 import org.gradle.internal.jvm.Jvm
 
 plugins {
+  `visual-studio`
   `cpp-library`
   `java-library`
 }
@@ -20,6 +21,6 @@ library {
   }
 }
 
-//tasks.jar {
-//  from(library.developmentBinary.flatMap { (it as ComponentWithRuntimeFile).runtimeFile })
-//}
+tasks.jar {
+  from(library.developmentBinary.flatMap { (it as ComponentWithRuntimeFile).runtimeFile })
+}

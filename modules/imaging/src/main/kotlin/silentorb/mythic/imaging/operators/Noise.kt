@@ -8,6 +8,8 @@ import silentorb.imp.execution.TypeAlias
 import silentorb.mythic.imaging.*
 import silentorb.mythic.spatial.Vector3
 import thirdparty.noise.OpenSimplexNoise
+import java.nio.Buffer
+import java.nio.ByteBuffer
 
 tailrec fun noiseIteration(octaves: List<Pair<Float, Float>>, x: Float, y: Float, algorithm: GetPixel<Float>, step: Int, output: Float): Float {
   return if (step >= octaves.size)
@@ -101,31 +103,53 @@ val coloredNoiseFunctionNested = CompleteFunction(
     }
 )
 
+private var noiseContext: NoiseContext? = null
+
+fun getNoiseContext(): NoiseContext {
+  if (noiseContext == null)
+    noiseContext = NoiseContext(NoiseNative.newNoiseContext(1L))
+
+  return noiseContext!!
+}
+
+val noiseSignature = Signature(
+    parameters = listOf(
+        Parameter("dimensions", absoluteDimensionsKey),
+        Parameter("scale", floatKey),
+        Parameter("octaves", noiseOctaveKey),
+        Parameter("roughness", floatKey)
+    ),
+    output = grayscaleBitmapKey
+)
+
 val coloredNoiseFunction = CompleteFunction(
-    path = PathKey(texturingPath, "coloredNoise"),
-    signature = coloredNoiseSignature,
+    path = PathKey(texturingPath, "noise"),
+    signature = noiseSignature,
     implementation = { arguments ->
-      val testValue = NoiseNative.test()
+      val context = getNoiseContext()
 //      val getNoise = noise(arguments, nonTilingOpenSimplex2D())
-      val getNoise = nonTilingOpenSimplex2D()
-      val colorize = colorizeValue(arguments)
+//      val getNoise = nonTilingOpenSimplex2D()
+//      val colorize = colorizeValue(arguments)
+//      val getNoise: GetPixel<Float> = { x, y -> NoiseNative.noise2d(context.pointer, x.toDouble(), y.toDouble()).toFloat() }
       val dimensions = dimensionsFromArguments(arguments, "dimensions")
-      val depth = 3
+      val depth = 1
       val (octaves, amplitudeMax) = getNoiseOctaves(arguments)
-      val buffer = allocateFloatBuffer(dimensions.x * dimensions.y * depth)
-      for (octave in octaves) {
-        for (y in 0 until dimensions.y) {
-          for (x in 0 until dimensions.x) {
-            val value = getNoise(x.toFloat() / dimensions.x, 1f - y.toFloat() / dimensions.y)
-            buffer.put(value)
-          }
-        }
-        buffer.rewind()
-      }
+      val buffer = ByteBuffer.allocateDirect(dimensions.x * dimensions.y * depth * 4)
+      val bufferPointer = NoiseNative.getAddress(buffer)
+      NoiseNative.fillNoiseBuffer2d(context.pointer, bufferPointer, dimensions.x, dimensions.y, octaves.size)
+//      for (octave in octaves) {
+//        for (y in 0 until dimensions.y) {
+//          for (x in 0 until dimensions.x) {
+//            val value = getNoise(x.toFloat() / dimensions.x, 1f - y.toFloat() / dimensions.y)
+//            buffer.put(value)
+//          }
+//        }
+//        buffer.rewind()
+//      }
       Bitmap(
           dimensions = dimensions,
           channels = depth,
-          buffer = buffer
+          buffer = buffer.asFloatBuffer()
       )
     }
 )
