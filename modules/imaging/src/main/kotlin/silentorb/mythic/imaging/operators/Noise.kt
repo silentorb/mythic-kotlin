@@ -6,9 +6,7 @@ import silentorb.imp.execution.CompleteFunction
 import silentorb.imp.execution.FunctionImplementation
 import silentorb.imp.execution.TypeAlias
 import silentorb.mythic.imaging.*
-import silentorb.mythic.spatial.Vector3
 import thirdparty.noise.OpenSimplexNoise
-import java.nio.Buffer
 import java.nio.ByteBuffer
 
 tailrec fun noiseIteration(octaves: List<Pair<Float, Float>>, x: Float, y: Float, algorithm: GetPixel<Float>, step: Int, output: Float): Float {
@@ -26,11 +24,23 @@ data class NoiseOctaves(
     val amplitudeMax: Float
 )
 
+fun detailToOctaves(detail: Int): Int =
+    when {
+      detail == 0 -> 1
+      detail < 15 -> 2
+      detail < 30 -> 3
+      detail < 40 -> 4
+      detail < 60 -> 5
+      detail < 85 -> 6
+      detail < 99 -> 7
+      else -> 8
+    }
+
 fun getNoiseOctaves(arguments: Arguments): NoiseOctaves {
-  val scale = (arguments["scale"] as Float? ?: 10f)
-  val roughness = (arguments["roughness"] as Float? ?: 0.8f)
-  val octaveCount = arguments["octaves"]!! as Int? ?: 1
-  val amplitudeMod = roughness
+  val scale = (arguments["scale"] as Int).toFloat() / 300f
+  val detail = arguments["detail"] as Int
+  val octaveCount = detailToOctaves(detail)
+  val amplitudeMod = detail.toFloat() / 100f
   val (octaves) = (0 until octaveCount)
       .fold(Triple(listOf<Pair<Float, Float>>(), 1f, 1f)) { (accumulator, amplitude, frequency), b ->
         val octave = Pair(frequency / scale, amplitude)
@@ -60,96 +70,60 @@ fun noise(arguments: Arguments, algorithm: GetPixel<Float>): GetPixel<Float> {
   }
 }
 
-fun nonTilingOpenSimplex2D(): GetPixel<Float> {
-  val generator = OpenSimplexNoise(1)
+fun nonTilingOpenSimplex2D(seed: Long = 1L): GetPixel<Float> {
+  val generator = OpenSimplexNoise(seed)
   return { x, y ->
 //    0.5f
     generator.eval(x, y)
   }
 }
 
-val simpleNoiseOperator: FunctionImplementation = withBuffer("dimensions", withGrayscaleBuffer) { arguments ->
-  val getNoise = noise(arguments, nonTilingOpenSimplex2D())
-  ;
-  { x, y ->
-    getNoise(x, y)
-  }
-}
-
-val noiseOctaveKey = PathKey(texturingPath, "NoiseOctave")
+//val noiseOctaveKey = PathKey(texturingPath, "NoiseOctave")
+val noiseDetailKey = PathKey(texturingPath, "NoiseDetail")
+val noiseScaleKey = PathKey(texturingPath, "NoiseScale")
+val noiseVariationKey = PathKey(texturingPath, "NoiseVariation")
 
 val coloredNoiseSignature = Signature(
     parameters = listOf(
         Parameter("dimensions", absoluteDimensionsKey),
-        Parameter("scale", floatKey),
-        Parameter("octaves", noiseOctaveKey),
-        Parameter("roughness", floatKey),
+        Parameter("scale", noiseScaleKey),
+        Parameter("detail", noiseDetailKey),
         Parameter("firstColor", rgbColorKey),
         Parameter("secondColor", rgbColorKey)
     ),
     output = rgbBitmapKey
 )
 
-val coloredNoiseFunctionNested = CompleteFunction(
-    path = PathKey(texturingPath, "coloredNoise"),
-    signature = coloredNoiseSignature,
-    implementation = withBuffer("dimensions", withBitmapBuffer) { arguments ->
-      val getNoise = noise(arguments, nonTilingOpenSimplex2D())
-      val colorize = colorizeValue(arguments)
-      ;
-      { x, y ->
-        colorize(getNoise(x, y))
-      }
-    }
-)
-
-private var noiseContext: NoiseContext? = null
-
-fun getNoiseContext(): NoiseContext {
-  if (noiseContext == null)
-    noiseContext = NoiseContext(NoiseNative.newNoiseContext(1L))
-
-  return noiseContext!!
-}
-
 val noiseSignature = Signature(
     parameters = listOf(
         Parameter("dimensions", absoluteDimensionsKey),
-        Parameter("scale", floatKey),
-        Parameter("octaves", noiseOctaveKey),
-        Parameter("roughness", floatKey)
+        Parameter("scale", noiseScaleKey),
+        Parameter("detail", noiseDetailKey),
+        Parameter("variation", noiseVariationKey)
     ),
     output = grayscaleBitmapKey
 )
 
-val coloredNoiseFunction = CompleteFunction(
+val noiseFunction = CompleteFunction(
     path = PathKey(texturingPath, "noise"),
     signature = noiseSignature,
     implementation = { arguments ->
-      val context = getNoiseContext()
-//      val getNoise = noise(arguments, nonTilingOpenSimplex2D())
-//      val getNoise = nonTilingOpenSimplex2D()
-//      val colorize = colorizeValue(arguments)
-//      val getNoise: GetPixel<Float> = { x, y -> NoiseNative.noise2d(context.pointer, x.toDouble(), y.toDouble()).toFloat() }
+      val variation = arguments ["variation"] as Int
+      val getNoise = noise(arguments, nonTilingOpenSimplex2D(variation.toLong()))
       val dimensions = dimensionsFromArguments(arguments, "dimensions")
       val depth = 1
-      val (octaves, amplitudeMax) = getNoiseOctaves(arguments)
-      val buffer = ByteBuffer.allocateDirect(dimensions.x * dimensions.y * depth * 4)
-      val bufferPointer = NoiseNative.getAddress(buffer)
-      NoiseNative.fillNoiseBuffer2d(context.pointer, bufferPointer, dimensions.x, dimensions.y, octaves.size)
-//      for (octave in octaves) {
-//        for (y in 0 until dimensions.y) {
-//          for (x in 0 until dimensions.x) {
-//            val value = getNoise(x.toFloat() / dimensions.x, 1f - y.toFloat() / dimensions.y)
-//            buffer.put(value)
-//          }
-//        }
-//        buffer.rewind()
-//      }
+      val buffer = ByteBuffer.allocate(dimensions.x * dimensions.y * depth * 4).asFloatBuffer()
+      for (y in 0 until dimensions.y) {
+        for (x in 0 until dimensions.x) {
+          val value = getNoise(x.toFloat() / dimensions.x, 1f - y.toFloat() / dimensions.y)
+          buffer.put(value)
+        }
+      }
+      buffer.rewind()
       Bitmap(
           dimensions = dimensions,
           channels = depth,
-          buffer = buffer.asFloatBuffer()
+          buffer = buffer
       )
     }
 )
@@ -185,9 +159,24 @@ val seamlessColoredNoiseFunction = CompleteFunction(
 
 fun noiseAliases() =
     listOf(
+//        TypeAlias(
+//            path = noiseOctaveKey,
+//            alias = intKey,
+//            numericConstraint = newNumericConstraint(1, 8)
+//        ),
         TypeAlias(
-            path = noiseOctaveKey,
+            path = noiseScaleKey,
             alias = intKey,
-            numericConstraint = newNumericConstraint(0, 20)
+            numericConstraint = newNumericConstraint(1, 100)
+        ),
+        TypeAlias(
+            path = noiseDetailKey,
+            alias = intKey,
+            numericConstraint = newNumericConstraint(0, 100)
+        ),
+        TypeAlias(
+            path = noiseVariationKey,
+            alias = intKey,
+            numericConstraint = newNumericConstraint(1, 1000)
         )
     )

@@ -3,7 +3,8 @@ import org.gradle.internal.jvm.Jvm
 plugins {
   `visual-studio`
   `cpp-library`
-  `java-library`
+  `cpp-unit-test`
+//  `java-library`
 }
 
 library {
@@ -21,6 +22,6 @@ library {
   }
 }
 
-tasks.jar {
-  from(library.developmentBinary.flatMap { (it as ComponentWithRuntimeFile).runtimeFile })
-}
+//tasks.jar {
+//  from(library.developmentBinary.flatMap { (it as ComponentWithRuntimeFile).runtimeFile })
+//}

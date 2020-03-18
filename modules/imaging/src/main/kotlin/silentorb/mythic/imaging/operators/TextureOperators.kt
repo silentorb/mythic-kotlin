@@ -70,8 +70,6 @@ fun colorizeValue(arguments: Arguments): (Float) -> Vector3 {
 }
 
 val colorizeOperator: FunctionImplementation = withBuffer("grayscale", withBitmapBuffer) { arguments ->
-  val classpath = System.getProperty("java.class.path")
-  println(classpath)
   val grayscale = arguments["grayscale"]!! as Bitmap
   grayscale.buffer.rewind()
   val first = arguments["firstColor"]!! as SolidColor
@@ -161,7 +159,6 @@ val colorizeKey = PathKey(texturingPath, "colorize")
 val checkersKey = PathKey(texturingPath, "checkers")
 val mixBitmapsKey = PathKey(texturingPath, "mixBitmaps")
 val mixGrayscalesKey = PathKey(texturingPath, "mixGrayscales")
-val perlinNoiseGrayscaleKey = PathKey(texturingPath, "perlinNoiseGrayscale")
 val voronoiBoundariesKey = PathKey(texturingPath, "voronoiBoundaries")
 
 fun completeTexturingFunctions() = listOf(
@@ -285,20 +282,8 @@ fun completeTexturingFunctions() = listOf(
         ),
         implementation = mixBitmaps
     ),
-    CompleteFunction(
-        path = perlinNoiseGrayscaleKey,
-        signature = Signature(
-            parameters = listOf(
-                Parameter("dimensions", absoluteDimensionsKey),
-                Parameter("scale", floatKey),
-                Parameter("octaves", intKey)
-            ),
-            output = grayscaleBitmapKey
-        ),
-        implementation = simpleNoiseOperator
-    ),
     seamlessColoredNoiseFunction,
-    coloredNoiseFunction,
+    noiseFunction,
     relativeDimensionsFunction,
     CompleteFunction(
         path = voronoiBoundariesKey,

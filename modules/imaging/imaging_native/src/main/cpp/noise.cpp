@@ -278,7 +278,6 @@ void fillNoiseBuffer2d(NoiseContext *context, float *buffer, int dimensionsX, in
         auto sampleX = static_cast<double>(x) / dimensionsX;
         auto sampleY = 1 - static_cast<double>(y) / dimensionsY;
         *bufferOffset++ = static_cast<float>(openSimplexNoise2d(context, sampleX, sampleY));
-        return;
       }
     }
   }

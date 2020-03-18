@@ -48,6 +48,7 @@ let output = mask foreground background shapeMask
       val graph = result.graph
       var i = 0
       while (++i < 20) {
+//      while (true) {
         globalProfiler().wrapBlock("all") {
           executeToSingleValue(library.implementation, graph)
         }
