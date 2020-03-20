@@ -54,11 +54,7 @@ val solidColor: FunctionImplementation = withBuffer("dimensions", withBitmapBuff
 val coloredCheckers: FunctionImplementation = withBuffer("dimensions", withBitmapBuffer) { arguments ->
   val first = arguments["firstColor"]!! as SolidColor
   val second = arguments["secondColor"]!! as SolidColor
-  checkerPattern(first, second)
-}
-
-val grayscaleCheckers: FunctionImplementation = withBuffer("dimensions", withGrayscaleBuffer) { _ ->
-  checkerOp(0f, 1f)
+  coloredCheckerPattern(first, second)
 }
 
 fun colorizeValue(arguments: Arguments): (Float) -> Vector3 {
@@ -156,7 +152,6 @@ val newSolidColor: FunctionImplementation = { arguments ->
 // Function Keys
 val coloredCheckersKey = PathKey(texturingPath, "coloredCheckers")
 val colorizeKey = PathKey(texturingPath, "colorize")
-val checkersKey = PathKey(texturingPath, "checkers")
 val mixBitmapsKey = PathKey(texturingPath, "mixBitmaps")
 val mixGrayscalesKey = PathKey(texturingPath, "mixGrayscales")
 val voronoiBoundariesKey = PathKey(texturingPath, "voronoiBoundaries")
@@ -240,16 +235,6 @@ fun completeTexturingFunctions() = listOf(
         implementation = colorizeOperator
     ),
     CompleteFunction(
-        path = checkersKey,
-        signature = Signature(
-            parameters = listOf(
-                Parameter("dimensions", absoluteDimensionsKey)
-            ),
-            output = rgbBitmapKey
-        ),
-        implementation = grayscaleCheckers
-    ),
-    CompleteFunction(
         path = PathKey(texturingPath, "mask"),
         signature = Signature(
             parameters = listOf(
@@ -298,6 +283,8 @@ fun completeTexturingFunctions() = listOf(
 )
     .plus(drawingFunctions())
     .plus(mathFunctions())
+    .plus(checkersFunctions())
 
 fun completeTexturingAliases() =
     noiseAliases()
+        .plus(checkersAliases())

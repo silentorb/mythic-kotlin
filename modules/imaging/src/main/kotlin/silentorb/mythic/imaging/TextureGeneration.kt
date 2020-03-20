@@ -4,8 +4,10 @@ import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector3i
 import org.lwjgl.BufferUtils
 import silentorb.imp.execution.newLibrary
+import silentorb.mythic.imaging.operators.GetPixel
 import silentorb.mythic.imaging.operators.completeTexturingAliases
 import silentorb.mythic.imaging.operators.completeTexturingFunctions
+import silentorb.mythic.spatial.Vector2i
 import java.nio.ByteBuffer
 
 typealias OpaqueColor = silentorb.mythic.spatial.Vector3
@@ -28,16 +30,7 @@ fun <T> checkerOp(first: T, second: T) = { x: Float, y: Float ->
     second
 }
 
-val checkerPattern = { first: OpaqueColor, second: OpaqueColor ->
-  { x: Float, y: Float ->
-    if (flip(x < 0.5f, y < 0.5f))
-      first
-    else
-      second
-  }
-}
-
-val checkerPattern2 = { first: Vector3i, second: Vector3i ->
+val coloredCheckerPattern = { first: OpaqueColor, second: OpaqueColor ->
   { x: Float, y: Float ->
     if (flip(x < 0.5f, y < 0.5f))
       first
