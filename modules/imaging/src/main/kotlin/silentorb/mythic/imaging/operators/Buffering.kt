@@ -48,6 +48,23 @@ fun <T> withBuffer(dimensionsField: String, bufferInfo: BufferInfo<T>, function:
       )
     }
 
+fun <T> samplertoBitmap(bufferInfo: BufferInfo<T>, dimensions: Vector2i, sampler: GetPixel<T>): Bitmap {
+  val depth = bufferInfo.depth
+  val buffer = allocateFloatBuffer(dimensions.x * dimensions.y * depth)
+  for (y in 0 until dimensions.y) {
+    for (x in 0 until dimensions.x) {
+      val value = sampler(x.toFloat() / dimensions.x, 1f - y.toFloat() / dimensions.y)
+      bufferInfo.setter(buffer, value)
+    }
+  }
+  buffer.rewind()
+  return Bitmap(
+      dimensions = dimensions,
+      channels = depth,
+      buffer = buffer
+  )
+}
+
 val withBitmapBuffer = BufferInfo<Vector3>(3) { buffer, value ->
   buffer.put(value)
 }

@@ -96,12 +96,11 @@ val coloredNoiseSignature = Signature(
 
 val noiseSignature = Signature(
     parameters = listOf(
-        Parameter("dimensions", absoluteDimensionsKey),
         Parameter("scale", noiseScaleKey),
         Parameter("detail", noiseDetailKey),
         Parameter("variation", noiseVariationKey)
     ),
-    output = grayscaleBitmapKey
+    output = floatSamplerKey
 )
 
 val noiseFunction = CompleteFunction(
@@ -109,22 +108,21 @@ val noiseFunction = CompleteFunction(
     signature = noiseSignature,
     implementation = { arguments ->
       val variation = arguments ["variation"] as Int
-      val getNoise = noise(arguments, nonTilingOpenSimplex2D(variation.toLong()))
-      val dimensions = dimensionsFromArguments(arguments, "dimensions")
-      val depth = 1
-      val buffer = ByteBuffer.allocate(dimensions.x * dimensions.y * depth * 4).asFloatBuffer()
-      for (y in 0 until dimensions.y) {
-        for (x in 0 until dimensions.x) {
-          val value = getNoise(x.toFloat() / dimensions.x, 1f - y.toFloat() / dimensions.y)
-          buffer.put(value)
-        }
-      }
-      buffer.rewind()
-      Bitmap(
-          dimensions = dimensions,
-          channels = depth,
-          buffer = buffer
-      )
+      noise(arguments, nonTilingOpenSimplex2D(variation.toLong()))
+//      val depth = 1
+//      val buffer = ByteBuffer.allocate(dimensions.x * dimensions.y * depth * 4).asFloatBuffer()
+//      for (y in 0 until dimensions.y) {
+//        for (x in 0 until dimensions.x) {
+//          val value = getNoise(x.toFloat() / dimensions.x, 1f - y.toFloat() / dimensions.y)
+//          buffer.put(value)
+//        }
+//      }
+//      buffer.rewind()
+//      Bitmap(
+//          dimensions = dimensions,
+//          channels = depth,
+//          buffer = buffer
+//      )
     }
 )
 

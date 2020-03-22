@@ -1,11 +1,8 @@
 package silentorb.mythic.imaging
 
-import silentorb.mythic.spatial.MutableVector3
-import silentorb.mythic.spatial.Vector3
-import silentorb.mythic.spatial.Vector3i
 import org.lwjgl.BufferUtils
 import silentorb.mythic.imaging.operators.allocateFloatBuffer
-import silentorb.mythic.spatial.Vector2i
+import silentorb.mythic.spatial.*
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.nio.ByteBuffer
@@ -42,8 +39,8 @@ enum class BufferedImageType(val value: Int, val channels: Int) {
 }
 
 fun getBufferedImageTypeByChannels(channels: Int): BufferedImageType =
-    BufferedImageType.values().firstOrNull { it.channels == channels } ?:
-    throw Error("Unsupported bitmap channel count ${channels}")
+    BufferedImageType.values().firstOrNull { it.channels == channels }
+        ?: throw Error("Unsupported bitmap channel count ${channels}")
 
 fun bitmapToBufferedImage(bitmap: Bitmap): BufferedImage {
   val buffer = bitmap.buffer
@@ -56,6 +53,44 @@ fun bitmapToBufferedImage(bitmap: Bitmap): BufferedImage {
   }
   val image = BufferedImage(dimensions.x, dimensions.y, type.value)
   image.raster.setPixels(0, 0, dimensions.x, dimensions.y, array)
+  return image
+}
+
+data class SamplerAwtWriter(
+    val depth: Int,
+    val write: (Float, Float, IntArray, Int) -> Int
+)
+
+fun newFloatSampleWriter(sampler: FloatSampler) =
+    SamplerAwtWriter(depth = 1) { x, y, array, i ->
+      val sample = sampler(x, y)
+      array[i] = (sample * 255).toInt()
+      i + 1
+    }
+
+fun newRgbSampleWriter(sampler: RgbSampler) =
+    SamplerAwtWriter(depth = 3) { x, y, array, i ->
+      val sample = sampler(x, y)
+      array[i] = (sample.x * 255).toInt()
+      array[i + 1] = (sample.y * 255).toInt()
+      array[i + 2] = (sample.z * 255).toInt()
+      i + 3
+    }
+
+fun rgbSamplerToBufferedImage(fullDimensions: Vector2i, samplerAwtWriter: SamplerAwtWriter, offset: Vector2i, tileSize: Vector2i): BufferedImage {
+  val depth = samplerAwtWriter.depth
+  val type = getBufferedImageTypeByChannels(depth)
+  val size = tileSize.x * tileSize.y * depth
+  val array = IntArray(size)
+  var i = 0
+  val end = offset + tileSize
+  for (y in offset.y until end.y) {
+    for (x in offset.x until end.x) {
+      i = samplerAwtWriter.write(x.toFloat() / fullDimensions.x, y.toFloat() / fullDimensions.y, array, i)
+    }
+  }
+  val image = BufferedImage(tileSize.x, tileSize.y, type.value)
+  image.raster.setPixels(0, 0, tileSize.x, tileSize.y, array)
   return image
 }
 

@@ -65,18 +65,6 @@ fun colorizeValue(arguments: Arguments): (Float) -> Vector3 {
   }
 }
 
-val colorizeOperator: FunctionImplementation = withBuffer("grayscale", withBitmapBuffer) { arguments ->
-  val grayscale = arguments["grayscale"]!! as Bitmap
-  grayscale.buffer.rewind()
-  val first = arguments["firstColor"]!! as SolidColor
-  val second = arguments["secondColor"]!! as SolidColor
-  val colorize = colorizeValue(arguments)
-  ;
-  { _, _ ->
-    colorize(grayscale.buffer.get())
-  }
-}
-
 fun floatBufferArgument(arguments: Arguments, name: String): FloatBuffer {
   val result = arguments[name]!! as Bitmap
   result.buffer.rewind()
@@ -226,32 +214,39 @@ fun completeTexturingFunctions() = listOf(
         path = colorizeKey,
         signature = Signature(
             parameters = listOf(
-                Parameter("grayscale", grayscaleBitmapKey),
+                Parameter("sampler", floatSamplerKey),
                 Parameter("firstColor", rgbColorKey),
                 Parameter("secondColor", rgbColorKey)
             ),
-            output = rgbBitmapKey
+            output = rgbSamplerKey
         ),
-        implementation = colorizeOperator
+        implementation = { arguments ->
+          val sampler = arguments["sampler"]!! as FloatSampler
+          val colorize = colorizeValue(arguments)
+          ;
+          { x: Float, y: Float ->
+            colorize(sampler(x, y))
+          }
+        }
     ),
     CompleteFunction(
         path = PathKey(texturingPath, "mask"),
         signature = Signature(
             parameters = listOf(
-                Parameter("first", rgbBitmapKey),
-                Parameter("second", rgbBitmapKey),
-                Parameter("mask", grayscaleBitmapKey)
+                Parameter("first", rgbSamplerKey),
+                Parameter("second", rgbSamplerKey),
+                Parameter("mask", floatSamplerKey)
             ),
-            output = rgbBitmapKey
+            output = rgbSamplerKey
         ),
-        implementation = withBuffer("first", withBitmapBuffer) { arguments ->
-          val first = floatBufferArgument(arguments, "first")
-          val second = floatBufferArgument(arguments, "second")
-          val mask = floatBufferArgument(arguments, "mask")
+        implementation = { arguments ->
+          val first = arguments["first"]!! as RgbSampler
+          val second = arguments["second"]!! as RgbSampler
+          val mask = arguments["mask"]!! as FloatSampler
           ;
-          { _, _ ->
-            val degree = mask.get()
-            first.getVector3() * (1f - degree) + second.getVector3() * degree
+          { x: Float, y: Float ->
+            val degree = mask(x, y)
+            first(x, y) * (1f - degree) + second(x, y) * degree
           }
         }
     ),

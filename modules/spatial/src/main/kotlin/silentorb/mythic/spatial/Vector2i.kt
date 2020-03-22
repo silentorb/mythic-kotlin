@@ -678,4 +678,7 @@ class Vector2i : Externalizable, Vector2ic {
     private val serialVersionUID = 1L
   }
 
+  operator fun times(other: Vector2i): Vector2i = Vector2i(x * other.x, y * other.y)
+  operator fun div(other: Vector2i): Vector2i = Vector2i(x / other.x, y / other.y)
+  operator fun plus(other: Vector2i): Vector2i = Vector2i(x + other.x, y + other.y)
 }
