@@ -1,4 +1,4 @@
-package silentorb.mythic.imaging.operators
+package silentorb.mythic.imaging.filters
 
 import org.lwjgl.BufferUtils
 import silentorb.imp.execution.Arguments
@@ -48,7 +48,7 @@ fun <T> withBuffer(dimensionsField: String, bufferInfo: BufferInfo<T>, function:
       )
     }
 
-fun <T> samplertoBitmap(bufferInfo: BufferInfo<T>, dimensions: Vector2i, sampler: GetPixel<T>): Bitmap {
+fun <T> samplerToBitmap(bufferInfo: BufferInfo<T>, dimensions: Vector2i, sampler: GetPixel<T>): Bitmap {
   val depth = bufferInfo.depth
   val buffer = allocateFloatBuffer(dimensions.x * dimensions.y * depth)
   for (y in 0 until dimensions.y) {

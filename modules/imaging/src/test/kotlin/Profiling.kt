@@ -6,8 +6,9 @@ import silentorb.imp.testing.errored
 import silentorb.mythic.debugging.globalProfiler
 import silentorb.mythic.debugging.printProfiler
 import silentorb.mythic.imaging.RgbSampler
-import silentorb.mythic.imaging.operators.samplertoBitmap
-import silentorb.mythic.imaging.operators.withBitmapBuffer
+import silentorb.mythic.imaging.newBufferedImage
+import silentorb.mythic.imaging.newRgbSampleWriter
+import silentorb.mythic.imaging.samplerToBufferedImage
 import silentorb.mythic.spatial.Vector2i
 import java.lang.management.ManagementFactory
 
@@ -89,11 +90,13 @@ let output = mask foreground background (checkers 3 3)
     handleRoot(errored, parseTextBranching(context)(code)) { result ->
       val graph = result.graph
       var i = 0
-      while (++i < 20) {
+      val dimensions = Vector2i(512)
+      val image = newBufferedImage(dimensions, 3)
+      while (++i < 40) {
 //      while (true) {
         globalProfiler().wrapBlock("all") {
           val value = executeToSingleValue(library.implementation, graph)
-          samplertoBitmap(withBitmapBuffer, Vector2i(512), value as RgbSampler)
+          samplerToBufferedImage(newRgbSampleWriter(value as RgbSampler), image, dimensions, Vector2i(0), dimensions)
         }
       }
       printProfiler(globalProfiler())

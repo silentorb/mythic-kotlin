@@ -1,4 +1,4 @@
-package silentorb.mythic.imaging.operators
+package silentorb.mythic.imaging.filters
 
 import java.nio.ByteBuffer
 

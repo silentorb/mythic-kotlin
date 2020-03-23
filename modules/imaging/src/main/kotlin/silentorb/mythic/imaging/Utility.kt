@@ -1,10 +1,11 @@
 package silentorb.mythic.imaging
 
 import org.lwjgl.BufferUtils
-import silentorb.mythic.imaging.operators.allocateFloatBuffer
+import silentorb.mythic.imaging.filters.allocateFloatBuffer
 import silentorb.mythic.spatial.*
 import java.awt.Color
 import java.awt.image.BufferedImage
+import java.awt.image.WritableRaster
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 
@@ -58,40 +59,39 @@ fun bitmapToBufferedImage(bitmap: Bitmap): BufferedImage {
 
 data class SamplerAwtWriter(
     val depth: Int,
-    val write: (Float, Float, IntArray, Int) -> Int
+    val write: (Float, Float, WritableRaster, Int, Int) -> Unit
 )
 
 fun newFloatSampleWriter(sampler: FloatSampler) =
-    SamplerAwtWriter(depth = 1) { x, y, array, i ->
+    SamplerAwtWriter(depth = 1) { x, y, raster, intX, intY ->
       val sample = sampler(x, y)
-      array[i] = (sample * 255).toInt()
-      i + 1
+      raster.setSample(intX, intY, 0, (sample * 255).toInt())
     }
 
 fun newRgbSampleWriter(sampler: RgbSampler) =
-    SamplerAwtWriter(depth = 3) { x, y, array, i ->
+    SamplerAwtWriter(depth = 3) { x, y, raster, intX, intY ->
       val sample = sampler(x, y)
-      array[i] = (sample.x * 255).toInt()
-      array[i + 1] = (sample.y * 255).toInt()
-      array[i + 2] = (sample.z * 255).toInt()
-      i + 3
+      raster.setSample(intX, intY, 0, (sample.x * 255).toInt())
+      raster.setSample(intX, intY, 1, (sample.y * 255).toInt())
+      raster.setSample(intX, intY, 2, (sample.z * 255).toInt())
     }
 
-fun rgbSamplerToBufferedImage(fullDimensions: Vector2i, samplerAwtWriter: SamplerAwtWriter, offset: Vector2i, tileSize: Vector2i): BufferedImage {
-  val depth = samplerAwtWriter.depth
+fun newBufferedImage(width: Int, height: Int, depth: Int): BufferedImage {
   val type = getBufferedImageTypeByChannels(depth)
-  val size = tileSize.x * tileSize.y * depth
-  val array = IntArray(size)
-  var i = 0
+  return BufferedImage(width, height, type.value)
+}
+
+fun newBufferedImage(dimensions: Vector2i, depth: Int) =
+    newBufferedImage(dimensions.x, dimensions.y, depth)
+
+fun samplerToBufferedImage(samplerAwtWriter: SamplerAwtWriter, image: BufferedImage, fullDimensions: Vector2i, offset: Vector2i, tileSize: Vector2i) {
   val end = offset + tileSize
+  val raster = image.raster
   for (y in offset.y until end.y) {
     for (x in offset.x until end.x) {
-      i = samplerAwtWriter.write(x.toFloat() / fullDimensions.x, y.toFloat() / fullDimensions.y, array, i)
+      samplerAwtWriter.write(x.toFloat() / fullDimensions.x, y.toFloat() / fullDimensions.y, raster, x - offset.x, y - offset.y)
     }
   }
-  val image = BufferedImage(tileSize.x, tileSize.y, type.value)
-  image.raster.setPixels(0, 0, tileSize.x, tileSize.y, array)
-  return image
 }
 
 fun bufferedImageToBitmap(dimensions: Vector2i, depth: Int, image: BufferedImage): Bitmap {

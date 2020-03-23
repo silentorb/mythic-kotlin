@@ -1,12 +1,10 @@
-package silentorb.mythic.imaging.operators
+package silentorb.mythic.imaging.filters
 
 import silentorb.imp.core.*
 import silentorb.imp.execution.CompleteFunction
 import silentorb.imp.execution.TypeAlias
 import silentorb.mythic.imaging.floatSamplerKey
-import silentorb.mythic.imaging.grayscaleBitmapKey
 import silentorb.mythic.imaging.texturingPath
-import silentorb.mythic.spatial.Vector2i
 
 val CheckersIterations = PathKey(texturingPath, "CheckersIterations")
 

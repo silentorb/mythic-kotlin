@@ -1,7 +1,7 @@
 package silentorb.mythic.imaging
 
 import silentorb.imp.core.PathKey
-import silentorb.mythic.imaging.operators.GetPixel
+import silentorb.mythic.imaging.filters.GetPixel
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
@@ -31,6 +31,7 @@ val rgbSamplerKey = PathKey(texturingPath, "RgbSampler")
 typealias FloatSampler = GetPixel<Float>
 
 typealias RgbSampler = GetPixel<Vector3>
+typealias AnySampler = GetPixel<Any>
 
 data class Bitmap(
     val buffer: FloatBuffer,

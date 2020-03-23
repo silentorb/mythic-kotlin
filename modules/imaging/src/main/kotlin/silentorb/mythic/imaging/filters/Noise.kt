@@ -1,13 +1,11 @@
-package silentorb.mythic.imaging.operators
+package silentorb.mythic.imaging.filters
 
 import silentorb.imp.core.*
 import silentorb.imp.execution.Arguments
 import silentorb.imp.execution.CompleteFunction
-import silentorb.imp.execution.FunctionImplementation
 import silentorb.imp.execution.TypeAlias
 import silentorb.mythic.imaging.*
 import thirdparty.noise.OpenSimplexNoise
-import java.nio.ByteBuffer
 
 tailrec fun noiseIteration(octaves: List<Pair<Float, Float>>, x: Float, y: Float, algorithm: GetPixel<Float>, step: Int, output: Float): Float {
   return if (step >= octaves.size)
@@ -80,13 +78,13 @@ fun nonTilingOpenSimplex2D(seed: Long = 1L): GetPixel<Float> {
 
 //val noiseOctaveKey = PathKey(texturingPath, "NoiseOctave")
 val noiseDetailKey = PathKey(texturingPath, "NoiseDetail")
-val noiseScaleKey = PathKey(texturingPath, "NoiseScale")
+val zeroToOneHundredKey = PathKey(texturingPath, "ZeroToOneHundred")
 val noiseVariationKey = PathKey(texturingPath, "NoiseVariation")
 
 val coloredNoiseSignature = Signature(
     parameters = listOf(
         Parameter("dimensions", absoluteDimensionsKey),
-        Parameter("scale", noiseScaleKey),
+        Parameter("scale", zeroToOneHundredKey),
         Parameter("detail", noiseDetailKey),
         Parameter("firstColor", rgbColorKey),
         Parameter("secondColor", rgbColorKey)
@@ -96,7 +94,7 @@ val coloredNoiseSignature = Signature(
 
 val noiseSignature = Signature(
     parameters = listOf(
-        Parameter("scale", noiseScaleKey),
+        Parameter("scale", zeroToOneHundredKey),
         Parameter("detail", noiseDetailKey),
         Parameter("variation", noiseVariationKey)
     ),
@@ -109,20 +107,6 @@ val noiseFunction = CompleteFunction(
     implementation = { arguments ->
       val variation = arguments ["variation"] as Int
       noise(arguments, nonTilingOpenSimplex2D(variation.toLong()))
-//      val depth = 1
-//      val buffer = ByteBuffer.allocate(dimensions.x * dimensions.y * depth * 4).asFloatBuffer()
-//      for (y in 0 until dimensions.y) {
-//        for (x in 0 until dimensions.x) {
-//          val value = getNoise(x.toFloat() / dimensions.x, 1f - y.toFloat() / dimensions.y)
-//          buffer.put(value)
-//        }
-//      }
-//      buffer.rewind()
-//      Bitmap(
-//          dimensions = dimensions,
-//          channels = depth,
-//          buffer = buffer
-//      )
     }
 )
 
@@ -163,7 +147,7 @@ fun noiseAliases() =
 //            numericConstraint = newNumericConstraint(1, 8)
 //        ),
         TypeAlias(
-            path = noiseScaleKey,
+            path = zeroToOneHundredKey,
             alias = intKey,
             numericConstraint = newNumericConstraint(1, 100)
         ),

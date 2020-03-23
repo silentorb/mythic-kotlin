@@ -1,4 +1,4 @@
-package silentorb.mythic.imaging.operators
+package silentorb.mythic.imaging.filters
 
 import silentorb.mythic.spatial.Vector3i
 import silentorb.imp.core.*
@@ -279,6 +279,7 @@ fun completeTexturingFunctions() = listOf(
     .plus(drawingFunctions())
     .plus(mathFunctions())
     .plus(checkersFunctions())
+    .plus(distortionFunctions())
 
 fun completeTexturingAliases() =
     noiseAliases()

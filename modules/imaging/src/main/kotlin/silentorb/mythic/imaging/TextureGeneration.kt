@@ -1,13 +1,10 @@
 package silentorb.mythic.imaging
 
 import silentorb.mythic.spatial.Vector3
-import silentorb.mythic.spatial.Vector3i
 import org.lwjgl.BufferUtils
 import silentorb.imp.execution.newLibrary
-import silentorb.mythic.imaging.operators.GetPixel
-import silentorb.mythic.imaging.operators.completeTexturingAliases
-import silentorb.mythic.imaging.operators.completeTexturingFunctions
-import silentorb.mythic.spatial.Vector2i
+import silentorb.mythic.imaging.filters.completeTexturingAliases
+import silentorb.mythic.imaging.filters.completeTexturingFunctions
 import java.nio.ByteBuffer
 
 typealias OpaqueColor = silentorb.mythic.spatial.Vector3
