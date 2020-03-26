@@ -94,6 +94,18 @@ fun samplerToBufferedImage(samplerAwtWriter: SamplerAwtWriter, image: BufferedIm
   }
 }
 
+fun rgbSamplerToArray(sampler: RgbSampler, image: FloatArray, dimensions: Vector2i) {
+  var i = 0
+  for (y in 0 until dimensions.y) {
+    for (x in 0 until dimensions.x) {
+      val sample = sampler(x.toFloat() / dimensions.x, y.toFloat() / dimensions.y)
+      image[i++] = sample.x
+      image[i++] = sample.y
+      image[i++] = sample.z
+    }
+  }
+}
+
 fun bufferedImageToBitmap(dimensions: Vector2i, depth: Int, image: BufferedImage): Bitmap {
   val buffer = allocateFloatBuffer(dimensions.x * dimensions.y * depth)
   val array = IntArray(buffer.capacity())
@@ -110,6 +122,9 @@ fun bufferedImageToBitmap(dimensions: Vector2i, depth: Int, image: BufferedImage
 }
 
 fun toAwtColor(color: Vector3) =
+    Color(color.x, color.y, color.z)
+
+fun toAwtColor(color: Vector3i) =
     Color(color.x, color.y, color.z)
 
 fun rgbFloatToBytes(input: FloatBuffer, output: ByteBuffer) {
@@ -144,3 +159,10 @@ fun grayscaleTextureToBytes(buffer: FloatBuffer): ByteBuffer {
   byteBuffer.rewind()
   return byteBuffer
 }
+
+fun rgbIntToFloat(value: RgbColor): Vector3 =
+    Vector3(
+        value.x / 255f,
+        value.y / 255f,
+        value.z / 255f
+    )

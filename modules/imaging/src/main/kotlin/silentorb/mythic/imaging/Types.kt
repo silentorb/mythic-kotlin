@@ -4,6 +4,7 @@ import silentorb.imp.core.PathKey
 import silentorb.mythic.imaging.filters.GetPixel
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.Vector3i
 import silentorb.mythic.spatial.Vector4
 import java.nio.FloatBuffer
 
@@ -11,7 +12,7 @@ typealias Sampler = (Float, Float) -> Float
 
 const val texturingPath = "silentorb.mythic.generation.texturing"
 
-typealias RgbColor = Vector3
+typealias RgbColor = Vector3i
 typealias RgbaColor = Vector4
 typealias GrayscaleColor = Float
 

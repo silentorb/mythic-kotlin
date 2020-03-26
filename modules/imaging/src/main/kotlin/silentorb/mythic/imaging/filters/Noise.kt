@@ -77,15 +77,15 @@ fun nonTilingOpenSimplex2D(seed: Long = 1L): GetPixel<Float> {
 }
 
 //val noiseOctaveKey = PathKey(texturingPath, "NoiseOctave")
-val noiseDetailKey = PathKey(texturingPath, "NoiseDetail")
-val zeroToOneHundredKey = PathKey(texturingPath, "ZeroToOneHundred")
+val zeroToOneHundredKey = PathKey(texturingPath, "NoiseDetail")
+val oneToOneHundredKey = PathKey(texturingPath, "ZeroToOneHundred")
 val noiseVariationKey = PathKey(texturingPath, "NoiseVariation")
 
 val coloredNoiseSignature = Signature(
     parameters = listOf(
         Parameter("dimensions", absoluteDimensionsKey),
-        Parameter("scale", zeroToOneHundredKey),
-        Parameter("detail", noiseDetailKey),
+        Parameter("scale", oneToOneHundredKey),
+        Parameter("detail", zeroToOneHundredKey),
         Parameter("firstColor", rgbColorKey),
         Parameter("secondColor", rgbColorKey)
     ),
@@ -94,8 +94,8 @@ val coloredNoiseSignature = Signature(
 
 val noiseSignature = Signature(
     parameters = listOf(
-        Parameter("scale", zeroToOneHundredKey),
-        Parameter("detail", noiseDetailKey),
+        Parameter("scale", oneToOneHundredKey),
+        Parameter("detail", zeroToOneHundredKey),
         Parameter("variation", noiseVariationKey)
     ),
     output = floatSamplerKey
@@ -147,12 +147,12 @@ fun noiseAliases() =
 //            numericConstraint = newNumericConstraint(1, 8)
 //        ),
         TypeAlias(
-            path = zeroToOneHundredKey,
+            path = oneToOneHundredKey,
             alias = intKey,
             numericConstraint = newNumericConstraint(1, 100)
         ),
         TypeAlias(
-            path = noiseDetailKey,
+            path = zeroToOneHundredKey,
             alias = intKey,
             numericConstraint = newNumericConstraint(0, 100)
         ),

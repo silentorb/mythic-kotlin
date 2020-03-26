@@ -23,7 +23,7 @@ fun checkersFunctions() = listOf(
         path = PathKey(texturingPath, "checkers"),
         signature = Signature(
             parameters = listOf(
-                Parameter("iterationsX", intKey),
+                Parameter("iterationsX", oneToOneHundredKey),
                 Parameter("iterationsY", intKey)
             ),
             output = floatSamplerKey

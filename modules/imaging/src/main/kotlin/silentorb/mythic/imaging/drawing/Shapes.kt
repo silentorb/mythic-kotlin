@@ -1,5 +1,6 @@
 package silentorb.mythic.imaging.drawing
 
+import silentorb.mythic.imaging.RgbColor
 import silentorb.mythic.spatial.Matrix3
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
@@ -27,7 +28,7 @@ data class GrayscaleStroke(
 data class Shapes(
     val ids: List<Id>,
     val grayscaleFills: Table<Float>,
-    val rgbFills: Table<Vector3>,
+    val rgbFills: Table<RgbColor>,
     val functions: Table<ShapeFunction>,
     val pointLists: Table<ShapePoints>,
     val grayscaleStrokes: Table<GrayscaleStroke>,

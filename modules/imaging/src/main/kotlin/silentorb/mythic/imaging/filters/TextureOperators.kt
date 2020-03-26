@@ -58,8 +58,8 @@ val coloredCheckers: FunctionImplementation = withBuffer("dimensions", withBitma
 }
 
 fun colorizeValue(arguments: Arguments): (Float) -> Vector3 {
-  val first = arguments["firstColor"]!! as SolidColor
-  val second = arguments["secondColor"]!! as SolidColor
+  val first = rgbIntToFloat(arguments["firstColor"]!! as RgbColor)
+  val second = rgbIntToFloat(arguments["secondColor"]!! as RgbColor)
   return { unit ->
     first * (1f - unit) + second * unit
   }
@@ -133,8 +133,8 @@ val voronoiBoundaryOperator: FunctionImplementation = withBuffer("dimensions", w
   voronoi(length, nearestCells, voronoiBoundaries(0.05f * grid.length.toFloat()))
 }
 
-val newSolidColor: FunctionImplementation = { arguments ->
-  Vector3(arguments["red"] as Float, arguments["green"] as Float, arguments["blue"] as Float)
+val newRgbColor: FunctionImplementation = { arguments ->
+  Vector3i(arguments["red"] as Int, arguments["green"] as Int, arguments["blue"] as Int)
 }
 
 // Function Keys
@@ -149,13 +149,13 @@ fun completeTexturingFunctions() = listOf(
         path = rgbColorKey,
         signature = Signature(
             parameters = listOf(
-                Parameter("red", floatKey),
-                Parameter("green", floatKey),
-                Parameter("blue", floatKey)
+                Parameter("red", intKey),
+                Parameter("green", intKey),
+                Parameter("blue", intKey)
             ),
             output = rgbColorKey
         ),
-        implementation = newSolidColor
+        implementation = newRgbColor
     ),
     CompleteFunction(
         path = absoluteDimensionsKey,
@@ -280,6 +280,7 @@ fun completeTexturingFunctions() = listOf(
     .plus(mathFunctions())
     .plus(checkersFunctions())
     .plus(distortionFunctions())
+    .plus(blurFunctions())
 
 fun completeTexturingAliases() =
     noiseAliases()
