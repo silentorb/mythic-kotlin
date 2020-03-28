@@ -33,10 +33,14 @@ class DesktopProcess(val window: Long) : PlatformProcess {
   }
 }
 
-fun createDesktopPlatform(title: String, config: PlatformDisplayConfig): Platform {
-  GLFWErrorCallback.createPrint(System.err).set()
+fun initializeDesktopPlatform() {
   if (!glfwInit())
     throw Error("Unable to initialize GLFW")
+}
+
+fun createDesktopPlatform(title: String, config: PlatformDisplayConfig): Platform {
+  GLFWErrorCallback.createPrint(System.err).set()
+  initializeDesktopPlatform()
 
   val window = createWindow(title, config)
   return Platform(

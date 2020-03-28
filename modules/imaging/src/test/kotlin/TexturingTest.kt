@@ -6,7 +6,7 @@ import silentorb.imp.execution.executeToSingleValue
 import silentorb.imp.parsing.general.handleRoot
 import silentorb.imp.parsing.parser.parseTextBranching
 import silentorb.imp.testing.errored
-import silentorb.mythic.imaging.Bitmap
+import silentorb.mythic.imaging.texturing.Bitmap
 
 class TexturingTest {
 

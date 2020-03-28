@@ -24,6 +24,18 @@ fun createWindow(title: String, config: PlatformDisplayConfig): Long {
   return window
 }
 
+fun createHeadlessWindow(): Long {
+  glfwDefaultWindowHints()
+  glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE)
+
+  val window = glfwCreateWindow(320, 200, "", MemoryUtil.NULL, MemoryUtil.NULL)
+  if (window == MemoryUtil.NULL)
+    throw RuntimeException("Failed to create the GLFW window")
+
+  glfwMakeContextCurrent(window)
+  return window
+}
+
 fun centerWindow(window: Long) {
   MemoryStack.stackPush().use { stack ->
     val width = stack.mallocInt(1)

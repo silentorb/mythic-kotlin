@@ -1,7 +1,7 @@
 package silentorb.mythic.lookinglass
 
 import silentorb.mythic.glowing.UniformBuffer
-import silentorb.mythic.lookinglass.shading.LightingConfig
+import silentorb.mythic.scenery.LightingConfig
 import silentorb.mythic.lookinglass.shading.createLightBuffer
 import silentorb.mythic.scenery.Light
 

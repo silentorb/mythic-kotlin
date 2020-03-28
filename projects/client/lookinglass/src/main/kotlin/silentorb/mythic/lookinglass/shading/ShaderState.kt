@@ -5,6 +5,7 @@ import silentorb.mythic.spatial.*
 import org.lwjgl.BufferUtils
 import silentorb.mythic.lookinglass.CameraEffectsData
 import silentorb.mythic.scenery.Light
+import silentorb.mythic.scenery.LightingConfig
 import java.nio.ByteBuffer
 
 data class EffectsData(
@@ -29,10 +30,6 @@ private const val maxLights = 128
 const val sectionBufferSize = headerSize + lightSize * maxLights
 private val sectionMemoryBuffer = BufferUtils.createByteBuffer(sectionBufferSize)
 private val sectionBufferCustodian = BufferCustodian(sectionMemoryBuffer)
-
-data class LightingConfig(
-    val ambient: Float = 0f
-)
 
 fun createLightBuffer(config: LightingConfig, lights: List<Light>): ByteBuffer {
   val buffer = sectionMemoryBuffer

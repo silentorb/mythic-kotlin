@@ -2,9 +2,9 @@ package silentorb.mythic.lookinglass.drawing
 
 import silentorb.mythic.glowing.DrawMethod
 import silentorb.mythic.glowing.drawMesh
+import silentorb.mythic.lookinglass.Renderer
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector4
-import silentorb.mythic.lookinglass.Renderer
 import silentorb.mythic.lookinglass.meshes.Primitive
 import silentorb.mythic.lookinglass.shading.ObjectShaderConfig
 import silentorb.mythic.lookinglass.shading.ShaderFeatureConfig

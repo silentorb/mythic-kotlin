@@ -1,4 +1,8 @@
 
 plugins { kotlin("jvm") }
 
-requires(project, "platforming", "spatial", "ent", "debugging")
+dependencies {
+  api("silentorb.mythic:debugging")
+}
+
+requires(project, "platforming", "spatial", "ent")

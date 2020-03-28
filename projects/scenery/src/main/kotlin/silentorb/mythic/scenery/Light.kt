@@ -15,3 +15,7 @@ data class Light(
     val direction: Vector3? = null,
     val range: Float
 )
+
+data class LightingConfig(
+    val ambient: Float = 0f
+)

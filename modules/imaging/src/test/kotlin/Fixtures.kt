@@ -1,8 +1,8 @@
 import silentorb.imp.execution.combineLibraries
 import silentorb.imp.execution.newLibrary
 import silentorb.imp.library.implementation.standard.standardLibrary
-import silentorb.mythic.imaging.filters.completeTexturingAliases
-import silentorb.mythic.imaging.filters.completeTexturingFunctions
+import silentorb.mythic.imaging.texturing.filters.completeTexturingAliases
+import silentorb.mythic.imaging.texturing.filters.completeTexturingFunctions
 
 val library = combineLibraries(
     standardLibrary(),

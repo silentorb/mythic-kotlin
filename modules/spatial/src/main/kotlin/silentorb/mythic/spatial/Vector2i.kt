@@ -670,7 +670,7 @@ class Vector2i : Externalizable, Vector2ic {
    * @return the string representation
    */
   fun toString(formatter: NumberFormat): String {
-    return "(" + formatter.format(x.toLong()) + " " + formatter.format(y.toLong()) + ")"
+    return "($x $y)"
   }
 
   companion object {

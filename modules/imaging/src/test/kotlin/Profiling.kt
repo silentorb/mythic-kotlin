@@ -5,10 +5,10 @@ import silentorb.imp.parsing.parser.parseTextBranching
 import silentorb.imp.testing.errored
 import silentorb.mythic.debugging.globalProfiler
 import silentorb.mythic.debugging.printProfiler
-import silentorb.mythic.imaging.RgbSampler
-import silentorb.mythic.imaging.newBufferedImage
-import silentorb.mythic.imaging.newRgbSampleWriter
-import silentorb.mythic.imaging.samplerToBufferedImage
+import silentorb.mythic.imaging.texturing.RgbSampler
+import silentorb.mythic.imaging.texturing.newBufferedImage
+import silentorb.mythic.imaging.texturing.newRgbSampleWriter
+import silentorb.mythic.imaging.texturing.samplerToBufferedImage
 import silentorb.mythic.spatial.Vector2i
 import java.lang.management.ManagementFactory
 

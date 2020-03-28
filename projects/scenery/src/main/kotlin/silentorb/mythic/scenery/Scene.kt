@@ -8,7 +8,8 @@ enum class CameraMode {
 
 data class Scene(
     val camera: Camera,
-    val lights: List<Light> = listOf()
+    val lights: List<Light> = listOf(),
+    val lightingConfig: LightingConfig
 )
 
 data class BillboardDetails(

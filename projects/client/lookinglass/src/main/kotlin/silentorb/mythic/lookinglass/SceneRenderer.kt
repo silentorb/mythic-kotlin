@@ -16,7 +16,7 @@ import silentorb.mythic.lookinglass.shading.ShaderFeatureConfig
 import silentorb.mythic.lookinglass.shading.Shaders
 import silentorb.mythic.scenery.Camera
 
-class SceneRenderer(
+data class SceneRenderer(
     val viewport: Vector4i,
     val renderer: Renderer,
     val camera: Camera,

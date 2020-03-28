@@ -43,7 +43,7 @@ fun getDisplayConfigFilters(config: DisplayConfig): List<ScreenFilter> =
     else
       listOf()
 
-class GameSceneRenderer(
+data class GameSceneRenderer(
     val scene: GameScene,
     val renderer: SceneRenderer
 ) {
