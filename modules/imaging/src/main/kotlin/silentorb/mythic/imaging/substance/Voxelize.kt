@@ -13,8 +13,8 @@ fun voxelize(sampler: Sampler3dFloat, dimensions: Vector3i, depth: Int, scale: F
     for (y in startY until half.y) {
       for (x in startZ until half.x) {
         val distance = sampler(x.toFloat() * scale, y.toFloat() * scale, z.toFloat() * scale)
-        val value = if (distance>= 0)
-          1f
+        val value = if (distance <= scale)
+          1f - distance / scale
         else
           0f
         buffer.put(value)
