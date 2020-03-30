@@ -5,8 +5,8 @@ private val _unit = Vector3i(1, 1, 1)
 
 data class Vector3i(
     val x: Int = 0,
-    val y: Int = 0,
-    val z: Int = 0
+    val y: Int = x,
+    val z: Int = x
 ) {
   companion object {
     val zero: Vector3i = _zero

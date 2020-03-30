@@ -132,3 +132,9 @@ data class Vector3(
         else -> throw Error("Invalid index $i")
       }
 }
+
+fun getNormal(a: Vector3, b: Vector3, c: Vector3) =
+  (c - b).cross(a - b).normalize()
+
+fun getNormal(vertices: List<Vector3>) =
+  (vertices[2] - vertices[1]).cross(vertices[0] - vertices[1]).normalize()

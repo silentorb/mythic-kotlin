@@ -2,6 +2,7 @@ package silentorb.mythic.imaging.substance.marching
 
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector3i
+import silentorb.mythic.spatial.getNormal
 import java.nio.FloatBuffer
 import java.util.*
 
@@ -142,10 +143,14 @@ fun marchingCubes(values: FloatBuffer, volumeDimensions: Vector3i, voxelDimensio
           val index2: Int = TablesMC.MC_TRI_TABLE.get(cubeindex + i + 1)
           val index3: Int = TablesMC.MC_TRI_TABLE.get(cubeindex + i + 2)
 
+          val a = Vector3(vertList[index3][0] / maxAxisVal - 0.5f, vertList[index3][1] / maxAxisVal - 0.5f, vertList[index3][2] / maxAxisVal - 0.5f)
+          val b = Vector3(vertList[index2][0] / maxAxisVal - 0.5f, vertList[index2][1] / maxAxisVal - 0.5f, vertList[index2][2] / maxAxisVal - 0.5f)
+          val c = Vector3(vertList[index1][0] / maxAxisVal - 0.5f, vertList[index1][1] / maxAxisVal - 0.5f, vertList[index1][2] / maxAxisVal - 0.5f)
+          val normal = getNormal(a, b, c)
           // Add triangles vertices normalized with the maximal possible value
-          vertexBuffer.addAll(listOf(vertList[index3][0] / maxAxisVal - 0.5f, vertList[index3][1] / maxAxisVal - 0.5f, vertList[index3][2] / maxAxisVal - 0.5f))
-          vertexBuffer.addAll(listOf(vertList[index2][0] / maxAxisVal - 0.5f, vertList[index2][1] / maxAxisVal - 0.5f, vertList[index2][2] / maxAxisVal - 0.5f))
-          vertexBuffer.addAll(listOf(vertList[index1][0] / maxAxisVal - 0.5f, vertList[index1][1] / maxAxisVal - 0.5f, vertList[index1][2] / maxAxisVal - 0.5f))
+          vertexBuffer.addAll(listOf(a.x, a.y, a.z, normal.x, normal.y, normal.z))
+          vertexBuffer.addAll(listOf(b.x, b.y, b.z, normal.x, normal.y, normal.z))
+          vertexBuffer.addAll(listOf(c.x, c.y, c.z, normal.x, normal.y, normal.z))
           i += 3
         }
       }
