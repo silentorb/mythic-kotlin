@@ -61,7 +61,7 @@ fun createBoneTransformBuffer(originalTransforms: List<Matrix>, transforms: List
   val originalIterator = originalTransforms.iterator()
   transforms.forEachIndexed { i, transform ->
     val originalTransform = originalIterator.next()
-    val diff = transform * toMatrix(toMutableMatrix(originalTransform).invert())
+    val diff = transform * originalTransform.invert()
     val k = boneMemoryBuffer
     writeMatrixToBuffer(boneMemoryBuffer, diff)
 //    originalTransform.get(boneMemoryBuffer)

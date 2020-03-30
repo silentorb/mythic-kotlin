@@ -22,6 +22,8 @@
  */
 package org.joml
 
+import silentorb.mythic.spatial.Vector2f
+import silentorb.mythic.spatial.Vector2fMinimal
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 

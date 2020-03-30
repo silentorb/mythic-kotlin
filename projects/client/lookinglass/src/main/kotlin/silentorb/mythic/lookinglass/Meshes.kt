@@ -7,7 +7,7 @@ import java.io.File
 
 fun getMeshFilenames(): Array<File> {
   val modelRoot = getResourceUrl("models")
-  val files = File(modelRoot.toURI()).listFiles()
+  val files = File(modelRoot!!.toURI()).listFiles()
   return files
 }
 

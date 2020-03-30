@@ -1,6 +1,5 @@
 package silentorb.mythic.spatial
 
-import org.joml.*
 import org.joml.Math.PI
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
@@ -10,7 +9,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 typealias Quaternion = Quaternionf
-typealias MutableMatrix = org.joml.Matrix4f
+typealias MutableMatrix = Matrix4f
 typealias Vector4New = Vector4
 
 private val initialQuaternion = Quaternion()
@@ -225,7 +224,7 @@ val Vector4.zw: Vector2
 
 fun Vector3m.copy() = Vector3m(this)
 
-fun Vector3m.transform(m: Matrix) = m.transform(Vector4(this, 1f)).xyz
+fun Vector3m.transform(m: Matrix) = m.transform(Vector4(this.x, this.y, this.z, 1f)).xyz
 
 private val tempVector = Vector4()
 fun transformVector(m: Matrix): Vector3m {
@@ -238,8 +237,8 @@ fun transformVector(m: Matrix): Vector3m {
 fun getVector3Center(first: Vector3, second: Vector3) =
     first + (second - first) * 0.5f
 
-fun getRotationMatrix(matrix: MutableMatrix): MutableMatrix =
-    MutableMatrix().rotation(matrix.getUnnormalizedRotation(initialQuaternion))
+//fun getRotationMatrix(matrix: MutableMatrix): MutableMatrix =
+//    MutableMatrix().rotation(matrix.getUnnormalizedRotation(initialQuaternion))
 
 fun getRotationMatrix(matrix: Matrix): Matrix =
     toMatrix(MutableMatrix().rotation(toMutableMatrix(matrix).getUnnormalizedRotation(initialQuaternion)))
@@ -252,8 +251,8 @@ fun Vector4i.toVector4() = Vector4(x.toFloat(), y.toFloat(), z.toFloat(), w.toFl
 fun arrangePointsCounterClockwise2D(center: Vector2, vertices: Collection<Vector2>): List<Vector2> =
     vertices.sortedBy { atan(it - center) }
 
-fun getCenter(points: Collection<Vector3m>): Vector3m =
-    points.reduce { a, b -> a + b } / points.size.toFloat()
+//fun getCenter(points: Collection<Vector3m>): Vector3m =
+//    points.reduce { a, b -> a + b } / points.size.toFloat()
 
 fun getCenter(points: Collection<Vector3>): Vector3 =
     points.reduce { a, b -> a + b } / points.size.toFloat()
@@ -292,11 +291,11 @@ fun toString2(vectors: List<Vector2>) =
 fun isZero(vector: Vector3m) =
     vector.x == 0f && vector.y == 0f && vector.z == 0f
 
-fun rotateToward(matrix: Matrix, dir: Vector3m): Matrix =
-    if (dir.x == 0f && dir.y == 0f)
-      matrix.rotateTowards(dir, Vector3m(0f, 1f, 0f))
-    else
-      matrix.rotateTowards(dir, Vector3m(0f, 0f, 1f))
+//fun rotateToward(matrix: Matrix, dir: Vector3m): Matrix =
+//    if (dir.x == 0f && dir.y == 0f)
+//      matrix.rotateTowards(dir, Vector3m(0f, 1f, 0f))
+//    else
+//      matrix.rotateTowards(dir, Vector3m(0f, 0f, 1f))
 
 //fun rotateToward(dir: Vector3m): Quaternion =
 ////    if (dir.x == 0f && dir.y == 0f)
@@ -304,14 +303,14 @@ fun rotateToward(matrix: Matrix, dir: Vector3m): Matrix =
 ////    else
 ////      Quaternion().rotateTo(dir, Vector3m(0f, 0f, 1f))
 
-fun sum(vertices: Collection<Vector3m>): Vector3m {
-  var result = Vector3m()
-  for (vertex in vertices) {
-    result += vertex
-  }
-
-  return result / vertices.size.toFloat()
-}
+//fun sum(vertices: Collection<Vector3m>): Vector3m {
+//  var result = Vector3m()
+//  for (vertex in vertices) {
+//    result += vertex
+//  }
+//
+//  return result / vertices.size.toFloat()
+//}
 
 fun minMax(min: Int, max: Int): (Int) -> Int = { value ->
   if (value < min)

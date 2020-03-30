@@ -31,9 +31,24 @@ fun toVector3(vector: GdxVector3) = Vector3(vector.x, vector.y, vector.z)
 // It would probably be best to wait until libGDX Bullet is replaced.
 fun toGdxMatrix4(matrix: Matrix): Matrix4 {
   val result = Matrix4()
-  val values = FloatArray(16)
-  toMutableMatrix(matrix).get(values)
-  result.set(values)
+  result.set(floatArrayOf(
+      matrix.m00,
+      matrix.m01,
+      matrix.m02,
+      matrix.m03,
+      matrix.m10,
+      matrix.m11,
+      matrix.m12,
+      matrix.m13,
+      matrix.m20,
+      matrix.m21,
+      matrix.m22,
+      matrix.m23,
+      matrix.m30,
+      matrix.m31,
+      matrix.m32,
+      matrix.m33
+  ))
   return result
 }
 

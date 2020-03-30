@@ -25,6 +25,15 @@ fun createFloatBuffer(values: List<Float>): FloatBuffer {
   return buffer
 }
 
+fun createFloatBuffer(values: FloatArray): FloatBuffer {
+  val buffer = BufferUtils.createFloatBuffer(values.size)
+  for (value in values) {
+    buffer.put(value)
+  }
+  buffer.flip()
+  return buffer
+}
+
 fun createIntBuffer(value: Int): IntBuffer {
   val buffer = BufferUtils.createIntBuffer(1)
   buffer.put(value)
@@ -57,7 +66,8 @@ data class GeneralMesh(
     val vertexBuffer: VertexBuffer,
     val offsets: IntBuffer? = null,
     val counts: IntBuffer? = null,
-    val indices: IntBuffer? = null
+    val indices: IntBuffer? = null,
+    val count: Int? = null
 )
 
 fun newGeneralMesh(vertexSchema: VertexSchema, values: List<Float>) =
@@ -69,13 +79,18 @@ fun newGeneralMesh(vertexSchema: VertexSchema, values: List<Float>) =
     )
 
 fun convertDrawMethod(mesh: GeneralMesh, method: DrawMethod): Int {
-  val mappedMethod = if (mesh.indices != null) {
+  val mappedMethod = if (mesh.indices != null)
     when (method) {
       DrawMethod.triangleFan -> DrawMethod.triangles
       DrawMethod.lineLoop -> DrawMethod.lineStrip
       else -> method
     }
-  } else
+  else if (mesh.count != null)
+    when (method) {
+      DrawMethod.triangleFan -> DrawMethod.triangles
+      else -> method
+    }
+  else
     method
 
   return convertDrawMethod(mappedMethod)
@@ -86,8 +101,10 @@ fun drawMesh(mesh: GeneralMesh, method: DrawMethod) {
   val mappedMethod = convertDrawMethod(mesh, method)
   if (mesh.indices != null) {
     glDrawElements(mappedMethod, mesh.indices)
-  } else {
-    glMultiDrawArrays(mappedMethod, mesh.offsets!!, mesh.counts!!)
+  } else if (mesh.offsets != null && mesh.counts != null) {
+    glMultiDrawArrays(mappedMethod, mesh.offsets, mesh.counts)
+  } else if (mesh.count != null) {
+    glDrawArrays(mappedMethod, 0, mesh.count / 3)
   }
 }
 

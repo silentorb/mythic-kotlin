@@ -489,7 +489,7 @@ interface Quaternionfc {
    * will hold the result
    * @return dest
    */
-  fun transform(vec: Vector3fc, dest: Vector3m): Vector3m
+  fun transform(vec: Vector3f, dest: Vector3m): Vector3m
 
   /**
    * Transform the given vector <tt>(x, y, z)</tt> by this quaternion and store the result in `dest`.
@@ -520,7 +520,7 @@ interface Quaternionfc {
    * will hold the result
    * @return dest
    */
-  fun transform(vec: Vector4c, dest: Vector4): Vector4
+  fun transform(vec: Vector4, dest: Vector4): Vector4
 
   /**
    * Transform the given vector <tt>(x, y, z)</tt> by this quaternion and store the result in `dest`.
@@ -802,7 +802,7 @@ interface Quaternionfc {
    * will hold the result
    * @return dest
    */
-  fun lookAlong(dir: Vector3fc, up: Vector3fc, dest: Quaternionf): Quaternionf
+  fun lookAlong(dir: Vector3f, up: Vector3f, dest: Quaternionf): Quaternionf
 
   /**
    * Apply a rotation to this quaternion that maps the given direction to the positive Z axis, and store the result in `dest`.
@@ -1094,7 +1094,7 @@ interface Quaternionfc {
    * will hold the result
    * @return dest
    */
-  fun rotateAxis(angle: Float, axis: Vector3fc, dest: Quaternionf): Quaternionf
+  fun rotateAxis(angle: Float, axis: Vector3f, dest: Quaternionf): Quaternionf
 
   /**
    * Compute the difference between `this` and the `other` quaternion

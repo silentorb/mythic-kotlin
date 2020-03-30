@@ -22,7 +22,7 @@
  */
 package org.joml
 
-import silentorb.mythic.spatial.Vector3fc
+import silentorb.mythic.spatial.Vector2f
 import silentorb.mythic.spatial.Vector3m
 import silentorb.mythic.spatial.Vector4
 
@@ -468,7 +468,7 @@ object Intersectionf {
    * the constant in the plane equation
    * @return `true` iff the axis-aligned box intersects the plane; `false` otherwise
    */
-//     fun testAabPlane(min:Vector3fc, max:Vector3fc, a:Float, b:Float, c:Float, d:Float):Boolean {
+//     fun testAabPlane(min:Vector3f, max:Vector3f, a:Float, b:Float, c:Float, d:Float):Boolean {
 //return testAabPlane(min.x, min.y, min.z, max.x, max.y, max.z, a, b, c, d)
 //}
 
@@ -525,7 +525,7 @@ object Intersectionf {
    * the maximum corner of the second axis-aligned box
    * @return `true` iff both axis-aligned boxes intersect; `false` otherwise
    */
-  fun testAabAab(minA: Vector3fc, maxA: Vector3fc, minB: Vector3fc, maxB: Vector3fc): Boolean {
+  fun testAabAab(minA: Vector3f, maxA: Vector3f, minB: Vector3f, maxB: Vector3f): Boolean {
     return testAabAab(minA.x, minA.y, minA.z, maxA.x, maxA.y, maxA.z, minB.x, minB.y, minB.z, maxB.x, maxB.y, maxB.z)
   }
 
@@ -827,7 +827,7 @@ object Intersectionf {
    * will hold the center of the circle of intersection in the <tt>(x, y, z)</tt> components and the radius in the w component
    * @return `true` iff both spheres intersect; `false` otherwise
    */
-  fun intersectSphereSphere(centerA: Vector3fc, radiusSquaredA: Float, centerB: Vector3fc, radiusSquaredB: Float, centerAndRadiusOfIntersectionCircle: Vector4): Boolean {
+  fun intersectSphereSphere(centerA: Vector3f, radiusSquaredA: Float, centerB: Vector3f, radiusSquaredB: Float, centerAndRadiusOfIntersectionCircle: Vector4): Boolean {
     return intersectSphereSphere(centerA.x, centerA.y, centerA.z, radiusSquaredA, centerB.x, centerB.y, centerB.z, radiusSquaredB, centerAndRadiusOfIntersectionCircle)
   }
 
@@ -965,7 +965,7 @@ object Intersectionf {
    * the square of the second sphere's radius
    * @return `true` iff both spheres intersect; `false` otherwise
    */
-  fun testSphereSphere(centerA: Vector3fc, radiusSquaredA: Float, centerB: Vector3fc, radiusSquaredB: Float): Boolean {
+  fun testSphereSphere(centerA: Vector3f, radiusSquaredA: Float, centerB: Vector3f, radiusSquaredB: Float): Boolean {
     return testSphereSphere(centerA.x, centerA.y, centerA.z, radiusSquaredA, centerB.x, centerB.y, centerB.z, radiusSquaredB)
   }
 
@@ -1120,7 +1120,7 @@ object Intersectionf {
    * @return the value of the parameter *t* in the ray equation *p(t) = origin + t * dir* of the intersection point, if the ray
    * intersects the plane; <tt>-1.0</tt> otherwise
    */
-  fun intersectRayPlane(origin: Vector3fc, dir: Vector3fc, point: Vector3fc, normal: Vector3fc, epsilon: Float): Float {
+  fun intersectRayPlane(origin: Vector3f, dir: Vector3f, point: Vector3f, normal: Vector3f, epsilon: Float): Float {
     return intersectRayPlane(origin.x, origin.y, origin.z, dir.x, dir.y, dir.z, point.x, point.y, point.z, normal.x, normal.y, normal.z, epsilon)
   }
 
@@ -1271,7 +1271,7 @@ object Intersectionf {
    * the squared of the sphere's radius
    * @return `true` iff the axis-aligned box intersects the sphere; `false` otherwise
    */
-  fun testAabSphere(min: Vector3fc, max: Vector3fc, center: Vector3fc, radiusSquared: Float): Boolean {
+  fun testAabSphere(min: Vector3f, max: Vector3f, center: Vector3f, radiusSquared: Float): Boolean {
     return testAabSphere(min.x, min.y, min.z, max.x, max.y, max.z, center.x, center.y, center.z, radiusSquared)
   }
 
@@ -1769,7 +1769,7 @@ object Intersectionf {
    * [.POINT_ON_TRIANGLE_EDGE_01], [.POINT_ON_TRIANGLE_EDGE_12], [.POINT_ON_TRIANGLE_EDGE_20] or
    * [.POINT_ON_TRIANGLE_FACE]
    */
-  fun findClosestPointOnTriangle(v0: Vector3fc, v1: Vector3fc, v2: Vector3fc, p: Vector3fc, result: Vector3m): Int {
+  fun findClosestPointOnTriangle(v0: Vector3f, v1: Vector3f, v2: Vector3f, p: Vector3f, result: Vector3m): Int {
     return findClosestPointOnTriangle(v0.x, v0.y, v0.z, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, p.x, p.y, p.z, result)
   }
 
@@ -2229,7 +2229,7 @@ object Intersectionf {
    * *p(t) = origin + t * dir* for both points (near, far) of intersections with the sphere
    * @return `true` if the ray intersects the sphere; `false` otherwise
    */
-  fun intersectRaySphere(origin: Vector3fc, dir: Vector3fc, center: Vector3fc, radiusSquared: Float, result: Vector2f): Boolean {
+  fun intersectRaySphere(origin: Vector3f, dir: Vector3f, center: Vector3f, radiusSquared: Float, result: Vector2f): Boolean {
     return intersectRaySphere(origin.x, origin.y, origin.z, dir.x, dir.y, dir.z, center.x, center.y, center.z, radiusSquared, result)
   }
 
@@ -2324,7 +2324,7 @@ object Intersectionf {
    * the sphere radius squared
    * @return `true` if the ray intersects the sphere; `false` otherwise
    */
-  fun testRaySphere(origin: Vector3fc, dir: Vector3fc, center: Vector3fc, radiusSquared: Float): Boolean {
+  fun testRaySphere(origin: Vector3f, dir: Vector3f, center: Vector3f, radiusSquared: Float): Boolean {
     return testRaySphere(origin.x, origin.y, origin.z, dir.x, dir.y, dir.z, center.x, center.y, center.z, radiusSquared)
   }
 
@@ -2421,7 +2421,7 @@ object Intersectionf {
    * the sphere radius squared
    * @return `true` if the line segment intersects the sphere; `false` otherwise
    */
-  fun testLineSegmentSphere(p0: Vector3fc, p1: Vector3fc, center: Vector3fc, radiusSquared: Float): Boolean {
+  fun testLineSegmentSphere(p0: Vector3f, p1: Vector3f, center: Vector3f, radiusSquared: Float): Boolean {
     return testLineSegmentSphere(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, center.x, center.y, center.z, radiusSquared)
   }
 
@@ -2553,7 +2553,7 @@ object Intersectionf {
    * iff the ray intersects the axis-aligned box
    * @return `true` if the given ray intersects the axis-aligned box; `false` otherwise
    */
-  fun intersectRayAab(origin: Vector3fc, dir: Vector3fc, min: Vector3fc, max: Vector3fc, result: Vector2f): Boolean {
+  fun intersectRayAab(origin: Vector3f, dir: Vector3f, min: Vector3f, max: Vector3f, result: Vector2f): Boolean {
     return intersectRayAab(origin.x, origin.y, origin.z, dir.x, dir.y, dir.z, min.x, min.y, min.z, max.x, max.y, max.z, result)
   }
 
@@ -2726,7 +2726,7 @@ object Intersectionf {
    * [.TWO_INTERSECTION] if the line segment intersects two sides of the axis-aligned box
    * or lies on an edge or a side of the box
    */
-  fun intersectLineSegmentAab(p0: Vector3fc, p1: Vector3fc, min: Vector3fc, max: Vector3fc, result: Vector2f): Int {
+  fun intersectLineSegmentAab(p0: Vector3f, p1: Vector3f, min: Vector3f, max: Vector3f, result: Vector2f): Int {
     return intersectLineSegmentAab(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, min.x, min.y, min.z, max.x, max.y, max.z, result)
   }
 
@@ -2872,7 +2872,7 @@ object Intersectionf {
    * the maximum corner of the axis-aligned box
    * @return `true` if the given ray intersects the axis-aligned box; `false` otherwise
    */
-  fun testRayAab(origin: Vector3fc, dir: Vector3fc, min: Vector3fc, max: Vector3fc): Boolean {
+  fun testRayAab(origin: Vector3f, dir: Vector3f, min: Vector3f, max: Vector3f): Boolean {
     return testRayAab(origin.x, origin.y, origin.z, dir.x, dir.y, dir.z, min.x, min.y, min.z, max.x, max.y, max.z)
   }
 
@@ -3010,7 +3010,7 @@ object Intersectionf {
    * a small epsilon when testing rays that are almost parallel to the triangle
    * @return `true` if the given ray intersects the frontface of the triangle; `false` otherwise
    */
-  fun testRayTriangleFront(origin: Vector3fc, dir: Vector3fc, v0: Vector3fc, v1: Vector3fc, v2: Vector3fc, epsilon: Float): Boolean {
+  fun testRayTriangleFront(origin: Vector3f, dir: Vector3f, v0: Vector3f, v1: Vector3f, v2: Vector3f, epsilon: Float): Boolean {
     return testRayTriangleFront(origin.x, origin.y, origin.z, dir.x, dir.y, dir.z, v0.x, v0.y, v0.z, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, epsilon)
   }
 
@@ -3118,7 +3118,7 @@ object Intersectionf {
    * a small epsilon when testing rays that are almost parallel to the triangle
    * @return `true` if the given ray intersects the frontface of the triangle; `false` otherwise
    */
-  fun testRayTriangle(origin: Vector3fc, dir: Vector3fc, v0: Vector3fc, v1: Vector3fc, v2: Vector3fc, epsilon: Float): Boolean {
+  fun testRayTriangle(origin: Vector3f, dir: Vector3f, v0: Vector3f, v1: Vector3f, v2: Vector3f, epsilon: Float): Boolean {
     return testRayTriangle(origin.x, origin.y, origin.z, dir.x, dir.y, dir.z, v0.x, v0.y, v0.z, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, epsilon)
   }
 
@@ -3232,7 +3232,7 @@ object Intersectionf {
    * @return the value of the parameter *t* in the ray equation *p(t) = origin + t * dir* of the point of intersection
    * if the ray intersects the frontface of the triangle; <tt>-1.0</tt> otherwise
    */
-  fun intersectRayTriangleFront(origin: Vector3fc, dir: Vector3fc, v0: Vector3fc, v1: Vector3fc, v2: Vector3fc, epsilon: Float): Float {
+  fun intersectRayTriangleFront(origin: Vector3f, dir: Vector3f, v0: Vector3f, v1: Vector3f, v2: Vector3f, epsilon: Float): Float {
     return intersectRayTriangleFront(origin.x, origin.y, origin.z, dir.x, dir.y, dir.z, v0.x, v0.y, v0.z, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, epsilon)
   }
 
@@ -3340,7 +3340,7 @@ object Intersectionf {
    * @return the value of the parameter *t* in the ray equation *p(t) = origin + t * dir* of the point of intersection
    * if the ray intersects the triangle; <tt>-1.0</tt> otherwise
    */
-  fun intersectRayTriangle(origin: Vector3fc, dir: Vector3fc, v0: Vector3fc, v1: Vector3fc, v2: Vector3fc, epsilon: Float): Float {
+  fun intersectRayTriangle(origin: Vector3f, dir: Vector3f, v0: Vector3f, v1: Vector3f, v2: Vector3f, epsilon: Float): Float {
     return intersectRayTriangle(origin.x, origin.y, origin.z, dir.x, dir.y, dir.z, v0.x, v0.y, v0.z, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, epsilon)
   }
 
@@ -3422,7 +3422,7 @@ object Intersectionf {
    * a small epsilon when testing line segments that are almost parallel to the triangle
    * @return `true` if the given line segment intersects the triangle; `false` otherwise
    */
-  fun testLineSegmentTriangle(p0: Vector3fc, p1: Vector3fc, v0: Vector3fc, v1: Vector3fc, v2: Vector3fc, epsilon: Float): Boolean {
+  fun testLineSegmentTriangle(p0: Vector3f, p1: Vector3f, v0: Vector3f, v1: Vector3f, v2: Vector3f, epsilon: Float): Boolean {
     return testLineSegmentTriangle(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, v0.x, v0.y, v0.z, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, epsilon)
   }
 
@@ -3516,7 +3516,7 @@ object Intersectionf {
    * the point of intersection
    * @return `true` if the given line segment intersects the triangle; `false` otherwise
    */
-  fun intersectLineSegmentTriangle(p0: Vector3fc, p1: Vector3fc, v0: Vector3fc, v1: Vector3fc, v2: Vector3fc, epsilon: Float, intersectionPoint: Vector3m): Boolean {
+  fun intersectLineSegmentTriangle(p0: Vector3f, p1: Vector3f, v0: Vector3f, v1: Vector3f, v2: Vector3f, epsilon: Float, intersectionPoint: Vector3m): Boolean {
     return intersectLineSegmentTriangle(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, v0.x, v0.y, v0.z, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, epsilon, intersectionPoint)
   }
 

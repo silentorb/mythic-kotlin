@@ -2,7 +2,7 @@ package silentorb.mythic.spatial
 
 import org.joml.*
 import org.joml.Quaternionfc
-import org.joml.Vector3fc
+import org.joml.Vector3f
 import java.text.DecimalFormat
 import java.text.NumberFormat
 
@@ -195,7 +195,7 @@ ${formatter.format(m02.toDouble())} ${formatter.format(m12.toDouble())} ${format
    * the factors of the x, y and z component, respectively
    * @return this
    */
-  fun scale(xyz: Vector3fc): Matrix3 {
+  fun scale(xyz: Vector3f): Matrix3 {
     return scale(xyz.x(), xyz.y(), xyz.z())
   }
 
@@ -286,7 +286,7 @@ ${formatter.format(m02.toDouble())} ${formatter.format(m12.toDouble())} ${format
    * the axis to rotate about (needs to be [normalized][Vector3f.normalize])
    * @return this
    */
-  fun rotation(angle: Float, axis: Vector3fc): Matrix3 {
+  fun rotation(angle: Float, axis: Vector3f): Matrix3 {
     return rotation(angle, axis.x(), axis.y(), axis.z())
   }
 
@@ -1805,7 +1805,7 @@ ${formatter.format(m02.toDouble())} ${formatter.format(m12.toDouble())} ${format
    * the up vector
    * @return this
    */
-  fun rotationTowards(dir: Vector3fc, up: Vector3fc): Matrix3 {
+  fun rotationTowards(dir: Vector3f, up: Vector3f): Matrix3 {
     return rotationTowards(dir.x(), dir.y(), dir.z(), up.x(), up.y(), up.z())
   }
 

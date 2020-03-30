@@ -1,6 +1,4 @@
-package org.joml
-
-import silentorb.mythic.spatial.Vector2
+package silentorb.mythic.spatial
 
 interface Vector2fMinimal {
   val x: Float

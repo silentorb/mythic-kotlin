@@ -1,39 +1,12 @@
-/*
- * (C) Copyright 2015-2018 Richard Greenlees
 
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
+package silentorb.mythic.spatial
 
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
-
- */
-package org.joml
-
-import silentorb.mythic.spatial.Vector2
-import org.joml.internal.MemUtil
-import org.joml.internal.Options
-import org.joml.internal.Runtime
-
-import java.io.Externalizable
+import org.joml.Math
+import org.joml.Matrix3x2fc
+import org.joml.Vector2fc
 import java.io.IOException
 import java.io.ObjectInput
 import java.io.ObjectOutput
-import java.nio.ByteBuffer
-import java.nio.FloatBuffer
-import java.text.DecimalFormat
 import java.text.NumberFormat
 
 /**
@@ -42,16 +15,17 @@ import java.text.NumberFormat
  * @author RGreenlees
  * @author Kai Burjack
  */
-class Vector2f : Externalizable, Vector2fc {
+class Vector2f {
 
   /**
    * The x component of the vector.
    */
- override var x: Float = 0.toFloat()
+  var x: Float = 0.toFloat()
+
   /**
    * The y component of the vector.
    */
-  override  var y: Float = 0.toFloat()
+  var y: Float = 0.toFloat()
 
   /**
    * Create a new [Vector2f] and initialize its components to zero.
@@ -77,84 +51,6 @@ class Vector2f : Externalizable, Vector2fc {
   constructor(x: Float, y: Float) {
     this.x = x
     this.y = y
-  }
-
-  /**
-   * Create a new [Vector2f] and initialize its components to the one of the given vector.
-   *
-   * @param v
-   * the [Vector2fc] to copy the values from
-   */
-  constructor(v: Vector2fc) {
-    x = v.x
-    y = v.y
-  }
-
-  /**
-   * Create a new [Vector2f] and read this vector from the supplied [ByteBuffer]
-   * at the current buffer [position][ByteBuffer.position].
-   *
-   *
-   * This method will not increment the position of the given ByteBuffer.
-   *
-   *
-   * In order to specify the offset into the ByteBuffer at which
-   * the vector is read, use [.Vector2f], taking
-   * the absolute position as parameter.
-   *
-   * @param buffer
-   * values will be read in <tt>x, y</tt> order
-   * @see .Vector2f
-   */
-  constructor(buffer: ByteBuffer) : this(buffer.position(), buffer) {}
-
-  /**
-   * Create a new [Vector2f] and read this vector from the supplied [ByteBuffer]
-   * starting at the specified absolute buffer position/index.
-   *
-   *
-   * This method will not increment the position of the given ByteBuffer.
-   *
-   * @param index
-   * the absolute position into the ByteBuffer
-   * @param buffer values will be read in <tt>x, y</tt> order
-   */
-  constructor(index: Int, buffer: ByteBuffer) {
-    MemUtil.INSTANCE.get(this, index, buffer)
-  }
-
-  /**
-   * Create a new [Vector2f] and read this vector from the supplied [FloatBuffer]
-   * at the current buffer [position][FloatBuffer.position].
-   *
-   *
-   * This method will not increment the position of the given FloatBuffer.
-   *
-   *
-   * In order to specify the offset into the FloatBuffer at which
-   * the vector is read, use [.Vector2f], taking
-   * the absolute position as parameter.
-   *
-   * @param buffer
-   * values will be read in <tt>x, y</tt> order
-   * @see .Vector2f
-   */
-  constructor(buffer: FloatBuffer) : this(buffer.position(), buffer) {}
-
-  /**
-   * Create a new [Vector2f] and read this vector from the supplied [FloatBuffer]
-   * starting at the specified absolute buffer position/index.
-   *
-   *
-   * This method will not increment the position of the given FloatBuffer.
-   *
-   * @param index
-   * the absolute position into the FloatBuffer
-   * @param buffer
-   * values will be read in <tt>x, y</tt> order
-   */
-  constructor(index: Int, buffer: FloatBuffer) {
-    MemUtil.INSTANCE.get(this, index, buffer)
   }
 
   private fun thisOrNew(): Vector2f {
@@ -198,111 +94,11 @@ class Vector2f : Externalizable, Vector2fc {
     return set(v.x, v.y)
   }
 
-  /**
-   * Read this vector from the supplied [ByteBuffer] at the current
-   * buffer [position][ByteBuffer.position].
-   *
-   *
-   * This method will not increment the position of the given ByteBuffer.
-   *
-   *
-   * In order to specify the offset into the ByteBuffer at which
-   * the vector is read, use [.set], taking
-   * the absolute position as parameter.
-   *
-   * @param buffer
-   * values will be read in <tt>x, y</tt> order
-   * @return this
-   * @see .set
-   */
-  fun set(buffer: ByteBuffer): Vector2f {
-    return set(buffer.position(), buffer)
-  }
-
-  /**
-   * Read this vector from the supplied [ByteBuffer] starting at the specified
-   * absolute buffer position/index.
-   *
-   *
-   * This method will not increment the position of the given ByteBuffer.
-   *
-   * @param index
-   * the absolute position into the ByteBuffer
-   * @param buffer
-   * values will be read in <tt>x, y</tt> order
-   * @return this
-   */
-  operator fun set(index: Int, buffer: ByteBuffer): Vector2f {
-    MemUtil.INSTANCE.get(this, index, buffer)
-    return this
-  }
-
-  /**
-   * Read this vector from the supplied [FloatBuffer] at the current
-   * buffer [position][FloatBuffer.position].
-   *
-   *
-   * This method will not increment the position of the given FloatBuffer.
-   *
-   *
-   * In order to specify the offset into the FloatBuffer at which
-   * the vector is read, use [.set], taking
-   * the absolute position as parameter.
-   *
-   * @param buffer
-   * values will be read in <tt>x, y</tt> order
-   * @return this
-   * @see .set
-   */
-  fun set(buffer: FloatBuffer): Vector2f {
-    return set(buffer.position(), buffer)
-  }
-
-  /**
-   * Read this vector from the supplied [FloatBuffer] starting at the specified
-   * absolute buffer position/index.
-   *
-   *
-   * This method will not increment the position of the given FloatBuffer.
-   *
-   * @param index
-   * the absolute position into the FloatBuffer
-   * @param buffer
-   * values will be read in <tt>x, y</tt> order
-   * @return this
-   */
-  operator fun set(index: Int, buffer: FloatBuffer): Vector2f {
-    MemUtil.INSTANCE.get(this, index, buffer)
-    return this
-  }
-
-  /**
-   * Set the values of this vector by reading 2 float values from off-heap memory,
-   * starting at the given address.
-   *
-   *
-   * This method will throw an [UnsupportedOperationException] when JOML is used with `-Djoml.nounsafe`.
-   *
-   *
-   * *This method is unsafe as it can result in a crash of the JVM process when the specified address range does not belong to this process.*
-   *
-   * @param address
-   * the off-heap memory address to read the vector values from
-   * @return this
-   */
-  fun setFromAddress(address: Long): Vector2f {
-    if (Options.NO_UNSAFE)
-      throw UnsupportedOperationException("Not supported when using joml.nounsafe")
-    val unsafe = MemUtil.INSTANCE as MemUtil.MemUtilUnsafe
-    unsafe.get(this, address)
-    return this
-  }
-
   /* (non-Javadoc)
      * @see Vector2fc#get(int)
      */
   @Throws(IllegalArgumentException::class)
-  override fun get(component: Int): Float {
+  fun get(component: Int): Float {
     when (component) {
       0 -> return x
       1 -> return y
@@ -330,44 +126,6 @@ class Vector2f : Externalizable, Vector2fc {
     return this
   }
 
-  /* (non-Javadoc)
-     * @see Vector2fc#get(java.nio.ByteBuffer)
-     */
-  override fun get(buffer: ByteBuffer): ByteBuffer {
-    return get(buffer.position(), buffer)
-  }
-
-  /* (non-Javadoc)
-     * @see Vector2fc#get(int, java.nio.ByteBuffer)
-     */
-  override fun get(index: Int, buffer: ByteBuffer): ByteBuffer {
-    MemUtil.INSTANCE.put(this, index, buffer)
-    return buffer
-  }
-
-  /* (non-Javadoc)
-     * @see Vector2fc#get(java.nio.FloatBuffer)
-     */
-  override fun get(buffer: FloatBuffer): FloatBuffer {
-    return get(buffer.position(), buffer)
-  }
-
-  /* (non-Javadoc)
-     * @see Vector2fc#get(int, java.nio.FloatBuffer)
-     */
-  override fun get(index: Int, buffer: FloatBuffer): FloatBuffer {
-    MemUtil.INSTANCE.put(this, index, buffer)
-    return buffer
-  }
-
-  override fun getToAddress(address: Long): Vector2fc {
-    if (Options.NO_UNSAFE)
-      throw UnsupportedOperationException("Not supported when using joml.nounsafe")
-    val unsafe = MemUtil.INSTANCE as MemUtil.MemUtilUnsafe
-    unsafe.put(this, address)
-    return this
-  }
-
   /**
    * Set this vector to be one of its perpendicular vectors.
    *
@@ -391,7 +149,7 @@ class Vector2f : Externalizable, Vector2fc {
   /* (non-Javadoc)
      * @see Vector2fc#sub(Vector2fc, Vector2f)
      */
-  override fun sub(v: Vector2fc, dest: Vector2f): Vector2f {
+  fun sub(v: Vector2fc, dest: Vector2f): Vector2f {
     dest.x = x - v.x
     dest.y = y - v.y
     return dest
@@ -413,7 +171,7 @@ class Vector2f : Externalizable, Vector2fc {
   /* (non-Javadoc)
      * @see Vector2fc#sub(float, float, Vector2f)
      */
-  override fun sub(x: Float, y: Float, dest: Vector2f): Vector2f {
+  fun sub(x: Float, y: Float, dest: Vector2f): Vector2f {
     dest.x = this.x - x
     dest.y = this.y - y
     return dest
@@ -422,14 +180,14 @@ class Vector2f : Externalizable, Vector2fc {
   /* (non-Javadoc)
      * @see Vector2fc#dot(Vector2fc)
      */
-  override fun dot(v: Vector2fc): Float {
+  fun dot(v: Vector2fc): Float {
     return x * v.x + y * v.y
   }
 
   /* (non-Javadoc)
      * @see Vector2fc#angle(Vector2fc)
      */
-  override fun angle(v: Vector2fc): Float {
+  fun angle(v: Vector2fc): Float {
     val dot = x * v.x + y * v.y
     val det = x * v.y - y * v.x
     return Math.atan2(det.toDouble(), dot.toDouble()).toFloat()
@@ -438,21 +196,21 @@ class Vector2f : Externalizable, Vector2fc {
   /* (non-Javadoc)
      * @see Vector2fc#length()
      */
-  override fun length(): Float {
+  fun length(): Float {
     return Math.sqrt((x * x + y * y).toDouble()).toFloat()
   }
 
   /* (non-Javadoc)
      * @see Vector2fc#lengthSquared()
      */
-  override fun lengthSquared(): Float {
+  fun lengthSquared(): Float {
     return x * x + y * y
   }
 
   /* (non-Javadoc)
      * @see Vector2fc#distance(Vector2fc)
      */
-  override fun distance(v: Vector2fc): Float {
+  fun distance(v: Vector2fc): Float {
     return distance(v.x, v.y)
   }
 
@@ -466,7 +224,7 @@ class Vector2f : Externalizable, Vector2fc {
   /* (non-Javadoc)
      * @see Vector2fc#distance(float, float)
      */
-  override fun distance(x: Float, y: Float): Float {
+  fun distance(x: Float, y: Float): Float {
     val dx = this.x - x
     val dy = this.y - y
     return Math.sqrt((dx * dx + dy * dy).toDouble()).toFloat()
@@ -493,7 +251,7 @@ class Vector2f : Externalizable, Vector2fc {
   /* (non-Javadoc)
      * @see Vector2fc#normalize(Vector2f)
      */
-  override fun normalize(dest: Vector2f): Vector2f {
+  fun normalize(dest: Vector2f): Vector2f {
     val invLength = (1.0 / Math.sqrt((x * x + y * y).toDouble())).toFloat()
     dest.x = x * invLength
     dest.y = y * invLength
@@ -514,7 +272,7 @@ class Vector2f : Externalizable, Vector2fc {
   /* (non-Javadoc)
      * @see Vector2fc#normalize(float, Vector2f)
      */
-  override fun normalize(length: Float, dest: Vector2f): Vector2f {
+  fun normalize(length: Float, dest: Vector2f): Vector2f {
     val invLength = (1.0 / Math.sqrt((x * x + y * y).toDouble())).toFloat() * length
     dest.x = x * invLength
     dest.y = y * invLength
@@ -535,7 +293,7 @@ class Vector2f : Externalizable, Vector2fc {
   /* (non-Javadoc)
      * @see Vector2fc#add(Vector2fc, Vector2f)
      */
-  override fun add(v: Vector2fc, dest: Vector2f): Vector2f {
+  fun add(v: Vector2fc, dest: Vector2f): Vector2f {
     dest.x = x + v.x
     dest.y = y + v.y
     return dest
@@ -557,7 +315,7 @@ class Vector2f : Externalizable, Vector2fc {
   /* (non-Javadoc)
      * @see Vector2fc#add(float, float, Vector2f)
      */
-  override fun add(x: Float, y: Float, dest: Vector2f): Vector2f {
+  fun add(x: Float, y: Float, dest: Vector2f): Vector2f {
     dest.x = this.x + x
     dest.y = this.y + y
     return dest
@@ -573,13 +331,13 @@ class Vector2f : Externalizable, Vector2fc {
   }
 
   @Throws(IOException::class)
-  override fun writeExternal(out: ObjectOutput) {
+  fun writeExternal(out: ObjectOutput) {
     out.writeFloat(x)
     out.writeFloat(y)
   }
 
   @Throws(IOException::class, ClassNotFoundException::class)
-  override fun readExternal(`in`: ObjectInput) {
+  fun readExternal(`in`: ObjectInput) {
     x = `in`.readFloat()
     y = `in`.readFloat()
   }
@@ -596,7 +354,7 @@ class Vector2f : Externalizable, Vector2fc {
   /* (non-Javadoc)
      * @see Vector2fc#negate(Vector2f)
      */
-  override fun negate(dest: Vector2f): Vector2f {
+  fun negate(dest: Vector2f): Vector2f {
     dest.x = -x
     dest.y = -y
     return dest
@@ -616,7 +374,7 @@ class Vector2f : Externalizable, Vector2fc {
   /* (non-Javadoc)
      * @see Vector2fc#mul(float, Vector2f)
      */
-  override fun mul(scalar: Float, dest: Vector2f): Vector2f {
+  fun mul(scalar: Float, dest: Vector2f): Vector2f {
     dest.x = x * scalar
     dest.y = y * scalar
     return dest
@@ -638,7 +396,7 @@ class Vector2f : Externalizable, Vector2fc {
   /* (non-Javadoc)
      * @see Vector2fc#mul(float, float, Vector2f)
      */
-  override fun mul(x: Float, y: Float, dest: Vector2f): Vector2f {
+  fun mul(x: Float, y: Float, dest: Vector2f): Vector2f {
     dest.x = this.x * x
     dest.y = this.y * y
     return dest
@@ -658,7 +416,7 @@ class Vector2f : Externalizable, Vector2fc {
   /* (non-Javadoc)
      * @see Vector2fc#mul(Vector2fc, Vector2f)
      */
-  override fun mul(v: Vector2fc, dest: Vector2f): Vector2f {
+  fun mul(v: Vector2fc, dest: Vector2f): Vector2f {
     dest.x = x * v.x
     dest.y = y * v.y
     return dest
@@ -681,7 +439,7 @@ class Vector2f : Externalizable, Vector2fc {
   /* (non-Javadoc)
      * @see Vector2fc#mulPosition(org.joml.Matrix3x2fc, Vector2f)
      */
-  override fun mulPosition(mat: Matrix3x2fc, dest: Vector2f): Vector2f {
+  fun mulPosition(mat: Matrix3x2fc, dest: Vector2f): Vector2f {
     dest[mat.m00() * x + mat.m10() * y + mat.m20()] = mat.m01() * x + mat.m11() * y + mat.m21()
     return dest
   }
@@ -703,7 +461,7 @@ class Vector2f : Externalizable, Vector2fc {
   /* (non-Javadoc)
      * @see Vector2fc#mulDirection(org.joml.Matrix3x2fc, Vector2f)
      */
-  override fun mulDirection(mat: Matrix3x2fc, dest: Vector2f): Vector2f {
+  fun mulDirection(mat: Matrix3x2fc, dest: Vector2f): Vector2f {
     dest[mat.m00() * x + mat.m10() * y] = mat.m01() * x + mat.m11() * y
     return dest
   }
@@ -729,43 +487,10 @@ class Vector2f : Externalizable, Vector2fc {
   /* (non-Javadoc)
      * @see Vector2fc#lerp(Vector2fc, float, Vector2f)
      */
-  override fun lerp(other: Vector2fc, t: Float, dest: Vector2f): Vector2f {
+  fun lerp(other: Vector2fc, t: Float, dest: Vector2f): Vector2f {
     dest.x = x + (other.x - x) * t
     dest.y = y + (other.y - y) * t
     return dest
-  }
-
-  override fun hashCode(): Int {
-    val prime = 31
-    var result = 1
-    result = prime * result + java.lang.Float.floatToIntBits(x)
-    result = prime * result + java.lang.Float.floatToIntBits(y)
-    return result
-  }
-
-  override fun equals(obj: Any?): Boolean {
-    if (this === obj)
-      return true
-    if (obj == null)
-      return false
-    if (javaClass != obj.javaClass)
-      return false
-    val other = obj as Vector2f?
-    if (java.lang.Float.floatToIntBits(x) != java.lang.Float.floatToIntBits(other!!.x))
-      return false
-    return if (java.lang.Float.floatToIntBits(y) != java.lang.Float.floatToIntBits(other.y)) false else true
-  }
-
-  /**
-   * Return a string representation of this vector.
-   *
-   *
-   * This method creates a new [DecimalFormat] on every invocation with the format string "<tt>0.000E0;-</tt>".
-   *
-   * @return the string representation
-   */
-  override fun toString(): String {
-    return Runtime.formatNumbers(toString(Options.NUMBER_FORMAT))
   }
 
   /**
@@ -808,7 +533,7 @@ class Vector2f : Externalizable, Vector2fc {
   /* (non-Javadoc)
      * @see Vector2fc#fma(Vector2fc, Vector2fc, Vector2f)
      */
-  override fun fma(a: Vector2fc, b: Vector2fc, dest: Vector2f): Vector2f {
+  fun fma(a: Vector2fc, b: Vector2fc, dest: Vector2f): Vector2f {
     dest.x = x + a.x * b.x
     dest.y = y + a.y * b.y
     return dest
@@ -817,7 +542,7 @@ class Vector2f : Externalizable, Vector2fc {
   /* (non-Javadoc)
      * @see Vector2fc#fma(float, Vector2fc, Vector2f)
      */
-  override fun fma(a: Float, b: Vector2fc, dest: Vector2f): Vector2f {
+  fun fma(a: Float, b: Vector2fc, dest: Vector2f): Vector2f {
     dest.x = x + a * b.x
     dest.y = y + a * b.y
     return dest
@@ -834,7 +559,7 @@ class Vector2f : Externalizable, Vector2fc {
     return min(v, thisOrNew())
   }
 
-  override fun min(v: Vector2fc, dest: Vector2f): Vector2f {
+  fun min(v: Vector2fc, dest: Vector2f): Vector2f {
     dest.x = if (x < v.x) x else v.x
     dest.y = if (y < v.y) y else v.y
     return this
@@ -851,13 +576,13 @@ class Vector2f : Externalizable, Vector2fc {
     return max(v, thisOrNew())
   }
 
-  override fun max(v: Vector2fc, dest: Vector2f): Vector2f {
+  fun max(v: Vector2fc, dest: Vector2f): Vector2f {
     dest.x = if (x > v.x) x else v.x
     dest.y = if (y > v.y) y else v.y
     return this
   }
 
-  override operator fun minus(v: Vector2fMinimal): Vector2 =
+  operator fun minus(v: Vector2fMinimal): Vector2 =
       Vector2(x - v.x, y - v.y)
 
   companion object {
@@ -865,5 +590,5 @@ class Vector2f : Externalizable, Vector2fc {
     private val serialVersionUID = 1L
   }
 
-  override fun xy(): Vector2 = Vector2(x, y)
+  fun xy(): Vector2 = Vector2(x, y)
 }

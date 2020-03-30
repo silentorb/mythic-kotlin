@@ -294,10 +294,10 @@ class MutableVector3 : Vector3int {
   }
 
   /* (non-Javadoc)
-     * @see org.joml.MutableVector3#mulProject(Matrix4fc, org.joml.MutableVector3)
+     * @see org.joml.MutableVector3#mulProject(Matrix4f, org.joml.MutableVector3)
      */
   @JvmOverloads
-  fun mulProject(mat: Matrix4fc, dest: MutableVector3 = thisOrNew()): MutableVector3 {
+  fun mulProject(mat: Matrix4f, dest: MutableVector3 = thisOrNew()): MutableVector3 {
     val invW = 1.0f / (mat.m03() * x + mat.m13() * y + mat.m23() * z + mat.m33())
     val rx = (mat.m00() * x + mat.m10() * y + mat.m20() * z + mat.m30()) * invW
     val ry = (mat.m01() * x + mat.m11() * y + mat.m21() * z + mat.m31()) * invW
@@ -364,10 +364,10 @@ class MutableVector3 : Vector3int {
   }
 
   /* (non-Javadoc)
-     * @see org.joml.MutableVector3#mulPosition(Matrix4fc, org.joml.MutableVector3)
+     * @see org.joml.MutableVector3#mulPosition(Matrix4f, org.joml.MutableVector3)
      */
   @JvmOverloads
-  fun mulPosition(mat: Matrix4fc, dest: MutableVector3 = thisOrNew()): MutableVector3 {
+  fun mulPosition(mat: Matrix4f, dest: MutableVector3 = thisOrNew()): MutableVector3 {
     val rx = mat.m00() * x + mat.m10() * y + mat.m20() * z + mat.m30()
     val ry = mat.m01() * x + mat.m11() * y + mat.m21() * z + mat.m31()
     val rz = mat.m02() * x + mat.m12() * y + mat.m22() * z + mat.m32()
@@ -392,10 +392,10 @@ class MutableVector3 : Vector3int {
   }
 
   /* (non-Javadoc)
-     * @see org.joml.MutableVector3#mulTransposePosition(Matrix4fc, org.joml.MutableVector3)
+     * @see org.joml.MutableVector3#mulTransposePosition(Matrix4f, org.joml.MutableVector3)
      */
   @JvmOverloads
-  fun mulTransposePosition(mat: Matrix4fc, dest: MutableVector3 = thisOrNew()): MutableVector3 {
+  fun mulTransposePosition(mat: Matrix4f, dest: MutableVector3 = thisOrNew()): MutableVector3 {
     val rx = mat.m00() * x + mat.m01() * y + mat.m02() * z + mat.m03()
     val ry = mat.m10() * x + mat.m11() * y + mat.m12() * z + mat.m13()
     val rz = mat.m20() * x + mat.m21() * y + mat.m22() * z + mat.m23()
@@ -406,10 +406,10 @@ class MutableVector3 : Vector3int {
   }
 
   /* (non-Javadoc)
-     * @see org.joml.MutableVector3#mulPositionW(Matrix4fc, org.joml.MutableVector3)
+     * @see org.joml.MutableVector3#mulPositionW(Matrix4f, org.joml.MutableVector3)
      */
   @JvmOverloads
-  fun mulPositionW(mat: Matrix4fc, dest: MutableVector3 = thisOrNew()): Float {
+  fun mulPositionW(mat: Matrix4f, dest: MutableVector3 = thisOrNew()): Float {
     val w = mat.m03() * x + mat.m13() * y + mat.m23() * z + mat.m33()
     val rx = mat.m00() * x + mat.m10() * y + mat.m20() * z + mat.m30()
     val ry = mat.m01() * x + mat.m11() * y + mat.m21() * z + mat.m31()
@@ -435,10 +435,10 @@ class MutableVector3 : Vector3int {
   }
 
   /* (non-Javadoc)
-     * @see org.joml.MutableVector3#mulDirection(Matrix4fc, org.joml.MutableVector3)
+     * @see org.joml.MutableVector3#mulDirection(Matrix4f, org.joml.MutableVector3)
      */
   @JvmOverloads
-  fun mulDirection(mat: Matrix4fc, dest: MutableVector3 = thisOrNew()): MutableVector3 {
+  fun mulDirection(mat: Matrix4f, dest: MutableVector3 = thisOrNew()): MutableVector3 {
     val rx = mat.m00() * x + mat.m10() * y + mat.m20() * z
     val ry = mat.m01() * x + mat.m11() * y + mat.m21() * z
     val rz = mat.m02() * x + mat.m12() * y + mat.m22() * z
@@ -463,10 +463,10 @@ class MutableVector3 : Vector3int {
   }
 
   /* (non-Javadoc)
-     * @see org.joml.MutableVector3#mulTransposeDirection(Matrix4fc, org.joml.MutableVector3)
+     * @see org.joml.MutableVector3#mulTransposeDirection(Matrix4f, org.joml.MutableVector3)
      */
   @JvmOverloads
-  fun mulTransposeDirection(mat: Matrix4fc, dest: MutableVector3 = thisOrNew()): MutableVector3 {
+  fun mulTransposeDirection(mat: Matrix4f, dest: MutableVector3 = thisOrNew()): MutableVector3 {
     val rx = mat.m00() * x + mat.m01() * y + mat.m02() * z
     val ry = mat.m10() * x + mat.m11() * y + mat.m12() * z
     val rz = mat.m20() * x + mat.m21() * y + mat.m22() * z

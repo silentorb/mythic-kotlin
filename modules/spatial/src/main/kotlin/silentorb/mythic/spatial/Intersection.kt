@@ -1,7 +1,6 @@
 package silentorb.mythic.spatial
 
 import org.joml.Math
-import org.joml.Vector2fMinimal
 
 fun lineIntersectsCircle(lineStart: Vector2, lineEnd: Vector2, circleCenter: Vector2, radius: Float): Boolean {
   val d = lineEnd - lineStart

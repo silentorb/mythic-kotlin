@@ -43,7 +43,7 @@ val interpolateVector3: TypedInterpolator<Vector3> = { a, b, progress ->
 }
 
 val interpolateVector4: TypedInterpolator<Vector4> = { a, b, progress ->
-  Vector4(a).lerp(Vector4(b), progress)
+  a.copy().lerp(b.copy(), progress)
 }
 
 val interpolateQuaternion: TypedInterpolator<Quaternion> = { a, b, progress ->

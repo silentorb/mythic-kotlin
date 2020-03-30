@@ -21,7 +21,7 @@
 
  */
 package org.joml
-
+/*
 import silentorb.mythic.spatial.*
 import silentorb.mythic.spatial.Quaternionf
 import silentorb.mythic.spatial.Quaternionfc
@@ -4856,3 +4856,4 @@ companion object {
 }
 
 }
+*/

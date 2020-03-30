@@ -12,8 +12,8 @@ class FlexibleEdge(
 ) {
   val vertices = listOf(first, second)
 
-  val middle: Vector3m
-    get() = (first + second) * 0.5f
+//  val middle: Vector3m
+//    get() = (first + second) * 0.5f
 
   fun getReference(face: FlexibleFace) = face.edges.first { it.edge == this }
 
@@ -46,8 +46,8 @@ class EdgeReference(
   val otherEdgeReferences: List<EdgeReference>
     get() = edge.references.filter { it != this }
 
-  val middle: Vector3m
-    get() = edge.middle
+//  val middle: Vector3m
+//    get() = edge.middle
 
 }
 

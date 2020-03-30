@@ -1,6 +1,6 @@
 package silentorb.mythic.characters
 
-import org.joml.Vector2fMinimal
+import silentorb.mythic.spatial.Vector2fMinimal
 import silentorb.mythic.happenings.CommandName
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3

@@ -23,7 +23,6 @@
 package silentorb.mythic.spatial
 
 import org.joml.*
-import org.joml.internal.MemUtil
 import org.joml.internal.Options
 import org.joml.internal.Runtime
 
@@ -42,24 +41,27 @@ import java.text.NumberFormat
  * @author Richard Greenlees
  * @author Kai Burjack
  */
-class Quaternionf : Externalizable, Quaternionfc {
+class Quaternionf {
 
   /**
    * The first component of the vector part.
    */
- override var x: Float = 0.toFloat()
+  var x: Float = 0.toFloat()
+
   /**
    * The second component of the vector part.
    */
-  override  var y: Float = 0.toFloat()
+  var y: Float = 0.toFloat()
+
   /**
    * The third component of the vector part.
    */
-  override var z: Float = 0.toFloat()
+  var z: Float = 0.toFloat()
+
   /**
    * The real/scalar part of the quaternion.
    */
-  override var w: Float = 0.toFloat()
+  var w: Float = 0.toFloat()
 
   /**
    * Create a new [Quaternionf] and initialize it with <tt>(x=0, y=0, z=0, w=1)</tt>,
@@ -94,9 +96,7 @@ class Quaternionf : Externalizable, Quaternionfc {
    * @param source
    * the [Quaternionf] to take the component values from
    */
-  constructor(source: Quaternionf) {
-    MemUtil.INSTANCE.copy(source, this)
-  }
+  constructor(source: Quaternionf) : this(source.x, source.y, source.z, source.w)
 
   /**
    * Create a new [Quaternionf] which represents the rotation of the given [AxisAngle4f].
@@ -128,9 +128,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#normalize(Quaternionf)
+     * @see Quaternionf#normalize(Quaternionf)
      */
-  override fun normalize(dest: Quaternionf): Quaternionf {
+  fun normalize(dest: Quaternionf): Quaternionf {
     val invNorm = (1.0 / Math.sqrt((x * x + y * y + z * z + w * w).toDouble())).toFloat()
     dest.x = x * invNorm
     dest.y = y * invNorm
@@ -157,9 +157,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#add(float, float, float, float, Quaternionf)
+     * @see Quaternionf#add(float, float, float, float, Quaternionf)
      */
-  override fun add(x: Float, y: Float, z: Float, w: Float, dest: Quaternionf): Quaternionf {
+  fun add(x: Float, y: Float, z: Float, w: Float, dest: Quaternionf): Quaternionf {
     dest.x = this.x + x
     dest.y = this.y + y
     dest.z = this.z + z
@@ -174,7 +174,7 @@ class Quaternionf : Externalizable, Quaternionfc {
    * the quaternion to add to this
    * @return this
    */
-  fun add(q2: Quaternionfc): Quaternionf {
+  fun add(q2: Quaternionf): Quaternionf {
     x += q2.x
     y += q2.y
     z += q2.z
@@ -183,9 +183,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#add(Quaternionfc, Quaternionf)
+     * @see Quaternionf#add(Quaternionf, Quaternionf)
      */
-  override fun add(q2: Quaternionfc, dest: Quaternionf): Quaternionf {
+  fun add(q2: Quaternionf, dest: Quaternionf): Quaternionf {
     dest.x = x + q2.x
     dest.y = y + q2.y
     dest.z = z + q2.z
@@ -205,24 +205,17 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#angle()
+     * @see Quaternionf#angle()
      */
-  override fun angle(): Float {
+  fun angle(): Float {
     val angle = (2.0 * Math.acos(w.toDouble())).toFloat()
     return if (angle <= Math.PI) angle else Pi + Pi - angle
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#get(Matrix4f)
+     * @see Quaternionf#get(org.joml.AxisAngle4f)
      */
-  override fun get(dest: Matrix4f): Matrix4f {
-    return dest.set(this)
-  }
-
-  /* (non-Javadoc)
-     * @see Quaternionfc#get(org.joml.AxisAngle4f)
-     */
-  override fun get(dest: AxisAngle4f): AxisAngle4f {
+  fun get(dest: AxisAngle4f): AxisAngle4f {
     var x = this.x
     var y = this.y
     var z = this.z
@@ -250,66 +243,6 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /**
-   * Set the given [Quaternionf] to the values of `this`.
-   *
-   * @see .set
-   * @param dest
-   * the [Quaternionf] to set
-   * @return the passed in destination
-   */
-  override fun get(dest: Quaternionf): Quaternionf {
-    return dest.set(this)
-  }
-
-  /* (non-Javadoc)
-     * @see Quaternionfc#getAsMatrix3f(java.nio.ByteBuffer)
-     */
-  override fun getAsMatrix3f(dest: ByteBuffer): ByteBuffer {
-    MemUtil.INSTANCE.putMatrix3f(this, dest.position(), dest)
-    return dest
-  }
-
-  /* (non-Javadoc)
-     * @see Quaternionfc#getAsMatrix3f(java.nio.FloatBuffer)
-     */
-  override fun getAsMatrix3f(dest: FloatBuffer): FloatBuffer {
-    MemUtil.INSTANCE.putMatrix3f(this, dest.position(), dest)
-    return dest
-  }
-
-  /* (non-Javadoc)
-     * @see Quaternionfc#getAsMatrix4f(java.nio.ByteBuffer)
-     */
-  override fun getAsMatrix4f(dest: ByteBuffer): ByteBuffer {
-    MemUtil.INSTANCE.putMatrix4f(this, dest.position(), dest)
-    return dest
-  }
-
-  /* (non-Javadoc)
-     * @see Quaternionfc#getAsMatrix4f(java.nio.FloatBuffer)
-     */
-  override fun getAsMatrix4f(dest: FloatBuffer): FloatBuffer {
-    MemUtil.INSTANCE.putMatrix4f(this, dest.position(), dest)
-    return dest
-  }
-
-  /* (non-Javadoc)
-     * @see Quaternionfc#getAsMatrix4x3f(java.nio.ByteBuffer)
-     */
-  override fun getAsMatrix4x3f(dest: ByteBuffer): ByteBuffer {
-    MemUtil.INSTANCE.putMatrix4x3f(this, dest.position(), dest)
-    return dest
-  }
-
-  /* (non-Javadoc)
-     * @see Quaternionfc#getAsMatrix4x3f(java.nio.FloatBuffer)
-     */
-  override fun getAsMatrix4x3f(dest: FloatBuffer): FloatBuffer {
-    MemUtil.INSTANCE.putMatrix4x3f(this, dest.position(), dest)
-    return dest
-  }
-
-  /**
    * Set this quaternion to the given values.
    *
    * @param x
@@ -327,25 +260,6 @@ class Quaternionf : Externalizable, Quaternionfc {
     this.y = y
     this.z = z
     this.w = w
-    return this
-  }
-
-  /**
-   * Set this quaternion to be a copy of q.
-   *
-   * @param q
-   * the [Quaternionf] to copy
-   * @return this
-   */
-  fun set(q: Quaternionfc): Quaternionf {
-    if (q is Quaternionf)
-      MemUtil.INSTANCE.copy(q, this)
-    else {
-      this.x = q.x
-      this.y = q.y
-      this.z = q.z
-      this.w = q.w
-    }
     return this
   }
 
@@ -472,7 +386,7 @@ class Quaternionf : Externalizable, Quaternionfc {
    * the axis to rotate about
    * @return this
    */
-  fun rotationAxis(angle: Float, axis: Vector3fc): Quaternionf {
+  fun rotationAxis(angle: Float, axis: Vector3): Quaternionf {
     return rotationAxis(angle, axis.x, axis.y, axis.z)
   }
 
@@ -691,7 +605,7 @@ class Quaternionf : Externalizable, Quaternionfc {
    * the matrix whose rotational component is used to set this quaternion
    * @return this
    */
-  fun setFromUnnormalized(mat: Matrix4fc): Quaternionf {
+  fun setFromUnnormalized(mat: Matrix4f): Quaternionf {
     setFromUnnormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
     return this
   }
@@ -736,7 +650,7 @@ class Quaternionf : Externalizable, Quaternionfc {
    * the matrix whose rotational component is used to set this quaternion
    * @return this
    */
-  fun setFromNormalized(mat: Matrix4fc): Quaternionf {
+  fun setFromNormalized(mat: Matrix4f): Quaternionf {
     setFromNormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
     return this
   }
@@ -868,7 +782,7 @@ class Quaternionf : Externalizable, Quaternionfc {
    * the angle in radians
    * @return this
    */
-  fun fromAxisAngleRad(axis: Vector3fc, angle: Float): Quaternionf {
+  fun fromAxisAngleRad(axis: Vector3, angle: Float): Quaternionf {
     return fromAxisAngleRad(axis.x, axis.y, axis.z, angle)
   }
 
@@ -907,7 +821,7 @@ class Quaternionf : Externalizable, Quaternionfc {
    * the angle in degrees
    * @return this
    */
-  fun fromAxisAngleDeg(axis: Vector3fc, angle: Float): Quaternionf {
+  fun fromAxisAngleDeg(axis: Vector3, angle: Float): Quaternionf {
     return fromAxisAngleRad(axis.x, axis.y, axis.z, Math.toRadians(angle.toDouble()).toFloat())
   }
 
@@ -947,14 +861,14 @@ class Quaternionf : Externalizable, Quaternionfc {
    * the quaternion to multiply `this` by
    * @return this
    */
-  fun mul(q: Quaternionfc): Quaternionf {
+  fun mul(q: Quaternionf): Quaternionf {
     return mul(q, this)
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#mul(Quaternionfc, Quaternionf)
+     * @see Quaternionf#mul(Quaternionf, Quaternionf)
      */
-  override fun mul(q: Quaternionfc, dest: Quaternionf): Quaternionf {
+  fun mul(q: Quaternionf, dest: Quaternionf): Quaternionf {
     dest[w * q.x + x * q.w + y * q.z - z * q.y, w * q.y - x * q.z + y * q.w + z * q.x, w * q.z + x * q.y - y * q.x + z * q.w] = w * q.w - x * q.x - y * q.y - z * q.z
     return dest
   }
@@ -992,9 +906,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#mul(float, float, float, float, Quaternionf)
+     * @see Quaternionf#mul(float, float, float, float, Quaternionf)
      */
-  override fun mul(qx: Float, qy: Float, qz: Float, qw: Float, dest: Quaternionf): Quaternionf {
+  fun mul(qx: Float, qy: Float, qz: Float, qw: Float, dest: Quaternionf): Quaternionf {
     dest[w * qx + x * qw + y * qz - z * qy, w * qy - x * qz + y * qw + z * qx, w * qz + x * qy - y * qx + z * qw] = w * qw - x * qx - y * qy - z * qz
     return dest
   }
@@ -1015,14 +929,14 @@ class Quaternionf : Externalizable, Quaternionfc {
    * the quaternion to pre-multiply `this` by
    * @return this
    */
-  fun premul(q: Quaternionfc): Quaternionf {
+  fun premul(q: Quaternionf): Quaternionf {
     return premul(q, this)
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#premul(Quaternionfc, Quaternionf)
+     * @see Quaternionf#premul(Quaternionf, Quaternionf)
      */
-  override fun premul(q: Quaternionfc, dest: Quaternionf): Quaternionf {
+  fun premul(q: Quaternionf, dest: Quaternionf): Quaternionf {
     dest[q.w * x + q.x * w + q.y * z - q.z * y, q.w * y - q.x * z + q.y * w + q.z * x, q.w * z + q.x * y - q.y * x + q.z * w] = q.w * w - q.x * x - q.y * y - q.z * z
     return dest
   }
@@ -1054,21 +968,21 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#premul(float, float, float, float, Quaternionf)
+     * @see Quaternionf#premul(float, float, float, float, Quaternionf)
      */
-  override fun premul(qx: Float, qy: Float, qz: Float, qw: Float, dest: Quaternionf): Quaternionf {
+  fun premul(qx: Float, qy: Float, qz: Float, qw: Float, dest: Quaternionf): Quaternionf {
     dest[qw * x + qx * w + qy * z - qz * y, qw * y - qx * z + qy * w + qz * x, qw * z + qx * y - qy * x + qz * w] = qw * w - qx * x - qy * y - qz * z
     return dest
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#transform(Vector3m)
+     * @see Quaternionf#transform(Vector3m)
      */
-  override fun transform(vec: Vector3m): Vector3m {
+  fun transform(vec: Vector3m): Vector3m {
     return transform(vec.x, vec.y, vec.z, vec)
   }
 
-  override fun transformPositiveX(dest: Vector3m): Vector3m {
+  fun transformPositiveX(dest: Vector3m): Vector3m {
     val w2 = this.w * this.w
     val x2 = this.x * this.x
     val y2 = this.y * this.y
@@ -1083,7 +997,7 @@ class Quaternionf : Externalizable, Quaternionfc {
     return dest
   }
 
-  override fun transformPositiveX(dest: Vector4): Vector4 {
+  fun transformPositiveX(dest: Vector4): Vector4 {
     val w2 = this.w * this.w
     val x2 = this.x * this.x
     val y2 = this.y * this.y
@@ -1098,7 +1012,7 @@ class Quaternionf : Externalizable, Quaternionfc {
     return dest
   }
 
-  override fun transformUnitPositiveX(dest: Vector3m): Vector3m {
+  fun transformUnitPositiveX(dest: Vector3m): Vector3m {
     val y2 = y * y
     val z2 = z * z
     val xy = x * y
@@ -1111,7 +1025,7 @@ class Quaternionf : Externalizable, Quaternionfc {
     return dest
   }
 
-  override fun transformUnitPositiveX(dest: Vector4): Vector4 {
+  fun transformUnitPositiveX(dest: Vector4): Vector4 {
     val y2 = y * y
     val z2 = z * z
     val xy = x * y
@@ -1124,7 +1038,7 @@ class Quaternionf : Externalizable, Quaternionfc {
     return dest
   }
 
-  override fun transformPositiveY(dest: Vector3m): Vector3m {
+  fun transformPositiveY(dest: Vector3m): Vector3m {
     val w2 = this.w * this.w
     val x2 = this.x * this.x
     val y2 = this.y * this.y
@@ -1139,7 +1053,7 @@ class Quaternionf : Externalizable, Quaternionfc {
     return dest
   }
 
-  override fun transformPositiveY(dest: Vector4): Vector4 {
+  fun transformPositiveY(dest: Vector4): Vector4 {
     val w2 = this.w * this.w
     val x2 = this.x * this.x
     val y2 = this.y * this.y
@@ -1154,7 +1068,7 @@ class Quaternionf : Externalizable, Quaternionfc {
     return dest
   }
 
-  override fun transformUnitPositiveY(dest: Vector4): Vector4 {
+  fun transformUnitPositiveY(dest: Vector4): Vector4 {
     val x2 = x * x
     val z2 = z * z
     val xy = x * y
@@ -1167,7 +1081,7 @@ class Quaternionf : Externalizable, Quaternionfc {
     return dest
   }
 
-  override fun transformUnitPositiveY(dest: Vector3m): Vector3m {
+  fun transformUnitPositiveY(dest: Vector3m): Vector3m {
     val x2 = x * x
     val z2 = z * z
     val xy = x * y
@@ -1180,7 +1094,7 @@ class Quaternionf : Externalizable, Quaternionfc {
     return dest
   }
 
-  override fun transformPositiveZ(dest: Vector3m): Vector3m {
+  fun transformPositiveZ(dest: Vector3m): Vector3m {
     val w2 = this.w * this.w
     val x2 = this.x * this.x
     val y2 = this.y * this.y
@@ -1195,7 +1109,7 @@ class Quaternionf : Externalizable, Quaternionfc {
     return dest
   }
 
-  override fun transformPositiveZ(dest: Vector4): Vector4 {
+  fun transformPositiveZ(dest: Vector4): Vector4 {
     val w2 = this.w * this.w
     val x2 = this.x * this.x
     val y2 = this.y * this.y
@@ -1210,7 +1124,7 @@ class Quaternionf : Externalizable, Quaternionfc {
     return dest
   }
 
-  override fun transformUnitPositiveZ(dest: Vector4): Vector4 {
+  fun transformUnitPositiveZ(dest: Vector4): Vector4 {
     val x2 = x * x
     val y2 = y * y
     val xz = x * z
@@ -1223,7 +1137,7 @@ class Quaternionf : Externalizable, Quaternionfc {
     return dest
   }
 
-  override fun transformUnitPositiveZ(dest: Vector3m): Vector3m {
+  fun transformUnitPositiveZ(dest: Vector3m): Vector3m {
     val x2 = x * x
     val y2 = y * y
     val xz = x * z
@@ -1237,27 +1151,27 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#transform(Vector4)
+     * @see Quaternionf#transform(Vector4)
      */
-  override fun transform(vec: Vector4): Vector4 {
+  fun transform(vec: Vector4): Vector4 {
     return transform(vec, vec)
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#transform(Vector3fc, Vector3m)
+     * @see Quaternionf#transform(Vector3, Vector3m)
      */
-  override fun transform(vec: Vector3fc, dest: Vector3m): Vector3m {
-    return transform(vec.x, vec.y, vec.z, dest)
+  fun transform(vec: Vector3): Vector3 {
+    return transform(vec.x, vec.y, vec.z)
   }
 
-  fun transform(vec: Vector3, dest: Vector3m): Vector3m {
+  fun transform(vec: Vector3m, dest: Vector3m): Vector3m {
     return transform(vec.x, vec.y, vec.z, dest)
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#transform(float, float, float, Vector3m)
+     * @see Quaternionf#transform(float, float, float, Vector3m)
      */
-  override fun transform(x: Float, y: Float, z: Float, dest: Vector3m): Vector3m {
+  fun transform(x: Float, y: Float, z: Float, dest: Vector3m): Vector3m {
     val w2 = this.w * this.w
     val x2 = this.x * this.x
     val y2 = this.y * this.y
@@ -1284,7 +1198,37 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#transform(double, double, double, org.joml.Vector3d)
+     * @see Quaternionf#transform(float, float, float, Vector3m)
+     */
+  fun transform(x: Float, y: Float, z: Float): Vector3 {
+    val w2 = this.w * this.w
+    val x2 = this.x * this.x
+    val y2 = this.y * this.y
+    val z2 = this.z * this.z
+    val zw = this.z * this.w
+    val xy = this.x * this.y
+    val xz = this.x * this.z
+    val yw = this.y * this.w
+    val yz = this.y * this.z
+    val xw = this.x * this.w
+    val m00 = w2 + x2 - z2 - y2
+    val m01 = xy + zw + zw + xy
+    val m02 = xz - yw + xz - yw
+    val m10 = -zw + xy - zw + xy
+    val m11 = y2 - z2 + w2 - x2
+    val m12 = yz + yz + xw + xw
+    val m20 = yw + xz + xz + yw
+    val m21 = yz + yz - xw - xw
+    val m22 = z2 - y2 - x2 + w2
+    return Vector3(
+        m00 * x + m10 * y + m20 * z,
+        m01 * x + m11 * y + m21 * z,
+        m02 * x + m12 * y + m22 * z
+    )
+  }
+
+  /* (non-Javadoc)
+     * @see Quaternionf#transform(double, double, double, org.joml.Vector3d)
      */
   fun transform(x: Double, y: Double, z: Double, dest: Vector3d): Vector3d {
     val w2 = this.w * this.w
@@ -1313,16 +1257,16 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#transform(Vector4c, Vector4)
+     * @see Quaternionf#transform(Vector4, Vector4)
      */
-  override fun transform(vec: Vector4c, dest: Vector4): Vector4 {
+  fun transform(vec: Vector4, dest: Vector4): Vector4 {
     return transform(vec.x, vec.y, vec.z, dest)
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#transform(float, float, float, Vector4)
+     * @see Quaternionf#transform(float, float, float, Vector4)
      */
-  override fun transform(x: Float, y: Float, z: Float, dest: Vector4): Vector4 {
+  fun transform(x: Float, y: Float, z: Float, dest: Vector4): Vector4 {
     val w2 = this.w * this.w
     val x2 = this.x * this.x
     val y2 = this.y * this.y
@@ -1349,9 +1293,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#invert(Quaternionf)
+     * @see Quaternionf#invert(Quaternionf)
      */
-  override fun invert(dest: Quaternionf): Quaternionf {
+  fun invert(dest: Quaternionf): Quaternionf {
     val invNorm = 1.0f / (x * x + y * y + z * z + w * w)
     dest.x = -x * invNorm
     dest.y = -y * invNorm
@@ -1374,9 +1318,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#div(Quaternionfc, Quaternionf)
+     * @see Quaternionf#div(Quaternionf, Quaternionf)
      */
-  override fun div(b: Quaternionfc, dest: Quaternionf): Quaternionf {
+  fun div(b: Quaternionf, dest: Quaternionf): Quaternionf {
     val invNorm = 1.0f / (b.x * b.x + b.y * b.y + b.z * b.z + b.w * b.w)
     val x = -b.x * invNorm
     val y = -b.y * invNorm
@@ -1399,7 +1343,7 @@ class Quaternionf : Externalizable, Quaternionfc {
    * the [Quaternionf] to divide this by
    * @return this
    */
-  operator fun div(b: Quaternionfc): Quaternionf {
+  operator fun div(b: Quaternionf): Quaternionf {
     return div(b, this)
   }
 
@@ -1416,9 +1360,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#conjugate(Quaternionf)
+     * @see Quaternionf#conjugate(Quaternionf)
      */
-  override fun conjugate(dest: Quaternionf): Quaternionf {
+  fun conjugate(dest: Quaternionf): Quaternionf {
     dest.x = -x
     dest.y = -y
     dest.z = -z
@@ -1432,7 +1376,8 @@ class Quaternionf : Externalizable, Quaternionfc {
    * @return this
    */
   fun identity(): Quaternionf {
-    MemUtil.INSTANCE.identity(this)
+    throw Error("Not implemented")
+//    MemUtil.INSTANCE.identity(this)
     return this
   }
 
@@ -1462,9 +1407,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#rotateXYZ(float, float, float, Quaternionf)
+     * @see Quaternionf#rotateXYZ(float, float, float, Quaternionf)
      */
-  override fun rotateXYZ(angleX: Float, angleY: Float, angleZ: Float, dest: Quaternionf): Quaternionf {
+  fun rotateXYZ(angleX: Float, angleY: Float, angleZ: Float, dest: Quaternionf): Quaternionf {
     val sx = Math.sin(angleX * 0.5).toFloat()
     val cx = Math.cosFromSin(sx.toDouble(), angleX * 0.5).toFloat()
     val sy = Math.sin(angleY * 0.5).toFloat()
@@ -1511,9 +1456,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#rotateZYX(float, float, float, Quaternionf)
+     * @see Quaternionf#rotateZYX(float, float, float, Quaternionf)
      */
-  override fun rotateZYX(angleZ: Float, angleY: Float, angleX: Float, dest: Quaternionf): Quaternionf {
+  fun rotateZYX(angleZ: Float, angleY: Float, angleX: Float, dest: Quaternionf): Quaternionf {
     val sx = Math.sin(angleX * 0.5).toFloat()
     val cx = Math.cosFromSin(sx.toDouble(), angleX * 0.5).toFloat()
     val sy = Math.sin(angleY * 0.5).toFloat()
@@ -1560,9 +1505,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#rotateYXZ(float, float, float, Quaternionf)
+     * @see Quaternionf#rotateYXZ(float, float, float, Quaternionf)
      */
-  override fun rotateYXZ(angleY: Float, angleX: Float, angleZ: Float, dest: Quaternionf): Quaternionf {
+  fun rotateYXZ(angleY: Float, angleX: Float, angleZ: Float, dest: Quaternionf): Quaternionf {
     val sx = Math.sin(angleX * 0.5).toFloat()
     val cx = Math.cosFromSin(sx.toDouble(), angleX * 0.5).toFloat()
     val sy = Math.sin(angleY * 0.5).toFloat()
@@ -1584,9 +1529,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#getEulerAnglesXYZ(Vector3m)
+     * @see Quaternionf#getEulerAnglesXYZ(Vector3m)
      */
-  override fun getEulerAnglesXYZ(eulerAngles: Vector3m): Vector3m {
+  fun getEulerAnglesXYZ(eulerAngles: Vector3m): Vector3m {
     eulerAngles.x = Math.atan2(2.0 * (x * w - y * z), 1.0 - 2.0 * (x * x + y * y)).toFloat()
     eulerAngles.y = Math.asin(2.0 * (x * z + y * w)).toFloat()
     eulerAngles.z = Math.atan2(2.0 * (z * w - x * y), 1.0 - 2.0 * (y * y + z * z)).toFloat()
@@ -1594,9 +1539,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#lengthSquared()
+     * @see Quaternionf#lengthSquared()
      */
-  override fun lengthSquared(): Float {
+  fun lengthSquared(): Float {
     return x * x + y * y + z * z + w * w
   }
 
@@ -1725,14 +1670,14 @@ class Quaternionf : Externalizable, Quaternionfc {
    * the interpolation factor, within <tt>[0..1]</tt>
    * @return this
    */
-  fun slerp(target: Quaternionfc, alpha: Float): Quaternionf {
+  fun slerp(target: Quaternionf, alpha: Float): Quaternionf {
     return slerp(target, alpha, this)
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#slerp(Quaternionfc, float, Quaternionf)
+     * @see Quaternionf#slerp(Quaternionf, float, Quaternionf)
      */
-  override fun slerp(target: Quaternionfc, alpha: Float, dest: Quaternionf): Quaternionf {
+  fun slerp(target: Quaternionf, alpha: Float, dest: Quaternionf): Quaternionf {
     val cosom = x * target.x + y * target.y + z * target.z + w * target.w
     val absCosom = Math.abs(cosom)
     val scale0: Float
@@ -1768,9 +1713,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#scale(float, Quaternionf)
+     * @see Quaternionf#scale(float, Quaternionf)
      */
-  override fun scale(factor: Float, dest: Quaternionf): Quaternionf {
+  fun scale(factor: Float, dest: Quaternionf): Quaternionf {
     val sqrt = Math.sqrt(factor.toDouble()).toFloat()
     dest.x = sqrt * x
     dest.y = sqrt * y
@@ -1826,9 +1771,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#integrate(float, float, float, float, Quaternionf)
+     * @see Quaternionf#integrate(float, float, float, float, Quaternionf)
      */
-  override fun integrate(dt: Float, vx: Float, vy: Float, vz: Float, dest: Quaternionf): Quaternionf {
+  fun integrate(dt: Float, vx: Float, vy: Float, vz: Float, dest: Quaternionf): Quaternionf {
     return rotateLocal(dt * vx, dt * vy, dt * vz, dest)
   }
 
@@ -1842,14 +1787,14 @@ class Quaternionf : Externalizable, Quaternionfc {
    * the interpolation factor. It is between 0.0 and 1.0
    * @return this
    */
-  fun nlerp(q: Quaternionfc, factor: Float): Quaternionf {
+  fun nlerp(q: Quaternionf, factor: Float): Quaternionf {
     return nlerp(q, factor, this)
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#nlerp(Quaternionfc, float, Quaternionf)
+     * @see Quaternionf#nlerp(Quaternionf, float, Quaternionf)
      */
-  override fun nlerp(q: Quaternionfc, factor: Float, dest: Quaternionf): Quaternionf {
+  fun nlerp(q: Quaternionf, factor: Float, dest: Quaternionf): Quaternionf {
     val cosom = x * q.x + y * q.y + z * q.z + w * q.w
     val scale0 = 1.0f - factor
     val scale1 = if (cosom >= 0.0f) factor else -factor
@@ -1866,9 +1811,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#nlerpIterative(Quaternionfc, float, float, Quaternionf)
+     * @see Quaternionf#nlerpIterative(Quaternionf, float, float, Quaternionf)
      */
-  override fun nlerpIterative(q: Quaternionfc, alpha: Float, dotThreshold: Float, dest: Quaternionf): Quaternionf {
+  fun nlerpIterative(q: Quaternionf, alpha: Float, dotThreshold: Float, dest: Quaternionf): Quaternionf {
     var q1x = x
     var q1y = y
     var q1z = z
@@ -1880,7 +1825,8 @@ class Quaternionf : Externalizable, Quaternionfc {
     var dot = q1x * q2x + q1y * q2y + q1z * q2z + q1w * q2w
     var absDot = Math.abs(dot)
     if (1.0f - 1E-6f < absDot) {
-      return dest.set(this)
+      throw Error("Not implemented")
+//      return dest.set(this)
     }
     var alphaN = alpha
     while (absDot < dotThreshold) {
@@ -1948,7 +1894,7 @@ class Quaternionf : Externalizable, Quaternionfc {
    * of a small-step linear interpolation
    * @return this
    */
-  fun nlerpIterative(q: Quaternionfc, alpha: Float, dotThreshold: Float): Quaternionf {
+  fun nlerpIterative(q: Quaternionf, alpha: Float, dotThreshold: Float): Quaternionf {
     return nlerpIterative(q, alpha, dotThreshold, this)
   }
 
@@ -1976,14 +1922,14 @@ class Quaternionf : Externalizable, Quaternionfc {
    * spanned by the given `dir` and `up`
    * @return this
    */
-  fun lookAlong(dir: Vector3fc, up: Vector3fc): Quaternionf {
+  fun lookAlong(dir: Vector3, up: Vector3): Quaternionf {
     return lookAlong(dir.x, dir.y, dir.z, up.x, up.y, up.z, this)
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#lookAlong(Vector3fc, Vector3fc, Quaternionf)
+     * @see Quaternionf#lookAlong(Vector3, Vector3, Quaternionf)
      */
-  override fun lookAlong(dir: Vector3fc, up: Vector3fc, dest: Quaternionf): Quaternionf {
+  fun lookAlong(dir: Vector3, up: Vector3, dest: Quaternionf): Quaternionf {
     return lookAlong(dir.x, dir.y, dir.z, up.x, up.y, up.z, dest)
   }
 
@@ -2023,9 +1969,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#lookAlong(float, float, float, float, float, float, Quaternionf)
+     * @see Quaternionf#lookAlong(float, float, float, float, float, float, Quaternionf)
      */
-  override fun lookAlong(dirX: Float, dirY: Float, dirZ: Float, upX: Float, upY: Float, upZ: Float, dest: Quaternionf): Quaternionf {
+  fun lookAlong(dirX: Float, dirY: Float, dirZ: Float, upX: Float, upY: Float, upZ: Float, dest: Quaternionf): Quaternionf {
     // Normalize direction
     val invDirLength = (1.0 / Math.sqrt((dirX * dirX + dirY * dirY + dirZ * dirZ).toDouble())).toFloat()
     val dirnX = -dirX * invDirLength
@@ -2156,14 +2102,14 @@ class Quaternionf : Externalizable, Quaternionfc {
    * the destination direction
    * @return this
    */
-  fun rotationTo(fromDir: Vector3fc, toDir: Vector3fc): Quaternionf {
+  fun rotationTo(fromDir: Vector3, toDir: Vector3): Quaternionf {
     return rotationTo(fromDir.x, fromDir.y, fromDir.z, toDir.x, toDir.y, toDir.z)
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#rotateTo(float, float, float, float, float, float, Quaternionf)
+     * @see Quaternionf#rotateTo(float, float, float, float, float, float, Quaternionf)
      */
-  override fun rotateTo(fromDirX: Float, fromDirY: Float, fromDirZ: Float, toDirX: Float, toDirY: Float, toDirZ: Float, dest: Quaternionf): Quaternionf {
+  fun rotateTo(fromDirX: Float, fromDirY: Float, fromDirZ: Float, toDirX: Float, toDirY: Float, toDirZ: Float, dest: Quaternionf): Quaternionf {
     var x = fromDirY * toDirZ - fromDirZ * toDirY
     var y = fromDirZ * toDirX - fromDirX * toDirZ
     var z = fromDirX * toDirY - fromDirY * toDirX
@@ -2226,9 +2172,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#rotateTo(Vector3fc, Vector3fc, Quaternionf)
+     * @see Quaternionf#rotateTo(Vector3, Vector3, Quaternionf)
      */
-//  override fun rotateTo(fromDir: Vector3fc, toDir: Vector3fc, dest: Quaternionf): Quaternionf {
+//  fun rotateTo(fromDir: Vector3, toDir: Vector3, dest: Quaternionf): Quaternionf {
 //    return rotateTo(fromDir.x, fromDir.y, fromDir.z, toDir.x, toDir.y, toDir.z, dest)
 //  }
 
@@ -2251,7 +2197,7 @@ class Quaternionf : Externalizable, Quaternionfc {
    * the destination direction
    * @return this
    */
-//  fun rotateTo(fromDir: Vector3fc, toDir: Vector3fc): Quaternionf {
+//  fun rotateTo(fromDir: Vector3, toDir: Vector3): Quaternionf {
 //    return rotateTo(fromDir.x, fromDir.y, fromDir.z, toDir.x, toDir.y, toDir.z, this)
 //  }
 
@@ -2302,7 +2248,7 @@ class Quaternionf : Externalizable, Quaternionfc {
    * will hold the result
    * @return dest
    */
-  override fun rotate(angleX: Float, angleY: Float, angleZ: Float, dest: Quaternionf): Quaternionf {
+  fun rotate(angleX: Float, angleY: Float, angleZ: Float, dest: Quaternionf): Quaternionf {
     val thetaX = angleX * 0.5
     val thetaY = angleY * 0.5
     val thetaZ = angleZ * 0.5
@@ -2378,7 +2324,7 @@ class Quaternionf : Externalizable, Quaternionfc {
    * will hold the result
    * @return dest
    */
-  override fun rotateLocal(angleX: Float, angleY: Float, angleZ: Float, dest: Quaternionf): Quaternionf {
+  fun rotateLocal(angleX: Float, angleY: Float, angleZ: Float, dest: Quaternionf): Quaternionf {
     val thetaX = angleX * 0.5f
     val thetaY = angleY * 0.5f
     val thetaZ = angleZ * 0.5f
@@ -2424,9 +2370,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#rotateX(float, Quaternionf)
+     * @see Quaternionf#rotateX(float, Quaternionf)
      */
-  override fun rotateX(angle: Float, dest: Quaternionf): Quaternionf {
+  fun rotateX(angle: Float, dest: Quaternionf): Quaternionf {
     val sin = Math.sin(angle * 0.5).toFloat()
     val cos = Math.cosFromSin(sin.toDouble(), angle * 0.5).toFloat()
     dest[w * sin + x * cos, y * cos + z * sin, z * cos - y * sin] = w * cos - x * sin
@@ -2452,9 +2398,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#rotateY(float, Quaternionf)
+     * @see Quaternionf#rotateY(float, Quaternionf)
      */
-  override fun rotateY(angle: Float, dest: Quaternionf): Quaternionf {
+  fun rotateY(angle: Float, dest: Quaternionf): Quaternionf {
     val sin = Math.sin(angle * 0.5).toFloat()
     val cos = Math.cosFromSin(sin.toDouble(), angle * 0.5).toFloat()
     dest[x * cos - z * sin, w * sin + y * cos, x * sin + z * cos] = w * cos - y * sin
@@ -2480,9 +2426,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#rotateZ(float, Quaternionf)
+     * @see Quaternionf#rotateZ(float, Quaternionf)
      */
-  override fun rotateZ(angle: Float, dest: Quaternionf): Quaternionf {
+  fun rotateZ(angle: Float, dest: Quaternionf): Quaternionf {
     val sin = Math.sin(angle * 0.5).toFloat()
     val cos = Math.cosFromSin(sin.toDouble(), angle * 0.5).toFloat()
     dest[x * cos + y * sin, y * cos - x * sin, w * sin + z * cos] = w * cos - z * sin
@@ -2507,9 +2453,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#rotateLocalX(float, Quaternionf)
+     * @see Quaternionf#rotateLocalX(float, Quaternionf)
      */
-  override fun rotateLocalX(angle: Float, dest: Quaternionf): Quaternionf {
+  fun rotateLocalX(angle: Float, dest: Quaternionf): Quaternionf {
     val hangle = angle * 0.5f
     val s = Math.sin(hangle.toDouble()).toFloat()
     val c = Math.cosFromSin(s.toDouble(), hangle.toDouble()).toFloat()
@@ -2535,9 +2481,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#rotateLocalY(float, Quaternionf)
+     * @see Quaternionf#rotateLocalY(float, Quaternionf)
      */
-  override fun rotateLocalY(angle: Float, dest: Quaternionf): Quaternionf {
+  fun rotateLocalY(angle: Float, dest: Quaternionf): Quaternionf {
     val hangle = angle * 0.5f
     val s = Math.sin(hangle.toDouble()).toFloat()
     val c = Math.cosFromSin(s.toDouble(), hangle.toDouble()).toFloat()
@@ -2563,9 +2509,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#rotateLocalZ(float, Quaternionf)
+     * @see Quaternionf#rotateLocalZ(float, Quaternionf)
      */
-  override fun rotateLocalZ(angle: Float, dest: Quaternionf): Quaternionf {
+  fun rotateLocalZ(angle: Float, dest: Quaternionf): Quaternionf {
     val hangle = angle * 0.5f
     val s = Math.sin(hangle.toDouble()).toFloat()
     val c = Math.cosFromSin(s.toDouble(), hangle.toDouble()).toFloat()
@@ -2574,9 +2520,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#rotateAxis(float, float, float, float, Quaternionf)
+     * @see Quaternionf#rotateAxis(float, float, float, float, Quaternionf)
      */
-  override fun rotateAxis(angle: Float, axisX: Float, axisY: Float, axisZ: Float, dest: Quaternionf): Quaternionf {
+  fun rotateAxis(angle: Float, axisX: Float, axisY: Float, axisZ: Float, dest: Quaternionf): Quaternionf {
     val hangle = angle / 2.0
     val sinAngle = Math.sin(hangle)
     val invVLength = 1.0 / Math.sqrt((axisX * axisX + axisY * axisY + axisZ * axisZ).toDouble())
@@ -2591,9 +2537,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#rotateAxis(float, Vector3fc, Quaternionf)
+     * @see Quaternionf#rotateAxis(float, Vector3, Quaternionf)
      */
-  override fun rotateAxis(angle: Float, axis: Vector3fc, dest: Quaternionf): Quaternionf {
+  fun rotateAxis(angle: Float, axis: Vector3, dest: Quaternionf): Quaternionf {
     return rotateAxis(angle, axis.x, axis.y, axis.z, dest)
   }
 
@@ -2613,7 +2559,7 @@ class Quaternionf : Externalizable, Quaternionfc {
    * the rotation axis
    * @return this
    */
-  fun rotateAxis(angle: Float, axis: Vector3fc): Quaternionf {
+  fun rotateAxis(angle: Float, axis: Vector3): Quaternionf {
     return rotateAxis(angle, axis.x, axis.y, axis.z, this)
   }
 
@@ -2649,9 +2595,9 @@ class Quaternionf : Externalizable, Quaternionfc {
    *
    * @return the string representation
    */
-  override fun toString(): String {
-    return Runtime.formatNumbers(toString(Options.NUMBER_FORMAT))
-  }
+//  fun toString(): String {
+//    return Runtime.formatNumbers(toString(Options.NUMBER_FORMAT))
+//  }
 
   /**
    * Return a string representation of this quaternion by formatting the components with the given [NumberFormat].
@@ -2665,7 +2611,7 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   @Throws(IOException::class)
-  override fun writeExternal(out: ObjectOutput) {
+  fun writeExternal(out: ObjectOutput) {
     out.writeFloat(x)
     out.writeFloat(y)
     out.writeFloat(z)
@@ -2673,7 +2619,7 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   @Throws(IOException::class, ClassNotFoundException::class)
-  override fun readExternal(`in`: ObjectInput) {
+  fun readExternal(`in`: ObjectInput) {
     x = `in`.readFloat()
     y = `in`.readFloat()
     z = `in`.readFloat()
@@ -2731,9 +2677,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#difference(Quaternionf, Quaternionf)
+     * @see Quaternionf#difference(Quaternionf, Quaternionf)
      */
-  override fun difference(other: Quaternionf, dest: Quaternionf): Quaternionf {
+  fun difference(other: Quaternionf, dest: Quaternionf): Quaternionf {
     val invNorm = 1.0f / (x * x + y * y + z * z + w * w)
     val x = -this.x * invNorm
     val y = -this.y * invNorm
@@ -2744,9 +2690,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#positiveX(Vector3m)
+     * @see Quaternionf#positiveX(Vector3m)
      */
-  override fun positiveX(dir: Vector3m): Vector3m {
+  fun positiveX(dir: Vector3m): Vector3m {
     val invNorm = 1.0f / (x * x + y * y + z * z + w * w)
     val nx = -x * invNorm
     val ny = -y * invNorm
@@ -2761,9 +2707,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#normalizedPositiveX(Vector3m)
+     * @see Quaternionf#normalizedPositiveX(Vector3m)
      */
-  override fun normalizedPositiveX(dir: Vector3m): Vector3m {
+  fun normalizedPositiveX(dir: Vector3m): Vector3m {
     val dy = y + y
     val dz = z + z
     dir.x = -y * dy - z * dz + 1.0f
@@ -2773,9 +2719,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#positiveY(Vector3m)
+     * @see Quaternionf#positiveY(Vector3m)
      */
-  override fun positiveY(dir: Vector3m): Vector3m {
+  fun positiveY(dir: Vector3m): Vector3m {
     val invNorm = 1.0f / (x * x + y * y + z * z + w * w)
     val nx = -x * invNorm
     val ny = -y * invNorm
@@ -2791,9 +2737,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#normalizedPositiveY(Vector3m)
+     * @see Quaternionf#normalizedPositiveY(Vector3m)
      */
-  override fun normalizedPositiveY(dir: Vector3m): Vector3m {
+  fun normalizedPositiveY(dir: Vector3m): Vector3m {
     val dx = x + x
     val dy = y + y
     val dz = z + z
@@ -2804,9 +2750,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#positiveZ(Vector3m)
+     * @see Quaternionf#positiveZ(Vector3m)
      */
-  override fun positiveZ(dir: Vector3m): Vector3m {
+  fun positiveZ(dir: Vector3m): Vector3m {
     val invNorm = 1.0f / (x * x + y * y + z * z + w * w)
     val nx = -x * invNorm
     val ny = -y * invNorm
@@ -2822,9 +2768,9 @@ class Quaternionf : Externalizable, Quaternionfc {
   }
 
   /* (non-Javadoc)
-     * @see Quaternionfc#normalizedPositiveZ(Vector3m)
+     * @see Quaternionf#normalizedPositiveZ(Vector3m)
      */
-  override fun normalizedPositiveZ(dir: Vector3m): Vector3m {
+  fun normalizedPositiveZ(dir: Vector3m): Vector3m {
     val dx = x + x
     val dy = y + y
     val dz = z + z
@@ -2833,111 +2779,4 @@ class Quaternionf : Externalizable, Quaternionfc {
     dir.z = -x * dx - y * dy + 1.0f
     return dir
   }
-
-  companion object {
-
-    private val serialVersionUID = 1L
-
-    /**
-     * Interpolate between all of the quaternions given in `qs` via spherical linear interpolation using the specified interpolation factors `weights`,
-     * and store the result in `dest`.
-     *
-     *
-     * This method will interpolate between each two successive quaternions via [.slerp] using their relative interpolation weights.
-     *
-     *
-     * This method resorts to non-spherical linear interpolation when the absolute dot product of any two interpolated quaternions is below <tt>1E-6f</tt>.
-     *
-     *
-     * Reference: [http://gamedev.stackexchange.com/](http://gamedev.stackexchange.com/questions/62354/method-for-interpolation-between-3-quaternions#answer-62356)
-     *
-     * @param qs
-     * the quaternions to interpolate over
-     * @param weights
-     * the weights of each individual quaternion in `qs`
-     * @param dest
-     * will hold the result
-     * @return dest
-     */
-    fun slerp(qs: Array<Quaternionf>, weights: FloatArray, dest: Quaternionf): Quaternionfc {
-      dest.set(qs[0])
-      var w = weights[0]
-      for (i in 1 until qs.size) {
-        val w0 = w
-        val w1 = weights[i]
-        val rw1 = w1 / (w0 + w1)
-        w += w1
-        dest.slerp(qs[i], rw1)
-      }
-      return dest
-    }
-
-    /**
-     * Interpolate between all of the quaternions given in `qs` via non-spherical linear interpolation using the
-     * specified interpolation factors `weights`, and store the result in `dest`.
-     *
-     *
-     * This method will interpolate between each two successive quaternions via [.nlerp]
-     * using their relative interpolation weights.
-     *
-     *
-     * Reference: [http://gamedev.stackexchange.com/](http://gamedev.stackexchange.com/questions/62354/method-for-interpolation-between-3-quaternions#answer-62356)
-     *
-     * @param qs
-     * the quaternions to interpolate over
-     * @param weights
-     * the weights of each individual quaternion in `qs`
-     * @param dest
-     * will hold the result
-     * @return dest
-     */
-    fun nlerp(qs: Array<Quaternionfc>, weights: FloatArray, dest: Quaternionf): Quaternionfc {
-      dest.set(qs[0])
-      var w = weights[0]
-      for (i in 1 until qs.size) {
-        val w0 = w
-        val w1 = weights[i]
-        val rw1 = w1 / (w0 + w1)
-        w += w1
-        dest.nlerp(qs[i], rw1)
-      }
-      return dest
-    }
-
-    /**
-     * Interpolate between all of the quaternions given in `qs` via iterative non-spherical linear interpolation using the
-     * specified interpolation factors `weights`, and store the result in `dest`.
-     *
-     *
-     * This method will interpolate between each two successive quaternions via [.nlerpIterative]
-     * using their relative interpolation weights.
-     *
-     *
-     * Reference: [http://gamedev.stackexchange.com/](http://gamedev.stackexchange.com/questions/62354/method-for-interpolation-between-3-quaternions#answer-62356)
-     *
-     * @param qs
-     * the quaternions to interpolate over
-     * @param weights
-     * the weights of each individual quaternion in `qs`
-     * @param dotThreshold
-     * the threshold for the dot product of each two interpolated quaternions above which [.nlerpIterative] performs another iteration
-     * of a small-step linear interpolation
-     * @param dest
-     * will hold the result
-     * @return dest
-     */
-    fun nlerpIterative(qs: Array<Quaternionf>, weights: FloatArray, dotThreshold: Float, dest: Quaternionf): Quaternionfc {
-      dest.set(qs[0])
-      var w = weights[0]
-      for (i in 1 until qs.size) {
-        val w0 = w
-        val w1 = weights[i]
-        val rw1 = w1 / (w0 + w1)
-        w += w1
-        dest.nlerpIterative(qs[i], rw1, dotThreshold)
-      }
-      return dest
-    }
-  }
-
 }

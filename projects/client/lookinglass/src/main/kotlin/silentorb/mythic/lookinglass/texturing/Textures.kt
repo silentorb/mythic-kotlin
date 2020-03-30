@@ -38,14 +38,14 @@ fun rawImageToTexture(image: RawImage, attributes: TextureAttributes): Texture {
 }
 
 fun loadTextureFromFile(loadImage: ImageLoader, path: String, attributes: TextureAttributes): Texture {
-  val fullPath = getResourceUrl(path).path.substring(1)
+  val fullPath = getResourceUrl(path)!!.path.substring(1)
   val image = loadImage(fullPath)!!
 
   return rawImageToTexture(image, attributes)
 }
 
 fun deferImageFile(loadImage: ImageLoader, path: String, attributes: TextureAttributes): DeferredTexture {
-  val fullPath = getResourceUrl(path).path.substring(1)
+  val fullPath = getResourceUrl(path)!!.path.substring(1)
   val shortName = getFileShortName(path)
   val (truncated, newAttributes) = if (shortName.contains('.')) {
     val tokens = shortName.split('.')

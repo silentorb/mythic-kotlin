@@ -43,8 +43,8 @@ val edgeLoopReversedNext: EdgeExplorer = { edge ->
 fun getEdgeLoop(edge: EdgeReference): List<EdgeReference> = gatherEdges(edgeLoopNext, edge)
 fun getEdgeLoopReversed(edge: EdgeReference): List<EdgeReference> = gatherEdges(edgeLoopReversedNext, edge)
 
-fun getEdgesCenter(edges: List<EdgeReference>) =
-    edges.map { it.first }.reduce { a, b -> a + b } / edges.size.toFloat()
+//fun getEdgesCenter(edges: List<EdgeReference>) =
+//    edges.map { it.first }.reduce { a, b -> a + b } / edges.size.toFloat()
 
 
 fun getVerticesCenter(vertices: List<Vector3>): Vector3 {

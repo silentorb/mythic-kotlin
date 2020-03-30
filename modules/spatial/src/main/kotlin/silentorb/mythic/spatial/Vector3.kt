@@ -1,6 +1,5 @@
 package silentorb.mythic.spatial
 
-import org.joml.*
 import java.text.NumberFormat
 
 private val _zero = Vector3()
@@ -14,13 +13,11 @@ data class Vector3(
 
   constructor(d: Float) : this(d, d, d) {}
 
-  constructor(v: Vector3fc) : this(v.x, v.y, v.z) {}
+  constructor(v: Vector3m) : this(v.x, v.y, v.z) {}
 
   constructor(v: Vector3int) : this(v.x, v.y, v.z) {}
 
-  constructor(v: Vector2fc, z: Float) : this(v.x, v.y, z) {}
-
-  constructor(v: Vector2ic, z: Float) : this(v.x.toFloat(), v.y.toFloat(), z) {}
+  constructor(v: Vector2f, z: Float) : this(v.x, v.y, z) {}
 
   constructor(v: Vector2, z: Float = 0f) : this(v.x, v.y, z) {}
 
@@ -67,7 +64,7 @@ data class Vector3(
   operator fun plus(v: Float): Vector3 = Vector3(x + v, y + v, z + v)
   operator fun times(other: Float): Vector3 = Vector3(x * other, y * other, z * other)
   operator fun times(other: Vector3): Vector3 = Vector3(x * other.x, y * other.y, z * other.z)
-  operator fun minus(other: Vector3fc) = Vector3m(x - other.x, y - other.y, z - other.z)
+  operator fun minus(other: Vector3m) = Vector3m(x - other.x, y - other.y, z - other.z)
   operator fun minus(v: Float) = Vector3m(x - v, y - v, z - v)
   operator fun div(v: Float) = Vector3(x / v, y / v, z / v)
   operator fun div(v: Vector3) = Vector3(x / v.x, y / v.y, z / v.z)

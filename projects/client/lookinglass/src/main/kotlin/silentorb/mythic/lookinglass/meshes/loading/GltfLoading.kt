@@ -9,6 +9,7 @@ import silentorb.mythic.lookinglass.meshes.VertexSchemas
 import silentorb.mythic.lookinglass.toCamelCase
 import silentorb.mythic.scenery.Light
 import silentorb.mythic.scenery.LightType
+import silentorb.mythic.spatial.newVector4
 
 fun loadMaterial(info: GltfInfo, materialIndex: Int): Material {
   val materialSource = info.materials!![materialIndex]
@@ -56,7 +57,7 @@ fun gatherChildLights(info: GltfInfo, node: Node): List<Light> {
         val light = lights[lightIndex]
         Light(
             type = LightType.values().first { it.name == light.type.name },
-            color = Vector4(light.color, light.intensity / 100f),
+            color = newVector4(light.color, light.intensity / 100f),
             offset = childNode.translation ?: Vector3.zero,
             direction = null,
             range = light.range

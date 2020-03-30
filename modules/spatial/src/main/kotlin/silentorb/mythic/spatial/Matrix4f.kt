@@ -1,58 +1,11 @@
-/*
- * (C) Copyright 2015-2018 Richard Greenlees
 
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
+package silentorb.mythic.spatial
 
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
-
- */
-package org.joml
-
-import org.joml.internal.MemUtil
-import org.joml.internal.Options
-import silentorb.mythic.spatial.*
-import silentorb.mythic.spatial.Quaternionf
-import silentorb.mythic.spatial.Quaternionfc
-import silentorb.mythic.spatial.Vector3fc
-
-import java.io.Externalizable
 import java.io.IOException
 import java.io.ObjectInput
 import java.io.ObjectOutput
-import java.nio.ByteBuffer
-import java.nio.FloatBuffer
-import java.text.DecimalFormat
-import java.text.NumberFormat
 
-
-/**
- * Contains the definition of a 4x4 matrix of floats, and associated functions to transform
- * it. The matrix is column-major to match OpenGL's interpretation, and it looks like this:
- *
- *
- * m00  m10  m20  m30<br></br>
- * m01  m11  m21  m31<br></br>
- * m02  m12  m22  m32<br></br>
- * m03  m13  m23  m33<br></br>
- *
- * @author Richard Greenlees
- * @author Kai Burjack
- */
-class Matrix4f : Externalizable, Matrix4fc {
+class Matrix4f {
 
   internal var m00: Float = 0.toFloat()
   internal var m01: Float = 0.toFloat()
@@ -74,9 +27,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   internal var properties: Int = 0
 
   /* (non-Javadoc)
-     * @see Matrix4fc#isAffine()
+     * @see Matrix4f#isAffine()
      */
-  override val isAffine: Boolean
+  val isAffine: Boolean
     get() = m03 == 0.0f && m13 == 0.0f && m23 == 0.0f && m33 == 1.0f
 
   /**
@@ -87,86 +40,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     m11 = 1.0f
     m22 = 1.0f
     m33 = 1.0f
-    properties = Matrix4fc.PROPERTY_IDENTITY or Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_TRANSLATION or Matrix4fc.PROPERTY_ORTHONORMAL
-  }
-
-  /**
-   * Create a new [Matrix4f] by setting its uppper left 3x3 submatrix to the values of the given [Matrix3fc]
-   * and the rest to identity.
-   *
-   * @param mat
-   * the [Matrix3fc]
-   */
-  constructor(mat: Matrix3fc) {
-    if (mat is Matrix3f) {
-      MemUtil.INSTANCE.copy3x3(mat, this)
-    } else {
-      set3x3Matrix3fc(mat)
-    }
-    m33 = 1.0f
-    properties = Matrix4fc.PROPERTY_AFFINE.toInt()
-  }
-
-  /**
-   * Create a new [Matrix4f] and make it a copy of the given matrix.
-   *
-   * @param mat
-   * the [Matrix4fc] to copy the values from
-   */
-  constructor(mat: Matrix4fc) {
-    if (mat is Matrix4f) {
-      MemUtil.INSTANCE.copy(mat, this)
-    } else {
-      setMatrix4fc(mat)
-    }
-    properties = mat.properties()
-  }
-
-  /**
-   * Create a new [Matrix4f] and set its upper 4x3 submatrix to the given matrix `mat`
-   * and all other elements to identity.
-   *
-   * @param mat
-   * the [Matrix4x3fc] to copy the values from
-   */
-  constructor(mat: Matrix4x3fc) {
-    if (mat is Matrix4x3f) {
-      MemUtil.INSTANCE.copy4x3(mat, this)
-    } else {
-      set4x3Matrix4x3fc(mat)
-    }
-    this.m33 = 1.0f
-    properties = mat.properties() or Matrix4fc.PROPERTY_AFFINE
-  }
-
-  /**
-   * Create a new [Matrix4f] and make it a copy of the given matrix.
-   *
-   *
-   * Note that due to the given [Matrix4dc] storing values in double-precision and the constructed [Matrix4f] storing them
-   * in single-precision, there is the possibility of losing precision.
-   *
-   * @param mat
-   * the [Matrix4dc] to copy the values from
-   */
-  constructor(mat: Matrix4dc) {
-    m00 = mat.m00().toFloat()
-    m01 = mat.m01().toFloat()
-    m02 = mat.m02().toFloat()
-    m03 = mat.m03().toFloat()
-    m10 = mat.m10().toFloat()
-    m11 = mat.m11().toFloat()
-    m12 = mat.m12().toFloat()
-    m13 = mat.m13().toFloat()
-    m20 = mat.m20().toFloat()
-    m21 = mat.m21().toFloat()
-    m22 = mat.m22().toFloat()
-    m23 = mat.m23().toFloat()
-    m30 = mat.m30().toFloat()
-    m31 = mat.m31().toFloat()
-    m32 = mat.m32().toFloat()
-    m33 = mat.m33().toFloat()
-    properties = mat.properties()
+    properties = Matrix4f.PROPERTY_IDENTITY or Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_TRANSLATION or Matrix4f.PROPERTY_ORTHONORMAL
   }
 
   /**
@@ -235,46 +109,6 @@ class Matrix4f : Externalizable, Matrix4fc {
     properties = 0
   }
 
-  /**
-   * Create a new [Matrix4f] by reading its 16 float components from the given [FloatBuffer]
-   * at the buffer's current position.
-   *
-   *
-   * That FloatBuffer is expected to hold the values in column-major order.
-   *
-   *
-   * The buffer's position will not be changed by this method.
-   *
-   * @param buffer
-   * the [FloatBuffer] to read the matrix values from
-   */
-  constructor(buffer: FloatBuffer) {
-    MemUtil.INSTANCE.get(this, buffer.position(), buffer)
-  }
-
-  /**
-   * Create a new [Matrix4f] and initialize its four columns using the supplied vectors.
-   *
-   * @param col0
-   * the first column
-   * @param col1
-   * the second column
-   * @param col2
-   * the third column
-   * @param col3
-   * the fourth column
-   */
-  constructor(col0: Vector4c, col1: Vector4c, col2: Vector4c, col3: Vector4c) {
-    if (col0 is Vector4 &&
-        col1 is Vector4 &&
-        col2 is Vector4 &&
-        col3 is Vector4) {
-      MemUtil.INSTANCE.set(this, col0, col1, col2, col3)
-    } else {
-      setVector4c(col0, col1, col2, col3)
-    }
-  }
-
   private fun thisOrNew(): Matrix4f {
     return this
   }
@@ -287,9 +121,9 @@ class Matrix4f : Externalizable, Matrix4fc {
    * Assume the given properties about this matrix.
    *
    *
-   * Use one or multiple of 0, [Matrix4fc.PROPERTY_IDENTITY],
-   * [Matrix4fc.PROPERTY_TRANSLATION], [Matrix4fc.PROPERTY_AFFINE],
-   * [Matrix4fc.PROPERTY_PERSPECTIVE], [Matrix4fc.PROPERTY_ORTHONORMAL].
+   * Use one or multiple of 0, [Matrix4f.PROPERTY_IDENTITY],
+   * [Matrix4f.PROPERTY_TRANSLATION], [Matrix4f.PROPERTY_AFFINE],
+   * [Matrix4f.PROPERTY_PERSPECTIVE], [Matrix4f.PROPERTY_ORTHONORMAL].
    *
    * @param properties
    * bitset of the properties to assume about this matrix
@@ -310,12 +144,12 @@ class Matrix4f : Externalizable, Matrix4fc {
     var properties = 0
     if (m03 == 0.0f && m13 == 0.0f) {
       if (m23 == 0.0f && m33 == 1.0f) {
-        properties = properties or Matrix4fc.PROPERTY_AFFINE.toInt()
+        properties = properties or Matrix4f.PROPERTY_AFFINE.toInt()
         if (m00 == 1.0f && m01 == 0.0f && m02 == 0.0f && m10 == 0.0f && m11 == 1.0f && m12 == 0.0f
             && m20 == 0.0f && m21 == 0.0f && m22 == 1.0f) {
-          properties = properties or (Matrix4fc.PROPERTY_TRANSLATION or Matrix4fc.PROPERTY_ORTHONORMAL)
+          properties = properties or (Matrix4f.PROPERTY_TRANSLATION or Matrix4f.PROPERTY_ORTHONORMAL)
           if (m30 == 0.0f && m31 == 0.0f && m32 == 0.0f)
-            properties = properties or Matrix4fc.PROPERTY_IDENTITY.toInt()
+            properties = properties or Matrix4f.PROPERTY_IDENTITY.toInt()
         }
         /*
                  * We do not determine orthogonality, since it would require arbitrary epsilons
@@ -323,7 +157,7 @@ class Matrix4f : Externalizable, Matrix4fc {
                  */
       } else if (m01 == 0.0f && m02 == 0.0f && m10 == 0.0f && m12 == 0.0f && m20 == 0.0f && m21 == 0.0f
           && m30 == 0.0f && m31 == 0.0f && m33 == 0.0f) {
-        properties = properties or Matrix4fc.PROPERTY_PERSPECTIVE.toInt()
+        properties = properties or Matrix4f.PROPERTY_PERSPECTIVE.toInt()
       }
     }
     this.properties = properties
@@ -331,121 +165,121 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#properties()
+     * @see Matrix4f#properties()
      */
-  override fun properties(): Int {
+  fun properties(): Int {
     return properties
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#m00()
+     * @see Matrix4f#m00()
      */
-  override fun m00(): Float {
+  fun m00(): Float {
     return m00
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#m01()
+     * @see Matrix4f#m01()
      */
-  override fun m01(): Float {
+  fun m01(): Float {
     return m01
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#m02()
+     * @see Matrix4f#m02()
      */
-  override fun m02(): Float {
+  fun m02(): Float {
     return m02
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#m03()
+     * @see Matrix4f#m03()
      */
-  override fun m03(): Float {
+  fun m03(): Float {
     return m03
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#m10()
+     * @see Matrix4f#m10()
      */
-  override fun m10(): Float {
+  fun m10(): Float {
     return m10
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#m11()
+     * @see Matrix4f#m11()
      */
-  override fun m11(): Float {
+  fun m11(): Float {
     return m11
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#m12()
+     * @see Matrix4f#m12()
      */
-  override fun m12(): Float {
+  fun m12(): Float {
     return m12
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#m13()
+     * @see Matrix4f#m13()
      */
-  override fun m13(): Float {
+  fun m13(): Float {
     return m13
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#m20()
+     * @see Matrix4f#m20()
      */
-  override fun m20(): Float {
+  fun m20(): Float {
     return m20
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#m21()
+     * @see Matrix4f#m21()
      */
-  override fun m21(): Float {
+  fun m21(): Float {
     return m21
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#m22()
+     * @see Matrix4f#m22()
      */
-  override fun m22(): Float {
+  fun m22(): Float {
     return m22
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#m23()
+     * @see Matrix4f#m23()
      */
-  override fun m23(): Float {
+  fun m23(): Float {
     return m23
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#m30()
+     * @see Matrix4f#m30()
      */
-  override fun m30(): Float {
+  fun m30(): Float {
     return m30
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#m31()
+     * @see Matrix4f#m31()
      */
-  override fun m31(): Float {
+  fun m31(): Float {
     return m31
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#m32()
+     * @see Matrix4f#m32()
      */
-  override fun m32(): Float {
+  fun m32(): Float {
     return m32
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#m33()
+     * @see Matrix4f#m33()
      */
-  override fun m33(): Float {
+  fun m33(): Float {
     return m33
   }
 
@@ -458,9 +292,9 @@ class Matrix4f : Externalizable, Matrix4fc {
    */
   fun m00(m00: Float): Matrix4f {
     this.m00 = m00
-    properties = properties and Matrix4fc.PROPERTY_ORTHONORMAL.inv()
+    properties = properties and Matrix4f.PROPERTY_ORTHONORMAL.inv()
     if (m00 != 1.0f)
-      properties = properties and (Matrix4fc.PROPERTY_IDENTITY or Matrix4fc.PROPERTY_TRANSLATION).inv()
+      properties = properties and (Matrix4f.PROPERTY_IDENTITY or Matrix4f.PROPERTY_TRANSLATION).inv()
     return this
   }
 
@@ -473,9 +307,9 @@ class Matrix4f : Externalizable, Matrix4fc {
    */
   fun m01(m01: Float): Matrix4f {
     this.m01 = m01
-    properties = properties and Matrix4fc.PROPERTY_ORTHONORMAL.inv()
+    properties = properties and Matrix4f.PROPERTY_ORTHONORMAL.inv()
     if (m01 != 0.0f)
-      properties = properties and (Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv()
+      properties = properties and (Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv()
     return this
   }
 
@@ -488,9 +322,9 @@ class Matrix4f : Externalizable, Matrix4fc {
    */
   fun m02(m02: Float): Matrix4f {
     this.m02 = m02
-    properties = properties and Matrix4fc.PROPERTY_ORTHONORMAL.inv()
+    properties = properties and Matrix4f.PROPERTY_ORTHONORMAL.inv()
     if (m02 != 0.0f)
-      properties = properties and (Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv()
+      properties = properties and (Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv()
     return this
   }
 
@@ -517,9 +351,9 @@ class Matrix4f : Externalizable, Matrix4fc {
    */
   fun m10(m10: Float): Matrix4f {
     this.m10 = m10
-    properties = properties and Matrix4fc.PROPERTY_ORTHONORMAL.inv()
+    properties = properties and Matrix4f.PROPERTY_ORTHONORMAL.inv()
     if (m10 != 0.0f)
-      properties = properties and (Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv()
+      properties = properties and (Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv()
     return this
   }
 
@@ -532,9 +366,9 @@ class Matrix4f : Externalizable, Matrix4fc {
    */
   fun m11(m11: Float): Matrix4f {
     this.m11 = m11
-    properties = properties and Matrix4fc.PROPERTY_ORTHONORMAL.inv()
+    properties = properties and Matrix4f.PROPERTY_ORTHONORMAL.inv()
     if (m11 != 1.0f)
-      properties = properties and (Matrix4fc.PROPERTY_IDENTITY or Matrix4fc.PROPERTY_TRANSLATION).inv()
+      properties = properties and (Matrix4f.PROPERTY_IDENTITY or Matrix4f.PROPERTY_TRANSLATION).inv()
     return this
   }
 
@@ -547,9 +381,9 @@ class Matrix4f : Externalizable, Matrix4fc {
    */
   fun m12(m12: Float): Matrix4f {
     this.m12 = m12
-    properties = properties and Matrix4fc.PROPERTY_ORTHONORMAL.inv()
+    properties = properties and Matrix4f.PROPERTY_ORTHONORMAL.inv()
     if (m12 != 0.0f)
-      properties = properties and (Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv()
+      properties = properties and (Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv()
     return this
   }
 
@@ -576,9 +410,9 @@ class Matrix4f : Externalizable, Matrix4fc {
    */
   fun m20(m20: Float): Matrix4f {
     this.m20 = m20
-    properties = properties and Matrix4fc.PROPERTY_ORTHONORMAL.inv()
+    properties = properties and Matrix4f.PROPERTY_ORTHONORMAL.inv()
     if (m20 != 0.0f)
-      properties = properties and (Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv()
+      properties = properties and (Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv()
     return this
   }
 
@@ -591,9 +425,9 @@ class Matrix4f : Externalizable, Matrix4fc {
    */
   fun m21(m21: Float): Matrix4f {
     this.m21 = m21
-    properties = properties and Matrix4fc.PROPERTY_ORTHONORMAL.inv()
+    properties = properties and Matrix4f.PROPERTY_ORTHONORMAL.inv()
     if (m21 != 0.0f)
-      properties = properties and (Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv()
+      properties = properties and (Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv()
     return this
   }
 
@@ -606,9 +440,9 @@ class Matrix4f : Externalizable, Matrix4fc {
    */
   fun m22(m22: Float): Matrix4f {
     this.m22 = m22
-    properties = properties and Matrix4fc.PROPERTY_ORTHONORMAL.inv()
+    properties = properties and Matrix4f.PROPERTY_ORTHONORMAL.inv()
     if (m22 != 1.0f)
-      properties = properties and (Matrix4fc.PROPERTY_IDENTITY or Matrix4fc.PROPERTY_TRANSLATION).inv()
+      properties = properties and (Matrix4f.PROPERTY_IDENTITY or Matrix4f.PROPERTY_TRANSLATION).inv()
     return this
   }
 
@@ -622,7 +456,7 @@ class Matrix4f : Externalizable, Matrix4fc {
   fun m23(m23: Float): Matrix4f {
     this.m23 = m23
     if (m23 != 0.0f)
-      properties = properties and (Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_AFFINE.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt()).inv()
+      properties = properties and (Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_AFFINE.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt() or Matrix4f.PROPERTY_ORTHONORMAL.toInt()).inv()
     return this
   }
 
@@ -636,7 +470,7 @@ class Matrix4f : Externalizable, Matrix4fc {
   fun m30(m30: Float): Matrix4f {
     this.m30 = m30
     if (m30 != 0.0f)
-      properties = properties and (Matrix4fc.PROPERTY_IDENTITY or Matrix4fc.PROPERTY_PERSPECTIVE).inv()
+      properties = properties and (Matrix4f.PROPERTY_IDENTITY or Matrix4f.PROPERTY_PERSPECTIVE).inv()
     return this
   }
 
@@ -650,7 +484,7 @@ class Matrix4f : Externalizable, Matrix4fc {
   fun m31(m31: Float): Matrix4f {
     this.m31 = m31
     if (m31 != 0.0f)
-      properties = properties and (Matrix4fc.PROPERTY_IDENTITY or Matrix4fc.PROPERTY_PERSPECTIVE).inv()
+      properties = properties and (Matrix4f.PROPERTY_IDENTITY or Matrix4f.PROPERTY_PERSPECTIVE).inv()
     return this
   }
 
@@ -664,7 +498,7 @@ class Matrix4f : Externalizable, Matrix4fc {
   fun m32(m32: Float): Matrix4f {
     this.m32 = m32
     if (m32 != 0.0f)
-      properties = properties and (Matrix4fc.PROPERTY_IDENTITY or Matrix4fc.PROPERTY_PERSPECTIVE).inv()
+      properties = properties and (Matrix4f.PROPERTY_IDENTITY or Matrix4f.PROPERTY_PERSPECTIVE).inv()
     return this
   }
 
@@ -678,9 +512,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   fun m33(m33: Float): Matrix4f {
     this.m33 = m33
     if (m33 != 0.0f)
-      properties = properties and Matrix4fc.PROPERTY_PERSPECTIVE.inv()
+      properties = properties and Matrix4f.PROPERTY_PERSPECTIVE.inv()
     if (m33 != 1.0f)
-      properties = properties and (Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt() or Matrix4fc.PROPERTY_AFFINE.toInt()).inv()
+      properties = properties and (Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt() or Matrix4f.PROPERTY_ORTHONORMAL.toInt() or Matrix4f.PROPERTY_AFFINE.toInt()).inv()
     return this
   }
 
@@ -905,33 +739,26 @@ class Matrix4f : Externalizable, Matrix4fc {
    * @return this
    */
   fun identity(): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+    if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       return this
-    MemUtil.INSTANCE.identity(this)
-    this._properties(Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_AFFINE.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt())
+    throw Error("Not implemented")
+//    throw Error("Not implemented")
+    this._properties(Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_AFFINE.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt() or Matrix4f.PROPERTY_ORTHONORMAL.toInt())
     return this
   }
 
-  /**
-   * Store the values of the given matrix `m` into `this` matrix.
-   *
-   * @see .Matrix4f
-   * @see .get
-   * @param m
-   * the matrix to copy the values from
-   * @return this
-   */
-  fun set(m: Matrix4fc): Matrix4f {
-    if (m is Matrix4f) {
-      MemUtil.INSTANCE.copy(m, this)
-    } else {
-      setMatrix4fc(m)
-    }
-    this._properties(m.properties())
+  fun setOrtho(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean = false): Matrix4f {
+    this._m00(2.0f / (right - left))
+    this._m11(2.0f / (top - bottom))
+    this._m22((if (zZeroToOne) 1.0f else 2.0f) / (zNear - zFar))
+    this._m30((right + left) / (left - right))
+    this._m31((top + bottom) / (bottom - top))
+    this._m32((if (zZeroToOne) zNear else zFar + zNear) / (zNear - zFar))
+    _properties(Matrix4f.PROPERTY_AFFINE.toInt())
     return this
   }
 
-  private fun setMatrix4fc(mat: Matrix4fc) {
+  private fun setMatrix4f(mat: Matrix4f) {
     _m00(mat.m00())
     _m01(mat.m01())
     _m02(mat.m02())
@@ -948,226 +775,6 @@ class Matrix4f : Externalizable, Matrix4fc {
     _m31(mat.m31())
     _m32(mat.m32())
     _m33(mat.m33())
-  }
-
-  /**
-   * Store the values of the given matrix `m` into `this` matrix
-   * and set the other matrix elements to identity.
-   *
-   * @see .Matrix4f
-   * @param m
-   * the matrix to copy the values from
-   * @return this
-   */
-  fun set(m: Matrix4x3fc): Matrix4f {
-    if (m is Matrix4x3f) {
-      MemUtil.INSTANCE.copy(m, this)
-    } else {
-      setMatrix4x3fc(m)
-    }
-    this._properties(m.properties() or Matrix4fc.PROPERTY_AFFINE)
-    return this
-  }
-
-  private fun setMatrix4x3fc(mat: Matrix4x3fc) {
-    _m00(mat.m00())
-    _m01(mat.m01())
-    _m02(mat.m02())
-    _m03(0.0f)
-    _m10(mat.m10())
-    _m11(mat.m11())
-    _m12(mat.m12())
-    _m13(0.0f)
-    _m20(mat.m20())
-    _m21(mat.m21())
-    _m22(mat.m22())
-    _m23(0.0f)
-    _m30(mat.m30())
-    _m31(mat.m31())
-    _m32(mat.m32())
-    _m33(1.0f)
-  }
-
-  /**
-   * Store the values of the given matrix `m` into `this` matrix.
-   *
-   *
-   * Note that due to the given matrix `m` storing values in double-precision and `this` matrix storing
-   * them in single-precision, there is the possibility to lose precision.
-   *
-   * @see .Matrix4f
-   * @see .get
-   * @param m
-   * the matrix to copy the values from
-   * @return this
-   */
-  fun set(m: Matrix4dc): Matrix4f {
-    this._m00(m.m00().toFloat())
-    this._m01(m.m01().toFloat())
-    this._m02(m.m02().toFloat())
-    this._m03(m.m03().toFloat())
-    this._m10(m.m10().toFloat())
-    this._m11(m.m11().toFloat())
-    this._m12(m.m12().toFloat())
-    this._m13(m.m13().toFloat())
-    this._m20(m.m20().toFloat())
-    this._m21(m.m21().toFloat())
-    this._m22(m.m22().toFloat())
-    this._m23(m.m23().toFloat())
-    this._m30(m.m30().toFloat())
-    this._m31(m.m31().toFloat())
-    this._m32(m.m32().toFloat())
-    this._m33(m.m33().toFloat())
-    this._properties(m.properties())
-    return this
-  }
-
-  /**
-   * Set the upper left 3x3 submatrix of this [Matrix4f] to the given [Matrix3fc]
-   * and the rest to identity.
-   *
-   * @see .Matrix4f
-   * @param mat
-   * the [Matrix3fc]
-   * @return this
-   */
-  fun set(mat: Matrix3fc): Matrix4f {
-    if (mat is Matrix3f) {
-      MemUtil.INSTANCE.copy(mat, this)
-    } else {
-      setMatrix3fc(mat)
-    }
-    this._properties(Matrix4fc.PROPERTY_AFFINE.toInt())
-    return this
-  }
-
-  private fun setMatrix3fc(mat: Matrix3fc) {
-    m00 = mat.m00()
-    m01 = mat.m01()
-    m02 = mat.m02()
-    m03 = 0.0f
-    m10 = mat.m10()
-    m11 = mat.m11()
-    m12 = mat.m12()
-    m13 = 0.0f
-    m20 = mat.m20()
-    m21 = mat.m21()
-    m22 = mat.m22()
-    m23 = 0.0f
-    m30 = 0.0f
-    m31 = 0.0f
-    m32 = 0.0f
-    m33 = 1.0f
-  }
-
-  /**
-   * Set this matrix to be equivalent to the rotation specified by the given [AxisAngle4f].
-   *
-   * @param axisAngle
-   * the [AxisAngle4f]
-   * @return this
-   */
-  fun set(axisAngle: AxisAngle4f): Matrix4f {
-    var x = axisAngle.x
-    var y = axisAngle.y
-    var z = axisAngle.z
-    val angle = axisAngle.angle.toDouble()
-    var n = Math.sqrt((x * x + y * y + z * z).toDouble())
-    n = 1 / n
-    x *= n.toFloat()
-    y *= n.toFloat()
-    z *= n.toFloat()
-    val s = Math.sin(angle)
-    val c = Math.cosFromSin(s, angle)
-    val omc = 1.0 - c
-    this._m00((c + x.toDouble() * x.toDouble() * omc).toFloat())
-    this._m11((c + y.toDouble() * y.toDouble() * omc).toFloat())
-    this._m22((c + z.toDouble() * z.toDouble() * omc).toFloat())
-    var tmp1 = x.toDouble() * y.toDouble() * omc
-    var tmp2 = z * s
-    this._m10((tmp1 - tmp2).toFloat())
-    this._m01((tmp1 + tmp2).toFloat())
-    tmp1 = x.toDouble() * z.toDouble() * omc
-    tmp2 = y * s
-    this._m20((tmp1 + tmp2).toFloat())
-    this._m02((tmp1 - tmp2).toFloat())
-    tmp1 = y.toDouble() * z.toDouble() * omc
-    tmp2 = x * s
-    this._m21((tmp1 - tmp2).toFloat())
-    this._m12((tmp1 + tmp2).toFloat())
-    this._m03(0.0f)
-    this._m13(0.0f)
-    this._m23(0.0f)
-    this._m30(0.0f)
-    this._m31(0.0f)
-    this._m32(0.0f)
-    this._m33(1.0f)
-    this._properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
-    return this
-  }
-
-  /**
-   * Set this matrix to be equivalent to the rotation specified by the given [AxisAngle4d].
-   *
-   * @param axisAngle
-   * the [AxisAngle4d]
-   * @return this
-   */
-  fun set(axisAngle: AxisAngle4d): Matrix4f {
-    var x = axisAngle.x
-    var y = axisAngle.y
-    var z = axisAngle.z
-    val angle = axisAngle.angle
-    var n = Math.sqrt(x * x + y * y + z * z)
-    n = 1 / n
-    x *= n
-    y *= n
-    z *= n
-    val s = Math.sin(angle)
-    val c = Math.cosFromSin(s, angle)
-    val omc = 1.0 - c
-    this._m00((c + x * x * omc).toFloat())
-    this._m11((c + y * y * omc).toFloat())
-    this._m22((c + z * z * omc).toFloat())
-    var tmp1 = x * y * omc
-    var tmp2 = z * s
-    this._m10((tmp1 - tmp2).toFloat())
-    this._m01((tmp1 + tmp2).toFloat())
-    tmp1 = x * z * omc
-    tmp2 = y * s
-    this._m20((tmp1 + tmp2).toFloat())
-    this._m02((tmp1 - tmp2).toFloat())
-    tmp1 = y * z * omc
-    tmp2 = x * s
-    this._m21((tmp1 - tmp2).toFloat())
-    this._m12((tmp1 + tmp2).toFloat())
-    this._m03(0.0f)
-    this._m13(0.0f)
-    this._m23(0.0f)
-    this._m30(0.0f)
-    this._m31(0.0f)
-    this._m32(0.0f)
-    this._m33(1.0f)
-    this._properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
-    return this
-  }
-
-  /**
-   * Set this matrix to be equivalent to the rotation specified by the given [Quaternionfc].
-   *
-   *
-   * This method is equivalent to calling: <tt>rotation(q)</tt>
-   *
-   *
-   * Reference: [http://www.euclideanspace.com/](http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/)
-   *
-   * @see .rotation
-   * @param q
-   * the [Quaternionfc]
-   * @return this
-   */
-  fun set(q: Quaternionfc): Matrix4f {
-    return rotation(q)
   }
 
   /**
@@ -1206,110 +813,11 @@ class Matrix4f : Externalizable, Matrix4fc {
 //    _m31(0.0f)
 //    _m32(0.0f)
 //    _m33(1.0f)
-//    this._properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+//    this._properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
 //    return this
 //  }
 
-  /**
-   * Set the upper left 3x3 submatrix of this [Matrix4f] to that of the given [Matrix4f]
-   * and don't change the other elements.
-   *
-   * @param mat
-   * the [Matrix4f]
-   * @return this
-   */
-  fun set3x3(mat: Matrix4f): Matrix4f {
-    MemUtil.INSTANCE.copy3x3(mat, this)
-    properties = properties and (mat.properties and Matrix4fc.PROPERTY_PERSPECTIVE.inv())
-    return this
-  }
-
-
-  /**
-   * Set the upper 4x3 submatrix of this [Matrix4f] to the given [Matrix4x3fc]
-   * and don't change the other elements.
-   *
-   * @see Matrix4x3f.get
-   * @param mat
-   * the [Matrix4x3fc]
-   * @return this
-   */
-  fun set4x3(mat: Matrix4x3fc): Matrix4f {
-    if (mat is Matrix4x3f) {
-      MemUtil.INSTANCE.copy4x3(mat, this)
-    } else {
-      set4x3Matrix4x3fc(mat)
-    }
-    properties = properties and (mat.properties() and Matrix4fc.PROPERTY_PERSPECTIVE.inv())
-    return this
-  }
-
-  private fun set4x3Matrix4x3fc(mat: Matrix4x3fc) {
-    _m00(mat.m00())
-    _m01(mat.m01())
-    _m02(mat.m02())
-    _m10(mat.m10())
-    _m11(mat.m11())
-    _m12(mat.m12())
-    _m20(mat.m20())
-    _m21(mat.m21())
-    _m22(mat.m22())
-    _m30(mat.m30())
-    _m31(mat.m31())
-    _m32(mat.m32())
-  }
-
-  /**
-   * Set the upper 4x3 submatrix of this [Matrix4f] to the upper 4x3 submatrix of the given [Matrix4f]
-   * and don't change the other elements.
-   *
-   * @param mat
-   * the [Matrix4f]
-   * @return this
-   */
-  fun set4x3(mat: Matrix4f): Matrix4f {
-    MemUtil.INSTANCE.copy4x3(mat, this)
-    properties = properties and (mat.properties and Matrix4fc.PROPERTY_PERSPECTIVE.inv())
-    return this
-  }
-
-  /**
-   * Multiply this matrix by the supplied `right` matrix and store the result in `this`.
-   *
-   *
-   * If `M` is `this` matrix and `R` the `right` matrix,
-   * then the new matrix will be `M * R`. So when transforming a
-   * vector `v` with the new matrix by using `M * R * v`, the
-   * transformation of the right matrix will be applied first!
-   *
-   * @param right
-   * the right operand of the matrix multiplication
-   * @return a matrix holding the result
-   */
-  fun mul(right: Matrix4fc): Matrix4f {
-    return mul(right, thisOrNew())
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#mul(Matrix4fc, Matrix4f)
-     */
-  override fun mul(right: Matrix4fc, dest: Matrix4f): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
-      return dest.set(right)
-    else if (right.properties() and Matrix4fc.PROPERTY_IDENTITY != 0)
-      return dest.set(this)
-    else if (properties and Matrix4fc.PROPERTY_TRANSLATION != 0 && right.properties() and Matrix4fc.PROPERTY_AFFINE != 0)
-      return mulTranslationAffine(right, dest)
-    else if (properties and Matrix4fc.PROPERTY_AFFINE != 0 && right.properties() and Matrix4fc.PROPERTY_AFFINE != 0)
-      return mulAffine(right, dest)
-    else if (properties and Matrix4fc.PROPERTY_PERSPECTIVE != 0 && right.properties() and Matrix4fc.PROPERTY_AFFINE != 0)
-      return mulPerspectiveAffine(right, dest)
-    else if (right.properties() and Matrix4fc.PROPERTY_AFFINE != 0)
-      return mulAffineR(right, dest)
-    return mulGeneric(right, dest)
-  }
-
-  private fun mulGeneric(right: Matrix4fc, dest: Matrix4f): Matrix4f {
+  private fun mulGeneric(right: Matrix4f, dest: Matrix4f): Matrix4f {
     val nm00 = m00 * right.m00() + m10 * right.m01() + m20 * right.m02() + m30 * right.m03()
     val nm01 = m01 * right.m00() + m11 * right.m01() + m21 * right.m02() + m31 * right.m03()
     val nm02 = m02 * right.m00() + m12 * right.m01() + m22 * right.m02() + m32 * right.m03()
@@ -1326,73 +834,6 @@ class Matrix4f : Externalizable, Matrix4fc {
     val nm31 = m01 * right.m30() + m11 * right.m31() + m21 * right.m32() + m31 * right.m33()
     val nm32 = m02 * right.m30() + m12 * right.m31() + m22 * right.m32() + m32 * right.m33()
     val nm33 = m03 * right.m30() + m13 * right.m31() + m23 * right.m32() + m33 * right.m33()
-    dest._m00(nm00)
-    dest._m01(nm01)
-    dest._m02(nm02)
-    dest._m03(nm03)
-    dest._m10(nm10)
-    dest._m11(nm11)
-    dest._m12(nm12)
-    dest._m13(nm13)
-    dest._m20(nm20)
-    dest._m21(nm21)
-    dest._m22(nm22)
-    dest._m23(nm23)
-    dest._m30(nm30)
-    dest._m31(nm31)
-    dest._m32(nm32)
-    dest._m33(nm33)
-    dest._properties(0)
-    return dest
-  }
-
-  /**
-   * Pre-multiply this matrix by the supplied `left` matrix and store the result in `this`.
-   *
-   *
-   * If `M` is `this` matrix and `L` the `left` matrix,
-   * then the new matrix will be `L * M`. So when transforming a
-   * vector `v` with the new matrix by using `L * M * v`, the
-   * transformation of `this` matrix will be applied first!
-   *
-   * @param left
-   * the left operand of the matrix multiplication
-   * @return a matrix holding the result
-   */
-  fun mulLocal(left: Matrix4fc): Matrix4f {
-    return mulLocal(left, thisOrNew())
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#mulLocal(Matrix4fc, Matrix4f)
-     */
-  override fun mulLocal(left: Matrix4fc, dest: Matrix4f): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
-      return dest.set(left)
-    else if (left.properties() and Matrix4fc.PROPERTY_IDENTITY != 0)
-      return dest.set(this)
-    else if (properties and Matrix4fc.PROPERTY_AFFINE != 0 && left.properties() and Matrix4fc.PROPERTY_AFFINE != 0)
-      return mulLocalAffine(left, dest)
-    return mulLocalGeneric(left, dest)
-  }
-
-  private fun mulLocalGeneric(left: Matrix4fc, dest: Matrix4f): Matrix4f {
-    val nm00 = left.m00() * m00 + left.m10() * m01 + left.m20() * m02 + left.m30() * m03
-    val nm01 = left.m01() * m00 + left.m11() * m01 + left.m21() * m02 + left.m31() * m03
-    val nm02 = left.m02() * m00 + left.m12() * m01 + left.m22() * m02 + left.m32() * m03
-    val nm03 = left.m03() * m00 + left.m13() * m01 + left.m23() * m02 + left.m33() * m03
-    val nm10 = left.m00() * m10 + left.m10() * m11 + left.m20() * m12 + left.m30() * m13
-    val nm11 = left.m01() * m10 + left.m11() * m11 + left.m21() * m12 + left.m31() * m13
-    val nm12 = left.m02() * m10 + left.m12() * m11 + left.m22() * m12 + left.m32() * m13
-    val nm13 = left.m03() * m10 + left.m13() * m11 + left.m23() * m12 + left.m33() * m13
-    val nm20 = left.m00() * m20 + left.m10() * m21 + left.m20() * m22 + left.m30() * m23
-    val nm21 = left.m01() * m20 + left.m11() * m21 + left.m21() * m22 + left.m31() * m23
-    val nm22 = left.m02() * m20 + left.m12() * m21 + left.m22() * m22 + left.m32() * m23
-    val nm23 = left.m03() * m20 + left.m13() * m21 + left.m23() * m22 + left.m33() * m23
-    val nm30 = left.m00() * m30 + left.m10() * m31 + left.m20() * m32 + left.m30() * m33
-    val nm31 = left.m01() * m30 + left.m11() * m31 + left.m21() * m32 + left.m31() * m33
-    val nm32 = left.m02() * m30 + left.m12() * m31 + left.m22() * m32 + left.m32() * m33
-    val nm33 = left.m03() * m30 + left.m13() * m31 + left.m23() * m32 + left.m33() * m33
     dest._m00(nm00)
     dest._m01(nm01)
     dest._m02(nm02)
@@ -1434,14 +875,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the left operand of the matrix multiplication (the last row is assumed to be <tt>(0, 0, 0, 1)</tt>)
    * @return a matrix holding the result
    */
-  fun mulLocalAffine(left: Matrix4fc): Matrix4f {
+  fun mulLocalAffine(left: Matrix4f): Matrix4f {
     return mulLocalAffine(left, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#mulLocalAffine(Matrix4fc, Matrix4f)
+     * @see Matrix4f#mulLocalAffine(Matrix4f, Matrix4f)
      */
-  override fun mulLocalAffine(left: Matrix4fc, dest: Matrix4f): Matrix4f {
+  fun mulLocalAffine(left: Matrix4f, dest: Matrix4f): Matrix4f {
     val nm00 = left.m00() * m00 + left.m10() * m01 + left.m20() * m02
     val nm01 = left.m01() * m00 + left.m11() * m01 + left.m21() * m02
     val nm02 = left.m02() * m00 + left.m12() * m01 + left.m22() * m02
@@ -1474,127 +915,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(nm31)
     dest._m32(nm32)
     dest._m33(nm33)
-    dest._properties(Matrix4fc.PROPERTY_AFFINE or (this.properties() and left.properties() and Matrix4fc.PROPERTY_ORTHONORMAL.toInt()))
-    return dest
-  }
-
-  /**
-   * Multiply this matrix by the supplied `right` matrix and store the result in `this`.
-   *
-   *
-   * If `M` is `this` matrix and `R` the `right` matrix,
-   * then the new matrix will be `M * R`. So when transforming a
-   * vector `v` with the new matrix by using `M * R * v`, the
-   * transformation of the right matrix will be applied first!
-   *
-   * @param right
-   * the right operand of the matrix multiplication
-   * @return a matrix holding the result
-   */
-  fun mul(right: Matrix4x3fc): Matrix4f {
-    return mul(right, thisOrNew())
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#mul(org.joml.Matrix4x3fc, Matrix4f)
-     */
-  override fun mul(right: Matrix4x3fc, dest: Matrix4f): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
-      return dest.set(right)
-    else if (right.properties() and Matrix4fc.PROPERTY_IDENTITY != 0)
-      return dest.set(this)
-    else if (properties and Matrix4fc.PROPERTY_PERSPECTIVE != 0 && right.properties() and Matrix4fc.PROPERTY_AFFINE != 0)
-      return mulPerspectiveAffine(right, dest)
-    return mulGeneric(right, dest)
-  }
-
-  private fun mulGeneric(right: Matrix4x3fc, dest: Matrix4f): Matrix4f {
-    val nm00 = m00 * right.m00() + m10 * right.m01() + m20 * right.m02()
-    val nm01 = m01 * right.m00() + m11 * right.m01() + m21 * right.m02()
-    val nm02 = m02 * right.m00() + m12 * right.m01() + m22 * right.m02()
-    val nm03 = m03 * right.m00() + m13 * right.m01() + m23 * right.m02()
-    val nm10 = m00 * right.m10() + m10 * right.m11() + m20 * right.m12()
-    val nm11 = m01 * right.m10() + m11 * right.m11() + m21 * right.m12()
-    val nm12 = m02 * right.m10() + m12 * right.m11() + m22 * right.m12()
-    val nm13 = m03 * right.m10() + m13 * right.m11() + m23 * right.m12()
-    val nm20 = m00 * right.m20() + m10 * right.m21() + m20 * right.m22()
-    val nm21 = m01 * right.m20() + m11 * right.m21() + m21 * right.m22()
-    val nm22 = m02 * right.m20() + m12 * right.m21() + m22 * right.m22()
-    val nm23 = m03 * right.m20() + m13 * right.m21() + m23 * right.m22()
-    val nm30 = m00 * right.m30() + m10 * right.m31() + m20 * right.m32() + m30
-    val nm31 = m01 * right.m30() + m11 * right.m31() + m21 * right.m32() + m31
-    val nm32 = m02 * right.m30() + m12 * right.m31() + m22 * right.m32() + m32
-    val nm33 = m03 * right.m30() + m13 * right.m31() + m23 * right.m32() + m33
-    dest._m00(nm00)
-    dest._m01(nm01)
-    dest._m02(nm02)
-    dest._m03(nm03)
-    dest._m10(nm10)
-    dest._m11(nm11)
-    dest._m12(nm12)
-    dest._m13(nm13)
-    dest._m20(nm20)
-    dest._m21(nm21)
-    dest._m22(nm22)
-    dest._m23(nm23)
-    dest._m30(nm30)
-    dest._m31(nm31)
-    dest._m32(nm32)
-    dest._m33(nm33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt()).inv())
-    return dest
-  }
-
-  /**
-   * Multiply this matrix by the supplied `right` matrix and store the result in `this`.
-   *
-   *
-   * If `M` is `this` matrix and `R` the `right` matrix,
-   * then the new matrix will be `M * R`. So when transforming a
-   * vector `v` with the new matrix by using `M * R * v`, the
-   * transformation of the right matrix will be applied first!
-   *
-   * @param right
-   * the right operand of the matrix multiplication
-   * @return a matrix holding the result
-   */
-  fun mul(right: Matrix3x2fc): Matrix4f {
-    return mul(right, thisOrNew())
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#mul(org.joml.Matrix3x2fc, Matrix4f)
-     */
-  override fun mul(right: Matrix3x2fc, dest: Matrix4f): Matrix4f {
-    val nm00 = m00 * right.m00() + m10 * right.m01()
-    val nm01 = m01 * right.m00() + m11 * right.m01()
-    val nm02 = m02 * right.m00() + m12 * right.m01()
-    val nm03 = m03 * right.m00() + m13 * right.m01()
-    val nm10 = m00 * right.m10() + m10 * right.m11()
-    val nm11 = m01 * right.m10() + m11 * right.m11()
-    val nm12 = m02 * right.m10() + m12 * right.m11()
-    val nm13 = m03 * right.m10() + m13 * right.m11()
-    val nm30 = m00 * right.m20() + m10 * right.m21() + m30
-    val nm31 = m01 * right.m20() + m11 * right.m21() + m31
-    val nm32 = m02 * right.m20() + m12 * right.m21() + m32
-    val nm33 = m03 * right.m20() + m13 * right.m21() + m33
-    dest._m00(nm00)
-    dest._m01(nm01)
-    dest._m02(nm02)
-    dest._m03(nm03)
-    dest._m10(nm10)
-    dest._m11(nm11)
-    dest._m12(nm12)
-    dest._m13(nm13)
-    dest._m20(m20)
-    dest._m21(m21)
-    dest._m22(m22)
-    dest._m23(m23)
-    dest._m30(nm30)
-    dest._m31(nm31)
-    dest._m32(nm32)
-    dest._m33(nm33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt()).inv())
+    dest._properties(Matrix4f.PROPERTY_AFFINE or (this.properties() and left.properties() and Matrix4f.PROPERTY_ORTHONORMAL.toInt()))
     return dest
   }
 
@@ -1611,71 +932,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the [affine][.isAffine] matrix to multiply `this` symmetric perspective projection matrix by
    * @return a matrix holding the result
    */
-  fun mulPerspectiveAffine(view: Matrix4fc): Matrix4f {
+  fun mulPerspectiveAffine(view: Matrix4f): Matrix4f {
     return mulPerspectiveAffine(view, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#mulPerspectiveAffine(Matrix4fc, Matrix4f)
+     * @see Matrix4f#mulPerspectiveAffine(Matrix4f, Matrix4f)
      */
-  override fun mulPerspectiveAffine(view: Matrix4fc, dest: Matrix4f): Matrix4f {
-    val nm00 = m00 * view.m00()
-    val nm01 = m11 * view.m01()
-    val nm02 = m22 * view.m02()
-    val nm03 = m23 * view.m02()
-    val nm10 = m00 * view.m10()
-    val nm11 = m11 * view.m11()
-    val nm12 = m22 * view.m12()
-    val nm13 = m23 * view.m12()
-    val nm20 = m00 * view.m20()
-    val nm21 = m11 * view.m21()
-    val nm22 = m22 * view.m22()
-    val nm23 = m23 * view.m22()
-    val nm30 = m00 * view.m30()
-    val nm31 = m11 * view.m31()
-    val nm32 = m22 * view.m32() + m32
-    val nm33 = m23 * view.m32()
-    dest._m00(nm00)
-    dest._m01(nm01)
-    dest._m02(nm02)
-    dest._m03(nm03)
-    dest._m10(nm10)
-    dest._m11(nm11)
-    dest._m12(nm12)
-    dest._m13(nm13)
-    dest._m20(nm20)
-    dest._m21(nm21)
-    dest._m22(nm22)
-    dest._m23(nm23)
-    dest._m30(nm30)
-    dest._m31(nm31)
-    dest._m32(nm32)
-    dest._m33(nm33)
-    dest._properties(0)
-    return dest
-  }
-
-  /**
-   * Multiply `this` symmetric perspective projection matrix by the supplied `view` matrix.
-   *
-   *
-   * If `P` is `this` matrix and `V` the `view` matrix,
-   * then the new matrix will be `P * V`. So when transforming a
-   * vector `v` with the new matrix by using `P * V * v`, the
-   * transformation of the `view` matrix will be applied first!
-   *
-   * @param view
-   * the matrix to multiply `this` symmetric perspective projection matrix by
-   * @return a matrix holding the result
-   */
-  fun mulPerspectiveAffine(view: Matrix4x3fc): Matrix4f {
-    return mulPerspectiveAffine(view, thisOrNew())
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#mulPerspectiveAffine(org.joml.Matrix4x3fc, Matrix4f)
-     */
-  override fun mulPerspectiveAffine(view: Matrix4x3fc, dest: Matrix4f): Matrix4f {
+  fun mulPerspectiveAffine(view: Matrix4f, dest: Matrix4f): Matrix4f {
     val nm00 = m00 * view.m00()
     val nm01 = m11 * view.m01()
     val nm02 = m22 * view.m02()
@@ -1729,14 +993,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the right operand of the matrix multiplication (the last row is assumed to be <tt>(0, 0, 0, 1)</tt>)
    * @return a matrix holding the result
    */
-  fun mulAffineR(right: Matrix4fc): Matrix4f {
+  fun mulAffineR(right: Matrix4f): Matrix4f {
     return mulAffineR(right, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#mulAffineR(Matrix4fc, Matrix4f)
+     * @see Matrix4f#mulAffineR(Matrix4f, Matrix4f)
      */
-  override fun mulAffineR(right: Matrix4fc, dest: Matrix4f): Matrix4f {
+  fun mulAffineR(right: Matrix4f, dest: Matrix4f): Matrix4f {
     val nm00 = m00 * right.m00() + m10 * right.m01() + m20 * right.m02()
     val nm01 = m01 * right.m00() + m11 * right.m01() + m21 * right.m02()
     val nm02 = m02 * right.m00() + m12 * right.m01() + m22 * right.m02()
@@ -1769,7 +1033,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(nm31)
     dest._m32(nm32)
     dest._m33(nm33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt() or Matrix4f.PROPERTY_ORTHONORMAL.toInt()).inv())
     return dest
   }
 
@@ -1794,14 +1058,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the right operand of the matrix multiplication (the last row is assumed to be <tt>(0, 0, 0, 1)</tt>)
    * @return a matrix holding the result
    */
-  fun mulAffine(right: Matrix4fc): Matrix4f {
+  fun mulAffine(right: Matrix4f): Matrix4f {
     return mulAffine(right, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#mulAffine(Matrix4fc, Matrix4f)
+     * @see Matrix4f#mulAffine(Matrix4f, Matrix4f)
      */
-  override fun mulAffine(right: Matrix4fc, dest: Matrix4f): Matrix4f {
+  fun mulAffine(right: Matrix4f, dest: Matrix4f): Matrix4f {
     val nm00 = m00 * right.m00() + m10 * right.m01() + m20 * right.m02()
     val nm01 = m01 * right.m00() + m11 * right.m01() + m21 * right.m02()
     val nm02 = m02 * right.m00() + m12 * right.m01() + m22 * right.m02()
@@ -1834,14 +1098,14 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(nm31)
     dest._m32(nm32)
     dest._m33(nm33)
-    dest._properties(Matrix4fc.PROPERTY_AFFINE or (this.properties and right.properties() and Matrix4fc.PROPERTY_ORTHONORMAL.toInt()))
+    dest._properties(Matrix4f.PROPERTY_AFFINE or (this.properties and right.properties() and Matrix4f.PROPERTY_ORTHONORMAL.toInt()))
     return dest
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#mulTranslationAffine(Matrix4fc, Matrix4f)
+     * @see Matrix4f#mulTranslationAffine(Matrix4f, Matrix4f)
      */
-  override fun mulTranslationAffine(right: Matrix4fc, dest: Matrix4f): Matrix4f {
+  fun mulTranslationAffine(right: Matrix4f, dest: Matrix4f): Matrix4f {
     val nm00 = right.m00()
     val nm01 = right.m01()
     val nm02 = right.m02()
@@ -1874,7 +1138,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(nm31)
     dest._m32(nm32)
     dest._m33(nm33)
-    dest._properties(Matrix4fc.PROPERTY_AFFINE or (right.properties() and Matrix4fc.PROPERTY_ORTHONORMAL))
+    dest._properties(Matrix4f.PROPERTY_AFFINE or (right.properties() and Matrix4f.PROPERTY_ORTHONORMAL))
     return dest
   }
 
@@ -1891,14 +1155,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the affine matrix which to multiply `this` with
    * @return a matrix holding the result
    */
-  fun mulOrthoAffine(view: Matrix4fc): Matrix4f {
+  fun mulOrthoAffine(view: Matrix4f): Matrix4f {
     return mulOrthoAffine(view, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#mulOrthoAffine(Matrix4fc, Matrix4f)
+     * @see Matrix4f#mulOrthoAffine(Matrix4f, Matrix4f)
      */
-  override fun mulOrthoAffine(view: Matrix4fc, dest: Matrix4f): Matrix4f {
+  fun mulOrthoAffine(view: Matrix4f, dest: Matrix4f): Matrix4f {
     val nm00 = m00 * view.m00()
     val nm01 = m11 * view.m01()
     val nm02 = m22 * view.m02()
@@ -1931,7 +1195,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(nm31)
     dest._m32(nm32)
     dest._m33(nm33)
-    dest._properties(Matrix4fc.PROPERTY_AFFINE.toInt())
+    dest._properties(Matrix4f.PROPERTY_AFFINE.toInt())
     return dest
   }
 
@@ -1949,14 +1213,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the factor to multiply each of the other matrix's 4x3 components
    * @return a matrix holding the result
    */
-  fun fma4x3(other: Matrix4fc, otherFactor: Float): Matrix4f {
+  fun fma4x3(other: Matrix4f, otherFactor: Float): Matrix4f {
     return fma4x3(other, otherFactor, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#fma4x3(Matrix4fc, float, Matrix4f)
+     * @see Matrix4f#fma4x3(Matrix4f, float, Matrix4f)
      */
-  override fun fma4x3(other: Matrix4fc, otherFactor: Float, dest: Matrix4f): Matrix4f {
+  fun fma4x3(other: Matrix4f, otherFactor: Float, dest: Matrix4f): Matrix4f {
     dest._m00(m00 + other.m00() * otherFactor)
     dest._m01(m01 + other.m01() * otherFactor)
     dest._m02(m02 + other.m02() * otherFactor)
@@ -1984,14 +1248,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the other addend
    * @return a matrix holding the result
    */
-  fun add(other: Matrix4fc): Matrix4f {
+  fun add(other: Matrix4f): Matrix4f {
     return add(other, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#add(Matrix4fc, Matrix4f)
+     * @see Matrix4f#add(Matrix4f, Matrix4f)
      */
-  override fun add(other: Matrix4fc, dest: Matrix4f): Matrix4f {
+  fun add(other: Matrix4f, dest: Matrix4f): Matrix4f {
     dest._m00(m00 + other.m00())
     dest._m01(m01 + other.m01())
     dest._m02(m02 + other.m02())
@@ -2019,14 +1283,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the subtrahend
    * @return a matrix holding the result
    */
-  fun sub(subtrahend: Matrix4fc): Matrix4f {
+  fun sub(subtrahend: Matrix4f): Matrix4f {
     return sub(subtrahend, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#sub(Matrix4fc, Matrix4f)
+     * @see Matrix4f#sub(Matrix4f, Matrix4f)
      */
-  override fun sub(subtrahend: Matrix4fc, dest: Matrix4f): Matrix4f {
+  fun sub(subtrahend: Matrix4f, dest: Matrix4f): Matrix4f {
     dest._m00(m00 - subtrahend.m00())
     dest._m01(m01 - subtrahend.m01())
     dest._m02(m02 - subtrahend.m02())
@@ -2054,14 +1318,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the other matrix
    * @return a matrix holding the result
    */
-  fun mulComponentWise(other: Matrix4fc): Matrix4f {
+  fun mulComponentWise(other: Matrix4f): Matrix4f {
     return mulComponentWise(other, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#mulComponentWise(Matrix4fc, Matrix4f)
+     * @see Matrix4f#mulComponentWise(Matrix4f, Matrix4f)
      */
-  override fun mulComponentWise(other: Matrix4fc, dest: Matrix4f): Matrix4f {
+  fun mulComponentWise(other: Matrix4f, dest: Matrix4f): Matrix4f {
     dest._m00(m00 * other.m00())
     dest._m01(m01 * other.m01())
     dest._m02(m02 * other.m02())
@@ -2089,14 +1353,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the other addend
    * @return a matrix holding the result
    */
-  fun add4x3(other: Matrix4fc): Matrix4f {
+  fun add4x3(other: Matrix4f): Matrix4f {
     return add4x3(other, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#add4x3(Matrix4fc, Matrix4f)
+     * @see Matrix4f#add4x3(Matrix4f, Matrix4f)
      */
-  override fun add4x3(other: Matrix4fc, dest: Matrix4f): Matrix4f {
+  fun add4x3(other: Matrix4f, dest: Matrix4f): Matrix4f {
     dest._m00(m00 + other.m00())
     dest._m01(m01 + other.m01())
     dest._m02(m02 + other.m02())
@@ -2129,9 +1393,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#sub4x3(Matrix4fc, Matrix4f)
+     * @see Matrix4f#sub4x3(Matrix4f, Matrix4f)
      */
-  override fun sub4x3(subtrahend: Matrix4fc, dest: Matrix4f): Matrix4f {
+  fun sub4x3(subtrahend: Matrix4f, dest: Matrix4f): Matrix4f {
     dest._m00(m00 - subtrahend.m00())
     dest._m01(m01 - subtrahend.m01())
     dest._m02(m02 - subtrahend.m02())
@@ -2159,14 +1423,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the other matrix
    * @return a matrix holding the result
    */
-  fun mul4x3ComponentWise(other: Matrix4fc): Matrix4f {
+  fun mul4x3ComponentWise(other: Matrix4f): Matrix4f {
     return mul4x3ComponentWise(other, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#mul4x3ComponentWise(Matrix4fc, Matrix4f)
+     * @see Matrix4f#mul4x3ComponentWise(Matrix4f, Matrix4f)
      */
-  override fun mul4x3ComponentWise(other: Matrix4fc, dest: Matrix4f): Matrix4f {
+  fun mul4x3ComponentWise(other: Matrix4f, dest: Matrix4f): Matrix4f {
     dest._m00(m00 * other.m00())
     dest._m01(m01 * other.m01())
     dest._m02(m02 * other.m02())
@@ -2253,121 +1517,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     return this
   }
 
-  /**
-   * Set the values in the matrix using a float array that contains the matrix elements in column-major order.
-   *
-   *
-   * The results will look like this:<br></br><br></br>
-   *
-   * 0, 4, 8, 12<br></br>
-   * 1, 5, 9, 13<br></br>
-   * 2, 6, 10, 14<br></br>
-   * 3, 7, 11, 15<br></br>
-   *
-   * @see .set
-   * @param m
-   * the array to read the matrix values from
-   * @param off
-   * the offset into the array
-   * @return this
-   */
-  @JvmOverloads
-  fun set(m: FloatArray, off: Int = 0): Matrix4f {
-    MemUtil.INSTANCE.copy(m, off, this)
-    _properties(0)
-    return this
-  }
-
-  /**
-   * Set the values of this matrix by reading 16 float values from the given [FloatBuffer] in column-major order,
-   * starting at its current position.
-   *
-   *
-   * The FloatBuffer is expected to contain the values in column-major order.
-   *
-   *
-   * The position of the FloatBuffer will not be changed by this method.
-   *
-   * @param buffer
-   * the FloatBuffer to read the matrix values from in column-major order
-   * @return this
-   */
-  fun set(buffer: FloatBuffer): Matrix4f {
-    MemUtil.INSTANCE.get(this, buffer.position(), buffer)
-    _properties(0)
-    return this
-  }
-
-  /**
-   * Set the values of this matrix by reading 16 float values from the given [ByteBuffer] in column-major order,
-   * starting at its current position.
-   *
-   *
-   * The ByteBuffer is expected to contain the values in column-major order.
-   *
-   *
-   * The position of the ByteBuffer will not be changed by this method.
-   *
-   * @param buffer
-   * the ByteBuffer to read the matrix values from in column-major order
-   * @return this
-   */
-  fun set(buffer: ByteBuffer): Matrix4f {
-    MemUtil.INSTANCE.get(this, buffer.position(), buffer)
-    _properties(0)
-    return this
-  }
-
-  /**
-   * Set the values of this matrix by reading 16 float values from off-heap memory in column-major order,
-   * starting at the given address.
-   *
-   *
-   * This method will throw an [UnsupportedOperationException] when JOML is used with `-Djoml.nounsafe`.
-   *
-   *
-   * *This method is unsafe as it can result in a crash of the JVM process when the specified address range does not belong to this process.*
-   *
-   * @param address
-   * the off-heap memory address to read the matrix values from in column-major order
-   * @return this
-   */
-  fun setFromAddress(address: Long): Matrix4f {
-    if (Options.NO_UNSAFE)
-      throw UnsupportedOperationException("Not supported when using joml.nounsafe")
-    val unsafe = MemUtil.INSTANCE as MemUtil.MemUtilUnsafe
-    unsafe.get(this, address)
-    _properties(0)
-    return this
-  }
-
-  /**
-   * Set the four columns of this matrix to the supplied vectors, respectively.
-   *
-   * @param col0
-   * the first column
-   * @param col1
-   * the second column
-   * @param col2
-   * the third column
-   * @param col3
-   * the fourth column
-   * @return this
-   */
-  operator fun set(col0: Vector4c, col1: Vector4c, col2: Vector4c, col3: Vector4c): Matrix4f {
-    if (col0 is Vector4 &&
-        col1 is Vector4 &&
-        col2 is Vector4 &&
-        col3 is Vector4) {
-      MemUtil.INSTANCE.set(this, col0, col1, col2, col3)
-    } else {
-      setVector4c(col0, col1, col2, col3)
-    }
-    _properties(0)
-    return this
-  }
-
-  private fun setVector4c(col0: Vector4c, col1: Vector4c, col2: Vector4c, col3: Vector4c) {
+  private fun setVector4(col0: Vector4, col1: Vector4, col2: Vector4, col3: Vector4) {
     this.m00 = col0.x
     this.m01 = col0.y
     this.m02 = col0.z
@@ -2387,10 +1537,10 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#determinant()
+     * @see Matrix4f#determinant()
      */
-  override fun determinant(): Float {
-    return if (properties and Matrix4fc.PROPERTY_AFFINE != 0) determinantAffine() else (m00 * m11 - m01 * m10) * (m22 * m33 - m23 * m32)
+  fun determinant(): Float {
+    return if (properties and Matrix4f.PROPERTY_AFFINE != 0) determinantAffine() else (m00 * m11 - m01 * m10) * (m22 * m33 - m23 * m32)
     +(m02 * m10 - m00 * m12) * (m21 * m33 - m23 * m31)
     +(m00 * m13 - m03 * m10) * (m21 * m32 - m22 * m31)
     +(m01 * m12 - m02 * m11) * (m20 * m33 - m23 * m30)
@@ -2399,51 +1549,24 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#determinant3x3()
+     * @see Matrix4f#determinant3x3()
      */
-  override fun determinant3x3(): Float {
+  fun determinant3x3(): Float {
     return ((m00 * m11 - m01 * m10) * m22
         + (m02 * m10 - m00 * m12) * m21
         + (m01 * m12 - m02 * m11) * m20)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#determinantAffine()
+     * @see Matrix4f#determinantAffine()
      */
-  override fun determinantAffine(): Float {
+  fun determinantAffine(): Float {
     return ((m00 * m11 - m01 * m10) * m22
         + (m02 * m10 - m00 * m12) * m21
         + (m01 * m12 - m02 * m11) * m20)
   }
 
-  /* (non-Javadoc)
-     * @see Matrix4fc#invert(Matrix4f)
-     */
-  override fun invert(dest: Matrix4f): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0) {
-      return dest.identity()
-    } else if (properties and Matrix4fc.PROPERTY_TRANSLATION != 0)
-      return invertTranslation(dest)
-    else if (properties and Matrix4fc.PROPERTY_ORTHONORMAL != 0)
-      return invertOrthonormal(dest)
-    else if (properties and Matrix4fc.PROPERTY_AFFINE != 0)
-      return invertAffine(dest)
-    else if (properties and Matrix4fc.PROPERTY_PERSPECTIVE != 0)
-      return invertPerspective(dest)
-    return invertGeneric(dest)
-  }
-
-  private fun invertTranslation(dest: Matrix4f): Matrix4f {
-    if (dest !== this)
-      dest.set(this)
-    dest.m30 = -m30
-    dest.m31 = -m31
-    dest.m32 = -m32
-    dest._properties(Matrix4fc.PROPERTY_AFFINE.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt())
-    return dest
-  }
-
-  private fun invertOrthonormal(dest: Matrix4f): Matrix4f {
+  fun invertOrthonormal(dest: Matrix4f): Matrix4f {
     val nm30 = -(m00 * m30 + m01 * m31 + m02 * m32)
     val nm31 = -(m10 * m30 + m11 * m31 + m12 * m32)
     val nm32 = -(m20 * m30 + m21 * m31 + m22 * m32)
@@ -2466,11 +1589,11 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(nm31)
     dest._m32(nm32)
     dest._m33(1.0f)
-    dest._properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    dest._properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
     return dest
   }
 
-  private fun invertGeneric(dest: Matrix4f): Matrix4f {
+  fun invertGeneric(dest: Matrix4f): Matrix4f {
     val a = m00 * m11 - m01 * m10
     val b = m00 * m12 - m02 * m10
     val c = m00 * m13 - m03 * m10
@@ -2538,20 +1661,6 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /**
-   * Invert this matrix.
-   *
-   *
-   * If `this` matrix represents an [affine][.isAffine] transformation, such as translation, rotation, scaling and shearing,
-   * and thus its last row is equal to <tt>(0, 0, 0, 1)</tt>, then [.invertAffine] can be used instead of this method.
-   *
-   * @see .invertAffine
-   * @return a matrix holding the result
-   */
-  fun invert(): Matrix4f {
-    return invert(thisOrNew())
-  }
-
-  /**
    * If `this` is a perspective projection matrix obtained via one of the [perspective()][.perspective] methods
    * or via [setPerspective()][.setPerspective], that is, if `this` is a symmetrical perspective frustum transformation,
    * then this method builds the inverse of `this` and stores it into the given `dest`.
@@ -2564,7 +1673,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the inverse of `this`
    * @return dest
    */
-  override fun invertPerspective(dest: Matrix4f): Matrix4f {
+  fun invertPerspective(dest: Matrix4f): Matrix4f {
     val a = 1.0f / (m00 * m11)
     val l = -1.0f / (m23 * m32)
     dest[m11 * a, 0f, 0f, 0f, 0f, m00 * a, 0f, 0f, 0f, 0f, 0f, -m23 * l, 0f, 0f, -m32 * l] = m22 * l
@@ -2605,7 +1714,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the inverse of `this`
    * @return dest
    */
-  override fun invertFrustum(dest: Matrix4f): Matrix4f {
+  fun invertFrustum(dest: Matrix4f): Matrix4f {
     val invM00 = 1.0f / m00
     val invM11 = 1.0f / m11
     val invM23 = 1.0f / m23
@@ -2635,14 +1744,14 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#invertOrtho(Matrix4f)
+     * @see Matrix4f#invertOrtho(Matrix4f)
      */
-  override fun invertOrtho(dest: Matrix4f): Matrix4f {
+  fun invertOrtho(dest: Matrix4f): Matrix4f {
     val invM00 = 1.0f / m00
     val invM11 = 1.0f / m11
     val invM22 = 1.0f / m22
     dest[invM00, 0f, 0f, 0f, 0f, invM11, 0f, 0f, 0f, 0f, invM22, 0f, -m30 * invM00, -m31 * invM11, -m32 * invM22] = 1f
-    dest._properties(Matrix4fc.PROPERTY_AFFINE or (this.properties and Matrix4fc.PROPERTY_ORTHONORMAL))
+    dest._properties(Matrix4f.PROPERTY_AFFINE or (this.properties and Matrix4f.PROPERTY_ORTHONORMAL))
     return dest
   }
 
@@ -2681,73 +1790,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the inverse of <tt>this * view</tt>
    * @return dest
    */
-  override fun invertPerspectiveView(view: Matrix4fc, dest: Matrix4f): Matrix4f {
-    val a = 1.0f / (m00 * m11)
-    val l = -1.0f / (m23 * m32)
-    val pm00 = m11 * a
-    val pm11 = m00 * a
-    val pm23 = -m23 * l
-    val pm32 = -m32 * l
-    val pm33 = m22 * l
-    val vm30 = -view.m00() * view.m30() - view.m01() * view.m31() - view.m02() * view.m32()
-    val vm31 = -view.m10() * view.m30() - view.m11() * view.m31() - view.m12() * view.m32()
-    val vm32 = -view.m20() * view.m30() - view.m21() * view.m31() - view.m22() * view.m32()
-    val nm00 = view.m00() * pm00
-    val nm01 = view.m10() * pm00
-    val nm02 = view.m20() * pm00
-    val nm10 = view.m01() * pm11
-    val nm11 = view.m11() * pm11
-    val nm12 = view.m21() * pm11
-    val nm20 = vm30 * pm23
-    val nm21 = vm31 * pm23
-    val nm22 = vm32 * pm23
-    val nm30 = view.m02() * pm32 + vm30 * pm33
-    val nm31 = view.m12() * pm32 + vm31 * pm33
-    val nm32 = view.m22() * pm32 + vm32 * pm33
-    dest.m00 = nm00
-    dest.m01 = nm01
-    dest.m02 = nm02
-    dest.m03 = 0.0f
-    dest.m10 = nm10
-    dest.m11 = nm11
-    dest.m12 = nm12
-    dest.m13 = 0.0f
-    dest.m20 = nm20
-    dest.m21 = nm21
-    dest.m22 = nm22
-    dest.m23 = pm23
-    dest.m30 = nm30
-    dest.m31 = nm31
-    dest.m32 = nm32
-    dest.m33 = pm33
-    dest._properties(0)
-    return dest
-  }
-
-  /**
-   * If `this` is a perspective projection matrix obtained via one of the [perspective()][.perspective] methods
-   * or via [setPerspective()][.setPerspective], that is, if `this` is a symmetrical perspective frustum transformation
-   * and the given `view` matrix has unit scaling,
-   * then this method builds the inverse of <tt>this * view</tt> and stores it into the given `dest`.
-   *
-   *
-   * This method can be used to quickly obtain the inverse of the combination of the view and projection matrices, when both were obtained
-   * via the common methods [perspective()][.perspective] and [lookAt()][.lookAt] or
-   * other methods, that build affine matrices, such as [translate][.translate] and [.rotate], except for [scale()][.scale].
-   *
-   *
-   * For the special cases of the matrices `this` and `view` mentioned above, this method is equivalent to the following code:
-   * <pre>
-   * dest.set(this).mul(view).invert();
-  </pre> *
-   *
-   * @param view
-   * the view transformation (must have unit scaling)
-   * @param dest
-   * will hold the inverse of <tt>this * view</tt>
-   * @return dest
-   */
-  override fun invertPerspectiveView(view: Matrix4x3fc, dest: Matrix4f): Matrix4f {
+  fun invertPerspectiveView(view: Matrix4f, dest: Matrix4f): Matrix4f {
     val a = 1.0f / (m00 * m11)
     val l = -1.0f / (m23 * m32)
     val pm00 = m11 * a
@@ -2791,9 +1834,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#invertAffine(Matrix4f)
+     * @see Matrix4f#invertAffine(Matrix4f)
      */
-  override fun invertAffine(dest: Matrix4f): Matrix4f {
+  fun invertAffine(dest: Matrix4f): Matrix4f {
     val m11m00 = m00 * m11
     val m10m01 = m01 * m10
     val m10m02 = m02 * m10
@@ -2854,7 +1897,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(nm31)
     dest._m32(nm32)
     dest._m33(1.0f)
-    dest._properties(Matrix4fc.PROPERTY_AFFINE.toInt())
+    dest._properties(Matrix4f.PROPERTY_AFFINE.toInt())
     return dest
   }
 
@@ -2868,10 +1911,10 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transpose(Matrix4f)
+     * @see Matrix4f#transpose(Matrix4f)
      */
-  override fun transpose(dest: Matrix4f): Matrix4f {
-    return if (properties and Matrix4fc.PROPERTY_IDENTITY != 0) dest.identity() else transposeGeneric(dest)
+  fun transpose(dest: Matrix4f): Matrix4f {
+    return if (properties and Matrix4f.PROPERTY_IDENTITY != 0) dest.identity() else transposeGeneric(dest)
   }
 
   private fun transposeGeneric(dest: Matrix4f): Matrix4f {
@@ -2911,22 +1954,10 @@ class Matrix4f : Externalizable, Matrix4fc {
     return dest
   }
 
-  /**
-   * Transpose only the upper left 3x3 submatrix of this matrix.
-   *
-   *
-   * All other matrix elements are left unchanged.
-   *
-   * @return a matrix holding the result
-   */
-  fun transpose3x3(): Matrix4f {
-    return transpose3x3(thisOrNew())
-  }
-
   /* (non-Javadoc)
-     * @see Matrix4fc#transpose3x3(Matrix4f)
+     * @see Matrix4f#transpose3x3(Matrix4f)
      */
-  override fun transpose3x3(dest: Matrix4f): Matrix4f {
+  fun transpose3x3(dest: Matrix4f): Matrix4f {
     val nm00 = m00
     val nm01 = m10
     val nm02 = m20
@@ -2945,23 +1976,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m20(nm20)
     dest._m21(nm21)
     dest._m22(nm22)
-    dest._properties(this.properties and (Matrix4fc.PROPERTY_AFFINE.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()))
-    return dest
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#transpose3x3(org.joml.Matrix3f)
-     */
-  override fun transpose3x3(dest: Matrix3f): Matrix3f {
-    dest.m00(m00)
-    dest.m01(m10)
-    dest.m02(m20)
-    dest.m10(m01)
-    dest.m11(m11)
-    dest.m12(m21)
-    dest.m20(m02)
-    dest.m21(m12)
-    dest.m22(m22)
+    dest._properties(this.properties and (Matrix4f.PROPERTY_AFFINE.toInt() or Matrix4f.PROPERTY_ORTHONORMAL.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()))
     return dest
   }
 
@@ -2972,56 +1987,6 @@ class Matrix4f : Externalizable, Matrix4fc {
    */
   fun transpose(): Matrix4f {
     return transpose(thisOrNew())
-  }
-
-  /**
-   * Set this matrix to be a simple translation matrix.
-   *
-   *
-   * The resulting matrix can be multiplied against another transformation
-   * matrix to obtain an additional translation.
-   *
-   *
-   * In order to post-multiply a translation transformation directly to a
-   * matrix, use [translate()][.translate] instead.
-   *
-   * @see .translate
-   * @param x
-   * the offset to translate in x
-   * @param y
-   * the offset to translate in y
-   * @param z
-   * the offset to translate in z
-   * @return this
-   */
-  fun translation(x: Float, y: Float, z: Float): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY == 0)
-      MemUtil.INSTANCE.identity(this)
-    this._m30(x)
-    this._m31(y)
-    this._m32(z)
-    _properties(Matrix4fc.PROPERTY_AFFINE.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt())
-    return this
-  }
-
-  /**
-   * Set this matrix to be a simple translation matrix.
-   *
-   *
-   * The resulting matrix can be multiplied against another transformation
-   * matrix to obtain an additional translation.
-   *
-   *
-   * In order to post-multiply a translation transformation directly to a
-   * matrix, use [translate()][.translate] instead.
-   *
-   * @see .translate
-   * @param offset
-   * the offsets in x, y and z to translate
-   * @return this
-   */
-  fun translation(offset: Vector3fc): Matrix4f {
-    return translation(offset.x, offset.y, offset.z)
   }
 
   /**
@@ -3048,7 +2013,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m30(x)
     this._m31(y)
     this._m32(z)
-    properties = properties and (Matrix4fc.PROPERTY_PERSPECTIVE or Matrix4fc.PROPERTY_IDENTITY).inv()
+    properties = properties and (Matrix4f.PROPERTY_PERSPECTIVE or Matrix4f.PROPERTY_IDENTITY).inv()
     return this
   }
 
@@ -3068,14 +2033,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the units to translate in <tt>(x, y, z)</tt>
    * @return this
    */
-  fun setTranslation(xyz: Vector3fc): Matrix4f {
+  fun setTranslation(xyz: Vector3m): Matrix4f {
     return setTranslation(xyz.x, xyz.y, xyz.z)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#getTranslation(Vector3m)
+     * @see Matrix4f#getTranslation(Vector3m)
      */
-  override fun getTranslation(dest: Vector3m): Vector3m {
+  fun getTranslation(dest: Vector3m): Vector3m {
     dest.x = m30
     dest.y = m31
     dest.z = m32
@@ -3083,350 +2048,27 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#getScale(Vector3m)
+     * @see Matrix4f#getScale(Vector3m)
      */
-  override fun getScale(dest: Vector3m): Vector3m {
+  fun getScale(dest: Vector3m): Vector3m {
     dest.x = Math.sqrt((m00 * m00 + m01 * m01 + m02 * m02).toDouble()).toFloat()
     dest.y = Math.sqrt((m10 * m10 + m11 * m11 + m12 * m12).toDouble()).toFloat()
     dest.z = Math.sqrt((m20 * m20 + m21 * m21 + m22 * m22).toDouble()).toFloat()
     return dest
   }
 
-  /**
-   * Return a string representation of this matrix.
-   *
-   *
-   * This method creates a new [DecimalFormat] on every invocation with the format string "<tt>0.000E0;-</tt>".
-   *
-   * @return the string representation
-   */
-  override fun toString(): String {
-    val formatter = DecimalFormat(" 0.000E0;-")
-    val str = toString(formatter)
-    val res = StringBuffer()
-    var eIndex = Integer.MIN_VALUE
-    for (i in 0 until str.length) {
-      val c = str[i]
-      if (c == 'E') {
-        eIndex = i
-      } else if (c == ' ' && eIndex == i - 1) {
-        // workaround Java 1.4 DecimalFormat bug
-        res.append('+')
-        continue
-      } else if (Character.isDigit(c) && eIndex == i - 1) {
-        res.append('+')
-      }
-      res.append(c)
-    }
-    return res.toString()
-  }
-
-  /**
-   * Return a string representation of this matrix by formatting the matrix elements with the given [NumberFormat].
-   *
-   * @param formatter
-   * the [NumberFormat] used to format the matrix values with
-   * @return the string representation
-   */
-  fun toString(formatter: NumberFormat): String {
-    return (formatter.format(m00.toDouble()) + " " + formatter.format(m10.toDouble()) + " " + formatter.format(m20.toDouble()) + " " + formatter.format(m30.toDouble()) + "\n"
-        + formatter.format(m01.toDouble()) + " " + formatter.format(m11.toDouble()) + " " + formatter.format(m21.toDouble()) + " " + formatter.format(m31.toDouble()) + "\n"
-        + formatter.format(m02.toDouble()) + " " + formatter.format(m12.toDouble()) + " " + formatter.format(m22.toDouble()) + " " + formatter.format(m32.toDouble()) + "\n"
-        + formatter.format(m03.toDouble()) + " " + formatter.format(m13.toDouble()) + " " + formatter.format(m23.toDouble()) + " " + formatter.format(m33.toDouble()) + "\n")
-  }
-
-  /**
-   * Get the current values of `this` matrix and store them into
-   * `dest`.
-   *
-   *
-   * This is the reverse method of [.set] and allows to obtain
-   * intermediate calculation results when chaining multiple transformations.
-   *
-   * @see .set
-   * @param dest
-   * the destination matrix
-   * @return the passed in destination
-   */
-  override fun get(dest: Matrix4f): Matrix4f {
-    return dest.set(this)
-  }
-
   /* (non-Javadoc)
-     * @see Matrix4fc#get4x3(org.joml.Matrix4x3f)
+     * @see Matrix4f#getUnnormalizedRotation(Quaternionf)
      */
-  override fun get4x3(dest: Matrix4x3f): Matrix4x3f {
-    return dest.set(this)
-  }
-
-  /**
-   * Get the current values of `this` matrix and store them into
-   * `dest`.
-   *
-   *
-   * This is the reverse method of [.set] and allows to obtain
-   * intermediate calculation results when chaining multiple transformations.
-   *
-   * @see .set
-   * @param dest
-   * the destination matrix
-   * @return the passed in destination
-   */
-  override fun get(dest: Matrix4d): Matrix4d {
-    return dest.set(this)
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#get3x3(org.joml.Matrix3f)
-     */
-  override fun get3x3(dest: Matrix3f): Matrix3f {
-    return dest.set(this)
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#get3x3(org.joml.Matrix3d)
-     */
-  override fun get3x3(dest: Matrix3d): Matrix3d {
-    return dest.set(this)
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#getRotation(org.joml.AxisAngle4f)
-     */
-  override fun getRotation(dest: AxisAngle4f): AxisAngle4f {
-    return dest.set(this)
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#getRotation(org.joml.AxisAngle4d)
-     */
-  override fun getRotation(dest: AxisAngle4d): AxisAngle4d {
-    return dest.set(this)
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#getUnnormalizedRotation(Quaternionf)
-     */
-  override fun getUnnormalizedRotation(dest: Quaternionf): Quaternionf {
+  fun getUnnormalizedRotation(dest: Quaternionf): Quaternionf {
     return dest.setFromUnnormalized(this)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#getNormalizedRotation(Quaternionf)
+     * @see Matrix4f#getNormalizedRotation(Quaternionf)
      */
-  override fun getNormalizedRotation(dest: Quaternionf): Quaternionf {
+  fun getNormalizedRotation(dest: Quaternionf): Quaternionf {
     return dest.setFromNormalized(this)
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#getUnnormalizedRotation(org.joml.Quaterniond)
-     */
-  override fun getUnnormalizedRotation(dest: Quaterniond): Quaterniond {
-    return dest.setFromUnnormalized(this)
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#getNormalizedRotation(org.joml.Quaterniond)
-     */
-  override fun getNormalizedRotation(dest: Quaterniond): Quaterniond {
-    return dest.setFromNormalized(this)
-  }
-
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#get(java.nio.FloatBuffer)
-     */
-  override fun get(buffer: FloatBuffer): FloatBuffer {
-    return get(buffer.position(), buffer)
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#get(int, java.nio.FloatBuffer)
-     */
-  override fun get(index: Int, buffer: FloatBuffer): FloatBuffer {
-    MemUtil.INSTANCE.put(this, index, buffer)
-    return buffer
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#get(java.nio.ByteBuffer)
-     */
-  override fun get(buffer: ByteBuffer): ByteBuffer {
-    return get(buffer.position(), buffer)
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#get(int, java.nio.ByteBuffer)
-     */
-  override fun get(index: Int, buffer: ByteBuffer): ByteBuffer {
-    MemUtil.INSTANCE.put(this, index, buffer)
-    return buffer
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#getTransposed(java.nio.FloatBuffer)
-     */
-  override fun getTransposed(buffer: FloatBuffer): FloatBuffer {
-    return getTransposed(buffer.position(), buffer)
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#getTransposed(int, java.nio.FloatBuffer)
-     */
-  override fun getTransposed(index: Int, buffer: FloatBuffer): FloatBuffer {
-    MemUtil.INSTANCE.putTransposed(this, index, buffer)
-    return buffer
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#getTransposed(java.nio.ByteBuffer)
-     */
-  override fun getTransposed(buffer: ByteBuffer): ByteBuffer {
-    return getTransposed(buffer.position(), buffer)
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#getTransposed(int, java.nio.ByteBuffer)
-     */
-  override fun getTransposed(index: Int, buffer: ByteBuffer): ByteBuffer {
-    MemUtil.INSTANCE.putTransposed(this, index, buffer)
-    return buffer
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#get4x3Transposed(java.nio.FloatBuffer)
-     */
-  override fun get4x3Transposed(buffer: FloatBuffer): FloatBuffer {
-    return get4x3Transposed(buffer.position(), buffer)
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#get4x3Transposed(int, java.nio.FloatBuffer)
-     */
-  override fun get4x3Transposed(index: Int, buffer: FloatBuffer): FloatBuffer {
-    MemUtil.INSTANCE.put4x3Transposed(this, index, buffer)
-    return buffer
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#get4x3Transposed(java.nio.ByteBuffer)
-     */
-  override fun get4x3Transposed(buffer: ByteBuffer): ByteBuffer {
-    return get4x3Transposed(buffer.position(), buffer)
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#get4x3Transposed(int, java.nio.ByteBuffer)
-     */
-  override fun get4x3Transposed(index: Int, buffer: ByteBuffer): ByteBuffer {
-    MemUtil.INSTANCE.put4x3Transposed(this, index, buffer)
-    return buffer
-  }
-
-  override fun getToAddress(address: Long): Matrix4fc {
-    if (Options.NO_UNSAFE)
-      throw UnsupportedOperationException("Not supported when using joml.nounsafe")
-    val unsafe = MemUtil.INSTANCE as MemUtil.MemUtilUnsafe
-    unsafe.put(this, address)
-    return this
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#get(float[], int)
-     */
-  override fun get(arr: FloatArray, offset: Int): FloatArray {
-    MemUtil.INSTANCE.copy(this, arr, offset)
-    return arr
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#get(float[])
-     */
-  override fun get(arr: FloatArray): FloatArray {
-    return get(arr, 0)
-  }
-
-  /**
-   * Set all the values within this matrix to `0`.
-   *
-   * @return a matrix holding the result
-   */
-  fun zero(): Matrix4f {
-    val dest = thisOrNew()
-    MemUtil.INSTANCE.zero(dest)
-    _properties(0)
-    return dest
-  }
-
-  /**
-   * Set this matrix to be a simple scale matrix, which scales all axes uniformly by the given factor.
-   *
-   *
-   * The resulting matrix can be multiplied against another transformation
-   * matrix to obtain an additional scaling.
-   *
-   *
-   * In order to post-multiply a scaling transformation directly to a
-   * matrix, use [scale()][.scale] instead.
-   *
-   * @see .scale
-   * @param factor
-   * the scale factor in x, y and z
-   * @return this
-   */
-  fun scaling(factor: Float): Matrix4f {
-    return scaling(factor, factor, factor)
-  }
-
-  /**
-   * Set this matrix to be a simple scale matrix.
-   *
-   *
-   * The resulting matrix can be multiplied against another transformation
-   * matrix to obtain an additional scaling.
-   *
-   *
-   * In order to post-multiply a scaling transformation directly to a
-   * matrix, use [scale()][.scale] instead.
-   *
-   * @see .scale
-   * @param x
-   * the scale in x
-   * @param y
-   * the scale in y
-   * @param z
-   * the scale in z
-   * @return this
-   */
-  fun scaling(x: Float, y: Float, z: Float): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY == 0)
-      MemUtil.INSTANCE.identity(this)
-    this._m00(x)
-    this._m11(y)
-    this._m22(z)
-    val one = Math.abs(x) == 1.0f && Math.abs(y) == 1.0f && Math.abs(z) == 1.0f
-    _properties(Matrix4fc.PROPERTY_AFFINE or if (one) Matrix4fc.PROPERTY_ORTHONORMAL else 0)
-    return this
-  }
-
-  /**
-   * Set this matrix to be a simple scale matrix which scales the base axes by <tt>xyz.x</tt>, <tt>xyz.y</tt> and <tt>xyz.z</tt> respectively.
-   *
-   *
-   * The resulting matrix can be multiplied against another transformation
-   * matrix to obtain an additional scaling.
-   *
-   *
-   * In order to post-multiply a scaling transformation directly to a
-   * matrix use [scale()][.scale] instead.
-   *
-   * @see .scale
-   * @param xyz
-   * the scale in x, y and z respectively
-   * @return this
-   */
-  fun scaling(xyz: Vector3fc): Matrix4f {
-    return scaling(xyz.x, xyz.y, xyz.z)
   }
 
   /**
@@ -3455,36 +2097,8 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the axis to rotate about (needs to be [normalized][Vector3m.normalize])
    * @return this
    */
-  fun rotation(angle: Float, axis: Vector3fc): Matrix4f {
+  fun rotation(angle: Float, axis: Vector3m): Matrix4f {
     return rotation(angle, axis.x, axis.y, axis.z)
-  }
-
-  /**
-   * Set this matrix to a rotation transformation using the given [AxisAngle4f].
-   *
-   *
-   * When used with a right-handed coordinate system, the produced rotation will rotate a vector
-   * counter-clockwise around the rotation axis, when viewing along the negative axis direction towards the origin.
-   * When used with a left-handed coordinate system, the rotation is clockwise.
-   *
-   *
-   * The resulting matrix can be multiplied against another transformation
-   * matrix to obtain an additional rotation.
-   *
-   *
-   * In order to apply the rotation transformation to an existing transformation,
-   * use [rotate()][.rotate] instead.
-   *
-   *
-   * Reference: [http://en.wikipedia.org](http://en.wikipedia.org/wiki/Rotation_matrix#Axis_and_angle)
-   *
-   * @see .rotate
-   * @param axisAngle
-   * the [AxisAngle4f] (needs to be [normalized][AxisAngle4f.normalize])
-   * @return this
-   */
-  fun rotation(axisAngle: AxisAngle4f): Matrix4f {
-    return rotation(axisAngle.angle, axisAngle.x, axisAngle.y, axisAngle.z)
   }
 
   /**
@@ -3543,7 +2157,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m13(0.0f)
     this._m23(0.0f)
     this._m33(1.0f)
-    _properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    _properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
     return this
   }
 
@@ -3567,13 +2181,13 @@ class Matrix4f : Externalizable, Matrix4fc {
     val cos: Float
     sin = Math.sin(ang.toDouble()).toFloat()
     cos = Math.cosFromSin(sin.toDouble(), ang.toDouble()).toFloat()
-    if (properties and Matrix4fc.PROPERTY_IDENTITY == 0)
-      MemUtil.INSTANCE.identity(this)
+    if (properties and Matrix4f.PROPERTY_IDENTITY == 0)
+      throw Error("Not implemented")
     this._m11(cos)
     this._m12(sin)
     this._m21(-sin)
     this._m22(cos)
-    _properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    _properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
     return this
   }
 
@@ -3597,13 +2211,13 @@ class Matrix4f : Externalizable, Matrix4fc {
     val cos: Float
     sin = Math.sin(ang.toDouble()).toFloat()
     cos = Math.cosFromSin(sin.toDouble(), ang.toDouble()).toFloat()
-    if (properties and Matrix4fc.PROPERTY_IDENTITY == 0)
-      MemUtil.INSTANCE.identity(this)
+    if (properties and Matrix4f.PROPERTY_IDENTITY == 0)
+      throw Error("Not implemented")
     this._m00(cos)
     this._m02(-sin)
     this._m20(sin)
     this._m22(cos)
-    _properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    _properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
     return this
   }
 
@@ -3627,13 +2241,13 @@ class Matrix4f : Externalizable, Matrix4fc {
     val cos: Float
     sin = Math.sin(ang.toDouble()).toFloat()
     cos = Math.cosFromSin(sin.toDouble(), ang.toDouble()).toFloat()
-    if (properties and Matrix4fc.PROPERTY_IDENTITY == 0)
-      MemUtil.INSTANCE.identity(this)
+    if (properties and Matrix4f.PROPERTY_IDENTITY == 0)
+      throw Error("Not implemented")
     this._m00(cos)
     this._m01(sin)
     this._m10(-sin)
     this._m11(cos)
-    _properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    _properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
     return this
   }
 
@@ -3650,13 +2264,13 @@ class Matrix4f : Externalizable, Matrix4fc {
    * @return this
    */
   fun rotationTowardsXY(dirX: Float, dirY: Float): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY == 0)
-      MemUtil.INSTANCE.identity(this)
+    if (properties and Matrix4f.PROPERTY_IDENTITY == 0)
+      throw Error("Not implemented")
     this._m00(dirY)
     this._m01(dirX)
     this._m10(-dirX)
     this._m11(dirY)
-    _properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    _properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
     return this
   }
 
@@ -3713,7 +2327,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m31(0.0f)
     this._m32(0.0f)
     this._m33(1.0f)
-    _properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    _properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
     return this
   }
 
@@ -3770,7 +2384,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m31(0.0f)
     this._m32(0.0f)
     this._m33(1.0f)
-    _properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    _properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
     return this
   }
 
@@ -3827,7 +2441,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m31(0.0f)
     this._m32(0.0f)
     this._m33(1.0f)
-    _properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    _properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
     return this
   }
 
@@ -3873,7 +2487,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m10(cosY * m_sinZ)
     this._m11(nm01 * m_sinZ + cosX * cosZ)
     this._m12(nm02 * m_sinZ + sinX * cosZ)
-    properties = properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv()
+    properties = properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv()
     return this
   }
 
@@ -3919,7 +2533,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m20(m_sinZ * m_sinX + nm20 * cosX)
     this._m21(cosZ * m_sinX + nm21 * cosX)
     this._m22(cosY * cosX)
-    properties = properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv()
+    properties = properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv()
     return this
   }
 
@@ -3965,12 +2579,12 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m10(cosY * m_sinZ + nm10 * cosZ)
     this._m11(cosX * cosZ)
     this._m12(m_sinY * m_sinZ + nm12 * cosZ)
-    properties = properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv()
+    properties = properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv()
     return this
   }
 
   /**
-   * Set this matrix to the rotation transformation of the given [Quaternionfc].
+   * Set this matrix to the rotation transformation of the given [Quaternionf].
    *
    *
    * When used with a right-handed coordinate system, the produced rotation will rotate a vector
@@ -3990,10 +2604,10 @@ class Matrix4f : Externalizable, Matrix4fc {
    *
    * @see .rotate
    * @param quat
-   * the [Quaternionfc]
+   * the [Quaternionf]
    * @return this
    */
-  fun rotation(quat: Quaternionfc): Matrix4f {
+  fun rotation(quat: Quaternionf): Matrix4f {
     val w2 = quat.w * quat.w
     val x2 = quat.x * quat.x
     val y2 = quat.y * quat.y
@@ -4004,8 +2618,8 @@ class Matrix4f : Externalizable, Matrix4fc {
     val yw = quat.y * quat.w
     val yz = quat.y * quat.z
     val xw = quat.x * quat.w
-    if (properties and Matrix4fc.PROPERTY_IDENTITY == 0)
-      MemUtil.INSTANCE.identity(this)
+    if (properties and Matrix4f.PROPERTY_IDENTITY == 0)
+      throw Error("Not implemented")
     _m00(w2 + x2 - z2 - y2)
     _m01(xy + zw + zw + xy)
     _m02(xz - yw + xz - yw)
@@ -4015,7 +2629,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     _m20(yw + xz + xz + yw)
     _m21(yz + yz - xw - xw)
     _m22(z2 - y2 - x2 + w2)
-    _properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    _properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
     return this
   }
 
@@ -4093,7 +2707,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m32(tz)
     this._m33(1.0f)
     val one = Math.abs(sx) == 1.0f && Math.abs(sy) == 1.0f && Math.abs(sz) == 1.0f
-    _properties(Matrix4fc.PROPERTY_AFFINE or if (one) Matrix4fc.PROPERTY_ORTHONORMAL else 0)
+    _properties(Matrix4f.PROPERTY_AFFINE or if (one) Matrix4f.PROPERTY_ORTHONORMAL else 0)
     return this
   }
 
@@ -4125,9 +2739,9 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the scaling factors
    * @return this
    */
-  fun translationRotateScale(translation: Vector3fc,
-                             quat: Quaternionfc,
-                             scale: Vector3fc): Matrix4f {
+  fun translationRotateScale(translation: Vector3m,
+                             quat: Quaternionf,
+                             scale: Vector3m): Matrix4f {
     return translationRotateScale(translation.x, translation.y, translation.z, quat.x, quat.y, quat.z, quat.w, scale.x, scale.y, scale.z)
   }
 
@@ -4203,8 +2817,8 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the scaling factors
    * @return this
    */
-  fun translationRotateScale(translation: Vector3fc,
-                             quat: Quaternionfc,
+  fun translationRotateScale(translation: Vector3m,
+                             quat: Quaternionf,
                              scale: Float): Matrix4f {
     return translationRotateScale(translation.x, translation.y, translation.z, quat.x, quat.y, quat.z, quat.w, scale, scale, scale)
   }
@@ -4281,7 +2895,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m31(-m01 * tx - m11 * ty - m21 * tz)
     this._m32(-m02 * tx - m12 * ty - m22 * tz)
     this._m33(1.0f)
-    _properties(Matrix4fc.PROPERTY_AFFINE.toInt())
+    _properties(Matrix4f.PROPERTY_AFFINE.toInt())
     return this
   }
 
@@ -4303,9 +2917,9 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the scaling factors
    * @return this
    */
-  fun translationRotateScaleInvert(translation: Vector3fc,
-                                   quat: Quaternionfc,
-                                   scale: Vector3fc): Matrix4f {
+  fun translationRotateScaleInvert(translation: Vector3m,
+                                   quat: Quaternionf,
+                                   scale: Vector3m): Matrix4f {
     return translationRotateScaleInvert(translation.x, translation.y, translation.z, quat.x, quat.y, quat.z, quat.w, scale.x, scale.y, scale.z)
   }
 
@@ -4327,8 +2941,8 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the scaling factors
    * @return this
    */
-  fun translationRotateScaleInvert(translation: Vector3fc,
-                                   quat: Quaternionfc,
+  fun translationRotateScaleInvert(translation: Vector3m,
+                                   quat: Quaternionf,
                                    scale: Float): Matrix4f {
     return translationRotateScaleInvert(translation.x, translation.y, translation.z, quat.x, quat.y, quat.z, quat.w, scale, scale, scale)
   }
@@ -4426,7 +3040,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m31(m31)
     this._m33(1.0f)
     val one = Math.abs(sx) == 1.0f && Math.abs(sy) == 1.0f && Math.abs(sz) == 1.0f
-    _properties(Matrix4fc.PROPERTY_AFFINE or if (one && m.properties and Matrix4fc.PROPERTY_ORTHONORMAL != 0) Matrix4fc.PROPERTY_ORTHONORMAL else 0)
+    _properties(Matrix4f.PROPERTY_AFFINE or if (one && m.properties and Matrix4f.PROPERTY_ORTHONORMAL != 0) Matrix4f.PROPERTY_ORTHONORMAL else 0)
     return this
   }
 
@@ -4460,9 +3074,9 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the [affine][.isAffine] matrix to multiply by
    * @return this
    */
-  fun translationRotateScaleMulAffine(translation: Vector3fc,
-                                      quat: Quaternionfc,
-                                      scale: Vector3fc,
+  fun translationRotateScaleMulAffine(translation: Vector3m,
+                                      quat: Quaternionf,
+                                      scale: Vector3m,
                                       m: Matrix4f): Matrix4f {
     return translationRotateScaleMulAffine(translation.x, translation.y, translation.z, quat.x, quat.y, quat.z, quat.w, scale.x, scale.y, scale.z, m)
   }
@@ -4524,7 +3138,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m31(ty)
     this._m32(tz)
     this._m33(1.0f)
-    _properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    _properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
     return this
   }
 
@@ -4555,57 +3169,28 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the quaternion representing a rotation
    * @return this
    */
-  fun translationRotate(tx: Float, ty: Float, tz: Float, quat: Quaternionfc): Matrix4f {
+  fun translationRotate(tx: Float, ty: Float, tz: Float, quat: Quaternionf): Matrix4f {
     return translationRotate(tx, ty, tz, quat.x, quat.y, quat.z, quat.w)
   }
 
-  /**
-   * Set the upper left 3x3 submatrix of this [Matrix4f] to the given [Matrix3fc] and don't change the other elements.
-   *
-   * @param mat
-   * the 3x3 matrix
-   * @return this
-   */
-  fun set3x3(mat: Matrix3fc): Matrix4f {
-    if (mat is Matrix3f) {
-      MemUtil.INSTANCE.copy3x3(mat, this)
-    } else {
-      set3x3Matrix3fc(mat)
-    }
-    properties = properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt()).inv()
-    return this
-  }
-
-  private fun set3x3Matrix3fc(mat: Matrix3fc) {
-    m00 = mat.m00()
-    m01 = mat.m01()
-    m02 = mat.m02()
-    m10 = mat.m10()
-    m11 = mat.m11()
-    m12 = mat.m12()
-    m20 = mat.m20()
-    m21 = mat.m21()
-    m22 = mat.m22()
-  }
-
   /* (non-Javadoc)
-     * @see Matrix4fc#transform(Vector4)
+     * @see Matrix4f#transform(Vector4)
      */
-  override fun transform(v: Vector4): Vector4 {
+  fun transform(v: Vector4): Vector4 {
     return v.mul(this)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transform(Vector4c, Vector4)
+     * @see Matrix4f#transform(Vector4, Vector4)
      */
-  override fun transform(v: Vector4c, dest: Vector4): Vector4 {
+  fun transform(v: Vector4, dest: Vector4): Vector4 {
     return v.mul(this, dest)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transform(float, float, float, float, Vector4)
+     * @see Matrix4f#transform(float, float, float, float, Vector4)
      */
-  override fun transform(x: Float, y: Float, z: Float, w: Float, dest: Vector4): Vector4 {
+  fun transform(x: Float, y: Float, z: Float, w: Float, dest: Vector4): Vector4 {
     dest.x = x
     dest.y = y
     dest.z = z
@@ -4614,23 +3199,23 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformProject(Vector4)
+     * @see Matrix4f#transformProject(Vector4)
      */
-  override fun transformProject(v: Vector4): Vector4 {
+  fun transformProject(v: Vector4): Vector4 {
     return v.mulProject(this)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformProject(Vector4c, Vector4)
+     * @see Matrix4f#transformProject(Vector4, Vector4)
      */
-  override fun transformProject(v: Vector4c, dest: Vector4): Vector4 {
+  fun transformProject(v: Vector4, dest: Vector4): Vector4 {
     return v.mulProject(this, dest)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformProject(float, float, float, float, Vector4)
+     * @see Matrix4f#transformProject(float, float, float, float, Vector4)
      */
-  override fun transformProject(x: Float, y: Float, z: Float, w: Float, dest: Vector4): Vector4 {
+  fun transformProject(x: Float, y: Float, z: Float, w: Float, dest: Vector4): Vector4 {
     dest.x = x
     dest.y = y
     dest.z = z
@@ -4639,23 +3224,23 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformProject(Vector3m)
+     * @see Matrix4f#transformProject(Vector3m)
      */
-  override fun transformProject(v: Vector3m): Vector3m {
+  fun transformProject(v: Vector3m): Vector3m {
     return v.mulProject(this)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformProject(Vector3fc, Vector3m)
+     * @see Matrix4f#transformProject(Vector3m, Vector3m)
      */
-  override fun transformProject(v: Vector3fc, dest: Vector3m): Vector3m {
+  fun transformProject(v: Vector3m, dest: Vector3m): Vector3m {
     return v.mulProject(this, dest)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformProject(float, float, float, Vector3m)
+     * @see Matrix4f#transformProject(float, float, float, Vector3m)
      */
-  override fun transformProject(x: Float, y: Float, z: Float, dest: Vector3m): Vector3m {
+  fun transformProject(x: Float, y: Float, z: Float, dest: Vector3m): Vector3m {
     dest.x = x
     dest.y = y
     dest.z = z
@@ -4663,23 +3248,23 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformPosition(Vector3m)
+     * @see Matrix4f#transformPosition(Vector3m)
      */
-  override fun transformPosition(v: Vector3m): Vector3m {
+  fun transformPosition(v: Vector3m): Vector3m {
     return v.mulPosition(this)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformPosition(Vector3fc, Vector3m)
+     * @see Matrix4f#transformPosition(Vector3m, Vector3m)
      */
-  override fun transformPosition(v: Vector3fc, dest: Vector3m): Vector3m {
+  fun transformPosition(v: Vector3m, dest: Vector3m): Vector3m {
     return transformPosition(v.x, v.y, v.z, dest)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformPosition(float, float, float, Vector3m)
+     * @see Matrix4f#transformPosition(float, float, float, Vector3m)
      */
-  override fun transformPosition(x: Float, y: Float, z: Float, dest: Vector3m): Vector3m {
+  fun transformPosition(x: Float, y: Float, z: Float, dest: Vector3m): Vector3m {
     dest.x = x
     dest.y = y
     dest.z = z
@@ -4687,23 +3272,23 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformDirection(Vector3m)
+     * @see Matrix4f#transformDirection(Vector3m)
      */
-  override fun transformDirection(v: Vector3m): Vector3m {
+  fun transformDirection(v: Vector3m): Vector3m {
     return transformDirection(v.x, v.y, v.z, v)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformDirection(Vector3fc, Vector3m)
+     * @see Matrix4f#transformDirection(Vector3m, Vector3m)
      */
-  override fun transformDirection(v: Vector3fc, dest: Vector3m): Vector3m {
+  fun transformDirection(v: Vector3m, dest: Vector3m): Vector3m {
     return transformDirection(v.x, v.y, v.z, dest)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformDirection(float, float, float, Vector3m)
+     * @see Matrix4f#transformDirection(float, float, float, Vector3m)
      */
-  override fun transformDirection(x: Float, y: Float, z: Float, dest: Vector3m): Vector3m {
+  fun transformDirection(x: Float, y: Float, z: Float, dest: Vector3m): Vector3m {
     dest.x = x
     dest.y = y
     dest.z = z
@@ -4711,92 +3296,28 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformAffine(Vector4)
+     * @see Matrix4f#transformAffine(Vector4)
      */
-  override fun transformAffine(v: Vector4): Vector4 {
+  fun transformAffine(v: Vector4): Vector4 {
     return v.mulAffine(this, v)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformAffine(Vector4c, Vector4)
+     * @see Matrix4f#transformAffine(Vector4, Vector4)
      */
-  override fun transformAffine(v: Vector4c, dest: Vector4): Vector4 {
+  fun transformAffine(v: Vector4, dest: Vector4): Vector4 {
     return transformAffine(v.x, v.y, v.z, v.w, dest)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformAffine(float, float, float, float, Vector4)
+     * @see Matrix4f#transformAffine(float, float, float, float, Vector4)
      */
-  override fun transformAffine(x: Float, y: Float, z: Float, w: Float, dest: Vector4): Vector4 {
+  fun transformAffine(x: Float, y: Float, z: Float, w: Float, dest: Vector4): Vector4 {
     dest.x = x
     dest.y = y
     dest.z = z
     dest.w = w
     return dest.mulAffine(this, dest)
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#scale(Vector3fc, Matrix4f)
-     */
-  override fun scale(xyz: Vector3fc, dest: Matrix4f): Matrix4f {
-    return scale(xyz.x, xyz.y, xyz.z, dest)
-  }
-
-  /**
-   * Apply scaling to this matrix by scaling the base axes by the given <tt>xyz.x</tt>,
-   * <tt>xyz.y</tt> and <tt>xyz.z</tt> factors, respectively.
-   *
-   *
-   * If `M` is `this` matrix and `S` the scaling matrix,
-   * then the new matrix will be `M * S`. So when transforming a
-   * vector `v` with the new matrix by using `M * S * v`, the
-   * scaling will be applied first!
-   *
-   * @param xyz
-   * the factors of the x, y and z component, respectively
-   * @return a matrix holding the result
-   */
-  fun scale(xyz: Vector3fc): Matrix4f {
-    return scale(xyz.x, xyz.y, xyz.z, thisOrNew())
-  }
-
-  fun scale(xyz: Vector3): Matrix4f {
-    return scale(xyz.x, xyz.y, xyz.z, thisOrNew())
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#scale(float, Matrix4f)
-     */
-  override fun scale(xyz: Float, dest: Matrix4f): Matrix4f {
-    return scale(xyz, xyz, xyz, dest)
-  }
-
-  /**
-   * Apply scaling to this matrix by uniformly scaling all base axes by the given `xyz` factor.
-   *
-   *
-   * If `M` is `this` matrix and `S` the scaling matrix,
-   * then the new matrix will be `M * S`. So when transforming a
-   * vector `v` with the new matrix by using `M * S * v`, the
-   * scaling will be applied first!
-   *
-   *
-   * Individual scaling of all three axes can be applied using [.scale].
-   *
-   * @see .scale
-   * @param xyz
-   * the factor for all components
-   * @return this
-   */
-  fun scale(xyz: Float): Matrix4f {
-    return scale(xyz, xyz, xyz)
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#scale(float, float, float, Matrix4f)
-     */
-  override fun scale(x: Float, y: Float, z: Float, dest: Matrix4f): Matrix4f {
-    return if (properties and Matrix4fc.PROPERTY_IDENTITY != 0) dest.scaling(x, y, z) else scaleGeneric(x, y, z, dest)
   }
 
   private fun scaleGeneric(x: Float, y: Float, z: Float, dest: Matrix4f): Matrix4f {
@@ -4817,37 +3338,15 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m32(m32)
     dest._m33(m33)
     val one = Math.abs(x) == 1.0f && Math.abs(y) == 1.0f && Math.abs(z) == 1.0f
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()
-        or (if (one) 0 else Matrix4fc.PROPERTY_ORTHONORMAL).toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()
+        or (if (one) 0 else Matrix4f.PROPERTY_ORTHONORMAL).toInt()).inv())
     return dest
   }
 
-  /**
-   * Apply scaling to this matrix by scaling the base axes by the given sx,
-   * sy and sz factors.
-   *
-   *
-   * If `M` is `this` matrix and `S` the scaling matrix,
-   * then the new matrix will be `M * S`. So when transforming a
-   * vector `v` with the new matrix by using `M * S * v`, the
-   * scaling will be applied first!
-   *
-   * @param x
-   * the factor of the x component
-   * @param y
-   * the factor of the y component
-   * @param z
-   * the factor of the z component
-   * @return a matrix holding the result
-   */
-  fun scale(x: Float, y: Float, z: Float): Matrix4f {
-    return scale(x, y, z, thisOrNew())
-  }
-
   /* (non-Javadoc)
-     * @see Matrix4fc#scaleAround(float, float, float, float, float, float, Matrix4f)
+     * @see Matrix4f#scaleAround(float, float, float, float, float, float, Matrix4f)
      */
-  override fun scaleAround(sx: Float, sy: Float, sz: Float, ox: Float, oy: Float, oz: Float, dest: Matrix4f): Matrix4f {
+  fun scaleAround(sx: Float, sy: Float, sz: Float, ox: Float, oy: Float, oz: Float, dest: Matrix4f): Matrix4f {
     val nm30 = m00 * ox + m10 * oy + m20 * oz + m30
     val nm31 = m01 * ox + m11 * oy + m21 * oz + m31
     val nm32 = m02 * ox + m12 * oy + m22 * oz + m32
@@ -4869,8 +3368,8 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m32(-m02 * ox - m12 * oy - m22 * oz + nm32)
     dest._m33(-m03 * ox - m13 * oy - m23 * oz + nm33)
     val one = Math.abs(sx) == 1.0f && Math.abs(sy) == 1.0f && Math.abs(sz) == 1.0f
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()
-        or (if (one) 0 else Matrix4fc.PROPERTY_ORTHONORMAL).toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()
+        or (if (one) 0 else Matrix4f.PROPERTY_ORTHONORMAL).toInt()).inv())
     return dest
   }
 
@@ -4933,17 +3432,10 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#scaleAround(float, float, float, float, Matrix4f)
+     * @see Matrix4f#scaleAround(float, float, float, float, Matrix4f)
      */
-  override fun scaleAround(factor: Float, ox: Float, oy: Float, oz: Float, dest: Matrix4f): Matrix4f {
+  fun scaleAround(factor: Float, ox: Float, oy: Float, oz: Float, dest: Matrix4f): Matrix4f {
     return scaleAround(factor, factor, factor, ox, oy, oz, dest)
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#scaleLocal(float, float, float, Matrix4f)
-     */
-  override fun scaleLocal(x: Float, y: Float, z: Float, dest: Matrix4f): Matrix4f {
-    return if (properties and Matrix4fc.PROPERTY_IDENTITY != 0) dest.scaling(x, y, z) else scaleLocalGeneric(x, y, z, dest)
   }
 
   private fun scaleLocalGeneric(x: Float, y: Float, z: Float, dest: Matrix4f): Matrix4f {
@@ -4980,61 +3472,15 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m32(nm32)
     dest._m33(nm33)
     val one = Math.abs(x) == 1.0f && Math.abs(y) == 1.0f && Math.abs(z) == 1.0f
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()
-        or (if (one) 0 else Matrix4fc.PROPERTY_ORTHONORMAL).toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()
+        or (if (one) 0 else Matrix4f.PROPERTY_ORTHONORMAL).toInt()).inv())
     return dest
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#scaleLocal(float, Matrix4f)
+     * @see Matrix4f#scaleAroundLocal(float, float, float, float, float, float, Matrix4f)
      */
-  override fun scaleLocal(xyz: Float, dest: Matrix4f): Matrix4f {
-    return scaleLocal(xyz, xyz, xyz, dest)
-  }
-
-  /**
-   * Pre-multiply scaling to this matrix by scaling the base axes by the given xyz factor.
-   *
-   *
-   * If `M` is `this` matrix and `S` the scaling matrix,
-   * then the new matrix will be `S * M`. So when transforming a
-   * vector `v` with the new matrix by using `S * M * v`, the
-   * scaling will be applied last!
-   *
-   * @param xyz
-   * the factor of the x, y and z component
-   * @return a matrix holding the result
-   */
-  fun scaleLocal(xyz: Float): Matrix4f {
-    return scaleLocal(xyz, thisOrNew())
-  }
-
-  /**
-   * Pre-multiply scaling to this matrix by scaling the base axes by the given x,
-   * y and z factors.
-   *
-   *
-   * If `M` is `this` matrix and `S` the scaling matrix,
-   * then the new matrix will be `S * M`. So when transforming a
-   * vector `v` with the new matrix by using `S * M * v`, the
-   * scaling will be applied last!
-   *
-   * @param x
-   * the factor of the x component
-   * @param y
-   * the factor of the y component
-   * @param z
-   * the factor of the z component
-   * @return a matrix holding the result
-   */
-  fun scaleLocal(x: Float, y: Float, z: Float): Matrix4f {
-    return scaleLocal(x, y, z, thisOrNew())
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#scaleAroundLocal(float, float, float, float, float, float, Matrix4f)
-     */
-  override fun scaleAroundLocal(sx: Float, sy: Float, sz: Float, ox: Float, oy: Float, oz: Float, dest: Matrix4f): Matrix4f {
+  fun scaleAroundLocal(sx: Float, sy: Float, sz: Float, ox: Float, oy: Float, oz: Float, dest: Matrix4f): Matrix4f {
     dest._m00(sx * (m00 - ox * m03) + ox * m03)
     dest._m01(sy * (m01 - oy * m03) + oy * m03)
     dest._m02(sz * (m02 - oz * m03) + oz * m03)
@@ -5052,8 +3498,8 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m32(sz * (m32 - oz * m33) + oz * m33)
     dest._m33(m33)
     val one = Math.abs(sx) == 1.0f && Math.abs(sy) == 1.0f && Math.abs(sz) == 1.0f
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()
-        or (if (one) 0 else Matrix4fc.PROPERTY_ORTHONORMAL).toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()
+        or (if (one) 0 else Matrix4f.PROPERTY_ORTHONORMAL).toInt()).inv())
     return dest
   }
 
@@ -5116,17 +3562,17 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#scaleAroundLocal(float, float, float, float, Matrix4f)
+     * @see Matrix4f#scaleAroundLocal(float, float, float, float, Matrix4f)
      */
-  override fun scaleAroundLocal(factor: Float, ox: Float, oy: Float, oz: Float, dest: Matrix4f): Matrix4f {
+  fun scaleAroundLocal(factor: Float, ox: Float, oy: Float, oz: Float, dest: Matrix4f): Matrix4f {
     return scaleAroundLocal(factor, factor, factor, ox, oy, oz, dest)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#rotateX(float, Matrix4f)
+     * @see Matrix4f#rotateX(float, Matrix4f)
      */
-  override fun rotateX(ang: Float, dest: Matrix4f): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+  fun rotateX(ang: Float, dest: Matrix4f): Matrix4f {
+    if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       return dest.rotationX(ang)
     val sin: Float
     val cos: Float
@@ -5157,7 +3603,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(m31)
     dest._m32(m32)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -5187,10 +3633,10 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#rotateY(float, Matrix4f)
+     * @see Matrix4f#rotateY(float, Matrix4f)
      */
-  override fun rotateY(ang: Float, dest: Matrix4f): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+  fun rotateY(ang: Float, dest: Matrix4f): Matrix4f {
+    if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       return dest.rotationY(ang)
     val cos: Float
     val sin: Float
@@ -5221,7 +3667,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(m31)
     dest._m32(m32)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -5251,10 +3697,10 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#rotateZ(float, Matrix4f)
+     * @see Matrix4f#rotateZ(float, Matrix4f)
      */
-  override fun rotateZ(ang: Float, dest: Matrix4f): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+  fun rotateZ(ang: Float, dest: Matrix4f): Matrix4f {
+    if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       return dest.rotationZ(ang)
     val sin = Math.sin(ang.toDouble()).toFloat()
     val cos = Math.cosFromSin(sin.toDouble(), ang.toDouble()).toFloat()
@@ -5309,10 +3755,10 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#rotateTowardsXY(float, float, Matrix4f)
+     * @see Matrix4f#rotateTowardsXY(float, float, Matrix4f)
      */
-  override fun rotateTowardsXY(dirX: Float, dirY: Float, dest: Matrix4f): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+  fun rotateTowardsXY(dirX: Float, dirY: Float, dest: Matrix4f): Matrix4f {
+    if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       return dest.rotationTowardsXY(dirX, dirY)
     val rm10 = -dirX
     val nm00 = m00 * dirY + m10 * dirX
@@ -5335,7 +3781,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(m31)
     dest._m32(m32)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -5396,12 +3842,12 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#rotateXYZ(float, float, float, Matrix4f)
+     * @see Matrix4f#rotateXYZ(float, float, float, Matrix4f)
      */
-  override fun rotateXYZ(angleX: Float, angleY: Float, angleZ: Float, dest: Matrix4f): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+  fun rotateXYZ(angleX: Float, angleY: Float, angleZ: Float, dest: Matrix4f): Matrix4f {
+    if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       return dest.rotationXYZ(angleX, angleY, angleZ)
-    else if (properties and Matrix4fc.PROPERTY_AFFINE != 0)
+    else if (properties and Matrix4f.PROPERTY_AFFINE != 0)
       return dest.rotateAffineXYZ(angleX, angleY, angleZ)
 
     val sinX = Math.sin(angleX.toDouble()).toFloat()
@@ -5446,7 +3892,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(m31)
     dest._m32(m32)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -5485,9 +3931,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#rotateAffineXYZ(float, float, float, Matrix4f)
+     * @see Matrix4f#rotateAffineXYZ(float, float, float, Matrix4f)
      */
-  override fun rotateAffineXYZ(angleX: Float, angleY: Float, angleZ: Float, dest: Matrix4f): Matrix4f {
+  fun rotateAffineXYZ(angleX: Float, angleY: Float, angleZ: Float, dest: Matrix4f): Matrix4f {
     val sinX = Math.sin(angleX.toDouble()).toFloat()
     val cosX = Math.cosFromSin(sinX.toDouble(), angleX.toDouble()).toFloat()
     val sinY = Math.sin(angleY.toDouble()).toFloat()
@@ -5527,7 +3973,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(m31)
     dest._m32(m32)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -5588,12 +4034,12 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#rotateZYX(float, float, float, Matrix4f)
+     * @see Matrix4f#rotateZYX(float, float, float, Matrix4f)
      */
-  override fun rotateZYX(angleZ: Float, angleY: Float, angleX: Float, dest: Matrix4f): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+  fun rotateZYX(angleZ: Float, angleY: Float, angleX: Float, dest: Matrix4f): Matrix4f {
+    if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       return dest.rotationZYX(angleZ, angleY, angleX)
-    else if (properties and Matrix4fc.PROPERTY_AFFINE != 0)
+    else if (properties and Matrix4f.PROPERTY_AFFINE != 0)
       return dest.rotateAffineZYX(angleZ, angleY, angleX)
 
     val sinX = Math.sin(angleX.toDouble()).toFloat()
@@ -5638,7 +4084,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(m31)
     dest._m32(m32)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -5674,9 +4120,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#rotateAffineZYX(float, float, float, Matrix4f)
+     * @see Matrix4f#rotateAffineZYX(float, float, float, Matrix4f)
      */
-  override fun rotateAffineZYX(angleZ: Float, angleY: Float, angleX: Float, dest: Matrix4f): Matrix4f {
+  fun rotateAffineZYX(angleZ: Float, angleY: Float, angleX: Float, dest: Matrix4f): Matrix4f {
     val sinX = Math.sin(angleX.toDouble()).toFloat()
     val cosX = Math.cosFromSin(sinX.toDouble(), angleX.toDouble()).toFloat()
     val sinY = Math.sin(angleY.toDouble()).toFloat()
@@ -5716,7 +4162,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(m31)
     dest._m32(m32)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -5777,12 +4223,12 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#rotateYXZ(float, float, float, Matrix4f)
+     * @see Matrix4f#rotateYXZ(float, float, float, Matrix4f)
      */
-  override fun rotateYXZ(angleY: Float, angleX: Float, angleZ: Float, dest: Matrix4f): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+  fun rotateYXZ(angleY: Float, angleX: Float, angleZ: Float, dest: Matrix4f): Matrix4f {
+    if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       return dest.rotationYXZ(angleY, angleX, angleZ)
-    else if (properties and Matrix4fc.PROPERTY_AFFINE != 0)
+    else if (properties and Matrix4f.PROPERTY_AFFINE != 0)
       return dest.rotateAffineYXZ(angleY, angleX, angleZ)
 
     val sinX = Math.sin(angleX.toDouble()).toFloat()
@@ -5827,7 +4273,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(m31)
     dest._m32(m32)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -5863,9 +4309,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#rotateAffineYXZ(float, float, float, Matrix4f)
+     * @see Matrix4f#rotateAffineYXZ(float, float, float, Matrix4f)
      */
-  override fun rotateAffineYXZ(angleY: Float, angleX: Float, angleZ: Float, dest: Matrix4f): Matrix4f {
+  fun rotateAffineYXZ(angleY: Float, angleX: Float, angleZ: Float, dest: Matrix4f): Matrix4f {
     val sinX = Math.sin(angleX.toDouble()).toFloat()
     val cosX = Math.cosFromSin(sinX.toDouble(), angleX.toDouble()).toFloat()
     val sinY = Math.sin(angleY.toDouble()).toFloat()
@@ -5905,7 +4351,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(m31)
     dest._m32(m32)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -5947,12 +4393,12 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun rotate(ang: Float, x: Float, y: Float, z: Float, dest: Matrix4f): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+  fun rotate(ang: Float, x: Float, y: Float, z: Float, dest: Matrix4f): Matrix4f {
+    if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       return dest.rotation(ang, x, y, z)
-    else if (properties and Matrix4fc.PROPERTY_TRANSLATION != 0)
+    else if (properties and Matrix4f.PROPERTY_TRANSLATION != 0)
       return rotateTranslation(ang, x, y, z, dest)
-    else if (properties and Matrix4fc.PROPERTY_AFFINE != 0)
+    else if (properties and Matrix4f.PROPERTY_AFFINE != 0)
       return rotateAffine(ang, x, y, z, dest)
     return rotateGeneric(ang, x, y, z, dest)
   }
@@ -6000,7 +4446,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(m31)
     dest._m32(m32)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -6085,7 +4531,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun rotateTranslation(ang: Float, x: Float, y: Float, z: Float, dest: Matrix4f): Matrix4f {
+  fun rotateTranslation(ang: Float, x: Float, y: Float, z: Float, dest: Matrix4f): Matrix4f {
     val s = Math.sin(ang.toDouble()).toFloat()
     val c = Math.cosFromSin(s.toDouble(), ang.toDouble()).toFloat()
     val C = 1.0f - c
@@ -6121,7 +4567,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(m31)
     dest._m32(m32)
     dest._m33(1.0f)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -6166,7 +4612,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun rotateAffine(ang: Float, x: Float, y: Float, z: Float, dest: Matrix4f): Matrix4f {
+  fun rotateAffine(ang: Float, x: Float, y: Float, z: Float, dest: Matrix4f): Matrix4f {
     val s = Math.sin(ang.toDouble()).toFloat()
     val c = Math.cosFromSin(s.toDouble(), ang.toDouble()).toFloat()
     val C = 1.0f - c
@@ -6210,7 +4656,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(m31)
     dest._m32(m32)
     dest._m33(1.0f)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -6295,8 +4741,8 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun rotateLocal(ang: Float, x: Float, y: Float, z: Float, dest: Matrix4f): Matrix4f {
-    return if (properties and Matrix4fc.PROPERTY_IDENTITY != 0) dest.rotation(ang, x, y, z) else rotateLocalGeneric(ang, x, y, z, dest)
+  fun rotateLocal(ang: Float, x: Float, y: Float, z: Float, dest: Matrix4f): Matrix4f {
+    return if (properties and Matrix4f.PROPERTY_IDENTITY != 0) dest.rotation(ang, x, y, z) else rotateLocalGeneric(ang, x, y, z, dest)
   }
 
   private fun rotateLocalGeneric(ang: Float, x: Float, y: Float, z: Float, dest: Matrix4f): Matrix4f {
@@ -6350,7 +4796,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(nm31)
     dest._m32(nm32)
     dest._m33(nm33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -6423,7 +4869,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun rotateLocalX(ang: Float, dest: Matrix4f): Matrix4f {
+  fun rotateLocalX(ang: Float, dest: Matrix4f): Matrix4f {
     val sin = Math.sin(ang.toDouble()).toFloat()
     val cos = Math.cosFromSin(sin.toDouble(), ang.toDouble()).toFloat()
     val nm01 = cos * m01 - sin * m02
@@ -6450,7 +4896,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(nm31)
     dest._m32(nm32)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -6513,7 +4959,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun rotateLocalY(ang: Float, dest: Matrix4f): Matrix4f {
+  fun rotateLocalY(ang: Float, dest: Matrix4f): Matrix4f {
     val sin = Math.sin(ang.toDouble()).toFloat()
     val cos = Math.cosFromSin(sin.toDouble(), ang.toDouble()).toFloat()
     val nm00 = cos * m00 + sin * m02
@@ -6540,7 +4986,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(m31)
     dest._m32(nm32)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -6603,7 +5049,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun rotateLocalZ(ang: Float, dest: Matrix4f): Matrix4f {
+  fun rotateLocalZ(ang: Float, dest: Matrix4f): Matrix4f {
     val sin = Math.sin(ang.toDouble()).toFloat()
     val cos = Math.cosFromSin(sin.toDouble(), ang.toDouble()).toFloat()
     val nm00 = cos * m00 - sin * m01
@@ -6630,7 +5076,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(nm31)
     dest._m32(m32)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -6662,212 +5108,6 @@ class Matrix4f : Externalizable, Matrix4fc {
    */
   fun rotateLocalZ(ang: Float): Matrix4f {
     return rotateLocalZ(ang, thisOrNew())
-  }
-
-  /**
-   * Apply a translation to this matrix by translating by the given number of
-   * units in x, y and z.
-   *
-   *
-   * If `M` is `this` matrix and `T` the translation
-   * matrix, then the new matrix will be `M * T`. So when
-   * transforming a vector `v` with the new matrix by using
-   * `M * T * v`, the translation will be applied first!
-   *
-   *
-   * In order to set the matrix to a translation transformation without post-multiplying
-   * it, use [.translation].
-   *
-   * @see .translation
-   * @param offset
-   * the number of units in x, y and z by which to translate
-   * @return this
-   */
-  fun translate(offset: Vector3fc): Matrix4f {
-    return translate(offset.x, offset.y, offset.z)
-  }
-
-  fun translateM(offset: Vector3): Matrix4f {
-    return translate(offset.x, offset.y, offset.z)
-  }
-
-  fun translate(offset: Vector3): Matrix4f {
-    return translate(offset.x, offset.y, offset.z)
-  }
-
-  /**
-   * Apply a translation to this matrix by translating by the given number of
-   * units in x, y and z and store the result in `dest`.
-   *
-   *
-   * If `M` is `this` matrix and `T` the translation
-   * matrix, then the new matrix will be `M * T`. So when
-   * transforming a vector `v` with the new matrix by using
-   * `M * T * v`, the translation will be applied first!
-   *
-   *
-   * In order to set the matrix to a translation transformation without post-multiplying
-   * it, use [.translation].
-   *
-   * @see .translation
-   * @param offset
-   * the number of units in x, y and z by which to translate
-   * @param dest
-   * will hold the result
-   * @return dest
-   */
-  override fun translate(offset: Vector3fc, dest: Matrix4f): Matrix4f {
-    return translate(offset.x, offset.y, offset.z, dest)
-  }
-
-  /**
-   * Apply a translation to this matrix by translating by the given number of
-   * units in x, y and z and store the result in `dest`.
-   *
-   *
-   * If `M` is `this` matrix and `T` the translation
-   * matrix, then the new matrix will be `M * T`. So when
-   * transforming a vector `v` with the new matrix by using
-   * `M * T * v`, the translation will be applied first!
-   *
-   *
-   * In order to set the matrix to a translation transformation without post-multiplying
-   * it, use [.translation].
-   *
-   * @see .translation
-   * @param x
-   * the offset to translate in x
-   * @param y
-   * the offset to translate in y
-   * @param z
-   * the offset to translate in z
-   * @param dest
-   * will hold the result
-   * @return dest
-   */
-  override fun translate(x: Float, y: Float, z: Float, dest: Matrix4f): Matrix4f {
-    return if (properties and Matrix4fc.PROPERTY_IDENTITY != 0) dest.translation(x, y, z) else translateGeneric(x, y, z, dest)
-  }
-
-  private fun translateGeneric(x: Float, y: Float, z: Float, dest: Matrix4f): Matrix4f {
-    MemUtil.INSTANCE.copy(this, dest)
-    dest._m30(m00 * x + m10 * y + m20 * z + m30)
-    dest._m31(m01 * x + m11 * y + m21 * z + m31)
-    dest._m32(m02 * x + m12 * y + m22 * z + m32)
-    dest._m33(m03 * x + m13 * y + m23 * z + m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE or Matrix4fc.PROPERTY_IDENTITY).inv())
-    return dest
-  }
-
-  /**
-   * Apply a translation to this matrix by translating by the given number of
-   * units in x, y and z.
-   *
-   *
-   * If `M` is `this` matrix and `T` the translation
-   * matrix, then the new matrix will be `M * T`. So when
-   * transforming a vector `v` with the new matrix by using
-   * `M * T * v`, the translation will be applied first!
-   *
-   *
-   * In order to set the matrix to a translation transformation without post-multiplying
-   * it, use [.translation].
-   *
-   * @see .translation
-   * @param x
-   * the offset to translate in x
-   * @param y
-   * the offset to translate in y
-   * @param z
-   * the offset to translate in z
-   * @return this
-   */
-  fun translate(x: Float, y: Float, z: Float): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
-      return translation(x, y, z)
-    this._m30(m00 * x + m10 * y + m20 * z + m30)
-    this._m31(m01 * x + m11 * y + m21 * z + m31)
-    this._m32(m02 * x + m12 * y + m22 * z + m32)
-    this._m33(m03 * x + m13 * y + m23 * z + m33)
-    properties = properties and (Matrix4fc.PROPERTY_PERSPECTIVE or Matrix4fc.PROPERTY_IDENTITY).inv()
-    return this
-  }
-
-  /**
-   * Pre-multiply a translation to this matrix by translating by the given number of
-   * units in x, y and z.
-   *
-   *
-   * If `M` is `this` matrix and `T` the translation
-   * matrix, then the new matrix will be `T * M`. So when
-   * transforming a vector `v` with the new matrix by using
-   * `T * M * v`, the translation will be applied last!
-   *
-   *
-   * In order to set the matrix to a translation transformation without pre-multiplying
-   * it, use [.translation].
-   *
-   * @see .translation
-   * @param offset
-   * the number of units in x, y and z by which to translate
-   * @return this
-   */
-  fun translateLocal(offset: Vector3fc): Matrix4f {
-    return translateLocal(offset.x, offset.y, offset.z)
-  }
-
-  /**
-   * Pre-multiply a translation to this matrix by translating by the given number of
-   * units in x, y and z and store the result in `dest`.
-   *
-   *
-   * If `M` is `this` matrix and `T` the translation
-   * matrix, then the new matrix will be `T * M`. So when
-   * transforming a vector `v` with the new matrix by using
-   * `T * M * v`, the translation will be applied last!
-   *
-   *
-   * In order to set the matrix to a translation transformation without pre-multiplying
-   * it, use [.translation].
-   *
-   * @see .translation
-   * @param offset
-   * the number of units in x, y and z by which to translate
-   * @param dest
-   * will hold the result
-   * @return dest
-   */
-  override fun translateLocal(offset: Vector3fc, dest: Matrix4f): Matrix4f {
-    return translateLocal(offset.x, offset.y, offset.z, dest)
-  }
-
-  /**
-   * Pre-multiply a translation to this matrix by translating by the given number of
-   * units in x, y and z and store the result in `dest`.
-   *
-   *
-   * If `M` is `this` matrix and `T` the translation
-   * matrix, then the new matrix will be `T * M`. So when
-   * transforming a vector `v` with the new matrix by using
-   * `T * M * v`, the translation will be applied last!
-   *
-   *
-   * In order to set the matrix to a translation transformation without pre-multiplying
-   * it, use [.translation].
-   *
-   * @see .translation
-   * @param x
-   * the offset to translate in x
-   * @param y
-   * the offset to translate in y
-   * @param z
-   * the offset to translate in z
-   * @param dest
-   * will hold the result
-   * @return dest
-   */
-  override fun translateLocal(x: Float, y: Float, z: Float, dest: Matrix4f): Matrix4f {
-    return if (properties and Matrix4fc.PROPERTY_IDENTITY != 0) dest.translation(x, y, z) else translateLocalGeneric(x, y, z, dest)
   }
 
   private fun translateLocalGeneric(x: Float, y: Float, z: Float, dest: Matrix4f): Matrix4f {
@@ -6903,39 +5143,12 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(nm31)
     dest._m32(nm32)
     dest._m33(nm33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE or Matrix4fc.PROPERTY_IDENTITY).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE or Matrix4f.PROPERTY_IDENTITY).inv())
     return dest
   }
 
-  /**
-   * Pre-multiply a translation to this matrix by translating by the given number of
-   * units in x, y and z.
-   *
-   *
-   * If `M` is `this` matrix and `T` the translation
-   * matrix, then the new matrix will be `T * M`. So when
-   * transforming a vector `v` with the new matrix by using
-   * `T * M * v`, the translation will be applied last!
-   *
-   *
-   * In order to set the matrix to a translation transformation without pre-multiplying
-   * it, use [.translation].
-   *
-   * @see .translation
-   * @param x
-   * the offset to translate in x
-   * @param y
-   * the offset to translate in y
-   * @param z
-   * the offset to translate in z
-   * @return a matrix holding the result
-   */
-  fun translateLocal(x: Float, y: Float, z: Float): Matrix4f {
-    return translateLocal(x, y, z, thisOrNew())
-  }
-
   @Throws(IOException::class)
-  override fun writeExternal(out: ObjectOutput) {
+  fun writeExternal(out: ObjectOutput) {
     out.writeFloat(m00)
     out.writeFloat(m01)
     out.writeFloat(m02)
@@ -6955,7 +5168,7 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   @Throws(IOException::class)
-  override fun readExternal(`in`: ObjectInput) {
+  fun readExternal(`in`: ObjectInput) {
     this._m00(`in`.readFloat())
     this._m01(`in`.readFloat())
     this._m02(`in`.readFloat())
@@ -7012,8 +5225,8 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun ortho(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
-    return if (properties and Matrix4fc.PROPERTY_IDENTITY != 0) dest.setOrtho(left, right, bottom, top, zNear, zFar, zZeroToOne) else orthoGeneric(left, right, bottom, top, zNear, zFar, zZeroToOne, dest)
+  fun ortho(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
+    return if (properties and Matrix4f.PROPERTY_IDENTITY != 0) dest.setOrtho(left, right, bottom, top, zNear, zFar, zZeroToOne) else orthoGeneric(left, right, bottom, top, zNear, zFar, zZeroToOne, dest)
   }
 
   private fun orthoGeneric(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
@@ -7042,7 +5255,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m21(m21 * rm22)
     dest._m22(m22 * rm22)
     dest._m23(m23 * rm22)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt() or Matrix4f.PROPERTY_ORTHONORMAL.toInt()).inv())
     return dest
   }
 
@@ -7080,7 +5293,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun ortho(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, dest: Matrix4f): Matrix4f {
+  fun ortho(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, dest: Matrix4f): Matrix4f {
     return ortho(left, right, bottom, top, zNear, zFar, false, dest)
   }
 
@@ -7123,47 +5336,6 @@ class Matrix4f : Externalizable, Matrix4fc {
     return ortho(left, right, bottom, top, zNear, zFar, zZeroToOne, thisOrNew())
   }
 
-  /**
-   * Apply an orthographic projection transformation for a left-handed coordiante system
-   * using the given NDC z range to this matrix and store the result in `dest`.
-   *
-   *
-   * If `M` is `this` matrix and `O` the orthographic projection matrix,
-   * then the new matrix will be `M * O`. So when transforming a
-   * vector `v` with the new matrix by using `M * O * v`, the
-   * orthographic projection transformation will be applied first!
-   *
-   *
-   * In order to set the matrix to an orthographic projection without post-multiplying it,
-   * use [setOrthoLH()][.setOrthoLH].
-   *
-   *
-   * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
-   *
-   * @see .setOrthoLH
-   * @param left
-   * the distance from the center to the left frustum edge
-   * @param right
-   * the distance from the center to the right frustum edge
-   * @param bottom
-   * the distance from the center to the bottom frustum edge
-   * @param top
-   * the distance from the center to the top frustum edge
-   * @param zNear
-   * near clipping plane distance
-   * @param zFar
-   * far clipping plane distance
-   * @param zZeroToOne
-   * whether to use Vulkan's and Direct3D's NDC z range of <tt>[0..+1]</tt> when `true`
-   * or whether to use OpenGL's NDC z range of <tt>[-1..+1]</tt> when `false`
-   * @param dest
-   * will hold the result
-   * @return dest
-   */
-  override fun orthoLH(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
-    return if (properties and Matrix4fc.PROPERTY_IDENTITY != 0) dest.setOrthoLH(left, right, bottom, top, zNear, zFar, zZeroToOne) else orthoLHGeneric(left, right, bottom, top, zNear, zFar, zZeroToOne, dest)
-  }
-
   private fun orthoLHGeneric(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
     // calculate right matrix elements
     val rm00 = 2.0f / (right - left)
@@ -7191,214 +5363,9 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m21(m21 * rm22)
     dest._m22(m22 * rm22)
     dest._m23(m23 * rm22)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt() or Matrix4f.PROPERTY_ORTHONORMAL.toInt()).inv())
 
     return dest
-  }
-
-  /**
-   * Apply an orthographic projection transformation for a left-handed coordiante system
-   * using OpenGL's NDC z range of <tt>[-1..+1]</tt> to this matrix and store the result in `dest`.
-   *
-   *
-   * If `M` is `this` matrix and `O` the orthographic projection matrix,
-   * then the new matrix will be `M * O`. So when transforming a
-   * vector `v` with the new matrix by using `M * O * v`, the
-   * orthographic projection transformation will be applied first!
-   *
-   *
-   * In order to set the matrix to an orthographic projection without post-multiplying it,
-   * use [setOrthoLH()][.setOrthoLH].
-   *
-   *
-   * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
-   *
-   * @see .setOrthoLH
-   * @param left
-   * the distance from the center to the left frustum edge
-   * @param right
-   * the distance from the center to the right frustum edge
-   * @param bottom
-   * the distance from the center to the bottom frustum edge
-   * @param top
-   * the distance from the center to the top frustum edge
-   * @param zNear
-   * near clipping plane distance
-   * @param zFar
-   * far clipping plane distance
-   * @param dest
-   * will hold the result
-   * @return dest
-   */
-  override fun orthoLH(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, dest: Matrix4f): Matrix4f {
-    return orthoLH(left, right, bottom, top, zNear, zFar, false, dest)
-  }
-
-  /**
-   * Apply an orthographic projection transformation for a left-handed coordiante system
-   * using the given NDC z range to this matrix.
-   *
-   *
-   * If `M` is `this` matrix and `O` the orthographic projection matrix,
-   * then the new matrix will be `M * O`. So when transforming a
-   * vector `v` with the new matrix by using `M * O * v`, the
-   * orthographic projection transformation will be applied first!
-   *
-   *
-   * In order to set the matrix to an orthographic projection without post-multiplying it,
-   * use [setOrthoLH()][.setOrthoLH].
-   *
-   *
-   * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
-   *
-   * @see .setOrthoLH
-   * @param left
-   * the distance from the center to the left frustum edge
-   * @param right
-   * the distance from the center to the right frustum edge
-   * @param bottom
-   * the distance from the center to the bottom frustum edge
-   * @param top
-   * the distance from the center to the top frustum edge
-   * @param zNear
-   * near clipping plane distance
-   * @param zFar
-   * far clipping plane distance
-   * @param zZeroToOne
-   * whether to use Vulkan's and Direct3D's NDC z range of <tt>[0..+1]</tt> when `true`
-   * or whether to use OpenGL's NDC z range of <tt>[-1..+1]</tt> when `false`
-   * @return a matrix holding the result
-   */
-  @JvmOverloads
-  fun orthoLH(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean = false): Matrix4f {
-    return orthoLH(left, right, bottom, top, zNear, zFar, zZeroToOne, thisOrNew())
-  }
-
-  /**
-   * Set this matrix to be an orthographic projection transformation for a right-handed coordinate system
-   * using the given NDC z range.
-   *
-   *
-   * In order to apply the orthographic projection to an already existing transformation,
-   * use [ortho()][.ortho].
-   *
-   *
-   * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
-   *
-   * @see .ortho
-   * @param left
-   * the distance from the center to the left frustum edge
-   * @param right
-   * the distance from the center to the right frustum edge
-   * @param bottom
-   * the distance from the center to the bottom frustum edge
-   * @param top
-   * the distance from the center to the top frustum edge
-   * @param zNear
-   * near clipping plane distance
-   * @param zFar
-   * far clipping plane distance
-   * @param zZeroToOne
-   * whether to use Vulkan's and Direct3D's NDC z range of <tt>[0..+1]</tt> when `true`
-   * or whether to use OpenGL's NDC z range of <tt>[-1..+1]</tt> when `false`
-   * @return this
-   */
-  @JvmOverloads
-  fun setOrtho(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean = false): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY == 0)
-      MemUtil.INSTANCE.identity(this)
-    this._m00(2.0f / (right - left))
-    this._m11(2.0f / (top - bottom))
-    this._m22((if (zZeroToOne) 1.0f else 2.0f) / (zNear - zFar))
-    this._m30((right + left) / (left - right))
-    this._m31((top + bottom) / (bottom - top))
-    this._m32((if (zZeroToOne) zNear else zFar + zNear) / (zNear - zFar))
-    _properties(Matrix4fc.PROPERTY_AFFINE.toInt())
-    return this
-  }
-
-  /**
-   * Set this matrix to be an orthographic projection transformation for a left-handed coordinate system
-   * using the given NDC z range.
-   *
-   *
-   * In order to apply the orthographic projection to an already existing transformation,
-   * use [orthoLH()][.orthoLH].
-   *
-   *
-   * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
-   *
-   * @see .orthoLH
-   * @param left
-   * the distance from the center to the left frustum edge
-   * @param right
-   * the distance from the center to the right frustum edge
-   * @param bottom
-   * the distance from the center to the bottom frustum edge
-   * @param top
-   * the distance from the center to the top frustum edge
-   * @param zNear
-   * near clipping plane distance
-   * @param zFar
-   * far clipping plane distance
-   * @param zZeroToOne
-   * whether to use Vulkan's and Direct3D's NDC z range of <tt>[0..+1]</tt> when `true`
-   * or whether to use OpenGL's NDC z range of <tt>[-1..+1]</tt> when `false`
-   * @return this
-   */
-  @JvmOverloads
-  fun setOrthoLH(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean = false): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY == 0)
-      MemUtil.INSTANCE.identity(this)
-    this._m00(2.0f / (right - left))
-    this._m11(2.0f / (top - bottom))
-    this._m22((if (zZeroToOne) 1.0f else 2.0f) / (zFar - zNear))
-    this._m30((right + left) / (left - right))
-    this._m31((top + bottom) / (bottom - top))
-    this._m32((if (zZeroToOne) zNear else zFar + zNear) / (zNear - zFar))
-    _properties(Matrix4fc.PROPERTY_AFFINE.toInt())
-    return this
-  }
-
-  /**
-   * Apply a symmetric orthographic projection transformation for a right-handed coordinate system
-   * using the given NDC z range to this matrix and store the result in `dest`.
-   *
-   *
-   * This method is equivalent to calling [ortho()][.ortho] with
-   * `left=-width/2`, `right=+width/2`, `bottom=-height/2` and `top=+height/2`.
-   *
-   *
-   * If `M` is `this` matrix and `O` the orthographic projection matrix,
-   * then the new matrix will be `M * O`. So when transforming a
-   * vector `v` with the new matrix by using `M * O * v`, the
-   * orthographic projection transformation will be applied first!
-   *
-   *
-   * In order to set the matrix to a symmetric orthographic projection without post-multiplying it,
-   * use [setOrthoSymmetric()][.setOrthoSymmetric].
-   *
-   *
-   * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
-   *
-   * @see .setOrthoSymmetric
-   * @param width
-   * the distance between the right and left frustum edges
-   * @param height
-   * the distance between the top and bottom frustum edges
-   * @param zNear
-   * near clipping plane distance
-   * @param zFar
-   * far clipping plane distance
-   * @param dest
-   * will hold the result
-   * @param zZeroToOne
-   * whether to use Vulkan's and Direct3D's NDC z range of <tt>[0..+1]</tt> when `true`
-   * or whether to use OpenGL's NDC z range of <tt>[-1..+1]</tt> when `false`
-   * @return dest
-   */
-  override fun orthoSymmetric(width: Float, height: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
-    return if (properties and Matrix4fc.PROPERTY_IDENTITY != 0) dest.setOrthoSymmetric(width, height, zNear, zFar, zZeroToOne) else orthoSymmetricGeneric(width, height, zNear, zFar, zZeroToOne, dest)
   }
 
   private fun orthoSymmetricGeneric(width: Float, height: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
@@ -7425,162 +5392,8 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m21(m21 * rm22)
     dest._m22(m22 * rm22)
     dest._m23(m23 * rm22)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt() or Matrix4f.PROPERTY_ORTHONORMAL.toInt()).inv())
     return dest
-  }
-
-  /**
-   * Apply a symmetric orthographic projection transformation for a right-handed coordinate system
-   * using OpenGL's NDC z range of <tt>[-1..+1]</tt> to this matrix and store the result in `dest`.
-   *
-   *
-   * This method is equivalent to calling [ortho()][.ortho] with
-   * `left=-width/2`, `right=+width/2`, `bottom=-height/2` and `top=+height/2`.
-   *
-   *
-   * If `M` is `this` matrix and `O` the orthographic projection matrix,
-   * then the new matrix will be `M * O`. So when transforming a
-   * vector `v` with the new matrix by using `M * O * v`, the
-   * orthographic projection transformation will be applied first!
-   *
-   *
-   * In order to set the matrix to a symmetric orthographic projection without post-multiplying it,
-   * use [setOrthoSymmetric()][.setOrthoSymmetric].
-   *
-   *
-   * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
-   *
-   * @see .setOrthoSymmetric
-   * @param width
-   * the distance between the right and left frustum edges
-   * @param height
-   * the distance between the top and bottom frustum edges
-   * @param zNear
-   * near clipping plane distance
-   * @param zFar
-   * far clipping plane distance
-   * @param dest
-   * will hold the result
-   * @return dest
-   */
-  override fun orthoSymmetric(width: Float, height: Float, zNear: Float, zFar: Float, dest: Matrix4f): Matrix4f {
-    return orthoSymmetric(width, height, zNear, zFar, false, dest)
-  }
-
-  /**
-   * Apply a symmetric orthographic projection transformation for a right-handed coordinate system
-   * using the given NDC z range to this matrix.
-   *
-   *
-   * This method is equivalent to calling [ortho()][.ortho] with
-   * `left=-width/2`, `right=+width/2`, `bottom=-height/2` and `top=+height/2`.
-   *
-   *
-   * If `M` is `this` matrix and `O` the orthographic projection matrix,
-   * then the new matrix will be `M * O`. So when transforming a
-   * vector `v` with the new matrix by using `M * O * v`, the
-   * orthographic projection transformation will be applied first!
-   *
-   *
-   * In order to set the matrix to a symmetric orthographic projection without post-multiplying it,
-   * use [setOrthoSymmetric()][.setOrthoSymmetric].
-   *
-   *
-   * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
-   *
-   * @see .setOrthoSymmetric
-   * @param width
-   * the distance between the right and left frustum edges
-   * @param height
-   * the distance between the top and bottom frustum edges
-   * @param zNear
-   * near clipping plane distance
-   * @param zFar
-   * far clipping plane distance
-   * @param zZeroToOne
-   * whether to use Vulkan's and Direct3D's NDC z range of <tt>[0..+1]</tt> when `true`
-   * or whether to use OpenGL's NDC z range of <tt>[-1..+1]</tt> when `false`
-   * @return a matrix holding the result
-   */
-  fun orthoSymmetric(width: Float, height: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean): Matrix4f {
-    return orthoSymmetric(width, height, zNear, zFar, zZeroToOne, thisOrNew())
-  }
-
-  /**
-   * Apply a symmetric orthographic projection transformation for a right-handed coordinate system
-   * using OpenGL's NDC z range of <tt>[-1..+1]</tt> to this matrix.
-   *
-   *
-   * This method is equivalent to calling [ortho()][.ortho] with
-   * `left=-width/2`, `right=+width/2`, `bottom=-height/2` and `top=+height/2`.
-   *
-   *
-   * If `M` is `this` matrix and `O` the orthographic projection matrix,
-   * then the new matrix will be `M * O`. So when transforming a
-   * vector `v` with the new matrix by using `M * O * v`, the
-   * orthographic projection transformation will be applied first!
-   *
-   *
-   * In order to set the matrix to a symmetric orthographic projection without post-multiplying it,
-   * use [setOrthoSymmetric()][.setOrthoSymmetric].
-   *
-   *
-   * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
-   *
-   * @see .setOrthoSymmetric
-   * @param width
-   * the distance between the right and left frustum edges
-   * @param height
-   * the distance between the top and bottom frustum edges
-   * @param zNear
-   * near clipping plane distance
-   * @param zFar
-   * far clipping plane distance
-   * @return a matrix holding the result
-   */
-  fun orthoSymmetric(width: Float, height: Float, zNear: Float, zFar: Float): Matrix4f {
-    return orthoSymmetric(width, height, zNear, zFar, false, thisOrNew())
-  }
-
-  /**
-   * Apply a symmetric orthographic projection transformation for a left-handed coordinate system
-   * using the given NDC z range to this matrix and store the result in `dest`.
-   *
-   *
-   * This method is equivalent to calling [orthoLH()][.orthoLH] with
-   * `left=-width/2`, `right=+width/2`, `bottom=-height/2` and `top=+height/2`.
-   *
-   *
-   * If `M` is `this` matrix and `O` the orthographic projection matrix,
-   * then the new matrix will be `M * O`. So when transforming a
-   * vector `v` with the new matrix by using `M * O * v`, the
-   * orthographic projection transformation will be applied first!
-   *
-   *
-   * In order to set the matrix to a symmetric orthographic projection without post-multiplying it,
-   * use [setOrthoSymmetricLH()][.setOrthoSymmetricLH].
-   *
-   *
-   * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
-   *
-   * @see .setOrthoSymmetricLH
-   * @param width
-   * the distance between the right and left frustum edges
-   * @param height
-   * the distance between the top and bottom frustum edges
-   * @param zNear
-   * near clipping plane distance
-   * @param zFar
-   * far clipping plane distance
-   * @param dest
-   * will hold the result
-   * @param zZeroToOne
-   * whether to use Vulkan's and Direct3D's NDC z range of <tt>[0..+1]</tt> when `true`
-   * or whether to use OpenGL's NDC z range of <tt>[-1..+1]</tt> when `false`
-   * @return dest
-   */
-  override fun orthoSymmetricLH(width: Float, height: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
-    return if (properties and Matrix4fc.PROPERTY_IDENTITY != 0) dest.setOrthoSymmetricLH(width, height, zNear, zFar, zZeroToOne) else orthoSymmetricLHGeneric(width, height, zNear, zFar, zZeroToOne, dest)
   }
 
   private fun orthoSymmetricLHGeneric(width: Float, height: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
@@ -7607,201 +5420,8 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m21(m21 * rm22)
     dest._m22(m22 * rm22)
     dest._m23(m23 * rm22)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt() or Matrix4f.PROPERTY_ORTHONORMAL.toInt()).inv())
     return dest
-  }
-
-  /**
-   * Apply a symmetric orthographic projection transformation for a left-handed coordinate system
-   * using OpenGL's NDC z range of <tt>[-1..+1]</tt> to this matrix and store the result in `dest`.
-   *
-   *
-   * This method is equivalent to calling [orthoLH()][.orthoLH] with
-   * `left=-width/2`, `right=+width/2`, `bottom=-height/2` and `top=+height/2`.
-   *
-   *
-   * If `M` is `this` matrix and `O` the orthographic projection matrix,
-   * then the new matrix will be `M * O`. So when transforming a
-   * vector `v` with the new matrix by using `M * O * v`, the
-   * orthographic projection transformation will be applied first!
-   *
-   *
-   * In order to set the matrix to a symmetric orthographic projection without post-multiplying it,
-   * use [setOrthoSymmetricLH()][.setOrthoSymmetricLH].
-   *
-   *
-   * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
-   *
-   * @see .setOrthoSymmetricLH
-   * @param width
-   * the distance between the right and left frustum edges
-   * @param height
-   * the distance between the top and bottom frustum edges
-   * @param zNear
-   * near clipping plane distance
-   * @param zFar
-   * far clipping plane distance
-   * @param dest
-   * will hold the result
-   * @return dest
-   */
-  override fun orthoSymmetricLH(width: Float, height: Float, zNear: Float, zFar: Float, dest: Matrix4f): Matrix4f {
-    return orthoSymmetricLH(width, height, zNear, zFar, false, dest)
-  }
-
-  /**
-   * Apply a symmetric orthographic projection transformation for a left-handed coordinate system
-   * using the given NDC z range to this matrix.
-   *
-   *
-   * This method is equivalent to calling [orthoLH()][.orthoLH] with
-   * `left=-width/2`, `right=+width/2`, `bottom=-height/2` and `top=+height/2`.
-   *
-   *
-   * If `M` is `this` matrix and `O` the orthographic projection matrix,
-   * then the new matrix will be `M * O`. So when transforming a
-   * vector `v` with the new matrix by using `M * O * v`, the
-   * orthographic projection transformation will be applied first!
-   *
-   *
-   * In order to set the matrix to a symmetric orthographic projection without post-multiplying it,
-   * use [setOrthoSymmetricLH()][.setOrthoSymmetricLH].
-   *
-   *
-   * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
-   *
-   * @see .setOrthoSymmetricLH
-   * @param width
-   * the distance between the right and left frustum edges
-   * @param height
-   * the distance between the top and bottom frustum edges
-   * @param zNear
-   * near clipping plane distance
-   * @param zFar
-   * far clipping plane distance
-   * @param zZeroToOne
-   * whether to use Vulkan's and Direct3D's NDC z range of <tt>[0..+1]</tt> when `true`
-   * or whether to use OpenGL's NDC z range of <tt>[-1..+1]</tt> when `false`
-   * @return a matrix holding the result
-   */
-  fun orthoSymmetricLH(width: Float, height: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean): Matrix4f {
-    return orthoSymmetricLH(width, height, zNear, zFar, zZeroToOne, thisOrNew())
-  }
-
-  /**
-   * Apply a symmetric orthographic projection transformation for a left-handed coordinate system
-   * using OpenGL's NDC z range of <tt>[-1..+1]</tt> to this matrix.
-   *
-   *
-   * This method is equivalent to calling [orthoLH()][.orthoLH] with
-   * `left=-width/2`, `right=+width/2`, `bottom=-height/2` and `top=+height/2`.
-   *
-   *
-   * If `M` is `this` matrix and `O` the orthographic projection matrix,
-   * then the new matrix will be `M * O`. So when transforming a
-   * vector `v` with the new matrix by using `M * O * v`, the
-   * orthographic projection transformation will be applied first!
-   *
-   *
-   * In order to set the matrix to a symmetric orthographic projection without post-multiplying it,
-   * use [setOrthoSymmetricLH()][.setOrthoSymmetricLH].
-   *
-   *
-   * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
-   *
-   * @see .setOrthoSymmetricLH
-   * @param width
-   * the distance between the right and left frustum edges
-   * @param height
-   * the distance between the top and bottom frustum edges
-   * @param zNear
-   * near clipping plane distance
-   * @param zFar
-   * far clipping plane distance
-   * @return a matrix holding the result
-   */
-  fun orthoSymmetricLH(width: Float, height: Float, zNear: Float, zFar: Float): Matrix4f {
-    return orthoSymmetricLH(width, height, zNear, zFar, false, thisOrNew())
-  }
-
-  /**
-   * Set this matrix to be a symmetric orthographic projection transformation for a right-handed coordinate system using the given NDC z range.
-   *
-   *
-   * This method is equivalent to calling [setOrtho()][.setOrtho] with
-   * `left=-width/2`, `right=+width/2`, `bottom=-height/2` and `top=+height/2`.
-   *
-   *
-   * In order to apply the symmetric orthographic projection to an already existing transformation,
-   * use [orthoSymmetric()][.orthoSymmetric].
-   *
-   *
-   * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
-   *
-   * @see .orthoSymmetric
-   * @param width
-   * the distance between the right and left frustum edges
-   * @param height
-   * the distance between the top and bottom frustum edges
-   * @param zNear
-   * near clipping plane distance
-   * @param zFar
-   * far clipping plane distance
-   * @param zZeroToOne
-   * whether to use Vulkan's and Direct3D's NDC z range of <tt>[0..+1]</tt> when `true`
-   * or whether to use OpenGL's NDC z range of <tt>[-1..+1]</tt> when `false`
-   * @return this
-   */
-  @JvmOverloads
-  fun setOrthoSymmetric(width: Float, height: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean = false): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY == 0)
-      MemUtil.INSTANCE.identity(this)
-    this._m00(2.0f / width)
-    this._m11(2.0f / height)
-    this._m22((if (zZeroToOne) 1.0f else 2.0f) / (zNear - zFar))
-    this._m32((if (zZeroToOne) zNear else zFar + zNear) / (zNear - zFar))
-    _properties(Matrix4fc.PROPERTY_AFFINE.toInt())
-    return this
-  }
-
-  /**
-   * Set this matrix to be a symmetric orthographic projection transformation for a left-handed coordinate system using the given NDC z range.
-   *
-   *
-   * This method is equivalent to calling [setOrtho()][.setOrtho] with
-   * `left=-width/2`, `right=+width/2`, `bottom=-height/2` and `top=+height/2`.
-   *
-   *
-   * In order to apply the symmetric orthographic projection to an already existing transformation,
-   * use [orthoSymmetricLH()][.orthoSymmetricLH].
-   *
-   *
-   * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
-   *
-   * @see .orthoSymmetricLH
-   * @param width
-   * the distance between the right and left frustum edges
-   * @param height
-   * the distance between the top and bottom frustum edges
-   * @param zNear
-   * near clipping plane distance
-   * @param zFar
-   * far clipping plane distance
-   * @param zZeroToOne
-   * whether to use Vulkan's and Direct3D's NDC z range of <tt>[0..+1]</tt> when `true`
-   * or whether to use OpenGL's NDC z range of <tt>[-1..+1]</tt> when `false`
-   * @return this
-   */
-  @JvmOverloads
-  fun setOrthoSymmetricLH(width: Float, height: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean = false): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY == 0)
-      MemUtil.INSTANCE.identity(this)
-    this._m00(2.0f / width)
-    this._m11(2.0f / height)
-    this._m22((if (zZeroToOne) 1.0f else 2.0f) / (zFar - zNear))
-    this._m32((if (zZeroToOne) zNear else zFar + zNear) / (zNear - zFar))
-    _properties(Matrix4fc.PROPERTY_AFFINE.toInt())
-    return this
   }
 
   /**
@@ -7839,8 +5459,8 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun ortho2D(left: Float, right: Float, bottom: Float, top: Float, dest: Matrix4f): Matrix4f {
-    return if (properties and Matrix4fc.PROPERTY_IDENTITY != 0) dest.setOrtho2D(left, right, bottom, top) else ortho2DGeneric(left, right, bottom, top, dest)
+  fun ortho2D(left: Float, right: Float, bottom: Float, top: Float, dest: Matrix4f): Matrix4f {
+    return if (properties and Matrix4f.PROPERTY_IDENTITY != 0) dest.setOrtho2D(left, right, bottom, top) else ortho2DGeneric(left, right, bottom, top, dest)
   }
 
   private fun ortho2DGeneric(left: Float, right: Float, bottom: Float, top: Float, dest: Matrix4f): Matrix4f {
@@ -7867,7 +5487,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m21(-m21)
     dest._m22(-m22)
     dest._m23(-m23)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt() or Matrix4f.PROPERTY_ORTHONORMAL.toInt()).inv())
     return dest
   }
 
@@ -7941,8 +5561,8 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun ortho2DLH(left: Float, right: Float, bottom: Float, top: Float, dest: Matrix4f): Matrix4f {
-    return if (properties and Matrix4fc.PROPERTY_IDENTITY != 0) dest.setOrtho2DLH(left, right, bottom, top) else ortho2DLHGeneric(left, right, bottom, top, dest)
+  fun ortho2DLH(left: Float, right: Float, bottom: Float, top: Float, dest: Matrix4f): Matrix4f {
+    return if (properties and Matrix4f.PROPERTY_IDENTITY != 0) dest.setOrtho2DLH(left, right, bottom, top) else ortho2DLHGeneric(left, right, bottom, top, dest)
   }
 
   private fun ortho2DLHGeneric(left: Float, right: Float, bottom: Float, top: Float, dest: Matrix4f): Matrix4f {
@@ -7970,7 +5590,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m21(m21)
     dest._m22(m22)
     dest._m23(m23)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt() or Matrix4f.PROPERTY_ORTHONORMAL.toInt()).inv())
 
     return dest
   }
@@ -8038,14 +5658,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    * @return this
    */
   fun setOrtho2D(left: Float, right: Float, bottom: Float, top: Float): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY == 0)
-      MemUtil.INSTANCE.identity(this)
+    if (properties and Matrix4f.PROPERTY_IDENTITY == 0)
+      throw Error("Not implemented")
     this._m00(2.0f / (right - left))
     this._m11(2.0f / (top - bottom))
     this._m22(-1.0f)
     this._m30(-(right + left) / (right - left))
     this._m31(-(top + bottom) / (top - bottom))
-    _properties(Matrix4fc.PROPERTY_AFFINE.toInt())
+    _properties(Matrix4f.PROPERTY_AFFINE.toInt())
     return this
   }
 
@@ -8076,13 +5696,13 @@ class Matrix4f : Externalizable, Matrix4fc {
    * @return this
    */
   fun setOrtho2DLH(left: Float, right: Float, bottom: Float, top: Float): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY == 0)
-      MemUtil.INSTANCE.identity(this)
+    if (properties and Matrix4f.PROPERTY_IDENTITY == 0)
+      throw Error("Not implemented")
     this._m00(2.0f / (right - left))
     this._m11(2.0f / (top - bottom))
     this._m30(-(right + left) / (right - left))
     this._m31(-(top + bottom) / (top - bottom))
-    _properties(Matrix4fc.PROPERTY_AFFINE.toInt())
+    _properties(Matrix4f.PROPERTY_AFFINE.toInt())
     return this
   }
 
@@ -8113,7 +5733,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the direction of 'up'
    * @return a matrix holding the result
    */
-  fun lookAlong(dir: Vector3fc, up: Vector3fc): Matrix4f {
+  fun lookAlong(dir: Vector3m, up: Vector3m): Matrix4f {
     return lookAlong(dir.x, dir.y, dir.z, up.x, up.y, up.z, thisOrNew())
   }
 
@@ -8147,7 +5767,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun lookAlong(dir: Vector3fc, up: Vector3fc, dest: Matrix4f): Matrix4f {
+  fun lookAlong(dir: Vector3m, up: Vector3m, dest: Matrix4f): Matrix4f {
     return lookAlong(dir.x, dir.y, dir.z, up.x, up.y, up.z, dest)
   }
 
@@ -8188,8 +5808,8 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun lookAlong(dirX: Float, dirY: Float, dirZ: Float, upX: Float, upY: Float, upZ: Float, dest: Matrix4f): Matrix4f {
-    return if (properties and Matrix4fc.PROPERTY_IDENTITY != 0) dest.setLookAlong(dirX, dirY, dirZ, upX, upY, upZ) else lookAlongGeneric(dirX, dirY, dirZ, upX, upY, upZ, dest)
+  fun lookAlong(dirX: Float, dirY: Float, dirZ: Float, upX: Float, upY: Float, upZ: Float, dest: Matrix4f): Matrix4f {
+    return if (properties and Matrix4f.PROPERTY_IDENTITY != 0) dest.setLookAlong(dirX, dirY, dirZ, upX, upY, upZ) else lookAlongGeneric(dirX, dirY, dirZ, upX, upY, upZ, dest)
   }
 
   private fun lookAlongGeneric(dirX: Float, dirY: Float, dirZ: Float, upX: Float, upY: Float, upZ: Float, dest: Matrix4f): Matrix4f {
@@ -8248,7 +5868,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(m31)
     dest._m32(m32)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -8312,7 +5932,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the direction of 'up'
    * @return this
    */
-  fun setLookAlong(dir: Vector3fc, up: Vector3fc): Matrix4f {
+  fun setLookAlong(dir: Vector3m, up: Vector3m): Matrix4f {
     return setLookAlong(dir.x, dir.y, dir.z, up.x, up.y, up.z)
   }
 
@@ -8387,7 +6007,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m31(0.0f)
     this._m32(0.0f)
     this._m33(1.0f)
-    _properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    _properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
 
     return this
   }
@@ -8415,7 +6035,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the direction of 'up'
    * @return this
    */
-  fun setLookAt(eye: Vector3fc, center: Vector3fc, up: Vector3fc): Matrix4f {
+  fun setLookAt(eye: Vector3m, center: Vector3m, up: Vector3m): Matrix4f {
     return setLookAt(eye.x, eye.y, eye.z, center.x, center.y, center.z, up.x, up.y, up.z)
   }
 
@@ -8501,7 +6121,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m31(-(upnX * eyeX + upnY * eyeY + upnZ * eyeZ))
     this._m32(-(dirX * eyeX + dirY * eyeY + dirZ * eyeZ))
     this._m33(1.0f)
-    _properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    _properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
 
     return this
   }
@@ -8532,7 +6152,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun lookAt(eye: Vector3fc, center: Vector3fc, up: Vector3fc, dest: Matrix4f): Matrix4f {
+  fun lookAt(eye: Vector3m, center: Vector3m, up: Vector3m, dest: Matrix4f): Matrix4f {
     return lookAt(eye.x, eye.y, eye.z, center.x, center.y, center.z, up.x, up.y, up.z, dest)
   }
 
@@ -8560,7 +6180,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the direction of 'up'
    * @return a matrix holding the result
    */
-  fun lookAt(eye: Vector3fc, center: Vector3fc, up: Vector3fc): Matrix4f {
+  fun lookAt(eye: Vector3m, center: Vector3m, up: Vector3m): Matrix4f {
     return lookAt(eye.x, eye.y, eye.z, center.x, center.y, center.z, up.x, up.y, up.z, thisOrNew())
   }
 
@@ -8602,12 +6222,12 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun lookAt(eyeX: Float, eyeY: Float, eyeZ: Float,
+  fun lookAt(eyeX: Float, eyeY: Float, eyeZ: Float,
                       centerX: Float, centerY: Float, centerZ: Float,
                       upX: Float, upY: Float, upZ: Float, dest: Matrix4f): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+    if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       return dest.setLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ)
-    else if (properties and Matrix4fc.PROPERTY_PERSPECTIVE != 0)
+    else if (properties and Matrix4f.PROPERTY_PERSPECTIVE != 0)
       return lookAtPerspective(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ, dest)
     return lookAtGeneric(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ, dest)
   }
@@ -8677,7 +6297,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m11(nm11)
     dest._m12(nm12)
     dest._m13(nm13)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -8723,7 +6343,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun lookAtPerspective(eyeX: Float, eyeY: Float, eyeZ: Float,
+  fun lookAtPerspective(eyeX: Float, eyeY: Float, eyeZ: Float,
                                  centerX: Float, centerY: Float, centerZ: Float,
                                  upX: Float, upY: Float, upZ: Float, dest: Matrix4f): Matrix4f {
     // Compute direction from position to lookAt
@@ -8862,7 +6482,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the direction of 'up'
    * @return this
    */
-  fun setLookAtLH(eye: Vector3fc, center: Vector3fc, up: Vector3fc): Matrix4f {
+  fun setLookAtLH(eye: Vector3m, center: Vector3m, up: Vector3m): Matrix4f {
     return setLookAtLH(eye.x, eye.y, eye.z, center.x, center.y, center.z, up.x, up.y, up.z)
   }
 
@@ -8944,7 +6564,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m31(-(upnX * eyeX + upnY * eyeY + upnZ * eyeZ))
     this._m32(-(dirX * eyeX + dirY * eyeY + dirZ * eyeZ))
     this._m33(1.0f)
-    _properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    _properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
 
     return this
   }
@@ -8974,7 +6594,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun lookAtLH(eye: Vector3fc, center: Vector3fc, up: Vector3fc, dest: Matrix4f): Matrix4f {
+  fun lookAtLH(eye: Vector3m, center: Vector3m, up: Vector3m, dest: Matrix4f): Matrix4f {
     return lookAtLH(eye.x, eye.y, eye.z, center.x, center.y, center.z, up.x, up.y, up.z, dest)
   }
 
@@ -9001,7 +6621,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the direction of 'up'
    * @return a matrix holding the result
    */
-  fun lookAtLH(eye: Vector3fc, center: Vector3fc, up: Vector3fc): Matrix4f {
+  fun lookAtLH(eye: Vector3m, center: Vector3m, up: Vector3m): Matrix4f {
     return lookAtLH(eye.x, eye.y, eye.z, center.x, center.y, center.z, up.x, up.y, up.z, thisOrNew())
   }
 
@@ -9043,12 +6663,12 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun lookAtLH(eyeX: Float, eyeY: Float, eyeZ: Float,
+  fun lookAtLH(eyeX: Float, eyeY: Float, eyeZ: Float,
                         centerX: Float, centerY: Float, centerZ: Float,
                         upX: Float, upY: Float, upZ: Float, dest: Matrix4f): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+    if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       return dest.setLookAtLH(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ)
-    else if (properties and Matrix4fc.PROPERTY_PERSPECTIVE != 0)
+    else if (properties and Matrix4f.PROPERTY_PERSPECTIVE != 0)
       return lookAtPerspectiveLH(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ, dest)
     return lookAtLHGeneric(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ, dest)
   }
@@ -9118,7 +6738,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m11(nm11)
     dest._m12(nm12)
     dest._m13(nm13)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
 
     return dest
   }
@@ -9207,7 +6827,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun lookAtPerspectiveLH(eyeX: Float, eyeY: Float, eyeZ: Float,
+  fun lookAtPerspectiveLH(eyeX: Float, eyeY: Float, eyeZ: Float,
                                    centerX: Float, centerY: Float, centerZ: Float,
                                    upX: Float, upY: Float, upZ: Float, dest: Matrix4f): Matrix4f {
     // Compute direction from position to lookAt
@@ -9313,8 +6933,8 @@ class Matrix4f : Externalizable, Matrix4fc {
    * or whether to use OpenGL's NDC z range of <tt>[-1..+1]</tt> when `false`
    * @return dest
    */
-  override fun perspective(fovy: Float, aspect: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
-    return if (properties and Matrix4fc.PROPERTY_IDENTITY != 0) dest.setPerspective(fovy, aspect, zNear, zFar, zZeroToOne) else perspectiveGeneric(fovy, aspect, zNear, zFar, zZeroToOne, dest)
+  fun perspective(fovy: Float, aspect: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
+    return if (properties and Matrix4f.PROPERTY_IDENTITY != 0) dest.setPerspective(fovy, aspect, zNear, zFar, zZeroToOne) else perspectiveGeneric(fovy, aspect, zNear, zFar, zZeroToOne, dest)
   }
 
   private fun perspectiveGeneric(fovy: Float, aspect: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
@@ -9360,7 +6980,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m21(nm21)
     dest._m22(nm22)
     dest._m23(nm23)
-    dest._properties(properties and (Matrix4fc.PROPERTY_AFFINE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_AFFINE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt() or Matrix4f.PROPERTY_ORTHONORMAL.toInt()).inv())
     return dest
   }
 
@@ -9393,7 +7013,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun perspective(fovy: Float, aspect: Float, zNear: Float, zFar: Float, dest: Matrix4f): Matrix4f {
+  fun perspective(fovy: Float, aspect: Float, zNear: Float, zFar: Float, dest: Matrix4f): Matrix4f {
     return perspective(fovy, aspect, zNear, zFar, false, dest)
   }
 
@@ -9488,7 +7108,6 @@ class Matrix4f : Externalizable, Matrix4fc {
    */
   @JvmOverloads
   fun setPerspective(fovy: Float, aspect: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean = false): Matrix4f {
-    MemUtil.INSTANCE.zero(this)
     val h = Math.tan((fovy * 0.5f).toDouble()).toFloat()
     this._m00(1.0f / (h * aspect))
     this._m11(1.0f / h)
@@ -9508,44 +7127,8 @@ class Matrix4f : Externalizable, Matrix4fc {
       this._m32((if (zZeroToOne) zFar else zFar + zFar) * zNear / (zNear - zFar))
     }
     this._m23(-1.0f)
-    _properties(Matrix4fc.PROPERTY_PERSPECTIVE.toInt())
+    _properties(Matrix4f.PROPERTY_PERSPECTIVE.toInt())
     return this
-  }
-
-  /**
-   * Apply a symmetric perspective projection frustum transformation for a left-handed coordinate system
-   * using the given NDC z range to this matrix and store the result in `dest`.
-   *
-   *
-   * If `M` is `this` matrix and `P` the perspective projection matrix,
-   * then the new matrix will be `M * P`. So when transforming a
-   * vector `v` with the new matrix by using `M * P * v`,
-   * the perspective projection will be applied first!
-   *
-   *
-   * In order to set the matrix to a perspective frustum transformation without post-multiplying,
-   * use [setPerspectiveLH][.setPerspectiveLH].
-   *
-   * @see .setPerspectiveLH
-   * @param fovy
-   * the vertical field of view in radians (must be greater than zero and less than [PI][Math.PI])
-   * @param aspect
-   * the aspect ratio (i.e. width / height; must be greater than zero)
-   * @param zNear
-   * near clipping plane distance. If the special value [Float.POSITIVE_INFINITY] is used, the near clipping plane will be at positive infinity.
-   * In that case, `zFar` may not also be [Float.POSITIVE_INFINITY].
-   * @param zFar
-   * far clipping plane distance. If the special value [Float.POSITIVE_INFINITY] is used, the far clipping plane will be at positive infinity.
-   * In that case, `zNear` may not also be [Float.POSITIVE_INFINITY].
-   * @param zZeroToOne
-   * whether to use Vulkan's and Direct3D's NDC z range of <tt>[0..+1]</tt> when `true`
-   * or whether to use OpenGL's NDC z range of <tt>[-1..+1]</tt> when `false`
-   * @param dest
-   * will hold the result
-   * @return dest
-   */
-  override fun perspectiveLH(fovy: Float, aspect: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
-    return if (properties and Matrix4fc.PROPERTY_IDENTITY != 0) dest.setPerspectiveLH(fovy, aspect, zNear, zFar, zZeroToOne) else perspectiveLHGeneric(fovy, aspect, zNear, zFar, zZeroToOne, dest)
   }
 
   private fun perspectiveLHGeneric(fovy: Float, aspect: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
@@ -9591,156 +7174,8 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m21(nm21)
     dest._m22(nm22)
     dest._m23(nm23)
-    dest._properties(properties and (Matrix4fc.PROPERTY_AFFINE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_AFFINE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt() or Matrix4f.PROPERTY_ORTHONORMAL.toInt()).inv())
     return dest
-  }
-
-  /**
-   * Apply a symmetric perspective projection frustum transformation for a left-handed coordinate system
-   * using the given NDC z range to this matrix.
-   *
-   *
-   * If `M` is `this` matrix and `P` the perspective projection matrix,
-   * then the new matrix will be `M * P`. So when transforming a
-   * vector `v` with the new matrix by using `M * P * v`,
-   * the perspective projection will be applied first!
-   *
-   *
-   * In order to set the matrix to a perspective frustum transformation without post-multiplying,
-   * use [setPerspectiveLH][.setPerspectiveLH].
-   *
-   * @see .setPerspectiveLH
-   * @param fovy
-   * the vertical field of view in radians (must be greater than zero and less than [PI][Math.PI])
-   * @param aspect
-   * the aspect ratio (i.e. width / height; must be greater than zero)
-   * @param zNear
-   * near clipping plane distance. If the special value [Float.POSITIVE_INFINITY] is used, the near clipping plane will be at positive infinity.
-   * In that case, `zFar` may not also be [Float.POSITIVE_INFINITY].
-   * @param zFar
-   * far clipping plane distance. If the special value [Float.POSITIVE_INFINITY] is used, the far clipping plane will be at positive infinity.
-   * In that case, `zNear` may not also be [Float.POSITIVE_INFINITY].
-   * @param zZeroToOne
-   * whether to use Vulkan's and Direct3D's NDC z range of <tt>[0..+1]</tt> when `true`
-   * or whether to use OpenGL's NDC z range of <tt>[-1..+1]</tt> when `false`
-   * @return a matrix holding the result
-   */
-  fun perspectiveLH(fovy: Float, aspect: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean): Matrix4f {
-    return perspectiveLH(fovy, aspect, zNear, zFar, zZeroToOne, thisOrNew())
-  }
-
-  /**
-   * Apply a symmetric perspective projection frustum transformation for a left-handed coordinate system
-   * using OpenGL's NDC z range of <tt>[-1..+1]</tt> to this matrix and store the result in `dest`.
-   *
-   *
-   * If `M` is `this` matrix and `P` the perspective projection matrix,
-   * then the new matrix will be `M * P`. So when transforming a
-   * vector `v` with the new matrix by using `M * P * v`,
-   * the perspective projection will be applied first!
-   *
-   *
-   * In order to set the matrix to a perspective frustum transformation without post-multiplying,
-   * use [setPerspectiveLH][.setPerspectiveLH].
-   *
-   * @see .setPerspectiveLH
-   * @param fovy
-   * the vertical field of view in radians (must be greater than zero and less than [PI][Math.PI])
-   * @param aspect
-   * the aspect ratio (i.e. width / height; must be greater than zero)
-   * @param zNear
-   * near clipping plane distance. If the special value [Float.POSITIVE_INFINITY] is used, the near clipping plane will be at positive infinity.
-   * In that case, `zFar` may not also be [Float.POSITIVE_INFINITY].
-   * @param zFar
-   * far clipping plane distance. If the special value [Float.POSITIVE_INFINITY] is used, the far clipping plane will be at positive infinity.
-   * In that case, `zNear` may not also be [Float.POSITIVE_INFINITY].
-   * @param dest
-   * will hold the result
-   * @return dest
-   */
-  override fun perspectiveLH(fovy: Float, aspect: Float, zNear: Float, zFar: Float, dest: Matrix4f): Matrix4f {
-    return perspectiveLH(fovy, aspect, zNear, zFar, false, dest)
-  }
-
-  /**
-   * Apply a symmetric perspective projection frustum transformation for a left-handed coordinate system
-   * using OpenGL's NDC z range of <tt>[-1..+1]</tt> to this matrix.
-   *
-   *
-   * If `M` is `this` matrix and `P` the perspective projection matrix,
-   * then the new matrix will be `M * P`. So when transforming a
-   * vector `v` with the new matrix by using `M * P * v`,
-   * the perspective projection will be applied first!
-   *
-   *
-   * In order to set the matrix to a perspective frustum transformation without post-multiplying,
-   * use [setPerspectiveLH][.setPerspectiveLH].
-   *
-   * @see .setPerspectiveLH
-   * @param fovy
-   * the vertical field of view in radians (must be greater than zero and less than [PI][Math.PI])
-   * @param aspect
-   * the aspect ratio (i.e. width / height; must be greater than zero)
-   * @param zNear
-   * near clipping plane distance. If the special value [Float.POSITIVE_INFINITY] is used, the near clipping plane will be at positive infinity.
-   * In that case, `zFar` may not also be [Float.POSITIVE_INFINITY].
-   * @param zFar
-   * far clipping plane distance. If the special value [Float.POSITIVE_INFINITY] is used, the far clipping plane will be at positive infinity.
-   * In that case, `zNear` may not also be [Float.POSITIVE_INFINITY].
-   * @return a matrix holding the result
-   */
-  fun perspectiveLH(fovy: Float, aspect: Float, zNear: Float, zFar: Float): Matrix4f {
-    return perspectiveLH(fovy, aspect, zNear, zFar, thisOrNew())
-  }
-
-  /**
-   * Set this matrix to be a symmetric perspective projection frustum transformation for a left-handed coordinate system
-   * using the given NDC z range of <tt>[-1..+1]</tt>.
-   *
-   *
-   * In order to apply the perspective projection transformation to an existing transformation,
-   * use [perspectiveLH()][.perspectiveLH].
-   *
-   * @see .perspectiveLH
-   * @param fovy
-   * the vertical field of view in radians (must be greater than zero and less than [PI][Math.PI])
-   * @param aspect
-   * the aspect ratio (i.e. width / height; must be greater than zero)
-   * @param zNear
-   * near clipping plane distance. If the special value [Float.POSITIVE_INFINITY] is used, the near clipping plane will be at positive infinity.
-   * In that case, `zFar` may not also be [Float.POSITIVE_INFINITY].
-   * @param zFar
-   * far clipping plane distance. If the special value [Float.POSITIVE_INFINITY] is used, the far clipping plane will be at positive infinity.
-   * In that case, `zNear` may not also be [Float.POSITIVE_INFINITY].
-   * @param zZeroToOne
-   * whether to use Vulkan's and Direct3D's NDC z range of <tt>[0..+1]</tt> when `true`
-   * or whether to use OpenGL's NDC z range of <tt>[-1..+1]</tt> when `false`
-   * @return this
-   */
-  @JvmOverloads
-  fun setPerspectiveLH(fovy: Float, aspect: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean = false): Matrix4f {
-    MemUtil.INSTANCE.zero(this)
-    val h = Math.tan((fovy * 0.5f).toDouble()).toFloat()
-    this._m00(1.0f / (h * aspect))
-    this._m11(1.0f / h)
-    val farInf = zFar > 0 && java.lang.Float.isInfinite(zFar)
-    val nearInf = zNear > 0 && java.lang.Float.isInfinite(zNear)
-    if (farInf) {
-      // See: "Infinite Projection Matrix" (http://www.terathon.com/gdc07_lengyel.pdf)
-      val e = 1E-6f
-      this._m22(1.0f - e)
-      this._m32((e - if (zZeroToOne) 1.0f else 2.0f) * zNear)
-    } else if (nearInf) {
-      val e = 1E-6f
-      this._m22((if (zZeroToOne) 0.0f else 1.0f) - e)
-      this._m32(((if (zZeroToOne) 1.0f else 2.0f) - e) * zFar)
-    } else {
-      this._m22((if (zZeroToOne) zFar else zFar + zNear) / (zFar - zNear))
-      this._m32((if (zZeroToOne) zFar else zFar + zFar) * zNear / (zNear - zFar))
-    }
-    this._m23(1.0f)
-    _properties(Matrix4fc.PROPERTY_PERSPECTIVE.toInt())
-    return this
   }
 
   /**
@@ -9782,8 +7217,8 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun frustum(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
-    return if (properties and Matrix4fc.PROPERTY_IDENTITY != 0) dest.setFrustum(left, right, bottom, top, zNear, zFar, zZeroToOne) else frustumGeneric(left, right, bottom, top, zNear, zFar, zZeroToOne, dest)
+  fun frustum(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
+    return if (properties and Matrix4f.PROPERTY_IDENTITY != 0) dest.setFrustum(left, right, bottom, top, zNear, zFar, zZeroToOne) else frustumGeneric(left, right, bottom, top, zNear, zFar, zZeroToOne, dest)
   }
 
   private fun frustumGeneric(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
@@ -9874,7 +7309,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun frustum(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, dest: Matrix4f): Matrix4f {
+  fun frustum(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, dest: Matrix4f): Matrix4f {
     return frustum(left, right, bottom, top, zNear, zFar, false, dest)
   }
 
@@ -9990,8 +7425,8 @@ class Matrix4f : Externalizable, Matrix4fc {
    */
   @JvmOverloads
   fun setFrustum(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean = false): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY == 0)
-      MemUtil.INSTANCE.identity(this)
+    if (properties and Matrix4f.PROPERTY_IDENTITY == 0)
+      throw Error("Not implemented")
     this._m00((zNear + zNear) / (right - left))
     this._m11((zNear + zNear) / (top - bottom))
     this._m20((right + left) / (right - left))
@@ -10013,7 +7448,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     }
     this._m23(-1.0f)
     this._m33(0.0f)
-    _properties((if (this.m20 == 0.0f && this.m21 == 0.0f) Matrix4fc.PROPERTY_PERSPECTIVE else 0).toInt())
+    _properties((if (this.m20 == 0.0f && this.m21 == 0.0f) Matrix4f.PROPERTY_PERSPECTIVE else 0).toInt())
     return this
   }
 
@@ -10056,8 +7491,8 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun frustumLH(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
-    return if (properties and Matrix4fc.PROPERTY_IDENTITY != 0) dest.setFrustumLH(left, right, bottom, top, zNear, zFar, zZeroToOne) else frustumLHGeneric(left, right, bottom, top, zNear, zFar, zZeroToOne, dest)
+  fun frustumLH(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
+    return if (properties and Matrix4f.PROPERTY_IDENTITY != 0) dest.setFrustumLH(left, right, bottom, top, zNear, zFar, zZeroToOne) else frustumLHGeneric(left, right, bottom, top, zNear, zFar, zZeroToOne, dest)
   }
 
   private fun frustumLHGeneric(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean, dest: Matrix4f): Matrix4f {
@@ -10189,7 +7624,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun frustumLH(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, dest: Matrix4f): Matrix4f {
+  fun frustumLH(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, dest: Matrix4f): Matrix4f {
     return frustumLH(left, right, bottom, top, zNear, zFar, false, dest)
   }
 
@@ -10264,8 +7699,8 @@ class Matrix4f : Externalizable, Matrix4fc {
    */
   @JvmOverloads
   fun setFrustumLH(left: Float, right: Float, bottom: Float, top: Float, zNear: Float, zFar: Float, zZeroToOne: Boolean = false): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY == 0)
-      MemUtil.INSTANCE.identity(this)
+    if (properties and Matrix4f.PROPERTY_IDENTITY == 0)
+      throw Error("Not implemented")
     this._m00((zNear + zNear) / (right - left))
     this._m11((zNear + zNear) / (top - bottom))
     this._m20((right + left) / (right - left))
@@ -10341,12 +7776,12 @@ class Matrix4f : Externalizable, Matrix4fc {
     this.m31 = 0.0f
     this.m32 = l22 * -near * far
     this.m33 = 0.0f
-    this.properties = Matrix4fc.PROPERTY_PERSPECTIVE.toInt()
+    this.properties = Matrix4f.PROPERTY_PERSPECTIVE.toInt()
     return this
   }
 
   /**
-   * Apply the rotation transformation of the given [Quaternionfc] to this matrix and store
+   * Apply the rotation transformation of the given [Quaternionf] to this matrix and store
    * the result in `dest`.
    *
    *
@@ -10369,22 +7804,22 @@ class Matrix4f : Externalizable, Matrix4fc {
    *
    * @see .rotation
    * @param quat
-   * the [Quaternionfc]
+   * the [Quaternionf]
    * @param dest
    * will hold the result
    * @return dest
    */
-  override fun rotate(quat: Quaternionfc, dest: Matrix4f): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+  fun rotate(quat: Quaternionf, dest: Matrix4f): Matrix4f {
+    if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       return dest.rotation(quat)
-    else if (properties and Matrix4fc.PROPERTY_TRANSLATION != 0)
+    else if (properties and Matrix4f.PROPERTY_TRANSLATION != 0)
       return rotateTranslation(quat, dest)
-    else if (properties and Matrix4fc.PROPERTY_AFFINE != 0)
+    else if (properties and Matrix4f.PROPERTY_AFFINE != 0)
       return rotateAffine(quat, dest)
     return rotateGeneric(quat, dest)
   }
 
-  private fun rotateGeneric(quat: Quaternionfc, dest: Matrix4f): Matrix4f {
+  private fun rotateGeneric(quat: Quaternionf, dest: Matrix4f): Matrix4f {
     val w2 = quat.w * quat.w
     val x2 = quat.x * quat.x
     val y2 = quat.y * quat.y
@@ -10428,42 +7863,12 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(m31)
     dest._m32(m32)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
   /**
-   * Apply the rotation transformation of the given [Quaternionfc] to this matrix.
-   *
-   *
-   * When used with a right-handed coordinate system, the produced rotation will rotate a vector
-   * counter-clockwise around the rotation axis, when viewing along the negative axis direction towards the origin.
-   * When used with a left-handed coordinate system, the rotation is clockwise.
-   *
-   *
-   * If `M` is `this` matrix and `Q` the rotation matrix obtained from the given quaternion,
-   * then the new matrix will be `M * Q`. So when transforming a
-   * vector `v` with the new matrix by using `M * Q * v`,
-   * the quaternion rotation will be applied first!
-   *
-   *
-   * In order to set the matrix to a rotation transformation without post-multiplying,
-   * use [.rotation].
-   *
-   *
-   * Reference: [http://en.wikipedia.org](http://en.wikipedia.org/wiki/Rotation_matrix#Quaternion)
-   *
-   * @see .rotation
-   * @param quat
-   * the [Quaternionfc]
-   * @return a matrix holding the result
-   */
-  fun rotate(quat: Quaternionfc): Matrix4f {
-    return rotate(quat, thisOrNew())
-  }
-
-  /**
-   * Apply the rotation transformation of the given [Quaternionfc] to this [affine][.isAffine] matrix and store
+   * Apply the rotation transformation of the given [Quaternionf] to this [affine][.isAffine] matrix and store
    * the result in `dest`.
    *
    *
@@ -10489,12 +7894,12 @@ class Matrix4f : Externalizable, Matrix4fc {
    *
    * @see .rotation
    * @param quat
-   * the [Quaternionfc]
+   * the [Quaternionf]
    * @param dest
    * will hold the result
    * @return dest
    */
-  override fun rotateAffine(quat: Quaternionfc, dest: Matrix4f): Matrix4f {
+  fun rotateAffine(quat: Quaternionf, dest: Matrix4f): Matrix4f {
     val w2 = quat.w * quat.w
     val x2 = quat.x * quat.x
     val y2 = quat.y * quat.y
@@ -10536,13 +7941,13 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(m31)
     dest._m32(m32)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
 
     return dest
   }
 
   /**
-   * Apply the rotation transformation of the given [Quaternionfc] to this matrix.
+   * Apply the rotation transformation of the given [Quaternionf] to this matrix.
    *
    *
    * This method assumes `this` to be [affine][.isAffine].
@@ -10567,15 +7972,15 @@ class Matrix4f : Externalizable, Matrix4fc {
    *
    * @see .rotation
    * @param quat
-   * the [Quaternionfc]
+   * the [Quaternionf]
    * @return a matrix holding the result
    */
-  fun rotateAffine(quat: Quaternionfc): Matrix4f {
+  fun rotateAffine(quat: Quaternionf): Matrix4f {
     return rotateAffine(quat, thisOrNew())
   }
 
   /**
-   * Apply the rotation transformation of the given [Quaternionfc] to this matrix, which is assumed to only contain a translation, and store
+   * Apply the rotation transformation of the given [Quaternionf] to this matrix, which is assumed to only contain a translation, and store
    * the result in `dest`.
    *
    *
@@ -10601,12 +8006,12 @@ class Matrix4f : Externalizable, Matrix4fc {
    *
    * @see .rotation
    * @param quat
-   * the [Quaternionfc]
+   * the [Quaternionf]
    * @param dest
    * will hold the result
    * @return dest
    */
-  override fun rotateTranslation(quat: Quaternionfc, dest: Matrix4f): Matrix4f {
+  fun rotateTranslation(quat: Quaternionf, dest: Matrix4f): Matrix4f {
     val w2 = quat.w * quat.w
     val x2 = quat.x * quat.x
     val y2 = quat.y * quat.y
@@ -10642,13 +8047,13 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(m31)
     dest._m32(m32)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
 
     return dest
   }
 
   /**
-   * Apply the rotation transformation of the given [Quaternionfc] to this matrix while using <tt>(ox, oy, oz)</tt> as the rotation origin.
+   * Apply the rotation transformation of the given [Quaternionf] to this matrix while using <tt>(ox, oy, oz)</tt> as the rotation origin.
    *
    *
    * When used with a right-handed coordinate system, the produced rotation will rotate a vector
@@ -10668,7 +8073,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * Reference: [http://en.wikipedia.org](http://en.wikipedia.org/wiki/Rotation_matrix#Quaternion)
    *
    * @param quat
-   * the [Quaternionfc]
+   * the [Quaternionf]
    * @param ox
    * the x coordinate of the rotation origin
    * @param oy
@@ -10677,14 +8082,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the z coordinate of the rotation origin
    * @return a matrix holding the result
    */
-  fun rotateAround(quat: Quaternionfc, ox: Float, oy: Float, oz: Float): Matrix4f {
+  fun rotateAround(quat: Quaternionf, ox: Float, oy: Float, oz: Float): Matrix4f {
     return rotateAround(quat, ox, oy, oz, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#rotateAround(Quaternionfc, float, float, float, Matrix4f)
+     * @see Matrix4f#rotateAround(Quaternionf, float, float, float, Matrix4f)
      */
-  override fun rotateAround(quat: Quaternionfc, ox: Float, oy: Float, oz: Float, dest: Matrix4f): Matrix4f {
+  fun rotateAround(quat: Quaternionf, ox: Float, oy: Float, oz: Float, dest: Matrix4f): Matrix4f {
     val w2 = quat.w * quat.w
     val x2 = quat.x * quat.x
     val y2 = quat.y * quat.y
@@ -10731,12 +8136,12 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(-nm01 * ox - nm11 * oy - m21 * oz + tm31)
     dest._m32(-nm02 * ox - nm12 * oy - m22 * oz + tm32)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
   /**
-   * Pre-multiply the rotation transformation of the given [Quaternionfc] to this matrix and store
+   * Pre-multiply the rotation transformation of the given [Quaternionf] to this matrix and store
    * the result in `dest`.
    *
    *
@@ -10759,12 +8164,12 @@ class Matrix4f : Externalizable, Matrix4fc {
    *
    * @see .rotation
    * @param quat
-   * the [Quaternionfc]
+   * the [Quaternionf]
    * @param dest
    * will hold the result
    * @return dest
    */
-  override fun rotateLocal(quat: Quaternionfc, dest: Matrix4f): Matrix4f {
+  fun rotateLocal(quat: Quaternionf, dest: Matrix4f): Matrix4f {
     val w2 = quat.w * quat.w
     val x2 = quat.x * quat.x
     val y2 = quat.y * quat.y
@@ -10816,12 +8221,12 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(nm31)
     dest._m32(nm32)
     dest._m33(nm33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
   /**
-   * Pre-multiply the rotation transformation of the given [Quaternionfc] to this matrix.
+   * Pre-multiply the rotation transformation of the given [Quaternionf] to this matrix.
    *
    *
    * When used with a right-handed coordinate system, the produced rotation will rotate a vector
@@ -10843,17 +8248,17 @@ class Matrix4f : Externalizable, Matrix4fc {
    *
    * @see .rotation
    * @param quat
-   * the [Quaternionfc]
+   * the [Quaternionf]
    * @return a matrix holding the result
    */
-  fun rotateLocal(quat: Quaternionfc): Matrix4f {
+  fun rotateLocal(quat: Quaternionf): Matrix4f {
     return rotateLocal(quat, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#rotateAroundLocal(Quaternionfc, float, float, float, Matrix4f)
+     * @see Matrix4f#rotateAroundLocal(Quaternionf, float, float, float, Matrix4f)
      */
-  override fun rotateAroundLocal(quat: Quaternionfc, ox: Float, oy: Float, oz: Float, dest: Matrix4f): Matrix4f {
+  fun rotateAroundLocal(quat: Quaternionf, ox: Float, oy: Float, oz: Float, dest: Matrix4f): Matrix4f {
     val w2 = quat.w * quat.w
     val x2 = quat.x * quat.x
     val y2 = quat.y * quat.y
@@ -10901,12 +8306,12 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(lm01 * tm30 + lm11 * tm31 + lm21 * tm32 + oy * m33)
     dest._m32(lm02 * tm30 + lm12 * tm31 + lm22 * tm32 + oz * m33)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
   /**
-   * Pre-multiply the rotation transformation of the given [Quaternionfc] to this matrix while using <tt>(ox, oy, oz)</tt>
+   * Pre-multiply the rotation transformation of the given [Quaternionf] to this matrix while using <tt>(ox, oy, oz)</tt>
    * as the rotation origin.
    *
    *
@@ -10927,7 +8332,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * Reference: [http://en.wikipedia.org](http://en.wikipedia.org/wiki/Rotation_matrix#Quaternion)
    *
    * @param quat
-   * the [Quaternionfc]
+   * the [Quaternionf]
    * @param ox
    * the x coordinate of the rotation origin
    * @param oy
@@ -10936,72 +8341,8 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the z coordinate of the rotation origin
    * @return a matrix holding the result
    */
-  fun rotateAroundLocal(quat: Quaternionfc, ox: Float, oy: Float, oz: Float): Matrix4f {
+  fun rotateAroundLocal(quat: Quaternionf, ox: Float, oy: Float, oz: Float): Matrix4f {
     return rotateAroundLocal(quat, ox, oy, oz, thisOrNew())
-  }
-
-  /**
-   * Apply a rotation transformation, rotating about the given [AxisAngle4f], to this matrix.
-   *
-   *
-   * When used with a right-handed coordinate system, the produced rotation will rotate a vector
-   * counter-clockwise around the rotation axis, when viewing along the negative axis direction towards the origin.
-   * When used with a left-handed coordinate system, the rotation is clockwise.
-   *
-   *
-   * If `M` is `this` matrix and `A` the rotation matrix obtained from the given [AxisAngle4f],
-   * then the new matrix will be `M * A`. So when transforming a
-   * vector `v` with the new matrix by using `M * A * v`,
-   * the [AxisAngle4f] rotation will be applied first!
-   *
-   *
-   * In order to set the matrix to a rotation transformation without post-multiplying,
-   * use [.rotation].
-   *
-   *
-   * Reference: [http://en.wikipedia.org](http://en.wikipedia.org/wiki/Rotation_matrix#Axis_and_angle)
-   *
-   * @see .rotate
-   * @see .rotation
-   * @param axisAngle
-   * the [AxisAngle4f] (needs to be [normalized][AxisAngle4f.normalize])
-   * @return this
-   */
-  fun rotate(axisAngle: AxisAngle4f): Matrix4f {
-    return rotate(axisAngle.angle, axisAngle.x, axisAngle.y, axisAngle.z)
-  }
-
-  /**
-   * Apply a rotation transformation, rotating about the given [AxisAngle4f] and store the result in `dest`.
-   *
-   *
-   * When used with a right-handed coordinate system, the produced rotation will rotate a vector
-   * counter-clockwise around the rotation axis, when viewing along the negative axis direction towards the origin.
-   * When used with a left-handed coordinate system, the rotation is clockwise.
-   *
-   *
-   * If `M` is `this` matrix and `A` the rotation matrix obtained from the given [AxisAngle4f],
-   * then the new matrix will be `M * A`. So when transforming a
-   * vector `v` with the new matrix by using `M * A * v`,
-   * the [AxisAngle4f] rotation will be applied first!
-   *
-   *
-   * In order to set the matrix to a rotation transformation without post-multiplying,
-   * use [.rotation].
-   *
-   *
-   * Reference: [http://en.wikipedia.org](http://en.wikipedia.org/wiki/Rotation_matrix#Axis_and_angle)
-   *
-   * @see .rotate
-   * @see .rotation
-   * @param axisAngle
-   * the [AxisAngle4f] (needs to be [normalized][AxisAngle4f.normalize])
-   * @param dest
-   * will hold the result
-   * @return dest
-   */
-  override fun rotate(axisAngle: AxisAngle4f, dest: Matrix4f): Matrix4f {
-    return rotate(axisAngle.angle, axisAngle.x, axisAngle.y, axisAngle.z, dest)
   }
 
   /**
@@ -11036,7 +8377,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the rotation axis (needs to be [normalized][Vector3m.normalize])
    * @return this
    */
-  fun rotate(angle: Float, axis: Vector3fc): Matrix4f {
+  fun rotate(angle: Float, axis: Vector3m): Matrix4f {
     return rotate(angle, axis.x, axis.y, axis.z)
   }
 
@@ -11074,14 +8415,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun rotate(angle: Float, axis: Vector3fc, dest: Matrix4f): Matrix4f {
+  fun rotate(angle: Float, axis: Vector3m, dest: Matrix4f): Matrix4f {
     return rotate(angle, axis.x, axis.y, axis.z, dest)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#unproject(float, float, float, int[], Vector4)
+     * @see Matrix4f#unproject(float, float, float, int[], Vector4)
      */
-  override fun unproject(winX: Float, winY: Float, winZ: Float, viewport: IntArray, dest: Vector4): Vector4 {
+  fun unproject(winX: Float, winY: Float, winZ: Float, viewport: IntArray, dest: Vector4): Vector4 {
     val a = m00 * m11 - m01 * m10
     val b = m00 * m12 - m02 * m10
     val c = m00 * m13 - m03 * m10
@@ -11124,9 +8465,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#unproject(float, float, float, int[], Vector3m)
+     * @see Matrix4f#unproject(float, float, float, int[], Vector3m)
      */
-  override fun unproject(winX: Float, winY: Float, winZ: Float, viewport: IntArray, dest: Vector3m): Vector3m {
+  fun unproject(winX: Float, winY: Float, winZ: Float, viewport: IntArray, dest: Vector3m): Vector3m {
     val a = m00 * m11 - m01 * m10
     val b = m00 * m12 - m02 * m10
     val c = m00 * m13 - m03 * m10
@@ -11168,23 +8509,23 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#unproject(Vector3fc, int[], Vector4)
+     * @see Matrix4f#unproject(Vector3m, int[], Vector4)
      */
-  override fun unproject(winCoords: Vector3fc, viewport: IntArray, dest: Vector4): Vector4 {
+  fun unproject(winCoords: Vector3m, viewport: IntArray, dest: Vector4): Vector4 {
     return unproject(winCoords.x, winCoords.y, winCoords.z, viewport, dest)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#unproject(Vector3fc, int[], Vector3m)
+     * @see Matrix4f#unproject(Vector3m, int[], Vector3m)
      */
-  override fun unproject(winCoords: Vector3fc, viewport: IntArray, dest: Vector3m): Vector3m {
+  fun unproject(winCoords: Vector3m, viewport: IntArray, dest: Vector3m): Vector3m {
     return unproject(winCoords.x, winCoords.y, winCoords.z, viewport, dest)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#unprojectRay(float, float, int[], Vector3m, Vector3m)
+     * @see Matrix4f#unprojectRay(float, float, int[], Vector3m, Vector3m)
      */
-  override fun unprojectRay(winX: Float, winY: Float, viewport: IntArray, originDest: Vector3m, dirDest: Vector3m): Matrix4f {
+  fun unprojectRay(winX: Float, winY: Float, viewport: IntArray, originDest: Vector3m, dirDest: Vector3m): Matrix4f {
     val a = m00 * m11 - m01 * m10
     val b = m00 * m12 - m02 * m10
     val c = m00 * m13 - m03 * m10
@@ -11238,23 +8579,16 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#unprojectRay(Vector2fc, int[], Vector3m, Vector3m)
+     * @see Matrix4f#unprojectRay(Vector2f, int[], Vector3m, Vector3m)
      */
-  override fun unprojectRay(winCoords: Vector2fc, viewport: IntArray, originDest: Vector3m, dirDest: Vector3m): Matrix4f {
+  fun unprojectRay(winCoords: Vector2f, viewport: IntArray, originDest: Vector3m, dirDest: Vector3m): Matrix4f {
     return unprojectRay(winCoords.x, winCoords.y, viewport, originDest, dirDest)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#unprojectInv(Vector3fc, int[], Vector4)
+     * @see Matrix4f#unprojectInv(float, float, float, int[], Vector4)
      */
-  override fun unprojectInv(winCoords: Vector3fc, viewport: IntArray, dest: Vector4): Vector4 {
-    return unprojectInv(winCoords.x, winCoords.y, winCoords.z, viewport, dest)
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#unprojectInv(float, float, float, int[], Vector4)
-     */
-  override fun unprojectInv(winX: Float, winY: Float, winZ: Float, viewport: IntArray, dest: Vector4): Vector4 {
+  fun unprojectInv(winX: Float, winY: Float, winZ: Float, viewport: IntArray, dest: Vector4): Vector4 {
     val ndcX = (winX - viewport[0]) / viewport[2] * 2.0f - 1.0f
     val ndcY = (winY - viewport[1]) / viewport[3] * 2.0f - 1.0f
     val ndcZ = winZ + winZ - 1.0f
@@ -11267,16 +8601,16 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#unprojectInvRay(Vector2fc, int[], Vector3m, Vector3m)
+     * @see Matrix4f#unprojectInvRay(Vector2f, int[], Vector3m, Vector3m)
      */
-  override fun unprojectInvRay(winCoords: Vector2fc, viewport: IntArray, originDest: Vector3m, dirDest: Vector3m): Matrix4f {
+  fun unprojectInvRay(winCoords: Vector2f, viewport: IntArray, originDest: Vector3m, dirDest: Vector3m): Matrix4f {
     return unprojectInvRay(winCoords.x, winCoords.y, viewport, originDest, dirDest)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#unprojectInvRay(float, float, int[], Vector3m, Vector3m)
+     * @see Matrix4f#unprojectInvRay(float, float, int[], Vector3m, Vector3m)
      */
-  override fun unprojectInvRay(winX: Float, winY: Float, viewport: IntArray, originDest: Vector3m, dirDest: Vector3m): Matrix4f {
+  fun unprojectInvRay(winX: Float, winY: Float, viewport: IntArray, originDest: Vector3m, dirDest: Vector3m): Matrix4f {
     val ndcX = (winX - viewport[0]) / viewport[2] * 2.0f - 1.0f
     val ndcY = (winY - viewport[1]) / viewport[3] * 2.0f - 1.0f
     val px = m00 * ndcX + m10 * ndcY + m30
@@ -11300,16 +8634,16 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#unprojectInv(Vector3fc, int[], Vector3m)
+     * @see Matrix4f#unprojectInv(Vector3m, int[], Vector3m)
      */
-  override fun unprojectInv(winCoords: Vector3fc, viewport: IntArray, dest: Vector3m): Vector3m {
+  fun unprojectInv(winCoords: Vector3m, viewport: IntArray, dest: Vector3m): Vector3m {
     return unprojectInv(winCoords.x, winCoords.y, winCoords.z, viewport, dest)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#unprojectInv(float, float, float, int[], Vector3m)
+     * @see Matrix4f#unprojectInv(float, float, float, int[], Vector3m)
      */
-  override fun unprojectInv(winX: Float, winY: Float, winZ: Float, viewport: IntArray, dest: Vector3m): Vector3m {
+  fun unprojectInv(winX: Float, winY: Float, winZ: Float, viewport: IntArray, dest: Vector3m): Vector3m {
     val ndcX = (winX - viewport[0]) / viewport[2] * 2.0f - 1.0f
     val ndcY = (winY - viewport[1]) / viewport[3] * 2.0f - 1.0f
     val ndcZ = winZ + winZ - 1.0f
@@ -11321,9 +8655,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#project(float, float, float, int[], Vector4)
+     * @see Matrix4f#project(float, float, float, int[], Vector4)
      */
-  override fun project(x: Float, y: Float, z: Float, viewport: IntArray, winCoordsDest: Vector4): Vector4 {
+  fun project(x: Float, y: Float, z: Float, viewport: IntArray, winCoordsDest: Vector4): Vector4 {
     val invW = 1.0f / (m03 * x + m13 * y + m23 * z + m33)
     val nx = (m00 * x + m10 * y + m20 * z + m30) * invW
     val ny = (m01 * x + m11 * y + m21 * z + m31) * invW
@@ -11336,9 +8670,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#project(float, float, float, int[], Vector3m)
+     * @see Matrix4f#project(float, float, float, int[], Vector3m)
      */
-  override fun project(x: Float, y: Float, z: Float, viewport: IntArray, winCoordsDest: Vector3m): Vector3m {
+  fun project(x: Float, y: Float, z: Float, viewport: IntArray, winCoordsDest: Vector3m): Vector3m {
     val invW = 1.0f / (m03 * x + m13 * y + m23 * z + m33)
     val nx = (m00 * x + m10 * y + m20 * z + m30) * invW
     val ny = (m01 * x + m11 * y + m21 * z + m31) * invW
@@ -11350,26 +8684,12 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#project(Vector3fc, int[], Vector4)
+     * @see Matrix4f#reflect(float, float, float, float, Matrix4f)
      */
-  override fun project(position: Vector3fc, viewport: IntArray, winCoordsDest: Vector4): Vector4 {
-    return project(position.x, position.y, position.z, viewport, winCoordsDest)
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#project(Vector3fc, int[], Vector3m)
-     */
-  override fun project(position: Vector3fc, viewport: IntArray, winCoordsDest: Vector3m): Vector3m {
-    return project(position.x, position.y, position.z, viewport, winCoordsDest)
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#reflect(float, float, float, float, Matrix4f)
-     */
-  override fun reflect(a: Float, b: Float, c: Float, d: Float, dest: Matrix4f): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+  fun reflect(a: Float, b: Float, c: Float, d: Float, dest: Matrix4f): Matrix4f {
+    if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       return dest.reflection(a, b, c, d)
-    else if (properties and Matrix4fc.PROPERTY_AFFINE != 0)
+    else if (properties and Matrix4f.PROPERTY_AFFINE != 0)
       return reflectAffine(a, b, c, d, dest)
     return reflectGeneric(a, b, c, d, dest)
   }
@@ -11414,7 +8734,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m11(nm11)
     dest._m12(nm12)
     dest._m13(0.0f)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -11460,7 +8780,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m11(nm11)
     dest._m12(nm12)
     dest._m13(nm13)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -11523,9 +8843,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#reflect(float, float, float, float, float, float, Matrix4f)
+     * @see Matrix4f#reflect(float, float, float, float, float, float, Matrix4f)
      */
-  override fun reflect(nx: Float, ny: Float, nz: Float, px: Float, py: Float, pz: Float, dest: Matrix4f): Matrix4f {
+  fun reflect(nx: Float, ny: Float, nz: Float, px: Float, py: Float, pz: Float, dest: Matrix4f): Matrix4f {
     val invLength = 1.0f / Math.sqrt((nx * nx + ny * ny + nz * nz).toDouble()).toFloat()
     val nnx = nx * invLength
     val nny = ny * invLength
@@ -11550,7 +8870,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * a point on the plane
    * @return this
    */
-  fun reflect(normal: Vector3fc, point: Vector3fc): Matrix4f {
+  fun reflect(normal: Vector3m, point: Vector3m): Matrix4f {
     return reflect(normal.x, normal.y, normal.z, point.x, point.y, point.z)
   }
 
@@ -11560,7 +8880,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    *
    *
    * This method can be used to build a reflection transformation based on the orientation of a mirror object in the scene.
-   * It is assumed that the default mirror plane's normal is <tt>(0, 0, 1)</tt>. So, if the given [Quaternionfc] is
+   * It is assumed that the default mirror plane's normal is <tt>(0, 0, 1)</tt>. So, if the given [Quaternionf] is
    * the identity (does not apply any additional rotation), the reflection plane will be <tt>z=0</tt>, offset by the given `point`.
    *
    *
@@ -11575,14 +8895,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    * a point on the plane
    * @return a matrix holding the result
    */
-  fun reflect(orientation: Quaternionfc, point: Vector3fc): Matrix4f {
+  fun reflect(orientation: Quaternionf, point: Vector3m): Matrix4f {
     return reflect(orientation, point, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#reflect(Quaternionfc, Vector3fc, Matrix4f)
+     * @see Matrix4f#reflect(Quaternionf, Vector3m, Matrix4f)
      */
-  override fun reflect(orientation: Quaternionfc, point: Vector3fc, dest: Matrix4f): Matrix4f {
+  fun reflect(orientation: Quaternionf, point: Vector3m, dest: Matrix4f): Matrix4f {
     val num1 = (orientation.x + orientation.x).toDouble()
     val num2 = (orientation.y + orientation.y).toDouble()
     val num3 = (orientation.z + orientation.z).toDouble()
@@ -11593,9 +8913,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#reflect(Vector3fc, Vector3fc, Matrix4f)
+     * @see Matrix4f#reflect(Vector3m, Vector3m, Matrix4f)
      */
-  override fun reflect(normal: Vector3fc, point: Vector3fc, dest: Matrix4f): Matrix4f {
+  fun reflect(normal: Vector3m, point: Vector3m, dest: Matrix4f): Matrix4f {
     return reflect(normal.x, normal.y, normal.z, point.x, point.y, point.z, dest)
   }
 
@@ -11640,7 +8960,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m31(-dd * b)
     this._m32(-dd * c)
     this._m33(1.0f)
-    _properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    _properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
     return this
   }
 
@@ -11681,7 +9001,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * a point on the plane
    * @return this
    */
-  fun reflection(normal: Vector3fc, point: Vector3fc): Matrix4f {
+  fun reflection(normal: Vector3m, point: Vector3m): Matrix4f {
     return reflection(normal.x, normal.y, normal.z, point.x, point.y, point.z)
   }
 
@@ -11691,7 +9011,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    *
    *
    * This method can be used to build a reflection transformation based on the orientation of a mirror object in the scene.
-   * It is assumed that the default mirror plane's normal is <tt>(0, 0, 1)</tt>. So, if the given [Quaternionfc] is
+   * It is assumed that the default mirror plane's normal is <tt>(0, 0, 1)</tt>. So, if the given [Quaternionf] is
    * the identity (does not apply any additional rotation), the reflection plane will be <tt>z=0</tt>, offset by the given `point`.
    *
    * @param orientation
@@ -11700,7 +9020,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * a point on the plane
    * @return this
    */
-  fun reflection(orientation: Quaternionfc, point: Vector3fc): Matrix4f {
+  fun reflection(orientation: Quaternionf, point: Vector3m): Matrix4f {
     val num1 = (orientation.x + orientation.x).toDouble()
     val num2 = (orientation.y + orientation.y).toDouble()
     val num3 = (orientation.z + orientation.z).toDouble()
@@ -11711,10 +9031,10 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#getRow(int, Vector4)
+     * @see Matrix4f#getRow(int, Vector4)
      */
   @Throws(IndexOutOfBoundsException::class)
-  override fun getRow(row: Int, dest: Vector4): Vector4 {
+  fun getRow(row: Int, dest: Vector4): Vector4 {
     when (row) {
       0 -> {
         dest.x = m00
@@ -11756,7 +9076,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * @throws IndexOutOfBoundsException if `row` is not in <tt>[0..3]</tt>
    */
   @Throws(IndexOutOfBoundsException::class)
-  fun setRow(row: Int, src: Vector4c): Matrix4f {
+  fun setRow(row: Int, src: Vector4): Matrix4f {
     when (row) {
       0 -> {
         this._m00(src.x)
@@ -11786,127 +9106,6 @@ class Matrix4f : Externalizable, Matrix4fc {
     }
     _properties(0)
     return this
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#getColumn(int, Vector4)
-     */
-  @Throws(IndexOutOfBoundsException::class)
-  override fun getColumn(column: Int, dest: Vector4): Vector4 {
-    when (column) {
-      0 -> MemUtil.INSTANCE.putColumn0(this, dest)
-      1 -> MemUtil.INSTANCE.putColumn1(this, dest)
-      2 -> MemUtil.INSTANCE.putColumn2(this, dest)
-      3 -> MemUtil.INSTANCE.putColumn3(this, dest)
-      else -> throw IndexOutOfBoundsException()
-    }
-    return dest
-  }
-
-  /**
-   * Set the column at the given `column` index, starting with `0`.
-   *
-   * @param column
-   * the column index in <tt>[0..3]</tt>
-   * @param src
-   * the column components to set
-   * @return this
-   * @throws IndexOutOfBoundsException if `column` is not in <tt>[0..3]</tt>
-   */
-  @Throws(IndexOutOfBoundsException::class)
-  fun setColumn(column: Int, src: Vector4c): Matrix4f {
-    when (column) {
-      0 -> if (src is Vector4) {
-        MemUtil.INSTANCE.getColumn0(this, src)
-      } else {
-        this._m00(src.x)
-        this._m01(src.y)
-        this._m02(src.z)
-        this._m03(src.w)
-      }
-      1 -> if (src is Vector4) {
-        MemUtil.INSTANCE.getColumn1(this, src)
-      } else {
-        this._m10(src.x)
-        this._m11(src.y)
-        this._m12(src.z)
-        this._m13(src.w)
-      }
-      2 -> if (src is Vector4) {
-        MemUtil.INSTANCE.getColumn2(this, src)
-      } else {
-        this._m20(src.x)
-        this._m21(src.y)
-        this._m22(src.z)
-        this._m23(src.w)
-      }
-      3 -> if (src is Vector4) {
-        MemUtil.INSTANCE.getColumn3(this, src)
-      } else {
-        this._m30(src.x)
-        this._m31(src.y)
-        this._m32(src.z)
-        this._m33(src.w)
-      }
-      else -> throw IndexOutOfBoundsException()
-    }
-    _properties(0)
-    return this
-  }
-
-  /**
-   * Compute a normal matrix from the upper left 3x3 submatrix of `this`
-   * and store it into the upper left 3x3 submatrix of `this`.
-   * All other values of `this` will be set to [identity][.identity].
-   *
-   *
-   * The normal matrix of <tt>m</tt> is the transpose of the inverse of <tt>m</tt>.
-   *
-   *
-   * Please note that, if `this` is an orthogonal matrix or a matrix whose columns are orthogonal vectors,
-   * then this method *need not* be invoked, since in that case `this` itself is its normal matrix.
-   * In that case, use [.set3x3] to set a given Matrix4f to only the upper left 3x3 submatrix
-   * of this matrix.
-   *
-   * @see .set3x3
-   * @return a matrix holding the result
-   */
-  fun normal(): Matrix4f {
-    return normal(thisOrNew())
-  }
-
-  /**
-   * Compute a normal matrix from the upper left 3x3 submatrix of `this`
-   * and store it into the upper left 3x3 submatrix of `dest`.
-   * All other values of `dest` will be set to [identity][.identity].
-   *
-   *
-   * The normal matrix of <tt>m</tt> is the transpose of the inverse of <tt>m</tt>.
-   *
-   *
-   * Please note that, if `this` is an orthogonal matrix or a matrix whose columns are orthogonal vectors,
-   * then this method *need not* be invoked, since in that case `this` itself is its normal matrix.
-   * In that case, use [.set3x3] to set a given Matrix4f to only the upper left 3x3 submatrix
-   * of this matrix.
-   *
-   * @see .set3x3
-   * @param dest
-   * will hold the result
-   * @return dest
-   */
-  override fun normal(dest: Matrix4f): Matrix4f {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
-      return dest.identity()
-    else if (properties and Matrix4fc.PROPERTY_ORTHONORMAL != 0)
-      return normalOrthonormal(dest)
-    return normalGeneric(dest)
-  }
-
-  private fun normalOrthonormal(dest: Matrix4f): Matrix4f {
-    if (dest !== this)
-      dest.set(this)
-    dest._properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
-    return dest
   }
 
   private fun normalGeneric(dest: Matrix4f): Matrix4f {
@@ -11944,78 +9143,14 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(0.0f)
     dest._m32(0.0f)
     dest._m33(1.0f)
-    dest._properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    dest._properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
     return dest
-  }
-
-  /**
-   * Compute a normal matrix from the upper left 3x3 submatrix of `this`
-   * and store it into `dest`.
-   *
-   *
-   * The normal matrix of <tt>m</tt> is the transpose of the inverse of <tt>m</tt>.
-   *
-   *
-   * Please note that, if `this` is an orthogonal matrix or a matrix whose columns are orthogonal vectors,
-   * then this method *need not* be invoked, since in that case `this` itself is its normal matrix.
-   * In that case, use [Matrix3f.set] to set a given Matrix3f to only the upper left 3x3 submatrix
-   * of this matrix.
-   *
-   * @see Matrix3f.set
-   * @see .get3x3
-   * @param dest
-   * will hold the result
-   * @return dest
-   */
-  override fun normal(dest: Matrix3f): Matrix3f {
-    return if (properties and Matrix4fc.PROPERTY_ORTHONORMAL != 0) normalOrthonormal(dest) else normalGeneric(dest)
-  }
-
-  private fun normalOrthonormal(dest: Matrix3f): Matrix3f {
-    dest.set(this)
-    return dest
-  }
-
-  private fun normalGeneric(dest: Matrix3f): Matrix3f {
-    val m00m11 = m00 * m11
-    val m01m10 = m01 * m10
-    val m02m10 = m02 * m10
-    val m00m12 = m00 * m12
-    val m01m12 = m01 * m12
-    val m02m11 = m02 * m11
-    val det = (m00m11 - m01m10) * m22 + (m02m10 - m00m12) * m21 + (m01m12 - m02m11) * m20
-    val s = 1.0f / det
-    /* Invert and transpose in one go */
-    dest.m00((m11 * m22 - m21 * m12) * s)
-    dest.m01((m20 * m12 - m10 * m22) * s)
-    dest.m02((m10 * m21 - m20 * m11) * s)
-    dest.m10((m21 * m02 - m01 * m22) * s)
-    dest.m11((m00 * m22 - m20 * m02) * s)
-    dest.m12((m20 * m01 - m00 * m21) * s)
-    dest.m20((m01m12 - m02m11) * s)
-    dest.m21((m02m10 - m00m12) * s)
-    dest.m22((m00m11 - m01m10) * s)
-    return dest
-  }
-
-  /**
-   * Normalize the upper left 3x3 submatrix of this matrix.
-   *
-   *
-   * The resulting matrix will map unit vectors to unit vectors, though a pair of orthogonal input unit
-   * vectors need not be mapped to a pair of orthogonal output vectors if the original matrix was not orthogonal itself
-   * (i.e. had *skewing*).
-   *
-   * @return a matrix holding the result
-   */
-  fun normalize3x3(): Matrix4f {
-    return normalize3x3(thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#normalize3x3(Matrix4f)
+     * @see Matrix4f#normalize3x3(Matrix4f)
      */
-  override fun normalize3x3(dest: Matrix4f): Matrix4f {
+  fun normalize3x3(dest: Matrix4f): Matrix4f {
     val invXlen = (1.0 / Math.sqrt((m00 * m00 + m01 * m01 + m02 * m02).toDouble())).toFloat()
     val invYlen = (1.0 / Math.sqrt((m10 * m10 + m11 * m11 + m12 * m12).toDouble())).toFloat()
     val invZlen = (1.0 / Math.sqrt((m20 * m20 + m21 * m21 + m22 * m22).toDouble())).toFloat()
@@ -12033,60 +9168,26 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#normalize3x3(org.joml.Matrix3f)
+     * @see Matrix4f#frustumPlane(int, Vector4)
      */
-  override fun normalize3x3(dest: Matrix3f): Matrix3f {
-    val invXlen = (1.0 / Math.sqrt((m00 * m00 + m01 * m01 + m02 * m02).toDouble())).toFloat()
-    val invYlen = (1.0 / Math.sqrt((m10 * m10 + m11 * m11 + m12 * m12).toDouble())).toFloat()
-    val invZlen = (1.0 / Math.sqrt((m20 * m20 + m21 * m21 + m22 * m22).toDouble())).toFloat()
-    dest.m00(m00 * invXlen)
-    dest.m01(m01 * invXlen)
-    dest.m02(m02 * invXlen)
-    dest.m10(m10 * invYlen)
-    dest.m11(m11 * invYlen)
-    dest.m12(m12 * invYlen)
-    dest.m20(m20 * invZlen)
-    dest.m21(m21 * invZlen)
-    dest.m22(m22 * invZlen)
-    return dest
-  }
-
-  /* (non-Javadoc)
-     * @see Matrix4fc#frustumPlane(int, Vector4)
-     */
-  override fun frustumPlane(plane: Int, planeEquation: Vector4): Vector4 {
+  fun frustumPlane(plane: Int, planeEquation: Vector4): Vector4 {
     when (plane) {
-      Matrix4fc.PLANE_NX -> planeEquation.set(m03 + m00, m13 + m10, m23 + m20, m33 + m30).normalize3(planeEquation)
-      Matrix4fc.PLANE_PX -> planeEquation.set(m03 - m00, m13 - m10, m23 - m20, m33 - m30).normalize3(planeEquation)
-      Matrix4fc.PLANE_NY -> planeEquation.set(m03 + m01, m13 + m11, m23 + m21, m33 + m31).normalize3(planeEquation)
-      Matrix4fc.PLANE_PY -> planeEquation.set(m03 - m01, m13 - m11, m23 - m21, m33 - m31).normalize3(planeEquation)
-      Matrix4fc.PLANE_NZ -> planeEquation.set(m03 + m02, m13 + m12, m23 + m22, m33 + m32).normalize3(planeEquation)
-      Matrix4fc.PLANE_PZ -> planeEquation.set(m03 - m02, m13 - m12, m23 - m22, m33 - m32).normalize3(planeEquation)
+      Matrix4f.PLANE_NX -> planeEquation.set(m03 + m00, m13 + m10, m23 + m20, m33 + m30).normalize3(planeEquation)
+      Matrix4f.PLANE_PX -> planeEquation.set(m03 - m00, m13 - m10, m23 - m20, m33 - m30).normalize3(planeEquation)
+      Matrix4f.PLANE_NY -> planeEquation.set(m03 + m01, m13 + m11, m23 + m21, m33 + m31).normalize3(planeEquation)
+      Matrix4f.PLANE_PY -> planeEquation.set(m03 - m01, m13 - m11, m23 - m21, m33 - m31).normalize3(planeEquation)
+      Matrix4f.PLANE_NZ -> planeEquation.set(m03 + m02, m13 + m12, m23 + m22, m33 + m32).normalize3(planeEquation)
+      Matrix4f.PLANE_PZ -> planeEquation.set(m03 - m02, m13 - m12, m23 - m22, m33 - m32).normalize3(planeEquation)
       else -> throw IllegalArgumentException("plane") //$NON-NLS-1$
     }
     return planeEquation
   }
 
-  /* (non-Javadoc)
-     * @see Matrix4fc#frustumPlane(int, org.joml.Planef)
-     */
-  override fun frustumPlane(which: Int, plane: Planef): Planef {
-    when (which) {
-      Matrix4fc.PLANE_NX -> plane.set(m03 + m00, m13 + m10, m23 + m20, m33 + m30).normalize(plane)
-      Matrix4fc.PLANE_PX -> plane.set(m03 - m00, m13 - m10, m23 - m20, m33 - m30).normalize(plane)
-      Matrix4fc.PLANE_NY -> plane.set(m03 + m01, m13 + m11, m23 + m21, m33 + m31).normalize(plane)
-      Matrix4fc.PLANE_PY -> plane.set(m03 - m01, m13 - m11, m23 - m21, m33 - m31).normalize(plane)
-      Matrix4fc.PLANE_NZ -> plane.set(m03 + m02, m13 + m12, m23 + m22, m33 + m32).normalize(plane)
-      Matrix4fc.PLANE_PZ -> plane.set(m03 - m02, m13 - m12, m23 - m22, m33 - m32).normalize(plane)
-      else -> throw IllegalArgumentException("which") //$NON-NLS-1$
-    }
-    return plane
-  }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#frustumCorner(int, Vector3m)
+     * @see Matrix4f#frustumCorner(int, Vector3m)
      */
-  override fun frustumCorner(corner: Int, point: Vector3m): Vector3m {
+  fun frustumCorner(corner: Int, point: Vector3m): Vector3m {
     val d1: Float
     val d2: Float
     val d3: Float
@@ -12100,7 +9201,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     val n3y: Float
     val n3z: Float
     when (corner) {
-      Matrix4fc.CORNER_NXNYNZ // left, bottom, near
+      Matrix4f.CORNER_NXNYNZ // left, bottom, near
       -> {
         n1x = m03 + m00
         n1y = m13 + m10
@@ -12115,7 +9216,7 @@ class Matrix4f : Externalizable, Matrix4fc {
         n3z = m23 + m22
         d3 = m33 + m32 // near
       }
-      Matrix4fc.CORNER_PXNYNZ // right, bottom, near
+      Matrix4f.CORNER_PXNYNZ // right, bottom, near
       -> {
         n1x = m03 - m00
         n1y = m13 - m10
@@ -12130,7 +9231,7 @@ class Matrix4f : Externalizable, Matrix4fc {
         n3z = m23 + m22
         d3 = m33 + m32 // near
       }
-      Matrix4fc.CORNER_PXPYNZ // right, top, near
+      Matrix4f.CORNER_PXPYNZ // right, top, near
       -> {
         n1x = m03 - m00
         n1y = m13 - m10
@@ -12145,7 +9246,7 @@ class Matrix4f : Externalizable, Matrix4fc {
         n3z = m23 + m22
         d3 = m33 + m32 // near
       }
-      Matrix4fc.CORNER_NXPYNZ // left, top, near
+      Matrix4f.CORNER_NXPYNZ // left, top, near
       -> {
         n1x = m03 + m00
         n1y = m13 + m10
@@ -12160,7 +9261,7 @@ class Matrix4f : Externalizable, Matrix4fc {
         n3z = m23 + m22
         d3 = m33 + m32 // near
       }
-      Matrix4fc.CORNER_PXNYPZ // right, bottom, far
+      Matrix4f.CORNER_PXNYPZ // right, bottom, far
       -> {
         n1x = m03 - m00
         n1y = m13 - m10
@@ -12175,7 +9276,7 @@ class Matrix4f : Externalizable, Matrix4fc {
         n3z = m23 - m22
         d3 = m33 - m32 // far
       }
-      Matrix4fc.CORNER_NXNYPZ // left, bottom, far
+      Matrix4f.CORNER_NXNYPZ // left, bottom, far
       -> {
         n1x = m03 + m00
         n1y = m13 + m10
@@ -12190,7 +9291,7 @@ class Matrix4f : Externalizable, Matrix4fc {
         n3z = m23 - m22
         d3 = m33 - m32 // far
       }
-      Matrix4fc.CORNER_NXPYPZ // left, top, far
+      Matrix4f.CORNER_NXPYPZ // left, top, far
       -> {
         n1x = m03 + m00
         n1y = m13 + m10
@@ -12205,7 +9306,7 @@ class Matrix4f : Externalizable, Matrix4fc {
         n3z = m23 - m22
         d3 = m33 - m32 // far
       }
-      Matrix4fc.CORNER_PXPYPZ // right, top, far
+      Matrix4f.CORNER_PXPYPZ // right, top, far
       -> {
         n1x = m03 - m00
         n1y = m13 - m10
@@ -12274,7 +9375,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * perspective projection transformation
    * @return origin
    */
-  override fun perspectiveOrigin(origin: Vector3m): Vector3m {
+  fun perspectiveOrigin(origin: Vector3m): Vector3m {
     /*
          * Simply compute the intersection point of the left, right and top frustum plane.
          */
@@ -12344,7 +9445,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    *
    * @return the vertical field-of-view angle in radians
    */
-  override fun perspectiveFov(): Float {
+  fun perspectiveFov(): Float {
     /*
          * Compute the angle between the bottom and top frustum plane normals.
          */
@@ -12373,7 +9474,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    *
    * @return the near clip plane distance
    */
-  override fun perspectiveNear(): Float {
+  fun perspectiveNear(): Float {
     return m32 / (m23 + m22)
   }
 
@@ -12385,14 +9486,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    *
    * @return the far clip plane distance
    */
-  override fun perspectiveFar(): Float {
+  fun perspectiveFar(): Float {
     return m32 / (m22 - m23)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#frustumRayDir(float, float, Vector3m)
+     * @see Matrix4f#frustumRayDir(float, float, Vector3m)
      */
-  override fun frustumRayDir(x: Float, y: Float, dir: Vector3m): Vector3m {
+  fun frustumRayDir(x: Float, y: Float, dir: Vector3m): Vector3m {
     /*
          * This method works by first obtaining the frustum plane normals,
          * then building the cross product to obtain the corner rays,
@@ -12437,9 +9538,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#positiveZ(Vector3m)
+     * @see Matrix4f#positiveZ(Vector3m)
      */
-  override fun positiveZ(dir: Vector3m): Vector3m {
+  fun positiveZ(dir: Vector3m): Vector3m {
     dir.x = m10 * m21 - m11 * m20
     dir.y = m20 * m01 - m21 * m00
     dir.z = m00 * m11 - m01 * m10
@@ -12447,9 +9548,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#normalizedPositiveZ(Vector3m)
+     * @see Matrix4f#normalizedPositiveZ(Vector3m)
      */
-  override fun normalizedPositiveZ(dir: Vector3m): Vector3m {
+  fun normalizedPositiveZ(dir: Vector3m): Vector3m {
     dir.x = m02
     dir.y = m12
     dir.z = m22
@@ -12457,9 +9558,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#positiveX(Vector3m)
+     * @see Matrix4f#positiveX(Vector3m)
      */
-  override fun positiveX(dir: Vector3m): Vector3m {
+  fun positiveX(dir: Vector3m): Vector3m {
     dir.x = m11 * m22 - m12 * m21
     dir.y = m02 * m21 - m01 * m22
     dir.z = m01 * m12 - m02 * m11
@@ -12467,9 +9568,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#normalizedPositiveX(Vector3m)
+     * @see Matrix4f#normalizedPositiveX(Vector3m)
      */
-  override fun normalizedPositiveX(dir: Vector3m): Vector3m {
+  fun normalizedPositiveX(dir: Vector3m): Vector3m {
     dir.x = m00
     dir.y = m10
     dir.z = m20
@@ -12477,9 +9578,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#positiveY(Vector3m)
+     * @see Matrix4f#positiveY(Vector3m)
      */
-  override fun positiveY(dir: Vector3m): Vector3m {
+  fun positiveY(dir: Vector3m): Vector3m {
     dir.x = m12 * m20 - m10 * m22
     dir.y = m00 * m22 - m02 * m20
     dir.z = m02 * m10 - m00 * m12
@@ -12487,9 +9588,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#normalizedPositiveY(Vector3m)
+     * @see Matrix4f#normalizedPositiveY(Vector3m)
      */
-  override fun normalizedPositiveY(dir: Vector3m): Vector3m {
+  fun normalizedPositiveY(dir: Vector3m): Vector3m {
     dir.x = m01
     dir.y = m11
     dir.z = m21
@@ -12497,9 +9598,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#originAffine(Vector3m)
+     * @see Matrix4f#originAffine(Vector3m)
      */
-  override fun originAffine(origin: Vector3m): Vector3m {
+  fun originAffine(origin: Vector3m): Vector3m {
     val a = m00 * m11 - m01 * m10
     val b = m00 * m12 - m02 * m10
     val d = m01 * m12 - m02 * m11
@@ -12513,10 +9614,10 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#origin(Vector3m)
+     * @see Matrix4f#origin(Vector3m)
      */
-  override fun origin(dest: Vector3m): Vector3m {
-    return if (properties and Matrix4fc.PROPERTY_AFFINE != 0) originAffine(dest) else originGeneric(dest)
+  fun origin(dest: Vector3m): Vector3m {
+    return if (properties and Matrix4f.PROPERTY_AFFINE != 0) originAffine(dest) else originGeneric(dest)
   }
 
   private fun originGeneric(dest: Vector3m): Vector3m {
@@ -12577,9 +9678,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#shadow(Vector4, float, float, float, float, Matrix4f)
+     * @see Matrix4f#shadow(Vector4, float, float, float, float, Matrix4f)
      */
-  override fun shadow(light: Vector4, a: Float, b: Float, c: Float, d: Float, dest: Matrix4f): Matrix4f {
+  fun shadow(light: Vector4, a: Float, b: Float, c: Float, d: Float, dest: Matrix4f): Matrix4f {
     return shadow(light.x, light.y, light.z, light.w, a, b, c, d, dest)
   }
 
@@ -12622,9 +9723,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#shadow(float, float, float, float, float, float, float, float, Matrix4f)
+     * @see Matrix4f#shadow(float, float, float, float, float, float, float, float, Matrix4f)
      */
-  override fun shadow(lightX: Float, lightY: Float, lightZ: Float, lightW: Float, a: Float, b: Float, c: Float, d: Float, dest: Matrix4f): Matrix4f {
+  fun shadow(lightX: Float, lightY: Float, lightZ: Float, lightW: Float, a: Float, b: Float, c: Float, d: Float, dest: Matrix4f): Matrix4f {
     // normalize plane
     val invPlaneLen = (1.0 / Math.sqrt((a * a + b * b + c * c).toDouble())).toFloat()
     val an = a * invPlaneLen
@@ -12681,15 +9782,15 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m21(nm21)
     dest._m22(nm22)
     dest._m23(nm23)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt() or Matrix4f.PROPERTY_ORTHONORMAL.toInt()).inv())
 
     return dest
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#shadow(Vector4, Matrix4fc, Matrix4f)
+     * @see Matrix4f#shadow(Vector4, Matrix4f, Matrix4f)
      */
-  override fun shadow(light: Vector4, planeTransform: Matrix4fc, dest: Matrix4f): Matrix4f {
+  fun shadow(light: Vector4, planeTransform: Matrix4f, dest: Matrix4f): Matrix4f {
     // compute plane equation by transforming (y = 0)
     val a = planeTransform.m10()
     val b = planeTransform.m11()
@@ -12725,9 +9826,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#shadow(float, float, float, float, Matrix4fc, Matrix4f)
+     * @see Matrix4f#shadow(float, float, float, float, Matrix4f, Matrix4f)
      */
-  override fun shadow(lightX: Float, lightY: Float, lightZ: Float, lightW: Float, planeTransform: Matrix4fc, dest: Matrix4f): Matrix4f {
+  fun shadow(lightX: Float, lightY: Float, lightZ: Float, lightW: Float, planeTransform: Matrix4f, dest: Matrix4f): Matrix4f {
     // compute plane equation by transforming (y = 0)
     val a = planeTransform.m10()
     val b = planeTransform.m11()
@@ -12824,7 +9925,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m31(objPos.y)
     this._m32(objPos.z)
     this._m33(1.0f)
-    _properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    _properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
     return this
   }
 
@@ -12888,7 +9989,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m31(objPos.y)
     this._m32(objPos.z)
     this._m33(1.0f)
-    _properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    _properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
     return this
   }
 
@@ -12943,11 +10044,11 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m31(objPos.y)
     this._m32(objPos.z)
     this._m33(1.0f)
-    _properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    _properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
     return this
   }
 
-  override fun hashCode(): Int {
+ override fun hashCode(): Int {
     val prime = 31
     var result = 1
     result = prime * result + java.lang.Float.floatToIntBits(m00)
@@ -12969,14 +10070,14 @@ class Matrix4f : Externalizable, Matrix4fc {
     return result
   }
 
-  override fun equals(obj: Any?): Boolean {
+ override fun equals(obj: Any?): Boolean {
     if (this === obj)
       return true
     if (obj == null)
       return false
     if (obj !is Matrix4f)
       return false
-    val other = obj as Matrix4fc?
+    val other = obj as Matrix4f?
     if (java.lang.Float.floatToIntBits(m00) != java.lang.Float.floatToIntBits(other!!.m00()))
       return false
     if (java.lang.Float.floatToIntBits(m01) != java.lang.Float.floatToIntBits(other.m01()))
@@ -13011,9 +10112,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#pick(float, float, float, float, int[], Matrix4f)
+     * @see Matrix4f#pick(float, float, float, float, int[], Matrix4f)
      */
-  override fun pick(x: Float, y: Float, width: Float, height: Float, viewport: IntArray, dest: Matrix4f): Matrix4f {
+  fun pick(x: Float, y: Float, width: Float, height: Float, viewport: IntArray, dest: Matrix4f): Matrix4f {
     val sx = viewport[2] / width
     val sy = viewport[3] / height
     val tx = (viewport[2] + 2.0f * (viewport[0] - x)) / width
@@ -13054,25 +10155,10 @@ class Matrix4f : Externalizable, Matrix4fc {
     return pick(x, y, width, height, viewport, thisOrNew())
   }
 
-  /**
-   * Exchange the values of `this` matrix with the given `other` matrix.
-   *
-   * @param other
-   * the other matrix to exchange the values with
-   * @return this
-   */
-  fun swap(other: Matrix4f): Matrix4f {
-    MemUtil.INSTANCE.swap(this, other)
-    val props = properties
-    this.properties = other.properties()
-    other.properties = props
-    return this
-  }
-
   /* (non-Javadoc)
-     * @see Matrix4fc#arcball(float, float, float, float, float, float, Matrix4f)
+     * @see Matrix4f#arcball(float, float, float, float, float, float, Matrix4f)
      */
-  override fun arcball(radius: Float, centerX: Float, centerY: Float, centerZ: Float, angleX: Float, angleY: Float, dest: Matrix4f): Matrix4f {
+  fun arcball(radius: Float, centerX: Float, centerY: Float, centerZ: Float, angleX: Float, angleY: Float, dest: Matrix4f): Matrix4f {
     val m30 = m20 * -radius + this.m30
     val m31 = m21 * -radius + this.m31
     val m32 = m22 * -radius + this.m32
@@ -13113,14 +10199,14 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m01(nm01)
     dest._m02(nm02)
     dest._m03(nm03)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#arcball(float, Vector3fc, float, float, Matrix4f)
+     * @see Matrix4f#arcball(float, Vector3m, float, float, Matrix4f)
      */
-  override fun arcball(radius: Float, center: Vector3fc, angleX: Float, angleY: Float, dest: Matrix4f): Matrix4f {
+  fun arcball(radius: Float, center: Vector3m, angleX: Float, angleY: Float, dest: Matrix4f): Matrix4f {
     return arcball(radius, center.x, center.y, center.z, angleX, angleY, dest)
   }
 
@@ -13166,7 +10252,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the rotation angle around the Y axis in radians
    * @return a matrix holding the result
    */
-  fun arcball(radius: Float, center: Vector3fc, angleX: Float, angleY: Float): Matrix4f {
+  fun arcball(radius: Float, center: Vector3m, angleX: Float, angleY: Float): Matrix4f {
     return arcball(radius, center.x, center.y, center.z, angleX, angleY, thisOrNew())
   }
 
@@ -13187,7 +10273,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the maximum corner coordinates of the axis-aligned bounding box
    * @return this
    */
-  override fun frustumAabb(min: Vector3m, max: Vector3m): Matrix4f {
+  fun frustumAabb(min: Vector3m, max: Vector3m): Matrix4f {
     var minX = java.lang.Float.POSITIVE_INFINITY
     var minY = java.lang.Float.POSITIVE_INFINITY
     var minZ = java.lang.Float.POSITIVE_INFINITY
@@ -13219,9 +10305,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#projectedGridRange(Matrix4fc, float, float, Matrix4f)
+     * @see Matrix4f#projectedGridRange(Matrix4f, float, float, Matrix4f)
      */
-  override fun projectedGridRange(projector: Matrix4fc, sLower: Float, sUpper: Float, dest: Matrix4f): Matrix4f? {
+  fun projectedGridRange(projector: Matrix4f, sLower: Float, sUpper: Float, dest: Matrix4f): Matrix4f? {
     // Compute intersection with frustum edges and plane
     var minX = java.lang.Float.POSITIVE_INFINITY
     var minY = java.lang.Float.POSITIVE_INFINITY
@@ -13294,7 +10380,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     if (!intersection)
       return null // <- projected grid is not visible
     dest[maxX - minX, 0f, 0f, 0f, 0f, maxY - minY, 0f, 0f, 0f, 0f, 1f, 0f, minX, minY, 0f] = 1f
-    dest._properties(Matrix4fc.PROPERTY_AFFINE.toInt())
+    dest._properties(Matrix4f.PROPERTY_AFFINE.toInt())
     return dest
   }
 
@@ -13316,7 +10402,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the resulting matrix
    * @return dest
    */
-  override fun perspectiveFrustumSlice(near: Float, far: Float, dest: Matrix4f): Matrix4f {
+  fun perspectiveFrustumSlice(near: Float, far: Float, dest: Matrix4f): Matrix4f {
     val invOldNear = (m23 + m22) / m32
     val invNearFar = 1.0f / (near - far)
     dest._m00(m00 * invOldNear * near)
@@ -13335,60 +10421,8 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m31(m31)
     dest._m32((far + far) * near * invNearFar)
     dest._m33(m33)
-    dest._properties(properties and (Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt() or Matrix4fc.PROPERTY_ORTHONORMAL.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt() or Matrix4f.PROPERTY_ORTHONORMAL.toInt()).inv())
     return dest
-  }
-
-  /**
-   * Build an ortographic projection transformation that fits the view-projection transformation represented by `this`
-   * into the given affine `view` transformation.
-   *
-   *
-   * The transformation represented by `this` must be given as the [inverse][.invert] of a typical combined camera view-projection
-   * transformation, whose projection can be either orthographic or perspective.
-   *
-   *
-   * The `view` must be an [affine][.isAffine] transformation which in the application of Cascaded Shadow Maps is usually the light view transformation.
-   * It be obtained via any affine transformation or for example via [lookAt()][.lookAt].
-   *
-   *
-   * Reference: [OpenGL SDK - Cascaded Shadow Maps](http://developer.download.nvidia.com/SDK/10.5/opengl/screenshots/samples/cascaded_shadow_maps.html)
-   *
-   * @param view
-   * the view transformation to build a corresponding orthographic projection to fit the frustum of `this`
-   * @param dest
-   * will hold the crop projection transformation
-   * @return dest
-   */
-  override fun orthoCrop(view: Matrix4fc, dest: Matrix4f): Matrix4f {
-    // determine min/max world z and min/max orthographically view-projected x/y
-    var minX = java.lang.Float.POSITIVE_INFINITY
-    var maxX = java.lang.Float.NEGATIVE_INFINITY
-    var minY = java.lang.Float.POSITIVE_INFINITY
-    var maxY = java.lang.Float.NEGATIVE_INFINITY
-    var minZ = java.lang.Float.POSITIVE_INFINITY
-    var maxZ = java.lang.Float.NEGATIVE_INFINITY
-    for (t in 0..7) {
-      val x = (t and 1 shl 1) - 1.0f
-      val y = (t.ushr(1) and 1 shl 1) - 1.0f
-      val z = (t.ushr(2) and 1 shl 1) - 1.0f
-      var invW = 1.0f / (m03 * x + m13 * y + m23 * z + m33)
-      val wx = (m00 * x + m10 * y + m20 * z + m30) * invW
-      val wy = (m01 * x + m11 * y + m21 * z + m31) * invW
-      val wz = (m02 * x + m12 * y + m22 * z + m32) * invW
-      invW = 1.0f / (view.m03() * wx + view.m13() * wy + view.m23() * wz + view.m33())
-      val vx = view.m00() * wx + view.m10() * wy + view.m20() * wz + view.m30()
-      val vy = view.m01() * wx + view.m11() * wy + view.m21() * wz + view.m31()
-      val vz = (view.m02() * wx + view.m12() * wy + view.m22() * wz + view.m32()) * invW
-      minX = if (minX < vx) minX else vx
-      maxX = if (maxX > vx) maxX else vx
-      minY = if (minY < vy) minY else vy
-      maxY = if (maxY > vy) maxY else vy
-      minZ = if (minZ < vz) minZ else vz
-      maxZ = if (maxZ > vz) maxZ else vz
-    }
-    // build crop projection matrix to fit 'this' frustum into view
-    return dest.setOrtho(minX, maxX, minY, maxY, -maxZ, -minZ)
   }
 
   /**
@@ -13460,9 +10494,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformAab(float, float, float, float, float, float, Vector3m, Vector3m)
+     * @see Matrix4f#transformAab(float, float, float, float, float, float, Vector3m, Vector3m)
      */
-  override fun transformAab(minX: Float, minY: Float, minZ: Float, maxX: Float, maxY: Float, maxZ: Float, outMin: Vector3m, outMax: Vector3m): Matrix4f {
+  fun transformAab(minX: Float, minY: Float, minZ: Float, maxX: Float, maxY: Float, maxZ: Float, outMin: Vector3m, outMax: Vector3m): Matrix4f {
     val xax = m00 * minX
     val xay = m01 * minX
     val xaz = m02 * minX
@@ -13572,9 +10606,9 @@ class Matrix4f : Externalizable, Matrix4fc {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#transformAab(Vector3fc, Vector3fc, Vector3m, Vector3m)
+     * @see Matrix4f#transformAab(Vector3m, Vector3m, Vector3m, Vector3m)
      */
-  override fun transformAab(min: Vector3fc, max: Vector3fc, outMin: Vector3m, outMax: Vector3m): Matrix4f {
+  fun transformAab(min: Vector3m, max: Vector3m, outMin: Vector3m, outMax: Vector3m): Matrix4f {
     return transformAab(min.x, min.y, min.z, max.x, max.y, max.z, outMin, outMax)
   }
 
@@ -13592,14 +10626,14 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the interpolation factor between 0.0 and 1.0
    * @return a matrix holding the result
    */
-  fun lerp(other: Matrix4fc, t: Float): Matrix4f {
+  fun lerp(other: Matrix4f, t: Float): Matrix4f {
     return lerp(other, t, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4fc#lerp(Matrix4fc, float, Matrix4f)
+     * @see Matrix4f#lerp(Matrix4f, float, Matrix4f)
      */
-  override fun lerp(other: Matrix4fc, t: Float, dest: Matrix4f): Matrix4f {
+  fun lerp(other: Matrix4f, t: Float, dest: Matrix4f): Matrix4f {
     dest._m00(m00 + (other.m00() - m00) * t)
     dest._m01(m01 + (other.m01() - m01) * t)
     dest._m02(m02 + (other.m02() - m02) * t)
@@ -13647,7 +10681,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun rotateTowards(dir: Vector3fc, up: Vector3fc, dest: Matrix4f): Matrix4f {
+  fun rotateTowards(dir: Vector3m, up: Vector3m, dest: Matrix4f): Matrix4f {
     return rotateTowards(dir.x, dir.y, dir.z, up.x, up.y, up.z, dest)
   }
 
@@ -13676,7 +10710,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the up vector
    * @return a matrix holding the result
    */
-  fun rotateTowards(dir: Vector3fc, up: Vector3fc): Matrix4f {
+  fun rotateTowards(dir: Vector3m, up: Vector3m): Matrix4f {
     return rotateTowards(dir.x, dir.y, dir.z, up.x, up.y, up.z, thisOrNew())
   }
 
@@ -13753,7 +10787,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the result
    * @return dest
    */
-  override fun rotateTowards(dirX: Float, dirY: Float, dirZ: Float, upX: Float, upY: Float, upZ: Float, dest: Matrix4f): Matrix4f {
+  fun rotateTowards(dirX: Float, dirY: Float, dirZ: Float, upX: Float, upY: Float, upZ: Float, dest: Matrix4f): Matrix4f {
     // Normalize direction
     val invDirLength = 1.0f / Math.sqrt((dirX * dirX + dirY * dirY + dirZ * dirZ).toDouble()).toFloat()
     val ndirX = dirX * invDirLength
@@ -13799,7 +10833,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     dest._m11(nm11)
     dest._m12(nm12)
     dest._m13(nm13)
-    dest._properties(properties and (Matrix4fc.PROPERTY_PERSPECTIVE.toInt() or Matrix4fc.PROPERTY_IDENTITY.toInt() or Matrix4fc.PROPERTY_TRANSLATION.toInt()).inv())
+    dest._properties(properties and (Matrix4f.PROPERTY_PERSPECTIVE.toInt() or Matrix4f.PROPERTY_IDENTITY.toInt() or Matrix4f.PROPERTY_TRANSLATION.toInt()).inv())
     return dest
   }
 
@@ -13822,7 +10856,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the up vector
    * @return this
    */
-  fun rotationTowards(dir: Vector3fc, up: Vector3fc): Matrix4f {
+  fun rotationTowards(dir: Vector3m, up: Vector3m): Matrix4f {
     return rotationTowards(dir.x, dir.y, dir.z, up.x, up.y, up.z)
   }
 
@@ -13891,7 +10925,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m31(0.0f)
     this._m32(0.0f)
     this._m33(1.0f)
-    _properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    _properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
     return this
   }
 
@@ -13913,7 +10947,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * the up vector
    * @return this
    */
-  fun translationRotateTowards(pos: Vector3fc, dir: Vector3fc, up: Vector3fc): Matrix4f {
+  fun translationRotateTowards(pos: Vector3m, dir: Vector3m, up: Vector3m): Matrix4f {
     return translationRotateTowards(pos.x, pos.y, pos.z, dir.x, dir.y, dir.z, up.x, up.y, up.z)
   }
 
@@ -13985,7 +11019,7 @@ class Matrix4f : Externalizable, Matrix4fc {
     this._m31(posY)
     this._m32(posZ)
     this._m33(1.0f)
-    _properties(Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL)
+    _properties(Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL)
     return this
   }
 
@@ -14014,7 +11048,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * will hold the extracted Euler angles
    * @return dest
    */
-  override fun getEulerAnglesZYX(dest: Vector3m): Vector3m {
+  fun getEulerAnglesZYX(dest: Vector3m): Vector3m {
     dest.x = Math.atan2(m12.toDouble(), m22.toDouble()).toFloat()
     dest.y = Math.atan2((-m02).toDouble(), Math.sqrt((m12 * m12 + m22 * m22).toDouble()).toFloat().toDouble()).toFloat()
     dest.z = Math.atan2(m01.toDouble(), m00.toDouble()).toFloat()
@@ -14036,7 +11070,7 @@ class Matrix4f : Externalizable, Matrix4fc {
    * and subtracting them to obtain the length and direction of the span vectors.
    *
    * @param corner
-   * will hold one corner of the span (usually the corner [Matrix4fc.CORNER_NXNYNZ])
+   * will hold one corner of the span (usually the corner [Matrix4f.CORNER_NXNYNZ])
    * @param xDir
    * will hold the direction and length of the span along the positive X axis
    * @param yDir
@@ -14091,9 +11125,9 @@ class Matrix4f : Externalizable, Matrix4fc {
 
   /*
      * (non-Javadoc)
-     * @see Matrix4fc#testPoint(float, float, float)
+     * @see Matrix4f#testPoint(float, float, float)
      */
-  override fun testPoint(x: Float, y: Float, z: Float): Boolean {
+  fun testPoint(x: Float, y: Float, z: Float): Boolean {
     val nxX = m03 + m00
     val nxY = m13 + m10
     val nxZ = m23 + m20
@@ -14125,9 +11159,9 @@ class Matrix4f : Externalizable, Matrix4fc {
 
   /*
      * (non-Javadoc)
-     * @see Matrix4fc#testSphere(float, float, float, float)
+     * @see Matrix4f#testSphere(float, float, float, float)
      */
-  override fun testSphere(x: Float, y: Float, z: Float, r: Float): Boolean {
+  fun testSphere(x: Float, y: Float, z: Float, r: Float): Boolean {
     var invl: Float
     var nxX = m03 + m00
     var nxY = m13 + m10
@@ -14190,9 +11224,9 @@ class Matrix4f : Externalizable, Matrix4fc {
 
   /*
      * (non-Javadoc)
-     * @see Matrix4fc#testAab(float, float, float, float, float, float)
+     * @see Matrix4f#testAab(float, float, float, float, float, float)
      */
-  override fun testAab(minX: Float, minY: Float, minZ: Float, maxX: Float, maxY: Float, maxZ: Float): Boolean {
+  fun testAab(minX: Float, minY: Float, minZ: Float, maxX: Float, maxY: Float, maxZ: Float): Boolean {
     val nxX = m03 + m00
     val nxY = m13 + m10
     val nxZ = m23 + m20
@@ -14300,288 +11334,105 @@ class Matrix4f : Externalizable, Matrix4fc {
       }
       projDest.setFrustum(px, px + tx, py, py + ty, near, far, zeroToOne)
     }
-  }
 
+    /**
+     * Argument to the first parameter of [.frustumPlane] and
+     * [.frustumPlane]
+     * identifying the plane with equation <tt>x=-1</tt> when using the identity matrix.
+     */
+    val PLANE_NX = 0
+    /**
+     * Argument to the first parameter of [.frustumPlane] and
+     * [.frustumPlane]
+     * identifying the plane with equation <tt>x=1</tt> when using the identity matrix.
+     */
+    val PLANE_PX = 1
+    /**
+     * Argument to the first parameter of [.frustumPlane] and
+     * [.frustumPlane]
+     * identifying the plane with equation <tt>y=-1</tt> when using the identity matrix.
+     */
+    val PLANE_NY = 2
+    /**
+     * Argument to the first parameter of [.frustumPlane] and
+     * [.frustumPlane]
+     * identifying the plane with equation <tt>y=1</tt> when using the identity matrix.
+     */
+    val PLANE_PY = 3
+    /**
+     * Argument to the first parameter of [.frustumPlane] and
+     * [.frustumPlane]
+     * identifying the plane with equation <tt>z=-1</tt> when using the identity matrix.
+     */
+    val PLANE_NZ = 4
+    /**
+     * Argument to the first parameter of [.frustumPlane] and
+     * [.frustumPlane]
+     * identifying the plane with equation <tt>z=1</tt> when using the identity matrix.
+     */
+    val PLANE_PZ = 5
+    /**
+     * Argument to the first parameter of [.frustumCorner]
+     * identifying the corner <tt>(-1, -1, -1)</tt> when using the identity matrix.
+     */
+    val CORNER_NXNYNZ = 0
+    /**
+     * Argument to the first parameter of [.frustumCorner]
+     * identifying the corner <tt>(1, -1, -1)</tt> when using the identity matrix.
+     */
+    val CORNER_PXNYNZ = 1
+    /**
+     * Argument to the first parameter of [.frustumCorner]
+     * identifying the corner <tt>(1, 1, -1)</tt> when using the identity matrix.
+     */
+    val CORNER_PXPYNZ = 2
+    /**
+     * Argument to the first parameter of [.frustumCorner]
+     * identifying the corner <tt>(-1, 1, -1)</tt> when using the identity matrix.
+     */
+    val CORNER_NXPYNZ = 3
+    /**
+     * Argument to the first parameter of [.frustumCorner]
+     * identifying the corner <tt>(1, -1, 1)</tt> when using the identity matrix.
+     */
+    val CORNER_PXNYPZ = 4
+    /**
+     * Argument to the first parameter of [.frustumCorner]
+     * identifying the corner <tt>(-1, -1, 1)</tt> when using the identity matrix.
+     */
+    val CORNER_NXNYPZ = 5
+    /**
+     * Argument to the first parameter of [.frustumCorner]
+     * identifying the corner <tt>(-1, 1, 1)</tt> when using the identity matrix.
+     */
+    val CORNER_NXPYPZ = 6
+    /**
+     * Argument to the first parameter of [.frustumCorner]
+     * identifying the corner <tt>(1, 1, 1)</tt> when using the identity matrix.
+     */
+    val CORNER_PXPYPZ = 7
+
+    /**
+     * Bit returned by [.properties] to indicate that the matrix represents a perspective transformation.
+     */
+    val PROPERTY_PERSPECTIVE = (1 shl 0)
+    /**
+     * Bit returned by [.properties] to indicate that the matrix represents an affine transformation.
+     */
+    val PROPERTY_AFFINE = (1 shl 1)
+    /**
+     * Bit returned by [.properties] to indicate that the matrix represents the identity transformation.
+     */
+    val PROPERTY_IDENTITY = (1 shl 2)
+    /**
+     * Bit returned by [.properties] to indicate that the matrix represents a pure translation transformation.
+     */
+    val PROPERTY_TRANSLATION = (1 shl 3)
+    /**
+     * Bit returned by [.properties] to indicate that the upper-left 3x3 submatrix represents an orthogonal
+     * matrix (i.e. orthonormal basis). For practical reasons, this property also always implies
+     * [.PROPERTY_AFFINE] in this implementation.
+     */
+    val PROPERTY_ORTHONORMAL = (1 shl 4)
+  }
 }
-/**
- * Set the values in the matrix using a float array that contains the matrix elements in column-major order.
- *
- *
- * The results will look like this:<br></br><br></br>
- *
- * 0, 4, 8, 12<br></br>
- * 1, 5, 9, 13<br></br>
- * 2, 6, 10, 14<br></br>
- * 3, 7, 11, 15<br></br>
- *
- * @see .set
- * @param m
- * the array to read the matrix values from
- * @return this
- */
-/**
- * Apply an orthographic projection transformation for a right-handed coordinate system
- * using OpenGL's NDC z range of <tt>[-1..+1]</tt> to this matrix.
- *
- *
- * If `M` is `this` matrix and `O` the orthographic projection matrix,
- * then the new matrix will be `M * O`. So when transforming a
- * vector `v` with the new matrix by using `M * O * v`, the
- * orthographic projection transformation will be applied first!
- *
- *
- * In order to set the matrix to an orthographic projection without post-multiplying it,
- * use [setOrtho()][.setOrtho].
- *
- *
- * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
- *
- * @see .setOrtho
- * @param left
- * the distance from the center to the left frustum edge
- * @param right
- * the distance from the center to the right frustum edge
- * @param bottom
- * the distance from the center to the bottom frustum edge
- * @param top
- * the distance from the center to the top frustum edge
- * @param zNear
- * near clipping plane distance
- * @param zFar
- * far clipping plane distance
- * @return this
- */
-/**
- * Apply an orthographic projection transformation for a left-handed coordiante system
- * using OpenGL's NDC z range of <tt>[-1..+1]</tt> to this matrix.
- *
- *
- * If `M` is `this` matrix and `O` the orthographic projection matrix,
- * then the new matrix will be `M * O`. So when transforming a
- * vector `v` with the new matrix by using `M * O * v`, the
- * orthographic projection transformation will be applied first!
- *
- *
- * In order to set the matrix to an orthographic projection without post-multiplying it,
- * use [setOrthoLH()][.setOrthoLH].
- *
- *
- * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
- *
- * @see .setOrthoLH
- * @param left
- * the distance from the center to the left frustum edge
- * @param right
- * the distance from the center to the right frustum edge
- * @param bottom
- * the distance from the center to the bottom frustum edge
- * @param top
- * the distance from the center to the top frustum edge
- * @param zNear
- * near clipping plane distance
- * @param zFar
- * far clipping plane distance
- * @return this
- */
-/**
- * Set this matrix to be an orthographic projection transformation for a right-handed coordinate system
- * using OpenGL's NDC z range of <tt>[-1..+1]</tt>.
- *
- *
- * In order to apply the orthographic projection to an already existing transformation,
- * use [ortho()][.ortho].
- *
- *
- * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
- *
- * @see .ortho
- * @param left
- * the distance from the center to the left frustum edge
- * @param right
- * the distance from the center to the right frustum edge
- * @param bottom
- * the distance from the center to the bottom frustum edge
- * @param top
- * the distance from the center to the top frustum edge
- * @param zNear
- * near clipping plane distance
- * @param zFar
- * far clipping plane distance
- * @return this
- */
-/**
- * Set this matrix to be an orthographic projection transformation for a left-handed coordinate system
- * using OpenGL's NDC z range of <tt>[-1..+1]</tt>.
- *
- *
- * In order to apply the orthographic projection to an already existing transformation,
- * use [orthoLH()][.orthoLH].
- *
- *
- * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
- *
- * @see .orthoLH
- * @param left
- * the distance from the center to the left frustum edge
- * @param right
- * the distance from the center to the right frustum edge
- * @param bottom
- * the distance from the center to the bottom frustum edge
- * @param top
- * the distance from the center to the top frustum edge
- * @param zNear
- * near clipping plane distance
- * @param zFar
- * far clipping plane distance
- * @return this
- */
-/**
- * Set this matrix to be a symmetric orthographic projection transformation for a right-handed coordinate system
- * using OpenGL's NDC z range of <tt>[-1..+1]</tt>.
- *
- *
- * This method is equivalent to calling [setOrtho()][.setOrtho] with
- * `left=-width/2`, `right=+width/2`, `bottom=-height/2` and `top=+height/2`.
- *
- *
- * In order to apply the symmetric orthographic projection to an already existing transformation,
- * use [orthoSymmetric()][.orthoSymmetric].
- *
- *
- * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
- *
- * @see .orthoSymmetric
- * @param width
- * the distance between the right and left frustum edges
- * @param height
- * the distance between the top and bottom frustum edges
- * @param zNear
- * near clipping plane distance
- * @param zFar
- * far clipping plane distance
- * @return this
- */
-/**
- * Set this matrix to be a symmetric orthographic projection transformation for a left-handed coordinate system
- * using OpenGL's NDC z range of <tt>[-1..+1]</tt>.
- *
- *
- * This method is equivalent to calling [setOrthoLH()][.setOrthoLH] with
- * `left=-width/2`, `right=+width/2`, `bottom=-height/2` and `top=+height/2`.
- *
- *
- * In order to apply the symmetric orthographic projection to an already existing transformation,
- * use [orthoSymmetricLH()][.orthoSymmetricLH].
- *
- *
- * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#ortho)
- *
- * @see .orthoSymmetricLH
- * @param width
- * the distance between the right and left frustum edges
- * @param height
- * the distance between the top and bottom frustum edges
- * @param zNear
- * near clipping plane distance
- * @param zFar
- * far clipping plane distance
- * @return this
- */
-/**
- * Set this matrix to be a symmetric perspective projection frustum transformation for a right-handed coordinate system
- * using OpenGL's NDC z range of <tt>[-1..+1]</tt>.
- *
- *
- * In order to apply the perspective projection transformation to an existing transformation,
- * use [perspective()][.perspective].
- *
- * @see .perspective
- * @param fovy
- * the vertical field of view in radians (must be greater than zero and less than [PI][Math.PI])
- * @param aspect
- * the aspect ratio (i.e. width / height; must be greater than zero)
- * @param zNear
- * near clipping plane distance. If the special value [Float.POSITIVE_INFINITY] is used, the near clipping plane will be at positive infinity.
- * In that case, `zFar` may not also be [Float.POSITIVE_INFINITY].
- * @param zFar
- * far clipping plane distance. If the special value [Float.POSITIVE_INFINITY] is used, the far clipping plane will be at positive infinity.
- * In that case, `zNear` may not also be [Float.POSITIVE_INFINITY].
- * @return this
- */
-/**
- * Set this matrix to be a symmetric perspective projection frustum transformation for a left-handed coordinate system
- * using OpenGL's NDC z range of <tt>[-1..+1]</tt>.
- *
- *
- * In order to apply the perspective projection transformation to an existing transformation,
- * use [perspectiveLH()][.perspectiveLH].
- *
- * @see .perspectiveLH
- * @param fovy
- * the vertical field of view in radians (must be greater than zero and less than [PI][Math.PI])
- * @param aspect
- * the aspect ratio (i.e. width / height; must be greater than zero)
- * @param zNear
- * near clipping plane distance. If the special value [Float.POSITIVE_INFINITY] is used, the near clipping plane will be at positive infinity.
- * In that case, `zFar` may not also be [Float.POSITIVE_INFINITY].
- * @param zFar
- * far clipping plane distance. If the special value [Float.POSITIVE_INFINITY] is used, the far clipping plane will be at positive infinity.
- * In that case, `zNear` may not also be [Float.POSITIVE_INFINITY].
- * @return this
- */
-/**
- * Set this matrix to be an arbitrary perspective projection frustum transformation for a right-handed coordinate system
- * using OpenGL's NDC z range of <tt>[-1..+1]</tt>.
- *
- *
- * In order to apply the perspective frustum transformation to an existing transformation,
- * use [frustum()][.frustum].
- *
- *
- * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#perspective)
- *
- * @see .frustum
- * @param left
- * the distance along the x-axis to the left frustum edge
- * @param right
- * the distance along the x-axis to the right frustum edge
- * @param bottom
- * the distance along the y-axis to the bottom frustum edge
- * @param top
- * the distance along the y-axis to the top frustum edge
- * @param zNear
- * near clipping plane distance. If the special value [Float.POSITIVE_INFINITY] is used, the near clipping plane will be at positive infinity.
- * In that case, `zFar` may not also be [Float.POSITIVE_INFINITY].
- * @param zFar
- * far clipping plane distance. If the special value [Float.POSITIVE_INFINITY] is used, the far clipping plane will be at positive infinity.
- * In that case, `zNear` may not also be [Float.POSITIVE_INFINITY].
- * @return this
- */
-/**
- * Set this matrix to be an arbitrary perspective projection frustum transformation for a left-handed coordinate system
- * using OpenGL's NDC z range of <tt>[-1..+1]</tt>.
- *
- *
- * In order to apply the perspective frustum transformation to an existing transformation,
- * use [frustumLH()][.frustumLH].
- *
- *
- * Reference: [http://www.songho.ca](http://www.songho.ca/opengl/gl_projectionmatrix.html#perspective)
- *
- * @see .frustumLH
- * @param left
- * the distance along the x-axis to the left frustum edge
- * @param right
- * the distance along the x-axis to the right frustum edge
- * @param bottom
- * the distance along the y-axis to the bottom frustum edge
- * @param top
- * the distance along the y-axis to the top frustum edge
- * @param zNear
- * near clipping plane distance. If the special value [Float.POSITIVE_INFINITY] is used, the near clipping plane will be at positive infinity.
- * In that case, `zFar` may not also be [Float.POSITIVE_INFINITY].
- * @param zFar
- * far clipping plane distance. If the special value [Float.POSITIVE_INFINITY] is used, the far clipping plane will be at positive infinity.
- * In that case, `zNear` may not also be [Float.POSITIVE_INFINITY].
- * @return this
- */

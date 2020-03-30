@@ -33,13 +33,13 @@ fun getAspectRatio(dimensions: Vector2i): Float {
 fun createPerspectiveMatrix(dimensions: Vector2i, angle: Float, nearClip: Float, farClip: Float): Matrix {
   val ratio = getAspectRatio(dimensions)
   val radians = Math.toRadians(angle.toDouble()).toFloat()
-  return toMatrix(MutableMatrix()
+  return toMatrix(toMutableMatrix(zeroMatrix())
       .setPerspective(radians, ratio, nearClip, farClip))
 }
 
 fun createOrthographicMatrix(dimensions: Vector2i, zoom: Float, nearClip: Float, farClip: Float): Matrix {
   val ratio = getAspectRatio(dimensions)
-  return toMatrix(MutableMatrix()
+  return toMatrix(toMutableMatrix(Matrix.identity)
       .setOrtho(-1f * zoom, 1f * zoom, -1f * zoom, 1f * zoom, nearClip, farClip))
 }
 

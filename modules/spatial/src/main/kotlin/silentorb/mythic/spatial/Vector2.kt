@@ -1,6 +1,5 @@
 package silentorb.mythic.spatial
 
-import org.joml.*
 import java.text.NumberFormat
 
 data class Vector2(
@@ -10,7 +9,7 @@ data class Vector2(
 
   constructor(d: Float) : this(d, d) {}
 
-  constructor(v: Vector2fc) : this(v.x, v.y) {}
+  constructor(v: Vector2f) : this(v.x, v.y) {}
 
   override operator fun minus(v: Vector2fMinimal): Vector2 =
       Vector2(x - v.x, y - v.y)
@@ -45,7 +44,7 @@ data class Vector2(
   operator fun plus(v: Float): Vector2 = Vector2(x + v, y + v)
   operator fun times(other: Float): Vector2 = Vector2(x * other, y * other)
   operator fun times(other: Vector2): Vector2 = Vector2(x * other.x, y * other.y)
-//  operator fun minus(other: Vector2fc) = Vector2(x - other.x, y - other.y)
+//  operator fun minus(other: Vector2f) = Vector2(x - other.x, y - other.y)
   operator fun minus(v: Float) = Vector2(x - v, y - v)
   operator fun div(v: Float) = Vector2(x / v, y / v)
   operator fun div(v: Vector2) = Vector2(x / v.x, y / v.y)

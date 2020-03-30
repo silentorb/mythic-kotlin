@@ -1,11 +1,10 @@
 package silentorb.mythic.spatial
 
-import org.joml.*
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 
 fun matrixIdentityProperties() =
-    Matrix4fc.PROPERTY_IDENTITY or Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_TRANSLATION or Matrix4fc.PROPERTY_ORTHONORMAL
+    Matrix4f.PROPERTY_IDENTITY or Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_TRANSLATION or Matrix4f.PROPERTY_ORTHONORMAL
 
 fun mulAffine(matrix: Matrix, vector: Vector4): Vector4 {
   val rx = matrix.m00 * vector.x + matrix.m10 * vector.y + matrix.m20 * vector.z + matrix.m30 * vector.w
@@ -23,13 +22,13 @@ private fun mulGeneric(matrix: Matrix, vector: Vector4): Vector4 {
 }
 
 fun scaling(matrix: Matrix, x: Float, y: Float, z: Float): Matrix {
-  val source = if (matrix.properties and Matrix4fc.PROPERTY_IDENTITY == 0)
+  val source = if (matrix.properties and Matrix4f.PROPERTY_IDENTITY == 0)
     Matrix.identity
   else
     matrix
 
   val one = Math.abs(x) == 1.0f && Math.abs(y) == 1.0f && Math.abs(z) == 1.0f
-  val properties = Matrix4fc.PROPERTY_AFFINE or if (one) Matrix4fc.PROPERTY_ORTHONORMAL else 0
+  val properties = Matrix4f.PROPERTY_AFFINE or if (one) Matrix4f.PROPERTY_ORTHONORMAL else 0
 
   return matrix.copy(
       m00 = x,
@@ -41,10 +40,10 @@ fun scaling(matrix: Matrix, x: Float, y: Float, z: Float): Matrix {
 
 fun scaleGeneric(matrix: Matrix, x: Float, y: Float, z: Float): Matrix {
   val one = Math.abs(x) == 1.0f && Math.abs(y) == 1.0f && Math.abs(z) == 1.0f
-  val properties = matrix.properties and (Matrix4fc.PROPERTY_PERSPECTIVE
-      or Matrix4fc.PROPERTY_IDENTITY
-      or Matrix4fc.PROPERTY_TRANSLATION
-      or (if (one) 0 else Matrix4fc.PROPERTY_ORTHONORMAL).toInt()).inv()
+  val properties = matrix.properties and (Matrix4f.PROPERTY_PERSPECTIVE
+      or Matrix4f.PROPERTY_IDENTITY
+      or Matrix4f.PROPERTY_TRANSLATION
+      or (if (one) 0 else Matrix4f.PROPERTY_ORTHONORMAL).toInt()).inv()
 
   return Matrix(
       matrix.m00 * x,
@@ -119,14 +118,126 @@ data class Matrix(
   }
 
   fun identityOrThis() =
-      if (properties and Matrix4fc.PROPERTY_IDENTITY == 0)
+      if (properties and Matrix4f.PROPERTY_IDENTITY == 0)
         identity
       else
         this
 
-  // TODO: Migrate additional mul functions to remove dependency and avoid the triple conversion
+  fun mulTranslationAffine(right: Matrix): Matrix =
+      Matrix(
+          m00 = right.m00,
+          m01 = right.m01,
+          m02 = right.m02,
+          m03 = m03,
+          m10 = right.m10,
+          m11 = right.m11,
+          m12 = right.m12,
+          m13 = m13,
+          m20 = right.m20,
+          m21 = right.m21,
+          m22 = right.m22,
+          m23 = m23,
+          m30 = right.m30 + m30,
+          m31 = right.m31 + m31,
+          m32 = right.m32 + m32,
+          m33 = m33,
+          properties = Matrix4f.PROPERTY_AFFINE or (right.properties and Matrix4f.PROPERTY_ORTHONORMAL)
+      )
+
+  fun mulAffineR(right: Matrix): Matrix =
+      Matrix(
+          m00 = m00 * right.m00 + m10 * right.m01 + m20 * right.m02,
+          m01 = m01 * right.m00 + m11 * right.m01 + m21 * right.m02,
+          m02 = m02 * right.m00 + m12 * right.m01 + m22 * right.m02,
+          m03 = m03 * right.m00 + m13 * right.m01 + m23 * right.m02,
+          m10 = m00 * right.m10 + m10 * right.m11 + m20 * right.m12,
+          m11 = m01 * right.m10 + m11 * right.m11 + m21 * right.m12,
+          m12 = m02 * right.m10 + m12 * right.m11 + m22 * right.m12,
+          m13 = m03 * right.m10 + m13 * right.m11 + m23 * right.m12,
+          m20 = m00 * right.m20 + m10 * right.m21 + m20 * right.m22,
+          m21 = m01 * right.m20 + m11 * right.m21 + m21 * right.m22,
+          m22 = m02 * right.m20 + m12 * right.m21 + m22 * right.m22,
+          m23 = m03 * right.m20 + m13 * right.m21 + m23 * right.m22,
+          m30 = m00 * right.m30 + m10 * right.m31 + m20 * right.m32 + m30,
+          m31 = m01 * right.m30 + m11 * right.m31 + m21 * right.m32 + m31,
+          m32 = m02 * right.m30 + m12 * right.m31 + m22 * right.m32 + m32,
+          m33 = m03 * right.m30 + m13 * right.m31 + m23 * right.m32 + m33,
+          properties = properties and (Matrix4f.PROPERTY_IDENTITY or Matrix4f.PROPERTY_PERSPECTIVE or Matrix4f.PROPERTY_TRANSLATION or Matrix4f.PROPERTY_ORTHONORMAL).inv()
+      )
+
+  fun mulPerspectiveAffine(right: Matrix): Matrix =
+      Matrix(
+          m00 = m00 * right.m00,
+          m01 = m11 * right.m01,
+          m02 = m22 * right.m02,
+          m03 = m23 * right.m02,
+          m10 = m00 * right.m10,
+          m11 = m11 * right.m11,
+          m12 = m22 * right.m12,
+          m13 = m23 * right.m12,
+          m20 = m00 * right.m20,
+          m21 = m11 * right.m21,
+          m22 = m22 * right.m22,
+          m23 = m23 * right.m22,
+          m30 = m00 * right.m30,
+          m31 = m11 * right.m31,
+          m32 = m22 * right.m32 + m32,
+          m33 = m23 * right.m32,
+          properties = 0
+      )
+
+  fun mulGeneric(right: Matrix): Matrix =
+      Matrix(
+          m00 = m00 * right.m00 + m10 * right.m01 + m20 * right.m02 + m30 * right.m03,
+          m01 = m01 * right.m00 + m11 * right.m01 + m21 * right.m02 + m31 * right.m03,
+          m02 = m02 * right.m00 + m12 * right.m01 + m22 * right.m02 + m32 * right.m03,
+          m03 = m03 * right.m00 + m13 * right.m01 + m23 * right.m02 + m33 * right.m03,
+          m10 = m00 * right.m10 + m10 * right.m11 + m20 * right.m12 + m30 * right.m13,
+          m11 = m01 * right.m10 + m11 * right.m11 + m21 * right.m12 + m31 * right.m13,
+          m12 = m02 * right.m10 + m12 * right.m11 + m22 * right.m12 + m32 * right.m13,
+          m13 = m03 * right.m10 + m13 * right.m11 + m23 * right.m12 + m33 * right.m13,
+          m20 = m00 * right.m20 + m10 * right.m21 + m20 * right.m22 + m30 * right.m23,
+          m21 = m01 * right.m20 + m11 * right.m21 + m21 * right.m22 + m31 * right.m23,
+          m22 = m02 * right.m20 + m12 * right.m21 + m22 * right.m22 + m32 * right.m23,
+          m23 = m03 * right.m20 + m13 * right.m21 + m23 * right.m22 + m33 * right.m23,
+          m30 = m00 * right.m30 + m10 * right.m31 + m20 * right.m32 + m30 * right.m33,
+          m31 = m01 * right.m30 + m11 * right.m31 + m21 * right.m32 + m31 * right.m33,
+          m32 = m02 * right.m30 + m12 * right.m31 + m22 * right.m32 + m32 * right.m33,
+          m33 = m03 * right.m30 + m13 * right.m31 + m23 * right.m32 + m33 * right.m33,
+          properties = 0
+      )
+
+  fun mulAffine(right: Matrix): Matrix =
+      Matrix(
+          m00 = m00 * right.m00 + m10 * right.m01 + m20 * right.m02,
+          m01 = m01 * right.m00 + m11 * right.m01 + m21 * right.m02,
+          m02 = m02 * right.m00 + m12 * right.m01 + m22 * right.m02,
+          m03 = m03,
+          m10 = m00 * right.m10 + m10 * right.m11 + m20 * right.m12,
+          m11 = m01 * right.m10 + m11 * right.m11 + m21 * right.m12,
+          m12 = m02 * right.m10 + m12 * right.m11 + m22 * right.m12,
+          m13 = m13,
+          m20 = m00 * right.m20 + m10 * right.m21 + m20 * right.m22,
+          m21 = m01 * right.m20 + m11 * right.m21 + m21 * right.m22,
+          m22 = m02 * right.m20 + m12 * right.m21 + m22 * right.m22,
+          m23 = m23,
+          m30 = m00 * right.m30 + m10 * right.m31 + m20 * right.m32 + m30,
+          m31 = m01 * right.m30 + m11 * right.m31 + m21 * right.m32 + m31,
+          m32 = m02 * right.m30 + m12 * right.m31 + m22 * right.m32 + m32,
+          m33 = m33,
+          properties = 0
+      )
+
   fun mul(right: Matrix): Matrix {
-    return toMatrix(toMutableMatrix(this).mul(toMutableMatrix(right)))
+    return when {
+      properties and Matrix4f.PROPERTY_IDENTITY != 0 -> right
+      right.properties and Matrix4f.PROPERTY_IDENTITY != 0 -> this
+      properties and Matrix4f.PROPERTY_TRANSLATION != 0 && right.properties and Matrix4f.PROPERTY_AFFINE != 0 -> mulTranslationAffine(right)
+      properties and Matrix4f.PROPERTY_AFFINE != 0 && right.properties and Matrix4f.PROPERTY_AFFINE != 0 -> mulAffine(right)
+      properties and Matrix4f.PROPERTY_PERSPECTIVE != 0 && right.properties and Matrix4f.PROPERTY_AFFINE != 0 -> mulPerspectiveAffine(right)
+      right.properties and Matrix4f.PROPERTY_AFFINE != 0 -> mulAffineR(right)
+      else -> mulGeneric(right)
+    }
   }
 
   fun rotation(angle: Float, x: Float, y: Float, z: Float): Matrix {
@@ -153,7 +264,7 @@ data class Matrix(
         m13 = 0.0f,
         m23 = 0.0f,
         m33 = 1.0f,
-        properties = Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL
+        properties = Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL
     )
   }
 
@@ -164,11 +275,11 @@ data class Matrix(
       rotation(angle, axis.x, axis.y, axis.z)
 
   fun rotate(quat: Quaternion): Matrix {
-    return if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+    return if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       rotation(quat)
-    else if (properties and Matrix4fc.PROPERTY_TRANSLATION != 0)
+    else if (properties and Matrix4f.PROPERTY_TRANSLATION != 0)
       rotateTranslation(quat)
-    else if (properties and Matrix4fc.PROPERTY_AFFINE != 0)
+    else if (properties and Matrix4f.PROPERTY_AFFINE != 0)
       rotateAffine(quat)
     else
       rotateGeneric(quat)
@@ -219,7 +330,7 @@ data class Matrix(
         m31 = m31,
         m32 = m32,
         m33 = 1.0f,
-        properties = properties and (Matrix4fc.PROPERTY_PERSPECTIVE or Matrix4fc.PROPERTY_IDENTITY or Matrix4fc.PROPERTY_TRANSLATION).inv()
+        properties = properties and (Matrix4f.PROPERTY_PERSPECTIVE or Matrix4f.PROPERTY_IDENTITY or Matrix4f.PROPERTY_TRANSLATION).inv()
     )
   }
 
@@ -269,7 +380,7 @@ data class Matrix(
         m31 = m31,
         m32 = m32,
         m33 = m33,
-        properties = properties and (Matrix4fc.PROPERTY_PERSPECTIVE or Matrix4fc.PROPERTY_IDENTITY or Matrix4fc.PROPERTY_TRANSLATION).inv()
+        properties = properties and (Matrix4f.PROPERTY_PERSPECTIVE or Matrix4f.PROPERTY_IDENTITY or Matrix4f.PROPERTY_TRANSLATION).inv()
     )
   }
 
@@ -318,7 +429,7 @@ data class Matrix(
         m31 = m31,
         m32 = m32,
         m33 = m33,
-        properties = properties and (Matrix4fc.PROPERTY_PERSPECTIVE or Matrix4fc.PROPERTY_IDENTITY or Matrix4fc.PROPERTY_TRANSLATION).inv()
+        properties = properties and (Matrix4f.PROPERTY_PERSPECTIVE or Matrix4f.PROPERTY_IDENTITY or Matrix4f.PROPERTY_TRANSLATION).inv()
     )
   }
 
@@ -369,11 +480,11 @@ data class Matrix(
         m11 = nm11,
         m12 = nm12,
         m13 = nm13,
-        properties = properties and (Matrix4fc.PROPERTY_PERSPECTIVE or Matrix4fc.PROPERTY_IDENTITY or Matrix4fc.PROPERTY_TRANSLATION).inv()
+        properties = properties and (Matrix4f.PROPERTY_PERSPECTIVE or Matrix4f.PROPERTY_IDENTITY or Matrix4f.PROPERTY_TRANSLATION).inv()
     )
   }
 
-  fun rotateTowards(dir: Vector3fc, up: Vector3fc): Matrix {
+  fun rotateTowards(dir: Vector3, up: Vector3): Matrix {
     return rotateTowards(dir.x, dir.y, dir.z, up.x, up.y, up.z)
   }
 
@@ -383,12 +494,12 @@ data class Matrix(
         m01 = dirX,
         m10 = -dirX,
         m11 = dirY,
-        properties = Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL
+        properties = Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL
     )
   }
 
   fun rotateTowardsXY(dirX: Float, dirY: Float): Matrix {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+    if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       return rotationTowardsXY(dirX, dirY)
 
     val rm10 = -dirX
@@ -413,7 +524,7 @@ data class Matrix(
         m31 = m31,
         m32 = m32,
         m33 = m33,
-        properties = properties and (Matrix4fc.PROPERTY_PERSPECTIVE or Matrix4fc.PROPERTY_IDENTITY or Matrix4fc.PROPERTY_TRANSLATION).inv()
+        properties = properties and (Matrix4f.PROPERTY_PERSPECTIVE or Matrix4f.PROPERTY_IDENTITY or Matrix4f.PROPERTY_TRANSLATION).inv()
     )
   }
 
@@ -454,7 +565,7 @@ data class Matrix(
         m31 = m31,
         m32 = m32,
         m33 = m33,
-        properties = properties and (Matrix4fc.PROPERTY_PERSPECTIVE or Matrix4fc.PROPERTY_IDENTITY or Matrix4fc.PROPERTY_TRANSLATION).inv()
+        properties = properties and (Matrix4f.PROPERTY_PERSPECTIVE or Matrix4f.PROPERTY_IDENTITY or Matrix4f.PROPERTY_TRANSLATION).inv()
     )
   }
 
@@ -466,12 +577,12 @@ data class Matrix(
         m12 = sin,
         m21 = -sin,
         m22 = cos,
-        properties = Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL
+        properties = Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL
     )
   }
 
   fun rotateX(ang: Float): Matrix {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+    if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       return rotationX(ang)
 
     val sin = Math.sin(ang.toDouble()).toFloat()
@@ -502,7 +613,7 @@ data class Matrix(
         m31 = m31,
         m32 = m32,
         m33 = m33,
-        properties = properties and (Matrix4fc.PROPERTY_PERSPECTIVE or Matrix4fc.PROPERTY_IDENTITY or Matrix4fc.PROPERTY_TRANSLATION).inv()
+        properties = properties and (Matrix4f.PROPERTY_PERSPECTIVE or Matrix4f.PROPERTY_IDENTITY or Matrix4f.PROPERTY_TRANSLATION).inv()
     )
   }
 
@@ -516,12 +627,12 @@ data class Matrix(
         m02 = -sin,
         m20 = sin,
         m22 = cos,
-        properties = Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL
+        properties = Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL
     )
   }
 
   fun rotateY(ang: Float): Matrix {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+    if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       return rotationY(ang)
     val cos: Float
     val sin: Float
@@ -553,7 +664,7 @@ data class Matrix(
         m31 = m31,
         m32 = m32,
         m33 = m33,
-        properties = properties and (Matrix4fc.PROPERTY_PERSPECTIVE or Matrix4fc.PROPERTY_IDENTITY or Matrix4fc.PROPERTY_TRANSLATION).inv()
+        properties = properties and (Matrix4f.PROPERTY_PERSPECTIVE or Matrix4f.PROPERTY_IDENTITY or Matrix4f.PROPERTY_TRANSLATION).inv()
     )
   }
 
@@ -565,12 +676,12 @@ data class Matrix(
         m01 = sin,
         m10 = -sin,
         m11 = cos,
-        properties = Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_ORTHONORMAL
+        properties = Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_ORTHONORMAL
     )
   }
 
   fun rotateZ(angle: Float): Matrix {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+    if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       return rotationZ(angle)
     val sin = Math.sin(angle.toDouble()).toFloat()
     val cos = Math.cosFromSin(sin.toDouble(), angle.toDouble()).toFloat()
@@ -578,7 +689,7 @@ data class Matrix(
   }
 
 //  fun rotateZ(ang: Float): Matrix {
-//    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+//    if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
 //      return dest.rotationZ(ang)
 //    val sin = Math.sin(ang.toDouble()).toFloat()
 //    val cos = Math.cosFromSin(sin.toDouble(), ang.toDouble()).toFloat()
@@ -586,7 +697,7 @@ data class Matrix(
 //  }
 
   fun scale(x: Float, y: Float, z: Float): Matrix =
-      if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+      if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
         scaling(this, x, y, z)
       else
         scaleGeneric(this, x, y, z)
@@ -598,7 +709,7 @@ data class Matrix(
       scale(value, value, value)
 
   fun transform(vector: Vector4): Vector4 {
-    return if (properties and Matrix4fc.PROPERTY_AFFINE != 0)
+    return if (properties and Matrix4f.PROPERTY_AFFINE != 0)
       mulAffine(this, vector)
     else
       mulGeneric(this, vector)
@@ -609,12 +720,12 @@ data class Matrix(
         m30 = x,
         m31 = y,
         m32 = z,
-        properties = Matrix4fc.PROPERTY_AFFINE or Matrix4fc.PROPERTY_TRANSLATION or Matrix4fc.PROPERTY_ORTHONORMAL
+        properties = Matrix4f.PROPERTY_AFFINE or Matrix4f.PROPERTY_TRANSLATION or Matrix4f.PROPERTY_ORTHONORMAL
     )
   }
 
   fun translate(x: Float, y: Float, z: Float): Matrix {
-    if (properties and Matrix4fc.PROPERTY_IDENTITY != 0)
+    if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       return translation(x, y, z)
 
     return this.copy(
@@ -622,12 +733,43 @@ data class Matrix(
         m31 = m01 * x + m11 * y + m21 * z + m31,
         m32 = m02 * x + m12 * y + m22 * z + m32,
         m33 = m03 * x + m13 * y + m23 * z + m33,
-        properties = properties and (Matrix4fc.PROPERTY_PERSPECTIVE or Matrix4fc.PROPERTY_IDENTITY).inv()
+        properties = properties and (Matrix4f.PROPERTY_PERSPECTIVE or Matrix4f.PROPERTY_IDENTITY).inv()
     )
   }
 
   fun translate(offset: Vector3): Matrix {
     return translate(offset.x, offset.y, offset.z)
+  }
+
+  fun invertOrthonormal(): Matrix {
+    val mutable = toMutableMatrix(this)
+    return toMatrix(mutable.invertOrthonormal(mutable))
+  }
+
+  fun invertAffine(): Matrix {
+    val mutable = toMutableMatrix(this)
+    return toMatrix(mutable.invertAffine(mutable))
+  }
+
+  fun invertPerspective(): Matrix {
+    val mutable = toMutableMatrix(this)
+    return toMatrix(mutable.invertPerspective(mutable))
+  }
+
+  fun invertGeneric(): Matrix {
+    val mutable = toMutableMatrix(this)
+    return toMatrix(mutable.invertGeneric(mutable))
+  }
+
+  fun invert(): Matrix {
+    return when {
+      properties and Matrix4f.PROPERTY_IDENTITY != 0 -> identity
+      properties and Matrix4f.PROPERTY_TRANSLATION != 0 -> throw Error("Not implemented")
+      properties and Matrix4f.PROPERTY_ORTHONORMAL != 0 -> invertOrthonormal()
+      properties and Matrix4f.PROPERTY_AFFINE != 0 -> invertAffine()
+      properties and Matrix4f.PROPERTY_PERSPECTIVE != 0 -> invertPerspective()
+      else -> invertGeneric()
+    }
   }
 
   operator fun times(m: Matrix) = mul(m)
