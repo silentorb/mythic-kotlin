@@ -1,5 +1,6 @@
 import org.junit.jupiter.api.Test
 import silentorb.mythic.imaging.substance.box
+import silentorb.mythic.imaging.substance.surfacing.findLongestLine
 import silentorb.mythic.imaging.substance.surfacing.findSurfacingStart
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
@@ -38,5 +39,15 @@ class SurfacingTest {
         Vector3(-20f, 10f, 0f),
         projectPointFromNormal(Vector3(0f, 0f, -1f), Vector2(20f, 10f))
     )
+  }
+
+  @Test()
+  fun canGetLongestLineAlongBoxSide() {
+    val getDistance = box(Vector3(2f))
+    val origin = Vector3(0f, -5f, 0f)
+    val direction = Vector3(0f, 1f, 0f)
+    val hit = findSurfacingStart(getDistance, 0.01f, origin, direction)
+    val candidate = findLongestLine(getDistance, 0.01f, 0.05f, hit)
+    val k = 0
   }
 }
