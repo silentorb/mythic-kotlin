@@ -1,4 +1,4 @@
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import silentorb.imp.execution.executeToSingleValue
 import silentorb.imp.parsing.general.handleRoot
 import silentorb.imp.parsing.parser.parseTextBranching

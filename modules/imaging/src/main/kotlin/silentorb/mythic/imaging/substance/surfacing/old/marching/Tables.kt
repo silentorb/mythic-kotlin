@@ -1,4 +1,4 @@
-package silentorb.mythic.imaging.substance.marching
+package silentorb.mythic.imaging.substance.surfacing.old.marching
 
 object TablesMC {
   val MC_EDGE_TABLE = intArrayOf(

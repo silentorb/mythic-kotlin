@@ -1,0 +1,16 @@
+package silentorb.mythic.imaging.substance
+
+import silentorb.mythic.spatial.Vector3
+import kotlin.math.max
+import kotlin.math.min
+
+fun sphere(radius: Float): DistanceFunction =
+    { origin ->
+      origin.distance(Vector3.zero) - radius
+    }
+
+fun box(bounds: Vector3): DistanceFunction =
+    { origin ->
+      val q = origin.absolute() - bounds
+      q.max(0f).length() + min(max(q.x, max(q.y, q.z)), 0f)
+    }

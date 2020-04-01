@@ -10,20 +10,19 @@ repositories {
 }
 
 dependencies {
-  testApi("junit:junit:4.13")
   implementation(kotlin("stdlib-jdk8"))
   implementation("silentorb.imp:execution")
   implementation("silentorb.imp:libraries_standard")
   implementation("silentorb.imp:libraries_standard_implementation")
-  testImplementation("silentorb.imp:testing")
   api("silentorb.mythic:ent")
   api("silentorb.mythic:spatial")
   api("silentorb.mythic:randomly")
   api("silentorb.mythic:debugging")
   api("org.lwjgl:lwjgl:3.1.5")
   api("org.lwjgl:lwjgl:3.1.5:natives-windows")
-//  implementation(project(":imaging_native"))
-//  implementation(files(project(":imaging_native").dependencyProject.buildDir.toString() + "\\lib\\main\\release"))
+
+  testImplementation("org.junit.jupiter:junit-jupiter:5.6.1")
+  testImplementation("silentorb.imp:testing")
 }
 
 tasks {
@@ -34,7 +33,3 @@ tasks {
     kotlinOptions.jvmTarget = "1.8"
   }
 }
-
-//tasks.jar {
-//  from(project(":imaging_native").library.developmentBinary.flatMap { (it as ComponentWithRuntimeFile).runtimeFile })
-//}

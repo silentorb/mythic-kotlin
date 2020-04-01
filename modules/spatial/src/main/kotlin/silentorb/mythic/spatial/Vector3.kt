@@ -1,6 +1,9 @@
 package silentorb.mythic.spatial
 
 import java.text.NumberFormat
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 private val _zero = Vector3()
 private val _unit = Vector3(1f, 1f, 1f)
@@ -131,10 +134,26 @@ data class Vector3(
         2 -> z
         else -> throw Error("Invalid index $i")
       }
+
+  fun absolute() = Vector3(abs(x), abs(y), abs(z))
+
+  fun max(b: Float) =
+      Vector3(
+          max(x, b),
+          max(y, b),
+          max(z, b)
+      )
+
+  fun min(b: Float) =
+      Vector3(
+          min(x, b),
+          min(y, b),
+          min(z, b)
+      )
 }
 
 fun getNormal(a: Vector3, b: Vector3, c: Vector3) =
-  (c - b).cross(a - b).normalize()
+    (c - b).cross(a - b).normalize()
 
 fun getNormal(vertices: List<Vector3>) =
-  (vertices[2] - vertices[1]).cross(vertices[0] - vertices[1]).normalize()
+    (vertices[2] - vertices[1]).cross(vertices[0] - vertices[1]).normalize()

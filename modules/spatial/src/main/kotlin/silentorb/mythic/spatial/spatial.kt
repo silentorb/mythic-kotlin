@@ -162,6 +162,14 @@ fun projectPointOntoLine(v: Vector2, u1: Vector2, u2: Vector2): Vector2 {
   return relative + u1
 }
 
+fun projectPointFromNormal(normal: Vector3, point: Vector3): Vector3 {
+  val rotation = Quaternion().rotationTo(Vector3(0f, 0f, 1f), normal)
+  return rotation.transform(point)
+}
+
+fun projectPointFromNormal(normal: Vector3, point: Vector2) =
+    projectPointFromNormal(normal, Vector3(point.x, point.y, 0f))
+
 fun projectPointOntoLine(v: Vector3, u1: Vector3, u2: Vector3): Vector3 {
   val u = u2 - u1
   val relative = u * u.dot(v - u1) / u.dot(u)
