@@ -1,5 +1,7 @@
 package silentorb.mythic.spatial
 
+import kotlin.math.roundToInt
+
 private val _zero = Vector3i()
 private val _unit = Vector3i(1, 1, 1)
 
@@ -13,6 +15,7 @@ data class Vector3i(
     val unit: Vector3i = _unit
   }
   operator fun plus(value: Vector3i): Vector3i = Vector3i(x + value.x, y + value.y, z + value.z)
+  operator fun plus(v: Int) = Vector3i(x + v, y + v, z + v)
   operator fun minus(value: Vector3i): Vector3i = Vector3i(x - value.x, y - value.y, z - value.z)
   operator fun minus(v: Int) = Vector3i(x - v, y - v, z - v)
   operator fun unaryMinus() = Vector3i(-x, -y, -z)
@@ -20,3 +23,10 @@ data class Vector3i(
   operator fun times(value: Int): Vector3i = Vector3i(x * value, y * value, z * value)
   operator fun div(value: Int): Vector3i = Vector3i(x / value, y / value, z / value)
 }
+
+fun toVector3i(value: Vector3): Vector3i =
+    Vector3i(
+        value.x.roundToInt(),
+        value.y.roundToInt(),
+        value.z.roundToInt()
+    )

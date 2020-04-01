@@ -33,11 +33,7 @@ data class Vector3(
     val unit: Vector3 = _unit
   }
 
-  override operator fun minus(v: Vector2fMinimal): Vector2 =
-      Vector2(x - v.x, y - v.y)
-
-  operator fun minus(v: Vector3): Vector3 =
-      Vector3(x - v.x, y - v.y, z - v.z)
+  override operator fun minus(v: Vector2fMinimal): Vector2 = Vector2(x - v.x, y - v.y)
 
   override fun hashCode(): Int {
     val prime = 31
@@ -68,7 +64,8 @@ data class Vector3(
   operator fun times(other: Float): Vector3 = Vector3(x * other, y * other, z * other)
   operator fun times(other: Vector3): Vector3 = Vector3(x * other.x, y * other.y, z * other.z)
   operator fun minus(other: Vector3m) = Vector3m(x - other.x, y - other.y, z - other.z)
-  operator fun minus(v: Float) = Vector3m(x - v, y - v, z - v)
+  operator fun minus(v: Vector3): Vector3 = Vector3(x - v.x, y - v.y, z - v.z)
+  operator fun minus(v: Float) = Vector3(x - v, y - v, z - v)
   operator fun div(v: Float) = Vector3(x / v, y / v, z / v)
   operator fun div(v: Vector3) = Vector3(x / v.x, y / v.y, z / v.z)
 
@@ -157,3 +154,9 @@ fun getNormal(a: Vector3, b: Vector3, c: Vector3) =
 
 fun getNormal(vertices: List<Vector3>) =
     (vertices[2] - vertices[1]).cross(vertices[0] - vertices[1]).normalize()
+
+fun arrayToVector3(items: Array<Float>): Vector3 =
+    Vector3(items[0], items[1], items[2])
+
+fun listToVector3(items: List<Float>): Vector3 =
+    Vector3(items[0], items[1], items[2])

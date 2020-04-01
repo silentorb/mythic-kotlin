@@ -1,7 +1,9 @@
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import silentorb.mythic.imaging.substance.box
-import silentorb.mythic.imaging.substance.surfacing.findLongestLine
-import silentorb.mythic.imaging.substance.surfacing.findSurfacingStart
+import silentorb.mythic.imaging.substance.surfacing.SurfacingConfig
+import silentorb.mythic.imaging.substance.surfacing.getSceneGridBounds
+import silentorb.mythic.imaging.substance.surfacing.old.findSurfacingStart
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.projectPointFromNormal
@@ -42,12 +44,25 @@ class SurfacingTest {
   }
 
   @Test()
+  fun canGetBounds() {
+    val getDistance = box(Vector3(2f, 2.4f, 2.7f))
+    val gridBounds = getSceneGridBounds(getDistance, 1f)
+    assertEquals(-3, gridBounds.start.x)
+    assertEquals(-3, gridBounds.start.y)
+    assertEquals(-4, gridBounds.start.z)
+    assertEquals(3, gridBounds.end.x)
+    assertEquals(3, gridBounds.end.y)
+    assertEquals(4, gridBounds.end.z)
+  }
+
+  @Test()
   fun canGetLongestLineAlongBoxSide() {
     val getDistance = box(Vector3(2f))
-    val origin = Vector3(0f, -5f, 0f)
-    val direction = Vector3(0f, 1f, 0f)
-    val hit = findSurfacingStart(getDistance, 0.01f, origin, direction)
-    val candidate = findLongestLine(getDistance, 0.01f, 0.05f, hit)
+    val config = SurfacingConfig(
+        getDistance = getDistance,
+        tolerance = 0.01f
+    )
+
     val k = 0
   }
 }

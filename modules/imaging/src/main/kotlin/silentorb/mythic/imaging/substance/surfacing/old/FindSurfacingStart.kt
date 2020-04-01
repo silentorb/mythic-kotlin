@@ -1,4 +1,4 @@
-package silentorb.mythic.imaging.substance.surfacing
+package silentorb.mythic.imaging.substance.surfacing.old
 
 import silentorb.mythic.imaging.substance.DistanceFunction
 import silentorb.mythic.spatial.Vector3
