@@ -5,7 +5,6 @@ import silentorb.mythic.imaging.substance.surfacing.old.getNormalRotation
 import silentorb.mythic.imaging.substance.surfacing.old.projectFromNormalRotation
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
-import silentorb.mythic.spatial.Vector3i
 import silentorb.mythic.spatial.toVector3
 
 data class SubSample(
@@ -45,15 +44,20 @@ fun sampleCellGrid(config: SurfacingConfig, center: Vector3, centerDistance: Flo
   val samples = (0 until sampleCount).map { i ->
     val y = i / subCells
     val x = i - y * subCells
-    val position = start +
+
+    val tangentPosition = start +
         right * subStep * x.toFloat() +
         down * subStep * y.toFloat()
+
+    val distance = getDistance(tangentPosition)
+    val sampleNormal = calculateNormal(getDistance, tangentPosition)
+    val position = tangentPosition - sampleNormal * distance
 
     if (isInsideBounds(bounds, position)) {
       SubSample(
           position = position,
-          normal = calculateNormal(getDistance, position),
-          distance = getDistance(position)
+          normal = sampleNormal,
+          distance = distance
       )
     } else
       null

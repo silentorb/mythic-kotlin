@@ -11,7 +11,7 @@ fun getVariance(first: Vector3, second: Vector3) =
 fun diffSamples(samples: Array<SubSample?>, first: Int, second: Int): Contour? {
   val a = samples[first]
   val b = samples[second]
-  return if (a != null && b != null) {
+  return if (a != null && b != null && a.normal != b.normal) {
     Contour(
         strength = getVariance(a.normal, b.normal),
         direction = a.normal.cross(b.normal).normalize(),
@@ -56,8 +56,9 @@ fun isolateContours(tolerance: Float, contourGrid: ContourGrid): Contours =
 
 fun getDistanceTolerance(config: SurfacingConfig): Float {
   val sampleLength = config.cellSize / config.subCells
-  val squared = sampleLength * sampleLength
-  return sqrt(squared + squared)
+  return sampleLength * 0.4f
+//  val squared = sampleLength * sampleLength
+//  return sqrt(squared + squared)
 }
 
 tailrec fun detectEdges(distanceTolerance: Float, normalTolerance: Float, contours: Contours, lines: LineAggregates): LineAggregates {
