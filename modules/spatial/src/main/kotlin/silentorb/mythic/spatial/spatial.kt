@@ -242,7 +242,7 @@ fun transformVector(m: Matrix): Vector3m {
 
 //fun Vector2.transform(m: Matrix) = m.transform(Vector4(x, y, 0f, 1f)).xy()
 
-fun getVector3Center(first: Vector3, second: Vector3) =
+fun getCenter(first: Vector3, second: Vector3) =
     first + (second - first) * 0.5f
 
 //fun getRotationMatrix(matrix: MutableMatrix): MutableMatrix =

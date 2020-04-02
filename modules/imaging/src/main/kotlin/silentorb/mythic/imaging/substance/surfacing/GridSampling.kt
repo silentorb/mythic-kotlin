@@ -42,9 +42,9 @@ fun sampleCellGrid(config: SurfacingConfig, center: Vector3, centerDistance: Flo
       end = center + cellHalf
   )
 
-  val samples = (0 until sampleCount).map { index ->
-    val y = index / subCells
-    val x = index - y * subCells
+  val samples = (0 until sampleCount).map { i ->
+    val y = i / subCells
+    val x = i - y * subCells
     val position = start +
         right * subStep * x.toFloat() +
         down * subStep * y.toFloat()

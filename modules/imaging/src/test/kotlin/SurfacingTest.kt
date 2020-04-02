@@ -1,15 +1,10 @@
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import silentorb.mythic.imaging.substance.box
-import silentorb.mythic.imaging.substance.surfacing.SurfacingConfig
-import silentorb.mythic.imaging.substance.surfacing.getSceneGridBounds
+import silentorb.mythic.imaging.substance.surfacing.*
 import silentorb.mythic.imaging.substance.surfacing.old.findSurfacingStart
-import silentorb.mythic.imaging.substance.surfacing.sampleCellGrids
-import silentorb.mythic.imaging.substance.surfacing.traceContours
 import silentorb.mythic.imaging.substance.translate
-import silentorb.mythic.spatial.Vector2
-import silentorb.mythic.spatial.Vector3
-import silentorb.mythic.spatial.projectPointFromNormal
+import silentorb.mythic.spatial.*
 
 class SurfacingTest {
 
@@ -59,6 +54,14 @@ class SurfacingTest {
   }
 
   @Test()
+  fun lineAndSphereIntersectionWorks() {
+    assertTrue(lineIntersectsSphere(Vector3(0f, 0f, 0f), Vector3(1f, 0f, 0f), Vector3(10f, 0f, 0f), 1f))
+    assertTrue(lineIntersectsSphere(Vector3(0f, 0f, 0f), Vector3(1f, 0f, 0f), Vector3(-10f, 0f, 0f), 1f))
+    assertTrue(lineIntersectsSphere(Vector3(0f, 0f, 0f), Vector3(1f, 0f, 0f), Vector3(0.5f, 0f, 0f), 0.1f))
+    assertFalse(lineIntersectsSphere(Vector3(0f, 0f, 0f), Vector3(1f, 0f, 0f), Vector3(0.5f, 0f, 1f), 0.1f))
+  }
+
+  @Test()
   fun canSampleABoxIntersectingCellCenters() {
     val getDistance = translate(Vector3(0.5f, 0f, 0.5f), box(Vector3(2f, 1f, 2f)))
     val config = SurfacingConfig(
@@ -69,8 +72,11 @@ class SurfacingTest {
     )
     val bounds = getSceneGridBounds(getDistance, config.cellSize)
     val sampleGrid = sampleCellGrids(config, bounds)
-    val grid = sampleGrid(0)
-    val k = 0
+    val grid = sampleGrid(0)!!
+    val variations = newContourGrid(grid, config.subCells)
+    val contours = isolateContours(config.tolerance, variations)
+    val lines = detectEdges(config, contours)
+    assertEquals(3, lines.size)
   }
 
   @Test()

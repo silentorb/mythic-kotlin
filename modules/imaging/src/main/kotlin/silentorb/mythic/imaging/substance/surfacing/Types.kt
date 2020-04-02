@@ -26,3 +26,37 @@ data class GridBounds(
           end = end + amount
       )
 }
+
+data class Contour(
+    val strength: Float,
+    val direction: Vector3,
+    val position: Vector3,
+    val firstSample: SubSample,
+    val secondSample: SubSample
+)
+
+typealias PossibleContours = List<Contour?>
+typealias Contours = List<Contour>
+
+data class ContourGrid(
+    val gridLength: Int,
+    val neighborhoodLength: Int,
+    val horizontal: PossibleContours,
+    val vertical: PossibleContours
+)
+
+typealias LineAggregate = List<Contour>
+typealias LineAggregates = List<LineAggregate>
+
+//data class Contour(
+//    val index: Int,
+//    val x: Float,
+//    val y: Float,
+//    val strength: Float,
+//    val direction: Vector3
+//)
+
+//data class Contours(
+//    val horizontal: Variations,
+//    val vertical: Variations
+//)

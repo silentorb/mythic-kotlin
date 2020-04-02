@@ -51,7 +51,7 @@ fun lineIntersectsCircle(lineStart: Vector2, lineEnd: Vector2, circleCenter: Vec
   }
 }
 
-fun lineIntersectsSphere(lineStart: Vector3m, lineEnd: Vector3m, circleCenter: Vector3m, radius: Float): Boolean {
+fun lineSegmentIntersectsSphere(lineStart: Vector3m, lineEnd: Vector3m, circleCenter: Vector3m, radius: Float): Boolean {
   val d = lineEnd - lineStart
   val f = lineStart - circleCenter
   val a = d.dot(d)
@@ -98,6 +98,29 @@ fun lineIntersectsSphere(lineStart: Vector3m, lineEnd: Vector3m, circleCenter: V
 
     // no intn: FallShort, Past, CompletelyInside
   }
+}
+
+fun lineIntersectsSphere(linePoint0: Vector3, vector: Vector3, circleCenter: Vector3, circleRadius: Float): Boolean {
+  val linePoint1 = linePoint0 + vector
+  val cx = circleCenter.x
+  val cy = circleCenter.y
+  val cz = circleCenter.z
+  val px = linePoint0.x
+  val py = linePoint0.y
+  val pz = linePoint0.z
+  val vx = linePoint1.x - px
+  val vy = linePoint1.y - py
+  val vz = linePoint1.z - pz
+  val A = vx * vx + vy * vy + vz * vz
+  val B = 2f * (px * vx + py * vy + pz * vz - vx * cx - vy * cy - vz * cz)
+  val C = px * px - 2f * px * cx + cx * cx + py * py - 2f * py * cy + cy * cy +
+      pz * pz - 2f * pz * cz + cz * cz - circleRadius * circleRadius
+  // discriminant
+  val D = B * B - 4f * A * C
+  if (D < 0) {
+    return false
+  }
+  return true
 }
 
 fun rayIntersectsSphere(lineStart: Vector3, lineEnd: Vector3, circleCenter: Vector3, radius: Float): Boolean {
