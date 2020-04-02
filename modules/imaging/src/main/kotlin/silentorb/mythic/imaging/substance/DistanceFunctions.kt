@@ -9,8 +9,15 @@ fun sphere(radius: Float): DistanceFunction =
       origin.distance(Vector3.zero) - radius
     }
 
-fun box(bounds: Vector3): DistanceFunction =
+fun box(bounds: Vector3): DistanceFunction {
+  val halfBounds = bounds / 2f
+  return { origin ->
+    val q = origin.absolute() - halfBounds
+    q.max(0f).length() + min(max(q.x, max(q.y, q.z)), 0f)
+  }
+}
+
+fun translate(offset: Vector3, function: DistanceFunction): DistanceFunction =
     { origin ->
-      val q = origin.absolute() - bounds
-      q.max(0f).length() + min(max(q.x, max(q.y, q.z)), 0f)
+      function(origin - offset)
     }
