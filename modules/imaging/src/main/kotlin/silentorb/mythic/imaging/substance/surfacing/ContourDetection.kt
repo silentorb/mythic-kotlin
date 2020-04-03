@@ -1,21 +1,31 @@
 package silentorb.mythic.imaging.substance.surfacing
 
+import silentorb.mythic.imaging.substance.DistanceFunction
+import silentorb.mythic.imaging.substance.calculateNormal
 import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.Vector3i
 import silentorb.mythic.spatial.getCenter
 import silentorb.mythic.spatial.lineIntersectsSphere
-import kotlin.math.sqrt
+import kotlin.math.abs
 
 fun getVariance(first: Vector3, second: Vector3) =
     (-first.dot(second) + 1f) / 2f
 
-fun diffSamples(samples: Array<SubSample?>, first: Int, second: Int): Contour? {
+fun refineMiddle(getDistance: DistanceFunction, a: SubSample, b: SubSample): Vector3 {
+  val middle = getCenter(a.position, b.position)
+  val normal = calculateNormal(getDistance, middle)
+  val distance = getDistance(middle)
+  return middle - normal * distance
+}
+
+fun diffSamples(getDistance: DistanceFunction, samples: Array<SubSample?>, first: Int, second: Int): Contour? {
   val a = samples[first]
   val b = samples[second]
   return if (a != null && b != null && a.normal != b.normal) {
     Contour(
         strength = getVariance(a.normal, b.normal),
         direction = a.normal.cross(b.normal).normalize(),
-        position = getCenter(a.position, b.position),
+        position = refineMiddle(getDistance, a, b),
         firstSample = a,
         secondSample = b
     )
@@ -23,45 +33,47 @@ fun diffSamples(samples: Array<SubSample?>, first: Int, second: Int): Contour? {
     null
 }
 
-fun diffSamples(samples: Array<SubSample?>, neighborhoodLength: Int, gridLength: Int, offset: Int) =
-    (0 until neighborhoodLength * neighborhoodLength)
-        .map { i ->
-          val y = i / neighborhoodLength
-          val x = i - y * neighborhoodLength
-          val first = x + y * gridLength
-          diffSamples(samples, first, first + offset)
-        }
-
-fun newContourGrid(grid: CellSample, gridLength: Int): ContourGrid {
-  val neighborhoodLength = (gridLength - 1)
-  val horizontal = diffSamples(grid.samples, neighborhoodLength, gridLength, 1)
-  val vertical = diffSamples(grid.samples, neighborhoodLength, gridLength, gridLength)
-  return ContourGrid(
-      gridLength = gridLength,
-      neighborhoodLength = neighborhoodLength,
-      horizontal = horizontal,
-      vertical = vertical
-  )
+fun diffSampleGrid(getDistance: DistanceFunction, samples: Array<SubSample?>, gridLength: Int): (Vector3i, Int) -> Contours = { axis, offset ->
+  val subLengths = Vector3i(gridLength) - axis
+  val sliceSize = subLengths.x * subLengths.y
+  val sampleCount = subLengths.x * subLengths.y * subLengths.z
+  (0 until sampleCount)
+      .mapNotNull { i ->
+        val z = i / sliceSize
+        val zRemainder = i - sliceSize * z
+        val y = zRemainder / subLengths.x
+        val x = zRemainder - y * subLengths.x
+        val first = x + y * gridLength + z * gridLength * gridLength
+        diffSamples(getDistance, samples, first, first + offset)
+      }
 }
 
-fun isolateContours(tolerance: Float, neighbors: PossibleContours) =
+fun newContourGrid(getDistance: DistanceFunction, grid: CellSample, gridLength: Int): Contours {
+  val diff = diffSampleGrid(getDistance, grid.samples, gridLength)
+  val x = diff(Vector3i(1, 0, 0), 1)
+  val y = diff(Vector3i(0, 1, 0), gridLength)
+  val z = diff(Vector3i(0, 0, 1), gridLength * gridLength)
+  return x + y + z
+}
+
+fun isolateContours(tolerance: Float, neighbors: Contours) =
     neighbors
-        .filterNotNull()
         .filter { it.strength > tolerance }
 
-fun isolateContours(tolerance: Float, contourGrid: ContourGrid): Contours =
-    isolateContours(tolerance, contourGrid.horizontal)
-        .plus(isolateContours(tolerance, contourGrid.vertical)
-        )
+//fun isolateContours(tolerance: Float, contourGrid: ContourGrid): Contours =
+//    isolateContours(tolerance, contourGrid.x)
+//        .plus(isolateContours(tolerance, contourGrid.y)
+//        )
 
 fun getDistanceTolerance(config: SurfacingConfig): Float {
   val sampleLength = config.cellSize / config.subCells
-  return sampleLength * 0.4f
+  return sampleLength// * 0.5f
 //  val squared = sampleLength * sampleLength
 //  return sqrt(squared + squared)
 }
 
-tailrec fun detectEdges(distanceTolerance: Float, normalTolerance: Float, contours: Contours, lines: LineAggregates): LineAggregates {
+tailrec fun detectEdges(distanceTolerance: Float, normalTolerance: Float, contours: Contours, pivots: Contours,
+                        lines: LineAggregates): LineAggregates {
   return if (contours.none())
     lines
   else {
@@ -69,31 +81,42 @@ tailrec fun detectEdges(distanceTolerance: Float, normalTolerance: Float, contou
     val remainingContours = contours.drop(1)
     val matches = remainingContours
         .filter { contour ->
-          lineIntersectsSphere(base.position, base.direction, contour.position, distanceTolerance)
-//          val vector = (base.position - contour.position).normalize()
-//          val dot = vector.dot(base.direction)
-//          abs(dot) > tolerance
-//          val strength = getVariance(vector, base.direction)
-//          strength < tolerance * 2f
+          lineIntersectsSphere(base.position, base.direction, contour.position, distanceTolerance) &&
+              abs(base.direction.dot(contour.direction)) > 0.8f
         }
 
     val alignedMatches = matches
+//        .filter { contour ->
+//          val strength = getVariance(base.direction, contour.direction)
+//          strength < normalTolerance
+//        }
+
+    val pivotMatches = pivots
         .filter { contour ->
-          val strength = getVariance(base.direction, contour.direction)
-          strength < normalTolerance
+          lineIntersectsSphere(base.position, base.direction, contour.position, distanceTolerance)
         }
 
     val nextContours = remainingContours
         .minus(alignedMatches)
 
-    val newLine = listOf(base).plus(matches)
+    val allMatches = matches.plus(pivotMatches)
 
-    val nextLines = lines.plusElement(newLine)
-    detectEdges(distanceTolerance, normalTolerance, nextContours, nextLines)
+    val nextLines = if (allMatches.any()) {
+      val newLine = listOf(base).plus(allMatches)
+      lines.plusElement(newLine)
+    } else
+      lines
+
+    val nextPivots = if (allMatches.none())
+      pivots.plus(base)
+    else
+      pivots
+
+    detectEdges(distanceTolerance, normalTolerance, nextContours, nextPivots, nextLines)
   }
 }
 
-fun detectEdges(config: SurfacingConfig, contours: Contours): LineAggregates {
+fun detectEdges(config: SurfacingConfig, contours: Contours, pivots: Contours): LineAggregates {
   val distanceTolerance = getDistanceTolerance(config)
-  return detectEdges(distanceTolerance, 0.2f, contours, listOf())
+  return detectEdges(distanceTolerance, 0.2f, contours, pivots, listOf())
 }

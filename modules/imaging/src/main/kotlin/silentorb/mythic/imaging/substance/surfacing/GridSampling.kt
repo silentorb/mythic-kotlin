@@ -1,14 +1,13 @@
 package silentorb.mythic.imaging.substance.surfacing
 
 import silentorb.mythic.imaging.substance.calculateNormal
-import silentorb.mythic.imaging.substance.surfacing.old.getNormalRotation
-import silentorb.mythic.imaging.substance.surfacing.old.projectFromNormalRotation
-import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.toVector3
+import kotlin.math.abs
 
 data class SubSample(
     val position: Vector3,
+    val center: Vector3,
     val normal: Vector3,
     val distance: Float
 )
@@ -17,57 +16,47 @@ data class CellSample(
     val samples: Array<SubSample?>,
 
     // Currently these variables are only used for debugging and testing
-    val center: Vector3,
-    val origin: Vector3,
-    val normal: Vector3
+    val center: Vector3
 )
 
-fun sampleCellGrid(config: SurfacingConfig, center: Vector3, centerDistance: Float): CellSample {
+fun sampleCellGrid(config: SurfacingConfig, center: Vector3, subCellRange: Float): CellSample {
   val getDistance = config.getDistance
   val subCells = config.subCells
   val subStep = config.cellSize / config.subCells
-  val normal = calculateNormal(getDistance, center)
-  val origin = center + normal * -centerDistance
-  val normalRotation = getNormalRotation(normal)
-  val left = projectFromNormalRotation(normalRotation, Vector2(-1f, 0f))
-  val up = projectFromNormalRotation(normalRotation, Vector2(0f, -1f))
-  val down = -up
-  val right = -left
   val cellHalf = config.cellSize / 2
-  val start = origin + left * cellHalf + up * cellHalf
-  val sampleCount = subCells * subCells
-  val bounds = DecimalBounds(
-      start = center - cellHalf,
-      end = center + cellHalf
-  )
+  val start = center - cellHalf
+  val sampleCount = subCells * subCells * subCells
+  val sliceSize = subCells * subCells
 
   val samples = (0 until sampleCount).map { i ->
-    val y = i / subCells
-    val x = i - y * subCells
+    val z = i / sliceSize
+    val zRemainder = i - sliceSize * z
+    val y = zRemainder / subCells
+    val x = zRemainder - y * subCells
 
-    val tangentPosition = start +
-        right * subStep * x.toFloat() +
-        down * subStep * y.toFloat()
+    val cellCenter = start + Vector3(
+        x.toFloat() * subStep,
+        y.toFloat() * subStep,
+        z.toFloat() * subStep
+    )
 
-    val distance = getDistance(tangentPosition)
-    val sampleNormal = calculateNormal(getDistance, tangentPosition)
-    val position = tangentPosition - sampleNormal * distance
-
-    if (isInsideBounds(bounds, position)) {
+    val distance = getDistance(cellCenter)
+    if (abs(distance) > subCellRange)
+      null
+    else {
+      val normal = calculateNormal(getDistance, cellCenter)
       SubSample(
-          position = position,
-          normal = sampleNormal,
+          center = cellCenter,
+          position = cellCenter - normal * distance,
+          normal = normal,
           distance = distance
       )
-    } else
-      null
+    }
   }.toTypedArray()
 
   return CellSample(
       samples = samples,
-      normal = normal,
-      center = center,
-      origin = origin
+      center = center
   )
 }
 
@@ -79,6 +68,7 @@ fun sampleCellGrids(config: SurfacingConfig, bounds: GridBounds): (Int) -> CellS
   val maxCellRange = Vector3(halfCell).length()
   val sliceSize = dimensions.x * dimensions.y
   val start = bounds.start.toVector3() + config.cellSize / 2f
+  val subCellRange = maxCellRange / config.subCells
   return { i ->
     val z = i / sliceSize
     val zRemainder = i - sliceSize * z
@@ -89,8 +79,8 @@ fun sampleCellGrids(config: SurfacingConfig, bounds: GridBounds): (Int) -> CellS
 
     // Skip cells that have no geometry
     val rangeSample = config.getDistance(center)
-    if (rangeSample <= maxCellRange) {
-      sampleCellGrid(config, center, rangeSample)
+    if (abs(rangeSample) <= maxCellRange) {
+      sampleCellGrid(config, center, subCellRange)
     } else
       null
   }

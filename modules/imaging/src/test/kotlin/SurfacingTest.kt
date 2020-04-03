@@ -4,7 +4,10 @@ import silentorb.mythic.imaging.substance.box
 import silentorb.mythic.imaging.substance.surfacing.*
 import silentorb.mythic.imaging.substance.surfacing.old.findSurfacingStart
 import silentorb.mythic.imaging.substance.translate
-import silentorb.mythic.spatial.*
+import silentorb.mythic.spatial.Vector2
+import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.lineIntersectsSphere
+import silentorb.mythic.spatial.projectPointFromNormal
 
 class SurfacingTest {
 
@@ -63,7 +66,7 @@ class SurfacingTest {
 
   @Test()
   fun canSampleABoxIntersectingCellCenters() {
-    val getDistance = translate(Vector3(0.5f, 0f, 0.5f), box(Vector3(2f, 1f, 2f)))
+    val getDistance = translate(Vector3(0.4f, 0f, 0.5f), box(Vector3(2f, 1f, 2f)))
     val config = SurfacingConfig(
         getDistance = getDistance,
         tolerance = 0.01f,
@@ -73,9 +76,13 @@ class SurfacingTest {
     val bounds = getSceneGridBounds(getDistance, config.cellSize)
     val sampleGrid = sampleCellGrids(config, bounds)
     val grid = sampleGrid(0)!!
-    val variations = newContourGrid(grid, config.subCells)
+    val variations = newContourGrid(getDistance, grid, config.subCells)
     val contours = isolateContours(config.tolerance, variations)
-    val lines = detectEdges(config, contours)
+//    val groups = groupDuplicates(0.01f, initialContours)
+//    val (contours, pivots) = removeDuplicates(initialContours, groups)
+//    val (contours, pivots) = removeDuplicates(0.01f, initialContours)
+//    val lines = detectEdges(config, contours, pivots)
+    val lines = detectEdges(config, contours, listOf())
     assertEquals(3, lines.size)
   }
 

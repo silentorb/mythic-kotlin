@@ -38,12 +38,11 @@ data class Contour(
 typealias PossibleContours = List<Contour?>
 typealias Contours = List<Contour>
 
-data class ContourGrid(
-    val gridLength: Int,
-    val neighborhoodLength: Int,
-    val horizontal: PossibleContours,
-    val vertical: PossibleContours
-)
+//data class ContourGrid(
+//    val x: PossibleContours,
+//    val y: PossibleContours,
+//    val z: PossibleContours
+//)
 
 typealias LineAggregate = List<Contour>
 typealias LineAggregates = List<LineAggregate>

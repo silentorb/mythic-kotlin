@@ -243,7 +243,7 @@ fun transformVector(m: Matrix): Vector3m {
 //fun Vector2.transform(m: Matrix) = m.transform(Vector4(x, y, 0f, 1f)).xy()
 
 fun getCenter(first: Vector3, second: Vector3) =
-    first + (second - first) * 0.5f
+    (first + second) * 0.5f
 
 //fun getRotationMatrix(matrix: MutableMatrix): MutableMatrix =
 //    MutableMatrix().rotation(matrix.getUnnormalizedRotation(initialQuaternion))
@@ -350,6 +350,7 @@ fun manhattanDistance(a: Vector3, b: Vector3): Float =
 
 // Faster than a regular distance check
 fun withinRangeFast(a: Vector3, b: Vector3, range: Float): Boolean {
+  assert(a.z == b.z) // This function only works along two dimensions.  What was I thinking?
   val c = abs(a.x - b.x)
   if (c > range) {
     return false
