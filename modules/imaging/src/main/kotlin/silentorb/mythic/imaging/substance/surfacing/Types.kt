@@ -59,3 +59,13 @@ typealias LineAggregates = List<LineAggregate>
 //    val horizontal: Variations,
 //    val vertical: Variations
 //)
+
+data class SimpleEdge(
+    val first: Vector3,
+    val second: Vector3
+)
+
+data class ContourMesh(
+    val vertices: List<Vector3>,
+    val edges: List<SimpleEdge>
+)

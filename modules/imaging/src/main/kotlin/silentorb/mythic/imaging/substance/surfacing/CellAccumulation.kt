@@ -1,23 +1,11 @@
 package silentorb.mythic.imaging.substance.surfacing
 
-import silentorb.mythic.spatial.Vector3
-
-data class SimpleEdge(
-    val first: Vector3,
-    val second: Vector3
-)
-
-data class ContourMesh(
-    val vertices: List<Vector3>,
-    val edges: List<SimpleEdge>
-)
-
 // This function assumes that vertices of each mesh already have a distance of at least minDistance between them
-fun mergeContourMeshes(minDistance: Float): (ContourMesh, ContourMesh) -> ContourMesh = { first, second ->
+fun mergeContourMeshes(distanceTolerance: Float): (ContourMesh, ContourMesh) -> ContourMesh = { first, second ->
   val clumps = second.vertices.mapNotNull { b ->
     // TODO: This code may eventually better neighbor selection when there are multiple options
     val a = first.vertices
-        .filter { it.distance(b) < minDistance }
+        .filter { it.distance(b) < distanceTolerance }
         .firstOrNull()
     if (a != null)
       Pair(b, a)

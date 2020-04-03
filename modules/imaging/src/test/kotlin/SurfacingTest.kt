@@ -83,7 +83,10 @@ class SurfacingTest {
 //    val (contours, pivots) = removeDuplicates(0.01f, initialContours)
 //    val lines = detectEdges(config, contours, pivots)
     val lines = detectEdges(config, contours, listOf())
+    val edges = lineAggregatesToEdges(0.01f, lines)
+    val vertices = getVerticesFromEdges(edges)
     assertEquals(3, lines.size)
+    assertEquals(4, vertices.size)
   }
 
   @Test()
