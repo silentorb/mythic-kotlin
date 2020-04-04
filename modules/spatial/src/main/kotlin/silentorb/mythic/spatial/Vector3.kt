@@ -160,3 +160,10 @@ fun arrayToVector3(items: Array<Float>): Vector3 =
 
 fun listToVector3(items: List<Float>): Vector3 =
     Vector3(items[0], items[1], items[2])
+
+fun toList(value: Vector3): List<Float> =
+    listOf(
+         value.x,
+        value.y,
+        value.z
+    )
