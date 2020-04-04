@@ -1,11 +1,8 @@
 package silentorb.mythic.lookinglass.meshes.loading
 
-import silentorb.mythic.glowing.GeneralMesh
-import silentorb.mythic.glowing.VertexAttributeDetail
-import silentorb.mythic.glowing.VertexSchema
-import silentorb.mythic.glowing.newVertexBuffer
 import silentorb.mythic.spatial.Vector3
 import org.lwjgl.BufferUtils
+import silentorb.mythic.glowing.*
 import silentorb.mythic.lookinglass.ModelMesh
 import silentorb.mythic.lookinglass.meshes.AttributeName
 import silentorb.mythic.lookinglass.meshes.VertexSchemas
@@ -191,7 +188,8 @@ fun loadPrimitiveMesh(buffer: ByteBuffer, info: GltfInfo, vertexSchema: VertexSc
   return GeneralMesh(
       vertexSchema = vertexSchema,
       vertexBuffer = newVertexBuffer(vertexSchema, packing == VertexPacking.interleaved).load(vertices),
-      indices = indices
+      indices = indices,
+      primitiveType = PrimitiveType.loops
   )
 }
 

@@ -1,6 +1,6 @@
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import silentorb.mythic.imaging.fathoming.box
+import silentorb.mythic.imaging.fathoming.cube
 import silentorb.mythic.imaging.fathoming.surfacing.*
 import silentorb.mythic.imaging.fathoming.surfacing.old.findSurfacingStart
 import silentorb.mythic.imaging.fathoming.translate
@@ -13,7 +13,7 @@ class SurfacingTest {
 
   @Test()
   fun canFindStart() {
-    val getDistance = box(Vector3(2f))
+    val getDistance = cube(Vector3(2f))
     val origin = Vector3(0f, -5f, 0f)
     val direction = Vector3(0f, 1f, 0f)
     val hit = findSurfacingStart(getDistance, 0.01f, origin, direction)
@@ -46,7 +46,7 @@ class SurfacingTest {
 
   @Test()
   fun canGetBounds() {
-    val getDistance = box(Vector3(2f, 2.4f, 2.7f))
+    val getDistance = cube(Vector3(2f, 2.4f, 2.7f))
     val gridBounds = getSceneGridBounds(getDistance, 1f)
     assertEquals(-3, gridBounds.start.x)
     assertEquals(-3, gridBounds.start.y)
@@ -66,7 +66,7 @@ class SurfacingTest {
 
   @Test()
   fun canSampleABoxIntersectingCellCenters() {
-    val getDistance = translate(Vector3(0.4f, 0f, 0.5f), box(Vector3(2f, 1f, 2f)))
+    val getDistance = translate(Vector3(0.4f, 0f, 0.5f), cube(Vector3(2f, 1f, 2f)))
     val config = SurfacingConfig(
         getDistance = getDistance,
         tolerance = 0.01f,
@@ -91,7 +91,7 @@ class SurfacingTest {
 
   @Test()
   fun canTraceABoxIntersectingCellCenters() {
-    val getDistance = box(Vector3(2.5f))
+    val getDistance = cube(Vector3(2.5f))
     val config = SurfacingConfig(
         getDistance = getDistance,
         tolerance = 0.01f,

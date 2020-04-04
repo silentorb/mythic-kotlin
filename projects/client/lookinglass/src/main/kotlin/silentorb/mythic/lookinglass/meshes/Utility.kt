@@ -1,6 +1,7 @@
 package silentorb.mythic.lookinglass.meshes
 
 import silentorb.mythic.glowing.GeneralMesh
+import silentorb.mythic.glowing.PrimitiveType
 import silentorb.mythic.glowing.newGeneralMesh
 import silentorb.mythic.sculpting.ImmutableFace
 import silentorb.mythic.sculpting.ImmutableMesh
@@ -48,13 +49,13 @@ fun createSimpleMesh(mesh: ImmutableMesh, vertexSchema: VertexSchema) =
     convertMesh(mesh, vertexSchema, simpleVertexSerializer())
 
 fun createLineMesh(vertexSchema: VertexSchema) =
-    newGeneralMesh(vertexSchema, listOf(
+    newGeneralMesh(vertexSchema, PrimitiveType.lineSegments, listOf(
         0f, 0f, 0f,
         1f, 0f, 0f
     ))
 
 fun createBillboardMesh(vertexSchema: VertexSchema) =
-    newGeneralMesh(vertexSchema, listOf(
+    newGeneralMesh(vertexSchema, PrimitiveType.loops, listOf(
         0f, 1f, 0f, 0f, 1f,
         0f, 0f, 0f, 0f, 0f,
         1f, 0f, 0f, 1f, 0f,

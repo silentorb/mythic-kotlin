@@ -1,11 +1,7 @@
 package silentorb.mythic.imaging.fathoming
 
-import silentorb.imp.execution.CompleteFunction
 import silentorb.imp.execution.newLibrary
-import silentorb.mythic.imaging.fathoming.functions.sphereFunctions
+import silentorb.mythic.imaging.fathoming.functions.fathomFunctions
 
-fun substanceFunctions(): List<CompleteFunction> =
-    sphereFunctions()
-
-fun substanceLibrary() =
-    newLibrary(substanceFunctions())
+fun fathomLibrary() =
+    newLibrary(fathomFunctions(), fathomAliases())

@@ -9,7 +9,7 @@ fun sphere(radius: Float): DistanceFunction =
       origin.distance(Vector3.zero) - radius
     }
 
-fun box(bounds: Vector3): DistanceFunction {
+fun cube(bounds: Vector3): DistanceFunction {
   val halfBounds = bounds / 2f
   return { origin ->
     val q = origin.absolute() - halfBounds

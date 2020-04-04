@@ -89,10 +89,6 @@ val voronoiBoundaryOperator: FunctionImplementation = withBuffer("dimensions", w
   voronoi(length, nearestCells, voronoiBoundaries(0.05f * grid.length.toFloat()))
 }
 
-val newRgbColor: FunctionImplementation = { arguments ->
-  Vector3i(arguments["red"] as Int, arguments["green"] as Int, arguments["blue"] as Int)
-}
-
 // Function Keys
 val coloredCheckersKey = PathKey(texturingPath, "coloredCheckers")
 val colorizeKey = PathKey(texturingPath, "colorize")
@@ -111,7 +107,9 @@ fun completeTexturingFunctions() = listOf(
             ),
             output = rgbColorKey
         ),
-        implementation = newRgbColor
+        implementation = { arguments ->
+            Vector3i(arguments["red"] as Int, arguments["green"] as Int, arguments["blue"] as Int)
+        }
     ),
     CompleteFunction(
         path = absoluteDimensionsKey,

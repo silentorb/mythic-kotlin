@@ -9,17 +9,15 @@ import silentorb.mythic.drawing.Canvas
 import silentorb.mythic.drawing.getStaticCanvasDependencies
 import silentorb.mythic.drawing.getUnitScaling
 import silentorb.mythic.glowing.*
-import silentorb.mythic.lookinglass.meshes.VertexSchemas
-import silentorb.mythic.lookinglass.meshes.createVertexSchemas
-import silentorb.mythic.lookinglass.shading.*
-import silentorb.mythic.lookinglass.texturing.DeferredTexture
+import silentorb.mythic.lookinglass.shading.EffectsData
+import silentorb.mythic.lookinglass.shading.createSceneBuffer
 import silentorb.mythic.lookinglass.texturing.DynamicTextureLibrary
-import silentorb.mythic.lookinglass.texturing.updateAsyncTextureLoading
 import silentorb.mythic.platforming.PlatformDisplayConfig
 import silentorb.mythic.platforming.WindowInfo
-import silentorb.mythic.scenery.*
+import silentorb.mythic.scenery.Light
+import silentorb.mythic.scenery.LightingConfig
+import silentorb.mythic.scenery.Scene
 import silentorb.mythic.spatial.*
-import silentorb.mythic.typography.FontSet
 import java.nio.FloatBuffer
 
 fun gatherEffectsData(dimensions: Vector2i, lights: List<Light>, cameraEffectsData: CameraEffectsData): EffectsData {
