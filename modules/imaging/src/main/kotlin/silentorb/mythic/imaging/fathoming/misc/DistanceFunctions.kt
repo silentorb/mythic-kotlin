@@ -1,4 +1,4 @@
-package silentorb.mythic.imaging.substance
+package silentorb.mythic.imaging.fathoming
 
 import silentorb.mythic.spatial.Vector3
 import kotlin.math.max

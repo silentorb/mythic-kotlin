@@ -1,6 +1,6 @@
-package silentorb.mythic.imaging.substance.surfacing.old
+package silentorb.mythic.imaging.fathoming.surfacing.old
 
-import silentorb.mythic.imaging.substance.DistanceFunction
+import silentorb.mythic.imaging.fathoming.DistanceFunction
 import silentorb.mythic.spatial.Vector3
 
 // TODO: Modify direction with each iteration to hone in on geometry and ensure a surface is hit

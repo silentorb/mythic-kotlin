@@ -1,6 +1,6 @@
-package silentorb.mythic.imaging.substance.surfacing
+package silentorb.mythic.imaging.fathoming.surfacing
 
-import silentorb.mythic.imaging.substance.calculateNormal
+import silentorb.mythic.imaging.fathoming.calculateNormal
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.toVector3
 import kotlin.math.abs

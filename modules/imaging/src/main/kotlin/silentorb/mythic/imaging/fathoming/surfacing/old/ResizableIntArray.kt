@@ -1,4 +1,4 @@
-package silentorb.mythic.imaging.substance.surfacing.old
+package silentorb.mythic.imaging.fathoming.surfacing.old
 
 data class ResizableIntArray(
     val data: IntArray,

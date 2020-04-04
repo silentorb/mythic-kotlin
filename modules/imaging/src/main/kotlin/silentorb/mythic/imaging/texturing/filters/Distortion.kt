@@ -11,7 +11,7 @@ import silentorb.mythic.imaging.texturing.rgbSampler2dKey
 import silentorb.mythic.imaging.texturing.texturingPath
 
 private fun commonDistortionParameters() = listOf(
-    Parameter("strength", oneToOneHundredKey),
+    Parameter("strength", zeroToOneHundredKey),
     Parameter("scale", oneToOneHundredKey),
     Parameter("detail", zeroToOneHundredKey),
     Parameter("variation", noiseVariationKey)

@@ -25,7 +25,7 @@ fun checkersFunctions() = listOf(
         signature = Signature(
             parameters = listOf(
                 Parameter("iterationsX", oneToOneHundredKey),
-                Parameter("iterationsY", intKey)
+                Parameter("iterationsY", oneToOneHundredKey)
             ),
             output = floatSampler2dKey
         ),

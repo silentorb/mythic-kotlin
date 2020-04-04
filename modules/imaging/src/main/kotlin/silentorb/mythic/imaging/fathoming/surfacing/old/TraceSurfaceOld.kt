@@ -1,7 +1,5 @@
-package silentorb.mythic.imaging.substance.surfacing.old
+package silentorb.mythic.imaging.fathoming.surfacing.old
 
-import silentorb.mythic.imaging.substance.calculateNormal
-import silentorb.mythic.imaging.substance.surfacing.SurfacingConfig
 import silentorb.mythic.spatial.Quaternion
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3

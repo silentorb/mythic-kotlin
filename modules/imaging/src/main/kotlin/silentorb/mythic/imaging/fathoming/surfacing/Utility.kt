@@ -1,4 +1,4 @@
-package silentorb.mythic.imaging.substance.surfacing
+package silentorb.mythic.imaging.fathoming.surfacing
 
 import silentorb.mythic.spatial.Vector3
 

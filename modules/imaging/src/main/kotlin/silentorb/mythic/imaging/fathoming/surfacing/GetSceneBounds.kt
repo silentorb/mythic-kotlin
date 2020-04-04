@@ -1,6 +1,6 @@
-package silentorb.mythic.imaging.substance.surfacing
+package silentorb.mythic.imaging.fathoming.surfacing
 
-import silentorb.mythic.imaging.substance.DistanceFunction
+import silentorb.mythic.imaging.fathoming.DistanceFunction
 import silentorb.mythic.spatial.*
 
 // The results of this function can  be imprecisely smaller than the actual bounds and can use a little padding

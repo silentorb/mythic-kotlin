@@ -1,6 +1,6 @@
-package silentorb.mythic.imaging.substance.surfacing
+package silentorb.mythic.imaging.fathoming.surfacing
 
-import silentorb.mythic.imaging.substance.DistanceFunction
+import silentorb.mythic.imaging.fathoming.DistanceFunction
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector3i
 
@@ -65,7 +65,9 @@ data class SimpleEdge(
     val second: Vector3
 )
 
+typealias SimpleEdges = List<SimpleEdge>
+
 data class ContourMesh(
     val vertices: List<Vector3>,
-    val edges: List<SimpleEdge>
+    val edges: SimpleEdges
 )

@@ -1,4 +1,4 @@
-package silentorb.mythic.imaging.substance.surfacing.old
+package silentorb.mythic.imaging.fathoming.surfacing.old
 
 import silentorb.mythic.spatial.Vector3
 import java.lang.Float.min

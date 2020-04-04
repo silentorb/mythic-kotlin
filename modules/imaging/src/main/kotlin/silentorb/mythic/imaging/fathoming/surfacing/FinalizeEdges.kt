@@ -1,4 +1,4 @@
-package silentorb.mythic.imaging.substance.surfacing
+package silentorb.mythic.imaging.fathoming.surfacing
 
 import silentorb.mythic.spatial.Vector3
 
@@ -41,7 +41,7 @@ fun lineAggregateToEdge(line: LineAggregate): SimpleEdge {
   )
 }
 
-fun lineAggregatesToEdges(distanceTolerance: Float, lines: LineAggregates): List<SimpleEdge> {
+fun lineAggregatesToEdges(distanceTolerance: Float, lines: LineAggregates): SimpleEdges {
   val edges = lines
       .filter { it.size > 1 }
       .map(::lineAggregateToEdge)

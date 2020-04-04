@@ -1,9 +1,9 @@
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import silentorb.mythic.imaging.substance.box
-import silentorb.mythic.imaging.substance.surfacing.*
-import silentorb.mythic.imaging.substance.surfacing.old.findSurfacingStart
-import silentorb.mythic.imaging.substance.translate
+import silentorb.mythic.imaging.fathoming.box
+import silentorb.mythic.imaging.fathoming.surfacing.*
+import silentorb.mythic.imaging.fathoming.surfacing.old.findSurfacingStart
+import silentorb.mythic.imaging.fathoming.translate
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.lineIntersectsSphere

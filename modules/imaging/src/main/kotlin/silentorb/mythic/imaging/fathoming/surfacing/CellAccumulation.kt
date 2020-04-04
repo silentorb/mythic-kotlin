@@ -1,4 +1,4 @@
-package silentorb.mythic.imaging.substance.surfacing
+package silentorb.mythic.imaging.fathoming.surfacing
 
 // This function assumes that vertices of each mesh already have a distance of at least minDistance between them
 fun mergeContourMeshes(distanceTolerance: Float): (ContourMesh, ContourMesh) -> ContourMesh = { first, second ->

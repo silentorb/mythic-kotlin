@@ -1,6 +1,6 @@
-package silentorb.mythic.imaging.substance.surfacing.old
+package silentorb.mythic.imaging.fathoming.surfacing.old
 
-import silentorb.mythic.imaging.substance.Sampler3dFloat
+import silentorb.mythic.imaging.fathoming.Sampler3dFloat
 import silentorb.mythic.spatial.Vector3i
 import java.nio.FloatBuffer
 
