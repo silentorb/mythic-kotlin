@@ -130,7 +130,7 @@ fun drawMesh(mesh: GeneralMesh, method: DrawMethod) {
   } else if (mesh.offsets != null && mesh.counts != null) {
     glMultiDrawArrays(mappedMethod, mesh.offsets, mesh.counts)
   } else if (mesh.count != null) {
-    glDrawArrays(mappedMethod, 0, mesh.count)
+    glDrawArrays(mappedMethod, 0, mesh.count / mesh.vertexSchema.floatSize)
   }
 }
 

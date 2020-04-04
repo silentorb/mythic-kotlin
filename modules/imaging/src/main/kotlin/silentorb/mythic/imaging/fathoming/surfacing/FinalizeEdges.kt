@@ -41,7 +41,8 @@ fun lineAggregateToEdge(line: LineAggregate): SimpleEdge {
   )
 }
 
-fun lineAggregatesToEdges(distanceTolerance: Float, lines: LineAggregates): SimpleEdges {
+fun lineAggregatesToEdges(config: SurfacingConfig, lines: LineAggregates): SimpleEdges {
+  val distanceTolerance = (config.cellSize / config.subCells) * 0.8f
   val edges = lines
       .filter { it.size > 1 }
       .map(::lineAggregateToEdge)

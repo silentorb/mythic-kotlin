@@ -78,14 +78,31 @@ class SurfacingTest {
     val grid = sampleGrid(0)!!
     val variations = newContourGrid(getDistance, grid, config.subCells)
     val contours = isolateContours(config.tolerance, variations)
-//    val groups = groupDuplicates(0.01f, initialContours)
-//    val (contours, pivots) = removeDuplicates(initialContours, groups)
-//    val (contours, pivots) = removeDuplicates(0.01f, initialContours)
-//    val lines = detectEdges(config, contours, pivots)
     val lines = detectEdges(config, contours, listOf())
-    val edges = lineAggregatesToEdges(0.01f, lines)
+    val edges = lineAggregatesToEdges(config, lines)
     val vertices = getVerticesFromEdges(edges)
     assertEquals(3, lines.size)
+    assertEquals(4, vertices.size)
+  }
+
+  @Test()
+  fun canSampleABoxIntersectingCellSides() {
+    val getDistance = cube(Vector3(2f, 2f, 2f))
+    val config = SurfacingConfig(
+        getDistance = getDistance,
+        tolerance = 0.01f,
+        cellSize = 1f,
+        subCells = 8
+    )
+    val bounds = getSceneGridBounds(getDistance, config.cellSize)
+    val sampleGrid = sampleCellGrids(config, bounds)
+    val grid = sampleGrid(0)!!
+    val variations = newContourGrid(getDistance, grid, config.subCells)
+    val contours = isolateContours(config.tolerance, variations)
+    val lines = detectEdges(config, contours, listOf())
+    val edges = lineAggregatesToEdges(config, lines)
+    val vertices = getVerticesFromEdges(edges)
+    assertEquals(3, edges.size)
     assertEquals(4, vertices.size)
   }
 

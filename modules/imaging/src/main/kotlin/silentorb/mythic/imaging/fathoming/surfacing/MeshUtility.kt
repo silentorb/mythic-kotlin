@@ -47,4 +47,5 @@ fun mergeNearbyEdgeVertices(distanceTolerance: Float, edges: List<SimpleEdge>): 
         second = vertexMap[edge.second] ?: edge.second
     )
   }
+      .filter { it.first != it.second}
 }
