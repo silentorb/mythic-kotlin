@@ -15,7 +15,8 @@ fun refineMiddle(getDistance: DistanceFunction, a: SubSample, b: SubSample): Vec
   val middle = getCenter(a.position, b.position)
   val normal = calculateNormal(getDistance, middle)
   val distance = getDistance(middle)
-  return middle - normal * distance
+  val position = middle - normal * distance
+  return position
 }
 
 fun diffSamples(getDistance: DistanceFunction, samples: Array<SubSample?>, first: Int, second: Int): Contour? {
@@ -67,13 +68,12 @@ fun isolateContours(tolerance: Float, neighbors: Contours) =
 
 fun getDistanceTolerance(config: SurfacingConfig): Float {
   val sampleLength = config.cellSize / config.subCells
-  return sampleLength// * 0.5f
+  return sampleLength * 2.5f// * 0.5f
 //  val squared = sampleLength * sampleLength
 //  return sqrt(squared + squared)
 }
 
-tailrec fun detectEdges(distanceTolerance: Float, normalTolerance: Float, contours: Contours, pivots: Contours,
-                        lines: LineAggregates): LineAggregates {
+tailrec fun detectEdges(distanceTolerance: Float, contours: Contours, pivots: Contours, lines: LineAggregates): LineAggregates {
   return if (contours.none())
     lines
   else {
@@ -112,11 +112,11 @@ tailrec fun detectEdges(distanceTolerance: Float, normalTolerance: Float, contou
     else
       pivots
 
-    detectEdges(distanceTolerance, normalTolerance, nextContours, nextPivots, nextLines)
+    detectEdges(distanceTolerance, nextContours, nextPivots, nextLines)
   }
 }
 
 fun detectEdges(config: SurfacingConfig, contours: Contours, pivots: Contours): LineAggregates {
   val distanceTolerance = getDistanceTolerance(config)
-  return detectEdges(distanceTolerance, 0.2f, contours, pivots, listOf())
+  return detectEdges(distanceTolerance, contours, pivots, listOf())
 }

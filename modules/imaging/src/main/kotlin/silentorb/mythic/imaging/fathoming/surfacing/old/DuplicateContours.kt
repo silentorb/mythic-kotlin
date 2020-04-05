@@ -1,5 +1,6 @@
-package silentorb.mythic.imaging.fathoming.surfacing
+package silentorb.mythic.imaging.fathoming.surfacing.old
 
+import silentorb.mythic.imaging.fathoming.surfacing.Contours
 import kotlin.math.abs
 
 tailrec fun groupDuplicates(tolerance: Float, contours: Contours, duplicates: List<Contours>): List<Contours> {

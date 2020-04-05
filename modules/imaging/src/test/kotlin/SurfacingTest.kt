@@ -86,7 +86,7 @@ class SurfacingTest {
   }
 
   @Test()
-  fun canSampleABoxIntersectingCellSides() {
+  fun canSampleABoxCellIntersectingCellSides() {
     val getDistance = cube(Vector3(2f, 2f, 2f))
     val config = SurfacingConfig(
         getDistance = getDistance,
@@ -107,17 +107,39 @@ class SurfacingTest {
   }
 
   @Test()
-  fun canTraceABoxIntersectingCellCenters() {
-    val getDistance = cube(Vector3(2.5f))
+  fun canSampleABoxIntersectingCellSides() {
+    val getDistance = cube(Vector3(2f, 2f, 2f))
+    val config = SurfacingConfig(
+        getDistance = getDistance,
+        tolerance = 0.01f,
+        cellSize = 1f,
+        subCells = 8
+    )
+    val bounds = getSceneGridBounds(getDistance, config.cellSize)
+    val cellCount = getBoundsCellCount(bounds)
+    val traceCell = traceCellEdges(config, bounds)
+    val cellEdges = (0 until cellCount).map(traceCell)
+    val k = 0
+//    val vertices = getVerticesFromEdges(edges)
+//    assertEquals(12, edges.size)
+//    assertEquals(8, vertices.size)
+  }
+
+  @Test()
+  fun canSampleABoxEndCell() {
+    val getDistance = cube(Vector3(2f, 2f, 2f))
     val config = SurfacingConfig(
         getDistance = getDistance,
         tolerance = 0.01f,
         cellSize = 1f,
         subCells = 4
     )
-    val bounds = getSceneGridBounds(getDistance, config.cellSize).pad(1)
-    val mesh = traceContours(config, bounds)
-    assertEquals(8, mesh.vertices.size)
-    val k = 0
+    val bounds = getSceneGridBounds(getDistance, config.cellSize)
+    val traceCell = traceCellEdges(config, bounds)
+    val edges = traceCell(7)
+    val vertices = getVerticesFromEdges(edges)
+    assertEquals(3, edges.size)
+    assertEquals(4, vertices.size)
   }
+
 }
