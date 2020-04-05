@@ -21,6 +21,16 @@ data class CellSample(
     val center: Vector3
 )
 
+fun snapToSurface(position: Vector3, normal: Vector3, distance: Float): Vector3 {
+  return position - normal * distance
+}
+
+fun snapToSurface(getDistance: DistanceFunction, position: Vector3): Vector3 {
+  val normal = calculateNormal(getDistance, position)
+  val distance = getDistance(position)
+  return snapToSurface(position, normal, distance)
+}
+
 tailrec fun snapToSurface(getDistance: DistanceFunction, tolerance: Float, normal: Vector3, position: Vector3, distance: Float, step: Int): Vector3 {
   return if (abs(distance) <= tolerance || step > 5)
     position
@@ -45,20 +55,20 @@ fun sampleCellGrid(config: SurfacingConfig, center: Vector3, start: Vector3, dim
     val y = zRemainder / dimensions.x
     val x = zRemainder - y * dimensions.x
 
-    val cellCenter = start + Vector3(
+    val subCenter = start + Vector3(
         x.toFloat() * subStep,
         y.toFloat() * subStep,
         z.toFloat() * subStep
     )
 
-    val distance = getDistance(cellCenter)
+    val distance = getDistance(subCenter)
     if (abs(distance) > subCellRange)
       null
     else {
-      val normal = calculateNormal(getDistance, cellCenter)
-      val position = snapToSurface(getDistance, snapTolerance, normal, cellCenter, distance, 1)
+      val normal = calculateNormal(getDistance, subCenter)
+      val position = snapToSurface(getDistance, snapTolerance, normal, subCenter, distance, 1)
       SubSample(
-          center = cellCenter,
+          center = subCenter,
           position = position,
           normal = normal,
           distance = distance

@@ -31,6 +31,7 @@ data class Contour(
     val strength: Float,
     val direction: Vector3,
     val position: Vector3,
+    val normal: Vector3,
     val firstSample: SubSample,
     val secondSample: SubSample
 )

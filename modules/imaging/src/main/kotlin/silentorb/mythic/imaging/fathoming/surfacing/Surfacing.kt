@@ -10,7 +10,8 @@ fun traceCellEdges(config: SurfacingConfig, bounds: GridBounds): (Int) -> Simple
       val variations = newContourGrid(config.getDistance, grid, config.subCells + 2)
       val contours = isolateContours(config.tolerance, variations)
       val lines = detectEdges(config, contours, listOf())
-      lineAggregatesToEdges(config, lines)
+      val edges = lineAggregatesToEdges(config, lines)
+      edges
     }
   }
 }

@@ -132,7 +132,7 @@ class SurfacingTest {
         getDistance = getDistance,
         tolerance = 0.01f,
         cellSize = 1f,
-        subCells = 4
+        subCells = 16
     )
     val bounds = getSceneGridBounds(getDistance, config.cellSize)
     val traceCell = traceCellEdges(config, bounds)
