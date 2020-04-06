@@ -26,10 +26,10 @@ tailrec fun groupNearbyVertices(distanceTolerance: Float, remaining: List<Vector
       groupNearbyVertices(distanceTolerance, nextRemaining, nextGroups)
     }
 
-fun groupNearbyVertices(distanceTolerance: Float, edges: List<SimpleEdge>): List<List<Vector3>> =
+fun groupNearbyVertices(distanceTolerance: Float, edges: List<Edge>): List<List<Vector3>> =
     groupNearbyVertices(distanceTolerance, getVerticesFromEdges(edges), listOf())
 
-fun mergeNearbyEdgeVertices(distanceTolerance: Float, edges: List<SimpleEdge>): List<SimpleEdge> {
+fun mergeNearbyEdgeVertices(distanceTolerance: Float, edges: List<Edge>): List<Edge> {
   val clumps = groupNearbyVertices(distanceTolerance, edges)
   val vertexMap = clumps.flatMap { points ->
     val center = points.reduce { a, b -> a + b } / points.size.toFloat()

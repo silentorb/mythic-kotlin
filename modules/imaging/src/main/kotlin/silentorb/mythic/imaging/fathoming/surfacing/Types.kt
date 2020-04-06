@@ -6,7 +6,7 @@ import silentorb.mythic.spatial.Vector3i
 
 data class SurfacingConfig(
     val getDistance: DistanceFunction,
-    val tolerance: Float,
+    val normalTolerance: Float,
     val cellSize: Float,
     val subCells: Int // The number of subcells along a single dimensions of a cell
 )
@@ -36,39 +36,19 @@ data class Contour(
     val secondSample: SubSample
 )
 
-typealias PossibleContours = List<Contour?>
 typealias Contours = List<Contour>
-
-//data class ContourGrid(
-//    val x: PossibleContours,
-//    val y: PossibleContours,
-//    val z: PossibleContours
-//)
 
 typealias LineAggregate = List<Contour>
 typealias LineAggregates = List<LineAggregate>
 
-//data class Contour(
-//    val index: Int,
-//    val x: Float,
-//    val y: Float,
-//    val strength: Float,
-//    val direction: Vector3
-//)
-
-//data class Contours(
-//    val horizontal: Variations,
-//    val vertical: Variations
-//)
-
-data class SimpleEdge(
+data class Edge(
     val first: Vector3,
     val second: Vector3
 )
 
-typealias SimpleEdges = List<SimpleEdge>
+typealias Edges = List<Edge>
 
 data class ContourMesh(
     val vertices: List<Vector3>,
-    val edges: SimpleEdges
+    val edges: Edges
 )

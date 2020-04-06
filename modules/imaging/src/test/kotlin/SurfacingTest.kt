@@ -69,7 +69,7 @@ class SurfacingTest {
     val getDistance = translate(Vector3(0.4f, 0f, 0.5f), cube(Vector3(2f, 1f, 2f)))
     val config = SurfacingConfig(
         getDistance = getDistance,
-        tolerance = 0.01f,
+        normalTolerance = 0.01f,
         cellSize = 1f,
         subCells = 4
     )
@@ -77,7 +77,7 @@ class SurfacingTest {
     val sampleGrid = sampleCellGrids(config, bounds)
     val grid = sampleGrid(0)!!
     val variations = newContourGrid(getDistance, grid, config.subCells)
-    val contours = isolateContours(config.tolerance, variations)
+    val contours = isolateContours(config.normalTolerance, variations)
     val lines = detectEdges(config, contours, listOf())
     val edges = lineAggregatesToEdges(config, lines)
     val vertices = getVerticesFromEdges(edges)
@@ -90,7 +90,7 @@ class SurfacingTest {
     val getDistance = cube(Vector3(2f, 2f, 2f))
     val config = SurfacingConfig(
         getDistance = getDistance,
-        tolerance = 0.01f,
+        normalTolerance = 0.01f,
         cellSize = 1f,
         subCells = 8
     )
@@ -98,7 +98,7 @@ class SurfacingTest {
     val sampleGrid = sampleCellGrids(config, bounds)
     val grid = sampleGrid(0)!!
     val variations = newContourGrid(getDistance, grid, config.subCells)
-    val contours = isolateContours(config.tolerance, variations)
+    val contours = isolateContours(config.normalTolerance, variations)
     val lines = detectEdges(config, contours, listOf())
     val edges = lineAggregatesToEdges(config, lines)
     val vertices = getVerticesFromEdges(edges)
@@ -111,18 +111,18 @@ class SurfacingTest {
     val getDistance = cube(Vector3(2f, 2f, 2f))
     val config = SurfacingConfig(
         getDistance = getDistance,
-        tolerance = 0.01f,
+        normalTolerance = 0.01f,
         cellSize = 1f,
-        subCells = 8
+        subCells = 32
     )
     val bounds = getSceneGridBounds(getDistance, config.cellSize)
-    val cellCount = getBoundsCellCount(bounds)
-    val traceCell = traceCellEdges(config, bounds)
-    val cellEdges = (0 until cellCount).map(traceCell)
-    val k = 0
-//    val vertices = getVerticesFromEdges(edges)
-//    assertEquals(12, edges.size)
-//    assertEquals(8, vertices.size)
+//    val cellCount = getBoundsCellCount(bounds)
+//    val traceCell = traceCellEdges(config, bounds)
+//    val cellEdges = (0 until cellCount).map(traceCell)
+    val edges = traceAll(bounds, config)
+    val vertices = getVerticesFromEdges(edges)
+    assertEquals(12, edges.size)
+    assertEquals(8, vertices.size)
   }
 
   @Test()
@@ -130,7 +130,7 @@ class SurfacingTest {
     val getDistance = cube(Vector3(2f, 2f, 2f))
     val config = SurfacingConfig(
         getDistance = getDistance,
-        tolerance = 0.01f,
+        normalTolerance = 0.01f,
         cellSize = 1f,
         subCells = 16
     )

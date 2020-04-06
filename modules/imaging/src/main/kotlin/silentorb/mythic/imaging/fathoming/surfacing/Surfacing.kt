@@ -1,6 +1,6 @@
 package silentorb.mythic.imaging.fathoming.surfacing
 
-fun traceCellEdges(config: SurfacingConfig, bounds: GridBounds): (Int) -> SimpleEdges {
+fun traceCellEdges(config: SurfacingConfig, bounds: GridBounds): (Int) -> Edges {
   val sampleGrid = sampleCellGrids(config, bounds)
   return { cell ->
     val grid = sampleGrid(cell)
@@ -8,7 +8,7 @@ fun traceCellEdges(config: SurfacingConfig, bounds: GridBounds): (Int) -> Simple
       listOf()
     else {
       val variations = newContourGrid(config.getDistance, grid, config.subCells + 2)
-      val contours = isolateContours(config.tolerance, variations)
+      val contours = isolateContours(config.normalTolerance, variations)
       val lines = detectEdges(config, contours, listOf())
       val edges = lineAggregatesToEdges(config, lines)
       edges
@@ -16,13 +16,13 @@ fun traceCellEdges(config: SurfacingConfig, bounds: GridBounds): (Int) -> Simple
   }
 }
 
-fun traceAll(bounds: GridBounds, traceCell: (Int) -> SimpleEdges): SimpleEdges {
+fun traceAll(config: SurfacingConfig, bounds: GridBounds, traceCell: (Int) -> Edges): Edges {
   val cellCount = getBoundsCellCount(bounds)
-  val cellEdges = (0 until cellCount).map(traceCell)
-  return cellEdges.flatten()
+  val cells = (0 until cellCount).map(traceCell)
+  return aggregateCells(config, bounds, cells)
 }
 
-fun traceAll(bounds: GridBounds, config: SurfacingConfig): SimpleEdges {
+fun traceAll(bounds: GridBounds, config: SurfacingConfig): Edges {
   val traceCell = traceCellEdges(config, bounds)
-  return traceAll(bounds, traceCell)
+  return traceAll(config, bounds, traceCell)
 }

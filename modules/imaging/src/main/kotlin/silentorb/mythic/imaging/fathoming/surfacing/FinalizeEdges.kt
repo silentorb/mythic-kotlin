@@ -30,18 +30,18 @@ fun getFarthestPoints(points: List<Vector3>): FarthestPointsResult {
   return getFarthestPoints(points.drop(2), FarthestPointsResult(first, second, first.distance(second)))
 }
 
-fun lineAggregateToEdge(line: LineAggregate): SimpleEdge {
+fun lineAggregateToEdge(line: LineAggregate): Edge {
   if (line.size < 2)
     throw Error("A line aggregate must have at least two samples to be converted to an edge.")
 
   val farthest = getFarthestPoints(line.map { it.position })
-  return SimpleEdge(
+  return Edge(
       farthest.first,
       farthest.second
   )
 }
 
-fun lineAggregatesToEdges(config: SurfacingConfig, lines: LineAggregates): SimpleEdges {
+fun lineAggregatesToEdges(config: SurfacingConfig, lines: LineAggregates): Edges {
   val distanceTolerance = getDistanceTolerance(config)
   val edges = lines
       .filter { it.size > 1 }

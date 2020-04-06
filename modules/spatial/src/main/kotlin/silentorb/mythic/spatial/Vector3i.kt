@@ -25,6 +25,14 @@ data class Vector3i(
   operator fun times(value: Vector3i): Vector3i = Vector3i(x * value.x, y * value.y, z * value.z)
   operator fun times(value: Int): Vector3i = Vector3i(x * value, y * value, z * value)
   operator fun div(value: Int): Vector3i = Vector3i(x / value, y / value, z / value)
+
+  operator fun get(i: Int): Int =
+      when (i) {
+        0 -> x
+        1 -> y
+        2 -> z
+        else -> throw Error("Invalid index $i")
+      }
 }
 
 fun toVector3iRounded(value: Vector3): Vector3i =
