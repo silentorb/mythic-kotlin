@@ -1,7 +1,7 @@
 package silentorb.mythic.imaging.fathoming.surfacing
 
 import silentorb.mythic.imaging.fathoming.DistanceFunction
-import silentorb.mythic.imaging.fathoming.calculateNormal
+import silentorb.mythic.imaging.fathoming.getNormal
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector3i
 import silentorb.mythic.spatial.toVector3
@@ -26,7 +26,7 @@ fun snapToSurface(position: Vector3, normal: Vector3, distance: Float): Vector3 
 }
 
 fun snapToSurface(getDistance: DistanceFunction, position: Vector3): Vector3 {
-  val normal = calculateNormal(getDistance, position)
+  val normal = getNormal(getDistance, position)
   val distance = getDistance(position)
   return snapToSurface(position, normal, distance)
 }
@@ -65,7 +65,7 @@ fun sampleCellGrid(config: SurfacingConfig, center: Vector3, start: Vector3, dim
     if (abs(distance) > subCellRange)
       null
     else {
-      val normal = calculateNormal(getDistance, subCenter)
+      val normal = getNormal(getDistance, subCenter)
       val position = snapToSurface(getDistance, snapTolerance, normal, subCenter, distance, 1)
       SubSample(
           center = subCenter,

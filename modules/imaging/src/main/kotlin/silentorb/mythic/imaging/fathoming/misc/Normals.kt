@@ -5,7 +5,7 @@ import silentorb.mythic.spatial.Vector3
 private const val normalStep = 0.001f
 
 // , hook: SdfHook
-fun calculateNormal(getDistance: DistanceFunction, position: Vector3): Vector3 {
+fun getNormal(getDistance: DistanceFunction, position: Vector3): Vector3 {
   fun accumulateDimension(offset: Vector3) =
       getDistance(position + offset) - getDistance(position - offset)
 

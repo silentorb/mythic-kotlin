@@ -52,3 +52,7 @@ data class ContourMesh(
     val vertices: List<Vector3>,
     val edges: Edges
 )
+
+typealias IndexedFace = List<Int>
+
+typealias VertexFace = List<Vector3>

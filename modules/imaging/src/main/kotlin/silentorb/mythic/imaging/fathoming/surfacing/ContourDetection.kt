@@ -1,7 +1,7 @@
 package silentorb.mythic.imaging.fathoming.surfacing
 
 import silentorb.mythic.imaging.fathoming.DistanceFunction
-import silentorb.mythic.imaging.fathoming.calculateNormal
+import silentorb.mythic.imaging.fathoming.getNormal
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector3i
 import silentorb.mythic.spatial.getCenter
@@ -12,7 +12,7 @@ fun getVariance(first: Vector3, second: Vector3) =
     (-first.dot(second) + 1f) / 2f
 
 fun getWeightedMiddle(getDistance: DistanceFunction, a: SubSample, b: SubSample, position: Vector3): Vector3 {
-  val normal = calculateNormal(getDistance, position)
+  val normal = getNormal(getDistance, position)
   val strengthA = getVariance(normal, a.normal)
   val strengthB = getVariance(normal, b.normal)
   val weightScale = strengthA + strengthB
@@ -38,7 +38,7 @@ fun diffSamples(getDistance: DistanceFunction, samples: Array<SubSample?>, first
         strength = getVariance(a.normal, b.normal),
         direction = a.normal.cross(b.normal).normalize(),
         position = position,
-        normal = calculateNormal(getDistance, position),
+        normal = getNormal(getDistance, position),
         firstSample = a,
         secondSample = b
     )

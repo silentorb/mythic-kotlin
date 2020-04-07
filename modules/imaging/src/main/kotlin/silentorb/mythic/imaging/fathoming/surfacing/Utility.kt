@@ -42,3 +42,16 @@ fun replaceEdgeVertex(edge: Edge, vertex: Vector3): Edge =
       Edge(edge.first, vertex)
     else
       edge
+
+fun getOtherVertex(edge: Edge, vertex: Vector3): Vector3 =
+    if (vertex == edge.first)
+      edge.second
+    else
+      edge.first
+
+fun getFaceNormal(face: VertexFace): Vector3 {
+  val second = face[1]
+  val a = (second - face[0]).normalize()
+  val b = (face[2] - second).normalize()
+  return a.cross(b)
+}
