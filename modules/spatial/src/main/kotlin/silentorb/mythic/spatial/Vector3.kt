@@ -163,7 +163,7 @@ fun listToVector3(items: List<Float>): Vector3 =
 
 fun toList(value: Vector3): List<Float> =
     listOf(
-         value.x,
+        value.x,
         value.y,
         value.z
     )

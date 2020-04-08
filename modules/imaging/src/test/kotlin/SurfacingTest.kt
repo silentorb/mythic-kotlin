@@ -121,7 +121,7 @@ class SurfacingTest {
 //    val cellEdges = (0 until cellCount).map(traceCell)
     val edges = traceAll(bounds, config)
     val vertices = getVerticesFromEdges(edges)
-    val faces = getAlignedFaces(getDistance, edges, vertices)
+    val faces = getFaces(getDistance, edges, vertices)
     assertEquals(12, edges.size)
     assertEquals(8, vertices.size)
     assertEquals(6, faces.size)
