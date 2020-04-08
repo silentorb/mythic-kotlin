@@ -12,11 +12,25 @@ data class MergeConfig(
 )
 
 data class EdgeUnion(
+    val middle: Vector3,
     val firstVertex: Vector3,
     val secondVertex: Vector3,
     val firstEdges: Edges,
     val secondEdges: Edges
 )
+
+fun edgesMatch(a: Edge, b: Edge): Boolean =
+    a == b || (a.second == b.first && a.first == b.second)
+
+tailrec fun getDuplicates(edges: Edges, duplicates: Edges): Edges =
+    if (edges.size < 2)
+      duplicates
+    else {
+      val next = edges.first()
+      val remaining = edges.drop(1)
+      val newDuplicates = remaining.filter { edgesMatch(next, it) }
+      getDuplicates(remaining.minus(newDuplicates), duplicates.plus(newDuplicates))
+    }
 
 fun mergeEdges(distanceTolerance: Float, firstEdges: Edges, secondEdges: Edges, firstVertices: List<Vector3>, secondVertices: List<Vector3>): Edges {
   val clumps = secondVertices
@@ -34,10 +48,8 @@ fun mergeEdges(distanceTolerance: Float, firstEdges: Edges, secondEdges: Edges, 
         val first = firstEdges.filter { edgeContains(it, a) }
         val second = secondEdges.filter { edgeContains(it, b) }
         assert(first.any() && second.any())
-        if (first.size > 1 || second.size > 1)
-          throw Error("Not yet supported")
-
         EdgeUnion(
+            middle = getCenter(a, b),
             firstVertex = a,
             secondVertex = b,
             firstEdges = first,
@@ -45,30 +57,49 @@ fun mergeEdges(distanceTolerance: Float, firstEdges: Edges, secondEdges: Edges, 
         )
       }
 
-  val (singleEdges, divergentEdges) = groupedEdges
-      .partition { union ->
-        val firstVector = getEdgeVector(union.firstEdges.first())
-        val secondVector = getEdgeVector(union.secondEdges.first())
-        val dot = firstVector.dot(secondVector)
-        abs(dot) > 0.8f
+  val firstAdjustedEdges1 = groupedEdges
+      .flatMap { union ->
+        union.firstEdges.map { edge -> replaceEdgeVertex(edge, union.firstVertex, union.middle) }
+      }
+  val secondAdjustedEdges1 = groupedEdges
+      .flatMap { union ->
+        union.secondEdges.map { edge -> replaceEdgeVertex(edge, union.secondVertex, union.middle) }
+      }
+  val duplicates = getDuplicates(firstAdjustedEdges1.plus(secondAdjustedEdges1), listOf())
+  val firstAdjustedEdges2 = firstAdjustedEdges1.minus(duplicates)
+  val secondAdjustedEdges2 = secondAdjustedEdges1.minus(duplicates)
+
+  val edgesNeedingUnifying = groupedEdges
+      .mapNotNull { group ->
+        val first = firstAdjustedEdges2.filter { edgeContains(it, group.middle) }
+        val second = secondAdjustedEdges2.filter { edgeContains(it, group.middle) }
+        if (first.size == 1 && second.size == 1) {
+          val a = first.first()
+          val b = first.first()
+          val firstVector = getEdgeVector(a)
+          val secondVector = getEdgeVector(b)
+          val dot = firstVector.dot(secondVector)
+          if (abs(dot) > 0.8f)
+            Triple(a, b, group.middle)
+          else
+            null
+        } else
+          null
       }
 
-  val mergedEdges = singleEdges
-      .map { union ->
-        val a = getEdgeVertices(union.firstEdges.first()).first { it != union.firstVertex }
-        val b = getEdgeVertices(union.secondEdges.first()).first { it != union.secondVertex }
+  val unifiedEdges = edgesNeedingUnifying
+      .map { (first, second, middle) ->
+        val a = getOtherVertex(first, middle)
+        val b = getOtherVertex(second, middle)
         Edge(a, b)
       }
-
-  val adjustedEdges = divergentEdges
-      .flatMap { union ->
-        val middle = getCenter(union.firstVertex, union.secondVertex)
-        val a = union.firstEdges.map { edge -> replaceEdgeVertex(edge, union.firstVertex) }
-        val b = union.secondEdges.map { edge -> replaceEdgeVertex(edge, union.secondVertex) }
-        a + b
-      }
-
-  val newEdges = adjustedEdges.plus(mergedEdges)
+  val newEdges = firstAdjustedEdges2
+      .minus(edgesNeedingUnifying.map { it.first })
+      .plus(
+          secondAdjustedEdges2
+              .minus(edgesNeedingUnifying.map { it.second })
+      )
+      .plus(unifiedEdges)
   val firstRemovedEdges = groupedEdges.flatMap { it.firstEdges }
   val secondRemovedEdges = groupedEdges.flatMap { it.secondEdges }
 
@@ -90,7 +121,7 @@ fun mergeCells(config: MergeConfig, boundary: Float, first: Edges, second: Edges
   return mergeEdges(config.distanceTolerance, first, second, firstCandidates, secondCandidates)
 }
 
-tailrec fun accumulateRow(
+fun accumulateRow(
     config: MergeConfig,
     cells: List<Edges>,
     boundary: Float,

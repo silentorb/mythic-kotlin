@@ -129,6 +129,26 @@ class SurfacingTest {
   }
 
   @Test()
+  fun canSampleABoxIntersectingCellSidesWithPadding() {
+    val getDistance = cube(Vector3(2f, 2f, 2f))
+    val config = SurfacingConfig(
+        getDistance = getDistance,
+        normalTolerance = 0.01f,
+        cellSize = 1f,
+        subCells = 32
+    )
+    val bounds = getSceneGridBounds(getDistance, config.cellSize)
+        .pad(1)
+    val edges = traceAll(bounds, config)
+    val vertices = getVerticesFromEdges(edges)
+    val faces = getFaces(getDistance, edges, vertices)
+    assertEquals(12, edges.size)
+    assertEquals(8, vertices.size)
+    assertEquals(6, faces.size)
+    assertTrue(faces.all { it.size == 4 })
+  }
+
+  @Test()
   fun canSampleABoxEndCell() {
     val getDistance = cube(Vector3(2f, 2f, 2f))
     val config = SurfacingConfig(

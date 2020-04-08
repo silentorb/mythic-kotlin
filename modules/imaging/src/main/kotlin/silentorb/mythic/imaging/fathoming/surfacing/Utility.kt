@@ -35,11 +35,11 @@ fun getEdgeVector(edge: Edge): Vector3 =
 fun getEdgeVertices(edge: Edge): List<Vector3> =
     listOf(edge.first, edge.second)
 
-fun replaceEdgeVertex(edge: Edge, vertex: Vector3): Edge =
-    if (edge.first == vertex)
-      Edge(vertex, edge.second)
-    else if (edge.second == vertex)
-      Edge(edge.first, vertex)
+fun replaceEdgeVertex(edge: Edge, old: Vector3, replacement: Vector3): Edge =
+    if (edge.first == old)
+      Edge(replacement, edge.second)
+    else if (edge.second == old)
+      Edge(edge.first, replacement)
     else
       edge
 
