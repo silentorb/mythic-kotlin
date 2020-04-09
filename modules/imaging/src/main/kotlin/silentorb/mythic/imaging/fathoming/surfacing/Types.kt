@@ -44,7 +44,13 @@ typealias LineAggregates = List<LineAggregate>
 data class Edge(
     val first: Vector3,
     val second: Vector3
-)
+) {
+  init {
+    if (first == second) {
+      val k = 0
+    }
+  }
+}
 
 typealias Edges = List<Edge>
 

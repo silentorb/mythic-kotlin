@@ -11,7 +11,11 @@ data class Corner(
     val first: Edge,
     val second: Edge,
     val normal: Vector3
-)
+){
+  init {
+    assert(!normal.x.isNaN())
+  }
+}
 
 typealias VertexEdgesMap = Map<Vector3, Edges>
 typealias Corners = List<Corner>
@@ -26,7 +30,11 @@ fun getVertexEdgesMap(edges: Edges, vertices: List<Vector3>) =
 fun getCornerNormal(first: Edge, second: Edge, b: Vector3): Vector3 {
   val a = getOtherVertex(first, b)
   val c = getOtherVertex(second, b)
-  return (b - a).normalize().cross((c - b).normalize())
+  val d = (b - a).normalize()
+  val e = (c - b).normalize()
+  val result = d.cross(e)
+  assert(!result.x.isNaN())
+  return result
 }
 
 tailrec fun getVertexCorners(getDistance: DistanceFunction, position: Vector3, edges: Edges, accumulator: Corners): Corners =

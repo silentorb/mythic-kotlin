@@ -111,17 +111,18 @@ fun isolateContours(tolerance: Float, neighbors: Contours) =
     neighbors
         .filter { it.strength > tolerance }
 
-//fun isolateContours(tolerance: Float, contourGrid: ContourGrid): Contours =
-//    isolateContours(tolerance, contourGrid.x)
-//        .plus(isolateContours(tolerance, contourGrid.y)
-//        )
-
 fun getDistanceTolerance(config: SurfacingConfig): Float {
   val sampleLength = config.cellSize / config.subCells
   return sampleLength * 2f// * 0.5f
 //  val squared = sampleLength * sampleLength
 //  return sqrt(squared + squared)
 }
+
+fun contoursAlign(distanceTolerance: Float, first: Contour, second: Contour) =
+    lineIntersectsSphere(first.position, first.direction, second.position, distanceTolerance)
+
+fun countoursAlignStrong(distanceTolerance: Float, first: Contour, second: Contour) =
+    abs(first.direction.dot(second.direction)) > 0.8f && contoursAlign(distanceTolerance, first, second)
 
 tailrec fun detectEdges(distanceTolerance: Float, contours: Contours, pivots: Contours, lines: LineAggregates): LineAggregates {
   return if (contours.none())
@@ -131,15 +132,8 @@ tailrec fun detectEdges(distanceTolerance: Float, contours: Contours, pivots: Co
     val remainingContours = contours.drop(1)
     val matches = remainingContours
         .filter { contour ->
-          lineIntersectsSphere(base.position, base.direction, contour.position, distanceTolerance) //&&
-              abs(base.direction.dot(contour.direction)) > 0.8f
+          countoursAlignStrong(distanceTolerance, base, contour)
         }
-
-    val alignedMatches = matches
-//        .filter { contour ->
-//          val strength = getVariance(base.direction, contour.direction)
-//          strength < normalTolerance
-//        }
 
     val pivotMatches = pivots
         .filter { contour ->
@@ -147,7 +141,7 @@ tailrec fun detectEdges(distanceTolerance: Float, contours: Contours, pivots: Co
         }
 
     val nextContours = remainingContours
-        .minus(alignedMatches)
+        .minus(matches)
 
     val allMatches = matches.plus(pivotMatches)
 
@@ -166,7 +160,20 @@ tailrec fun detectEdges(distanceTolerance: Float, contours: Contours, pivots: Co
   }
 }
 
+fun incorporateEdgeCorners(distanceTolerance: Float, weak: Contours, strong: LineAggregates): LineAggregates {
+  return weak.fold(strong) { accumulator, b ->
+    accumulator.map { contours ->
+      if (contoursAlign(distanceTolerance, contours.first(), b))
+        contours.plus(b)
+      else
+        contours
+    }
+  }
+}
+
 fun detectEdges(config: SurfacingConfig, contours: Contours, pivots: Contours): LineAggregates {
   val distanceTolerance = getDistanceTolerance(config)
-  return detectEdges(distanceTolerance, contours, pivots, listOf())
+  val lines = detectEdges(distanceTolerance, contours, pivots, listOf())
+  val (strong, weak) = lines.partition { it.size > 3 }
+  return incorporateEdgeCorners(distanceTolerance, weak.flatten(), strong)
 }

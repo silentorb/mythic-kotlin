@@ -121,9 +121,10 @@ class SurfacingTest {
 //    val cellEdges = (0 until cellCount).map(traceCell)
     val edges = traceAll(bounds, config)
     val vertices = getVerticesFromEdges(edges)
-    val faces = getFaces(getDistance, edges, vertices)
+    assertTrue(edges.none { it.first == it.second })
     assertEquals(12, edges.size)
     assertEquals(8, vertices.size)
+    val faces = getFaces(getDistance, edges, vertices)
     assertEquals(6, faces.size)
     assertTrue(faces.all { it.size == 4 })
   }
@@ -141,9 +142,9 @@ class SurfacingTest {
         .pad(1)
     val edges = traceAll(bounds, config)
     val vertices = getVerticesFromEdges(edges)
-    val faces = getFaces(getDistance, edges, vertices)
     assertEquals(12, edges.size)
     assertEquals(8, vertices.size)
+    val faces = getFaces(getDistance, edges, vertices)
     assertEquals(6, faces.size)
     assertTrue(faces.all { it.size == 4 })
   }

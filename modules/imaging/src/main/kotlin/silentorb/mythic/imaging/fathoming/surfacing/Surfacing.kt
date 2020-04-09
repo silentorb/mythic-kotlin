@@ -19,6 +19,8 @@ fun traceCellEdges(config: SurfacingConfig, bounds: GridBounds): (Int) -> Edges 
 fun traceAll(config: SurfacingConfig, bounds: GridBounds, traceCell: (Int) -> Edges): Edges {
   val cellCount = getBoundsCellCount(bounds)
   val cells = (0 until cellCount).map(traceCell)
+  // TODO: Remove this assert
+  assert(cells.all { cell -> cell.all { it.first != it.second } })
   return aggregateCells(config, bounds, cells)
 }
 

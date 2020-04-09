@@ -39,11 +39,17 @@ fun mergeNearbyEdgeVertices(distanceTolerance: Float, edges: List<Edge>): List<E
   }
       .associate { it }
 
-  return edges.map { edge ->
-    edge.copy(
-        first = vertexMap[edge.first] ?: edge.first,
-        second = vertexMap[edge.second] ?: edge.second
-    )
+  val result = edges.mapNotNull { edge ->
+    val first = vertexMap[edge.first] ?: edge.first
+    val second = vertexMap[edge.second] ?: edge.second
+    if (first.distance(second) > distanceTolerance)
+      edge.copy(
+          first = vertexMap[edge.first] ?: edge.first,
+          second = vertexMap[edge.second] ?: edge.second
+      )
+    else
+      null
   }
-      .filter { it.first.distance(it.second) > distanceTolerance }
+
+  return result
 }

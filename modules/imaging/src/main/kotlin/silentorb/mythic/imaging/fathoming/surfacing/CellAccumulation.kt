@@ -11,76 +11,64 @@ data class MergeConfig(
     val cellSize: Float
 )
 
-data class EdgeUnion(
-    val middle: Vector3,
-    val firstVertex: Vector3,
-    val secondVertex: Vector3,
-    val firstEdges: Edges,
-    val secondEdges: Edges
+data class Clump(
+    val first: Vector3,
+    val second: Vector3,
+    val middle: Vector3
 )
 
 fun edgesMatch(a: Edge, b: Edge): Boolean =
     a == b || (a.second == b.first && a.first == b.second)
 
-tailrec fun getDuplicates(edges: Edges, duplicates: Edges): Edges =
-    if (edges.size < 2)
-      duplicates
-    else {
-      val next = edges.first()
-      val remaining = edges.drop(1)
-      val newDuplicates = remaining.filter { edgesMatch(next, it) }
-      getDuplicates(remaining.minus(newDuplicates), duplicates.plus(newDuplicates))
+fun getDuplicates(firstEdges: Edges, secondEdges: Edges): Edges =
+    secondEdges
+        .filter { second ->
+          firstEdges.any { edgesMatch(second, it) }
+        }
+
+fun getClumps(distanceTolerance: Float, firstVertices: List<Vector3>, secondVertices: List<Vector3>): List<Clump> =
+    secondVertices
+        .mapNotNull { b ->
+          // TODO: This code may eventually need better neighbor selection for when there are multiple options
+          val a = firstVertices.firstOrNull { it.distance(b) < distanceTolerance }
+          if (a != null)
+            Clump(a, b, getCenter(a, b))
+          else
+            null
+        }
+
+fun synchronizeEdges(vertexMap: List<Pair<Vector3, Vector3>>, edges: Edges): Edges =
+    vertexMap.fold(edges) { accumulator, (from, to) ->
+      accumulator.map { replaceEdgeVertex(it, from, to) }
     }
 
-fun mergeEdges(distanceTolerance: Float, firstEdges: Edges, secondEdges: Edges, firstVertices: List<Vector3>, secondVertices: List<Vector3>): Edges {
-  val clumps = secondVertices
-      .mapNotNull { b ->
-        // TODO: This code may eventually need better neighbor selection for when there are multiple options
-        val a = firstVertices.firstOrNull { it.distance(b) < distanceTolerance }
-        if (a != null)
-          Pair(a, b)
-        else
-          null
-      }
+fun synchronizeEdges(clumps: List<Clump>, firstEdges: Edges, secondEdges: Edges): Pair<Edges, Edges> {
+  val synchronizedFirstEdges = synchronizeEdges(clumps.map { Pair(it.first, it.middle) }, firstEdges)
+  val synchronizedSecondEdges = synchronizeEdges(clumps.map { Pair(it.second, it.middle) }, secondEdges)
+  return Pair(synchronizedFirstEdges, synchronizedSecondEdges)
+}
 
-  val groupedEdges = clumps
-      .map { (a, b) ->
-        val first = firstEdges.filter { edgeContains(it, a) }
-        val second = secondEdges.filter { edgeContains(it, b) }
-        assert(first.any() && second.any())
-        EdgeUnion(
-            middle = getCenter(a, b),
-            firstVertex = a,
-            secondVertex = b,
-            firstEdges = first,
-            secondEdges = second
-        )
-      }
+fun withoutDuplicates(comparison: Edges, pruning: Edges): Edges {
+  val duplicates = getDuplicates(comparison, pruning)
+  if (duplicates.any()) {
+    val k = 0
+  }
+  return pruning.minus(duplicates)
+}
 
-  val firstAdjustedEdges1 = groupedEdges
-      .flatMap { union ->
-        union.firstEdges.map { edge -> replaceEdgeVertex(edge, union.firstVertex, union.middle) }
-      }
-  val secondAdjustedEdges1 = groupedEdges
-      .flatMap { union ->
-        union.secondEdges.map { edge -> replaceEdgeVertex(edge, union.secondVertex, union.middle) }
-      }
-  val duplicates = getDuplicates(firstAdjustedEdges1.plus(secondAdjustedEdges1), listOf())
-  val firstAdjustedEdges2 = firstAdjustedEdges1.minus(duplicates)
-  val secondAdjustedEdges2 = secondAdjustedEdges1.minus(duplicates)
-
-  val edgesNeedingUnifying = groupedEdges
-      .mapNotNull { group ->
-        val first = firstAdjustedEdges2.filter { edgeContains(it, group.middle) }
-        val second = secondAdjustedEdges2.filter { edgeContains(it, group.middle) }
+fun mergeEdges(sharedVertices: List<Vector3>, firstEdges: Edges, secondEdges: Edges): Edges {
+  val edgesNeedingUnifying = sharedVertices
+      .mapNotNull { vertex ->
+        val first = firstEdges.filter { edgeContains(it, vertex) }
+        val second = secondEdges.filter { edgeContains(it, vertex) }
         if (first.size == 1 && second.size == 1) {
           val a = first.first()
-          val b = first.first()
+          val b = second.first()
           val firstVector = getEdgeVector(a)
           val secondVector = getEdgeVector(b)
           val dot = firstVector.dot(secondVector)
           if (abs(dot) > 0.8f)
-            Triple(a, b, group.middle)
+            Triple(a, b, vertex)
           else
             null
         } else
@@ -93,19 +81,11 @@ fun mergeEdges(distanceTolerance: Float, firstEdges: Edges, secondEdges: Edges, 
         val b = getOtherVertex(second, middle)
         Edge(a, b)
       }
-  val newEdges = firstAdjustedEdges2
-      .minus(edgesNeedingUnifying.map { it.first })
-      .plus(
-          secondAdjustedEdges2
-              .minus(edgesNeedingUnifying.map { it.second })
-      )
-      .plus(unifiedEdges)
-  val firstRemovedEdges = groupedEdges.flatMap { it.firstEdges }
-  val secondRemovedEdges = groupedEdges.flatMap { it.secondEdges }
 
-  val firstResult = firstEdges.minus(firstRemovedEdges)
-  val secondResult = secondEdges.minus(secondRemovedEdges)
-  val result = firstResult.plus(secondResult).plus(newEdges)
+  val firstResult = firstEdges.minus(edgesNeedingUnifying.map { it.first })
+  val secondResult = secondEdges.minus(edgesNeedingUnifying.map { it.second })
+  val result = firstResult.plus(secondResult).plus(unifiedEdges)
+  assert(result.size <= firstEdges.size + secondEdges.size)
   return result
 }
 
@@ -118,7 +98,10 @@ fun mergeCells(config: MergeConfig, boundary: Float, first: Edges, second: Edges
   val secondCandidates = secondVertices
       .filter { it[config.axis] < secondBoundary }
 
-  return mergeEdges(config.distanceTolerance, first, second, firstCandidates, secondCandidates)
+  val clumps = getClumps(config.distanceTolerance, firstCandidates, secondCandidates)
+  val (synced1, synced2) = synchronizeEdges(clumps, first, second)
+  val result = mergeEdges(clumps.map { it.middle }, synced1, withoutDuplicates(synced1, synced2))
+  return result
 }
 
 fun accumulateRow(
