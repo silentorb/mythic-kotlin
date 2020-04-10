@@ -98,17 +98,21 @@ tailrec fun accumulateFaceCorners(
   } else {
     val previousEdge = previousCorner.second
     val options = vertexEdges.filter { it.first == previousEdge }
-    assert(options.any())
-    val nextCorner = if (options.size == 1)
-      options.first()
-    else
-      options.maxBy { option ->
-        val dot = option.normal.dot(previousCorner.normal)
-        abs(dot)
-      }!!
-    val nextFaceVertices = faceCorners.plus(nextCorner)
-    val nextPosition = getOtherVertex(nextCorner.second, position)
-    accumulateFaceCorners(nextCorner, nextPosition, cornerMap, nextFaceVertices)
+    if (options.none()) {
+      faceCorners
+    } else {
+      assert(options.any())
+      val nextCorner = if (options.size == 1)
+        options.first()
+      else
+        options.maxBy { option ->
+          val dot = option.normal.dot(previousCorner.normal)
+          abs(dot)
+        }!!
+      val nextFaceVertices = faceCorners.plus(nextCorner)
+      val nextPosition = getOtherVertex(nextCorner.second, position)
+      accumulateFaceCorners(nextCorner, nextPosition, cornerMap, nextFaceVertices)
+    }
   }
 }
 
@@ -131,7 +135,11 @@ fun getFace(
     val nextPosition = getOtherVertex(corner.second, position)
     val faceCorners = accumulateFaceCorners(corner, nextPosition, cornerMap, listOf(corner))
     val updatedCornerMap = removeUsedCorners(cornerMap, faceCorners)
-    Pair(faceCorners.map { it.position }, updatedCornerMap)
+    val face = if (faceCorners.size > 2)
+      faceCorners.map { it.position }
+    else
+      null
+    Pair(face, updatedCornerMap)
   }
 }
 

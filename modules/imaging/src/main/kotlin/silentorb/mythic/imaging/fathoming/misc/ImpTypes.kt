@@ -18,6 +18,7 @@ typealias DistanceFunction = (Vector3) -> Float
 
 val vector3Key = PathKey(fathomPath, "Vector3")
 val translation3Key = PathKey(fathomPath, "Translation3")
+val quaternionKey = PathKey(fathomPath, "Quaternion")
 
 fun fathomAliases() = listOf(
     TypeAlias(

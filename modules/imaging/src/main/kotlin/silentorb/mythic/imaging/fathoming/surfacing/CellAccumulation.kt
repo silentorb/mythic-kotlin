@@ -17,15 +17,6 @@ data class Clump(
     val middle: Vector3
 )
 
-fun edgesMatch(a: Edge, b: Edge): Boolean =
-    a == b || (a.second == b.first && a.first == b.second)
-
-fun getDuplicates(firstEdges: Edges, secondEdges: Edges): Edges =
-    secondEdges
-        .filter { second ->
-          firstEdges.any { edgesMatch(second, it) }
-        }
-
 fun getClumps(distanceTolerance: Float, firstVertices: List<Vector3>, secondVertices: List<Vector3>): List<Clump> =
     secondVertices
         .mapNotNull { b ->
@@ -47,6 +38,12 @@ fun synchronizeEdges(clumps: List<Clump>, firstEdges: Edges, secondEdges: Edges)
   val synchronizedSecondEdges = synchronizeEdges(clumps.map { Pair(it.second, it.middle) }, secondEdges)
   return Pair(synchronizedFirstEdges, synchronizedSecondEdges)
 }
+
+fun getDuplicates(firstEdges: Edges, secondEdges: Edges): Edges =
+    secondEdges
+        .filter { second ->
+          firstEdges.any { edgesMatch(second, it) }
+        }
 
 fun withoutDuplicates(comparison: Edges, pruning: Edges): Edges {
   val duplicates = getDuplicates(comparison, pruning)
@@ -149,7 +146,7 @@ fun aggregateCells(config: SurfacingConfig, bounds: GridBounds, cells: List<Edge
   val cellSize = config.cellSize
   val subCellSize = (cellSize / config.subCells)
   val mergeConfig = MergeConfig(
-      distanceTolerance = subCellSize * 2f,
+      distanceTolerance = subCellSize * 2.5f,
       axis = 0,
       boundaryRange = subCellSize * 2f,
       cellSize = cellSize

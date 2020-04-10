@@ -50,6 +50,8 @@ data class Edge(
       val k = 0
     }
   }
+
+  fun length(): Float = first.distance(second)
 }
 
 typealias Edges = List<Edge>

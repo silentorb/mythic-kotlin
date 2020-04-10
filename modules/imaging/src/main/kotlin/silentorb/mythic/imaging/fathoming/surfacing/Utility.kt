@@ -55,3 +55,6 @@ fun getFaceNormal(face: VertexFace): Vector3 {
   val b = (face[2] - second).normalize()
   return a.cross(b)
 }
+
+fun edgesMatch(a: Edge, b: Edge): Boolean =
+    a == b || (a.second == b.first && a.first == b.second)

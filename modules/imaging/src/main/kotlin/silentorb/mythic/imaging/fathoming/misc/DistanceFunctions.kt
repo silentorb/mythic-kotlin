@@ -1,6 +1,8 @@
 package silentorb.mythic.imaging.fathoming
 
+import silentorb.mythic.spatial.Quaternion
 import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.unaryMinus
 import kotlin.math.max
 import kotlin.math.min
 
@@ -21,3 +23,11 @@ fun translate(offset: Vector3, function: DistanceFunction): DistanceFunction =
     { origin ->
       function(origin - offset)
     }
+
+fun rotate(quaternion: Quaternion, function: DistanceFunction): DistanceFunction {
+  val opposite = -quaternion
+  return { origin ->
+    val rotated = opposite.transform(origin)
+    function(rotated)
+  }
+}

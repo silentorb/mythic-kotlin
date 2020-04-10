@@ -1,6 +1,7 @@
 package silentorb.mythic.imaging.fathoming.surfacing
 
 import silentorb.mythic.spatial.Vector3
+import kotlin.math.abs
 
 data class FarthestPointsResult(
     val first: Vector3,

@@ -1,13 +1,11 @@
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import silentorb.mythic.imaging.fathoming.cube
+import silentorb.mythic.imaging.fathoming.rotate
 import silentorb.mythic.imaging.fathoming.surfacing.*
 import silentorb.mythic.imaging.fathoming.surfacing.old.findSurfacingStart
 import silentorb.mythic.imaging.fathoming.translate
-import silentorb.mythic.spatial.Vector2
-import silentorb.mythic.spatial.Vector3
-import silentorb.mythic.spatial.lineIntersectsSphere
-import silentorb.mythic.spatial.projectPointFromNormal
+import silentorb.mythic.spatial.*
 
 class SurfacingTest {
 
@@ -116,10 +114,7 @@ class SurfacingTest {
         subCells = 32
     )
     val bounds = getSceneGridBounds(getDistance, config.cellSize)
-//    val cellCount = getBoundsCellCount(bounds)
-//    val traceCell = traceCellEdges(config, bounds)
-//    val cellEdges = (0 until cellCount).map(traceCell)
-    val edges = traceAll(bounds, config)
+    val edges = traceAllSimple(bounds, config)
     val vertices = getVerticesFromEdges(edges)
     assertTrue(edges.none { it.first == it.second })
     assertEquals(12, edges.size)
@@ -140,7 +135,7 @@ class SurfacingTest {
     )
     val bounds = getSceneGridBounds(getDistance, config.cellSize)
         .pad(1)
-    val edges = traceAll(bounds, config)
+    val edges = traceAllSimple(bounds, config)
     val vertices = getVerticesFromEdges(edges)
     assertEquals(12, edges.size)
     assertEquals(8, vertices.size)
@@ -164,6 +159,27 @@ class SurfacingTest {
     val vertices = getVerticesFromEdges(edges)
     assertEquals(3, edges.size)
     assertEquals(4, vertices.size)
+  }
+
+  @Test()
+  fun canSampleABoxRotatedAlongZ() {
+    val getDistance = rotate(Quaternion().rotateZ(Pi / 4), cube(Vector3(2f, 2f, 2f)))
+    val config = SurfacingConfig(
+        getDistance = getDistance,
+        normalTolerance = 0.01f,
+        cellSize = 1f,
+        subCells = 16
+    )
+    val bounds = getSceneGridBounds(getDistance, config.cellSize)
+        .pad(1)
+
+    val edges = traceAllSimple(bounds, config)
+    val vertices = getVerticesFromEdges(edges)
+    assertEquals(12, edges.size)
+    assertEquals(8, vertices.size)
+    val faces = getFaces(getDistance, edges, vertices)
+    assertEquals(6, faces.size)
+    assertTrue(faces.all { it.size == 4 })
   }
 
 }

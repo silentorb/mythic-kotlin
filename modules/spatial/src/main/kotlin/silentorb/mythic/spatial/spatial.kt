@@ -401,3 +401,9 @@ fun createArcZ(radius: Float, count: Int, sweep: Float = Pi * 2, offset: Float =
         Vector3(x, sin(theta) * radius, 0f)
       }
 }
+
+fun radiansToDegrees(radians: Float): Float =
+  radians * 180f / Pi
+
+fun degreesToRadians(degrees: Float): Float =
+    degrees * Pi / 180f
