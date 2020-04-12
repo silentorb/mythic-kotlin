@@ -105,20 +105,15 @@ fun newGeneralMesh(vertexSchema: VertexSchema, primitiveType: PrimitiveType, val
     )
 
 fun convertDrawMethod(mesh: GeneralMesh, method: DrawMethod): Int {
-//  val mappedMethod = if (mesh.indices != null)
-//    when (method) {
-//      DrawMethod.triangleFan -> DrawMethod.triangles
-//      DrawMethod.lineLoop -> DrawMethod.lineStrip
-//      else -> method
-//    }
-//  else if (mesh.count != null)
-//    when (method) {
-//      DrawMethod.triangleFan -> DrawMethod.triangles
-//      else -> method
-//    }
-//  else
-//    method
-  val mappedMethod = withPossibleFallback(method, mesh.primitiveType)
+  val mappedMethod = if (mesh.indices != null)
+    when (method) {
+      DrawMethod.triangleFan -> DrawMethod.triangles
+      DrawMethod.lineLoop -> DrawMethod.lineStrip
+      else -> method
+    }
+  else
+    withPossibleFallback(method, mesh.primitiveType)
+
   return convertDrawMethod(mappedMethod)
 }
 

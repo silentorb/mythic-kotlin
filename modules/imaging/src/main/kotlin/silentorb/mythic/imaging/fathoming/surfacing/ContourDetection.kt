@@ -121,8 +121,13 @@ fun getDistanceTolerance(config: SurfacingConfig): Float {
 fun contoursAlign(distanceTolerance: Float, first: Contour, second: Contour) =
     lineIntersectsSphere(first.position, first.direction, second.position, distanceTolerance)
 
-fun countoursAlignStrong(distanceTolerance: Float, first: Contour, second: Contour) =
-    abs(first.direction.dot(second.direction)) > 0.8f && contoursAlign(distanceTolerance, first, second)
+fun countoursAlignStrong(distanceTolerance: Float, first: Contour, second: Contour): Boolean {
+ val result = abs(first.direction.dot(second.direction)) > 0.9f && contoursAlign(distanceTolerance, first, second)
+  if (result) {
+    val k = 0
+  }
+  return result
+}
 
 tailrec fun detectEdges(distanceTolerance: Float, contours: Contours, pivots: Contours, lines: LineAggregates): LineAggregates {
   return if (contours.none())

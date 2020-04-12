@@ -37,6 +37,9 @@ fun getDebugString(name: String): String? {
 fun getDebugInt(name: String): Int? =
     getDebugString(name)?.toIntOrNull()
 
+fun getDebugBoolean(name: String): Boolean =
+    getDebugInt(name)?.equals(1) ?: false
+
 fun getDebugFloat(name: String): Float? =
     getDebugString(name)?.toFloatOrNull()
 

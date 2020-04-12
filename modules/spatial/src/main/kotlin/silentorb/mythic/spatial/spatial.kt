@@ -348,9 +348,12 @@ fun manhattanDistance(a: Vector3, b: Vector3): Float =
 
 //private val mk = mutableListOf(0, 0, 0, 0, 0)
 
+fun withinRange(a: Vector3, b: Vector3, range: Float): Boolean =
+    a.distance(b) <= range
+
 // Faster than a regular distance check
 fun withinRangeFast(a: Vector3, b: Vector3, range: Float): Boolean {
-  assert(a.z == b.z) // This function only works along two dimensions.  What was I thinking?
+//  assert(a.z == b.z) // This function only works along two dimensions.  What was I thinking?
   val c = abs(a.x - b.x)
   if (c > range) {
     return false
@@ -370,6 +373,18 @@ fun withinRangeFast(a: Vector3, b: Vector3, range: Float): Boolean {
   } else {
     false
   }
+}
+
+fun <T> nearest(items: List<Pair<Vector3, T>>): (Vector3) -> T = { anchor ->
+  var result = items.first()
+  var distance = result.first.distance(anchor)
+  for (item in items.asSequence().drop(1)) {
+    if (withinRange(anchor, item.first, distance)) {
+      result = item
+      distance = item.first.distance(anchor)
+    }
+  }
+  result.second
 }
 
 fun <T> nearestFast(items: List<Pair<Vector3, T>>): (Vector3) -> T = { anchor ->

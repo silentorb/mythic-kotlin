@@ -173,7 +173,7 @@ class SurfacingTest {
     val bounds = getSceneGridBounds(getDistance, config.cellSize)
         .pad(1)
 
-    val edges = traceAllSimple(bounds, config)
+    val edges = traceAllSimpler(bounds, config)
     val vertices = getVerticesFromEdges(edges)
     assertEquals(12, edges.size)
     assertEquals(8, vertices.size)
