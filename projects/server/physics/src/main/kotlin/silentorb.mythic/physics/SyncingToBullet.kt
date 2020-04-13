@@ -117,6 +117,7 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
 
         }
         bulletBody.userData = key
+        bulletBody.linearVelocity = toGdxVector3(body.velocity)
         bulletState.dynamicsWorld.addRigidBody(bulletBody)
         Pair(key, bulletBody)
       }

@@ -1,6 +1,7 @@
 package silentorb.mythic.ent
 
 typealias Table<T> = Map<Id, T>
+typealias TableEntry<T> = Map.Entry<Id, T>
 
 fun <T> mapTable(table: Table<T>, action: (Id, T) -> T): Table<T> =
     table.mapValues { (id, value) -> action(id, value) }
