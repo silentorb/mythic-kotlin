@@ -108,11 +108,6 @@ fun gatherChildLights(meshes: ModelMeshMap, groups: ElementGroups): List<Light> 
   }
 }
 
-fun gatherSceneLights(meshes: ModelMeshMap, scene: GameScene): List<Light> {
-  return scene.lights
-//      .plus(gatherChildLights(meshes, scene.opaqueElementGroups))
-}
-
 data class GraphicState(
     val textures: DynamicTextureLibrary = mutableMapOf()
 )
@@ -177,13 +172,6 @@ fun finishRender(renderer: Renderer, windowInfo: WindowInfo) {
     glDrawBuffer(GL_BACK)                       // Set the back buffer as the draw buffer
     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST)
   }
-}
-
-fun createSceneRenderer(renderer: Renderer, scene: GameScene, viewport: Vector4i): SceneRenderer {
-  val minimalScene = scene.main.copy(
-      lights = gatherSceneLights(renderer.meshes, scene)
-  )
-  return createSceneRenderer(renderer, minimalScene, viewport)
 }
 
 fun rasterizeCoordinates(position: Vector3, cameraEffectsData: CameraEffectsData, dimensions: Vector2i): Vector2 {

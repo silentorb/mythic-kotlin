@@ -5,16 +5,14 @@ import silentorb.mythic.drawing.getStaticCanvasDependencies
 import silentorb.mythic.drawing.prepareTextMatrix
 import silentorb.mythic.glowing.DrawMethod
 import silentorb.mythic.glowing.globalState
-import silentorb.mythic.spatial.*
-import silentorb.mythic.typography.*
-import silentorb.mythic.spatial.Vector2i
-import silentorb.mythic.spatial.Vector4i
 import silentorb.mythic.lookinglass.drawing.renderElementGroup
 import silentorb.mythic.lookinglass.shading.GeneralPerspectiveShader
 import silentorb.mythic.lookinglass.shading.ObjectShaderConfig
 import silentorb.mythic.lookinglass.shading.ShaderFeatureConfig
 import silentorb.mythic.lookinglass.shading.Shaders
 import silentorb.mythic.scenery.Camera
+import silentorb.mythic.spatial.*
+import silentorb.mythic.typography.*
 
 data class SceneRenderer(
     val viewport: Vector4i,
@@ -105,14 +103,14 @@ data class SceneRenderer(
     get() = renderer.meshes
 }
 
-fun renderElements(sceneRenderer: SceneRenderer, opaqueElementGroups: ElementGroups, transparentElementGroups: ElementGroups) {
+fun renderElements(renderer: Renderer, camera: Camera, opaqueElementGroups: ElementGroups, transparentElementGroups: ElementGroups) {
   for (group in opaqueElementGroups) {
-    renderElementGroup(sceneRenderer.renderer, sceneRenderer.camera, group)
+    renderElementGroup(renderer, camera, group)
   }
 
   globalState.depthWrite = false
   for (group in transparentElementGroups) {
-    renderElementGroup(sceneRenderer.renderer, sceneRenderer.camera, group)
+    renderElementGroup(renderer, camera, group)
   }
   globalState.depthWrite = true
 }
