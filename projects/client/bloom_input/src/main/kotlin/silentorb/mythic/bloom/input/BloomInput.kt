@@ -16,12 +16,7 @@ data class GeneralCommandState(
     val mouseOffset: Vector2
 )
 
-data class PlayerDevice(
-    val player: BloomId,
-    val device: DeviceIndex
-)
-
-typealias DeviceMap = Map<Int, PlayerDevice>
+typealias DeviceMap = Map<Int, DeviceIndex>
 
 fun newBloomInputState(deviceState: InputDeviceState) =
     InputState(
