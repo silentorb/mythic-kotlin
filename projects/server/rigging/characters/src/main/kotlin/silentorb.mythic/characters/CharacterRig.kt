@@ -12,7 +12,7 @@ import silentorb.mythic.ent.firstFloatSortedBy
 import kotlin.math.min
 
 const val defaultCharacterRadius = 0.3f
-const val defaultCharacterHeight = 1.2f
+const val defaultCharacterHeight = 2.5f
 const val characterGroundBuffer = 0.02f
 
 const val groundedLinearDamping = 0.9f
@@ -26,6 +26,9 @@ fun maxNegativeLookVelocityChange() = 0.2f
 fun maxMoveVelocityChange() = 1f
 
 fun lookSensitivity() = Vector2(.7f, .7f)
+
+fun getFacingVector(orientation: Quaternion) =
+    orientation * Vector3(1f, 0f, 0f)
 
 data class CharacterRig(
     val facingRotation: Vector3 = Vector3(),
@@ -41,7 +44,7 @@ data class CharacterRig(
         .rotateY(-facingRotation.y)
 
   val facingVector: Vector3
-    get() = facingQuaternion * Vector3(1f, 0f, 0f)
+    get() = getFacingVector(facingQuaternion)
 }
 
 data class AbsoluteOrientationForce(
@@ -62,7 +65,11 @@ private fun castFootStepRay(dynamicsWorld: btDiscreteDynamicsWorld, bodyPosition
   return { it: Vector3 ->
     val start = basePosition + it
     val end = start + endOffset
-    castCollisionRay(dynamicsWorld, start, end)?.distance
+    val result = castCollisionRay(dynamicsWorld, start, end)
+    if (result != null)
+      start.z - result.hitPoint.z
+    else
+      null
   }
 }
 
@@ -210,7 +217,7 @@ fun updateCharacterRigFacing(commands: Commands, delta: Float): (CharacterRig) -
 
   characterRig.copy(
       lookVelocity = lookVelocity,
-       facingRotation = Vector3(
+      facingRotation = Vector3(
           0f,
           minMax(facingRotation.y, -1.1f, 1.1f),
           facingRotation.z

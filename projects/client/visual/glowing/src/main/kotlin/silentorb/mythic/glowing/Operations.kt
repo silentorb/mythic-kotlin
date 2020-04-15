@@ -12,3 +12,7 @@ class Operations {
 //    glViewport(position.x, position.y, dimensions.x, dimensions.y)
 //  }
 }
+
+fun clearDepth() {
+  glClear(GL_DEPTH_BUFFER_BIT)
+}
