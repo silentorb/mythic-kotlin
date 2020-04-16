@@ -8,7 +8,7 @@ import silentorb.mythic.lookinglass.drawing.armatureTransforms
 import silentorb.mythic.lookinglass.shading.Shaders
 import silentorb.mythic.spatial.*
 
-typealias ScreenFilter = (Shaders) -> Unit
+typealias ScreenFilter = (Shaders, Vector2) -> Unit
 
 fun drawSkeleton(renderer: SceneRenderer, armature: Armature, transforms: List<Matrix>, modelTransform: Matrix) {
   armature.bones
@@ -34,7 +34,7 @@ fun drawSkeleton(renderer: SceneRenderer, armature: Armature, transforms: List<M
 fun getDisplayConfigFilters(config: DisplayConfig): List<ScreenFilter> =
     if (config.depthOfField)
       listOf<ScreenFilter>(
-          { it.depthOfField.activate() }
+          { shaders, scale -> shaders.depthOfField.activate(scale) }
       )
     else
       listOf()
@@ -72,7 +72,9 @@ fun finishRender(renderer: SceneRenderer, filters: List<ScreenFilter>) {
 fun applyFrameBufferTexture(renderer: SceneRenderer, filter: ScreenFilter) {
   val canvasDependencies = getStaticCanvasDependencies()
   val offscreenBuffer = renderer.renderer.offscreenBuffers.first()
-  filter(renderer.renderer.shaders)
+  val config = renderer.renderer.config
+  val scale = Vector2(config.width.toFloat(), config.height.toFloat()) / renderer.viewport.zw.toVector2()
+  filter(renderer.renderer.shaders, scale)
   activateTextures(listOf(offscreenBuffer.colorTexture, offscreenBuffer.depthTexture!!))
   canvasDependencies.meshes.image.draw(DrawMethod.triangleFan)
 }

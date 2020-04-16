@@ -157,7 +157,7 @@ fun applyRenderBuffer(renderer: Renderer, dimensions: Vector2i) {
     )
   }
 
-  renderer.shaders.screenTexture.activate()
+  renderer.shaders.screenTexture.activate(Vector2(1f))
   val canvasDependencies = getStaticCanvasDependencies()
   activateTextures(listOf(renderer.renderColor.texture!!, renderer.renderDepth.texture!!))
   canvasDependencies.meshes.image.draw(DrawMethod.triangleFan)

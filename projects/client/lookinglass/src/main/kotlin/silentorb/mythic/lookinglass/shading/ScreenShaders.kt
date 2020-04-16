@@ -5,6 +5,7 @@ import silentorb.mythic.glowing.Vector4Property
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector4
 import org.lwjgl.opengl.GL20
+import silentorb.mythic.glowing.Vector2Property
 
 fun routeTexture(program: ShaderProgram, name: String, unit: Int) {
   val location = GL20.glGetUniformLocation(program.id, name)
@@ -16,9 +17,11 @@ val screenVertex = """
 in vec4 vertex;
 out vec2 texCoords;
 
+uniform vec2 scale;
+
 void main()
 {
-  gl_Position = vec4(vertex.x * 2.0 - 1.0, vertex.y * 2.0 - 1.0, 0.0, 1.0);
+  gl_Position = vec4(vertex.x * scale.x * 2.0 - 1.0, vertex.y * scale.y * 2.0 - 1.0, 0.0, 1.0);
   texCoords = vertex.zw;
 }
 """
@@ -148,26 +151,30 @@ class SimpleScreenShader(val program: ShaderProgram) {
 }
 
 class DepthScreenShader(val program: ShaderProgram) {
+  private val scaleProperty = Vector2Property(program, "scale")
 
   init {
     routeTexture(program, "colorTexture", 0)
     routeTexture(program, "depthTexture", 1)
   }
 
-  fun activate() {
+  fun activate(scale: Vector2) {
+    scaleProperty.setValue(scale)
     program.activate()
   }
 }
 
 class ScreenColorShader(val program: ShaderProgram) {
   private val colorProperty = Vector4Property(program, "inputColor")
+  private val scaleProperty = Vector2Property(program, "scale")
 
   init {
     routeTexture(program, "colorTexture", 0)
     routeTexture(program, "depthTexture", 1)
   }
 
-  fun activate(color: Vector4) {
+  fun activate(scale: Vector2, color: Vector4) {
+    scaleProperty.setValue(scale)
     colorProperty.setValue(color)
     program.activate()
   }
