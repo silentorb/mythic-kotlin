@@ -1,5 +1,6 @@
 package silentorb.mythic.lookinglass.shading
 
+import silentorb.mythic.debugging.getDebugBoolean
 import silentorb.mythic.glowing.VertexSchema
 
 data class ShaderKey(
@@ -19,6 +20,9 @@ fun getCachedShader(buffers: UniformBuffers, cache: ShaderCache): ShaderGetter =
   if (shader!= null)
     shader
   else {
+    if (getDebugBoolean("LOG_SHADER_CREATION")) {
+      println("New Shader Created")
+    }
     val newShader = GeneralPerspectiveShader(buffers, vertexSchema, config)
     cache[key] = newShader
     newShader

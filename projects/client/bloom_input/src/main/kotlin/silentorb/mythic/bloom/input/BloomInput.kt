@@ -16,7 +16,7 @@ data class GeneralCommandState(
     val mouseOffset: Vector2
 )
 
-typealias DeviceMap = Map<Int, DeviceIndex>
+typealias DeviceTypeMap = Map<Int, DeviceIndex>
 
 fun newBloomInputState(deviceState: InputDeviceState) =
     InputState(

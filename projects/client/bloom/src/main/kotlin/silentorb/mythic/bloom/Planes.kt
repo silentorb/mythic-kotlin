@@ -38,5 +38,5 @@ fun normalizeBounds(plane: Plane): (Bounds) -> Bounds = { bounds ->
   )
 }
 
-val horizontalPlane: Plane = { Vector2i(it.x, it.y) }
+val horizontalPlane: Plane = { it }
 val verticalPlane: Plane = { Vector2i(it.y, it.x) }

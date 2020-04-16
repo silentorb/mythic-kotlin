@@ -117,16 +117,20 @@ fun convertDrawMethod(mesh: GeneralMesh, method: DrawMethod): Int {
   return convertDrawMethod(mappedMethod)
 }
 
-fun drawMesh(mesh: GeneralMesh, method: DrawMethod) {
+fun drawMesh(mesh: GeneralMesh, method: Int) {
   mesh.vertexBuffer.activate()
-  val mappedMethod = convertDrawMethod(mesh, method)
   if (mesh.indices != null) {
-    glDrawElements(mappedMethod, mesh.indices)
+    glDrawElements(method, mesh.indices)
   } else if (mesh.offsets != null && mesh.counts != null) {
-    glMultiDrawArrays(mappedMethod, mesh.offsets, mesh.counts)
+    glMultiDrawArrays(method, mesh.offsets, mesh.counts)
   } else if (mesh.count != null) {
-    glDrawArrays(mappedMethod, 0, mesh.count / mesh.vertexSchema.floatSize)
+    glDrawArrays(method, 0, mesh.count / mesh.vertexSchema.floatSize)
   }
+}
+
+fun drawMesh(mesh: GeneralMesh, method: DrawMethod) {
+  val mappedMethod = convertDrawMethod(mesh, method)
+  drawMesh(mesh, mappedMethod)
 }
 
 fun drawMeshInstanced(mesh: GeneralMesh, method: DrawMethod, instanceCount: Int) {

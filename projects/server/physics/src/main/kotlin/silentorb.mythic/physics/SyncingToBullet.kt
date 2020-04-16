@@ -119,6 +119,12 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
         bulletBody.userData = key
         bulletBody.linearVelocity = toGdxVector3(body.velocity)
         bulletState.dynamicsWorld.addRigidBody(bulletBody)
+
+        // Per-object bullet gravity needs to be set after the body is added to the world or the gravity is ignore.
+        // (Either a design flaw or bug...)
+        if (!dynamicBody.gravity)
+          bulletBody.gravity = toGdxVector3(Vector3.zero)
+
         Pair(key, bulletBody)
       }
 

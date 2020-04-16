@@ -41,12 +41,12 @@ fun createImageMesh(vertexSchema: VertexSchema) =
         1f, 1f, 1f, 1f
     ))
 
-fun createCircleList(radius: Float, count: Int): ArrayList<Float> {
+fun createCircleList(radius: Float, count: Int, offset: Float = 0f, direction: Float = 1f): ArrayList<Float> {
   val vertices = ArrayList<Float>((count) * 2)
-  val increment = Pi * 2 / count
+  val increment = direction * Pi * 2 / count
 
   for (i in 0..count) {
-    val theta = increment * i
+    val theta = increment * i + offset
     vertices.add(sin(theta) * radius)
     vertices.add(cos(theta) * radius)
   }
@@ -59,7 +59,7 @@ fun createCircleMesh(vertexSchema: VertexSchema, radius: Float, count: Int) =
 fun createSolidCircleMesh(vertexSchema: VertexSchema, radius: Float, count: Int) =
     SimpleMesh(vertexSchema, listOf(0f, 0f).plus(createCircleList(radius, count)))
 
-private val circleResolution = 32
+const val circleResolution = 32
 
 fun createDrawingMeshes(vertexSchemas: DrawingVertexSchemas) = Meshes(
     square = createSquareMesh(vertexSchemas.simple),
@@ -105,10 +105,17 @@ fun setGlobalFonts(fonts: List<FontSet>) {
   _globalFonts = fonts
 }
 
+fun transformScalar(pixelsToScalar: Matrix, position: Vector2, dimensions: Vector2) =
+    Matrix.identity
+        .mul(pixelsToScalar)
+        .translate(position.x, position.y, 0f)
+        .scale(dimensions.x, dimensions.y, 1f)
+
 class Canvas(
     val effects: DrawingEffects,
     val unitScaling: Vector2,
     val fonts: List<FontSet>,
+    val custom: Map<String, Any>,
     dimensions: Vector2i,
     dependencies: CanvasDependencies = getStaticCanvasDependencies()
 ) {
@@ -121,10 +128,7 @@ class Canvas(
   val pixelsToScalar = Matrix.identity.scale(1f / dimensions.x, 1f / dimensions.y, 1f)
 
   fun transformScalar(position: Vector2, dimensions: Vector2) =
-      Matrix.identity
-          .mul(pixelsToScalar)
-          .translate(position.x, position.y, 0f)
-          .scale(dimensions.x, dimensions.y, 1f)
+      transformScalar(pixelsToScalar, position, dimensions)
 
   fun drawSquare(position: Vector2, dimensions: Vector2, brush: Brush) {
     brush(transformScalar(position, dimensions), meshes.square)
