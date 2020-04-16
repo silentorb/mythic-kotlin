@@ -18,8 +18,7 @@ out vec2 texCoords;
 
 void main()
 {
-  vec4 temp = vec4(vertex.xy, 0.0, 1.0);
-  gl_Position = vec4(temp.x * 2.0 - 1.0, temp.y * 2.0 - 1.0, 0.0, 1.0);
+  gl_Position = vec4(vertex.x * 2.0 - 1.0, vertex.y * 2.0 - 1.0, 0.0, 1.0);
   texCoords = vertex.zw;
 }
 """

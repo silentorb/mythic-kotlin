@@ -46,7 +46,7 @@ fun prepareRender(renderer: SceneRenderer, filters: List<ScreenFilter>) {
     val offscreenBuffer = renderer.renderer.offscreenBuffers.first()
     val dimensions = Vector2i(offscreenBuffer.colorTexture.width, offscreenBuffer.colorTexture.height)
     glow.state.setFrameBuffer(offscreenBuffer.framebuffer.id)
-    glow.state.viewport = Vector4i(0, 0, dimensions.x, dimensions.y)
+//    glow.state.viewport = Vector4i(0, 0, dimensions.x, dimensions.y)
   }
   glow.state.viewport = renderer.viewport
 //    glow.operations.clearScreen()
@@ -59,7 +59,7 @@ fun finishRender(renderer: SceneRenderer, filters: List<ScreenFilter>) {
 
   for (filter in filters.dropLast(1)) {
 //      globalState.setFrameBuffer(renderer.renderer.offscreenBuffers.first().framebuffer.id)
-    applyFrameBufferTexture(renderer,filter)
+    applyFrameBufferTexture(renderer, filter)
   }
 
   globalState.setFrameBuffer(0)

@@ -73,6 +73,9 @@ fun prepareScreenFrameBuffer(windowWidth: Int, windowHeight: Int, withDepth: Boo
   if (status != GL_FRAMEBUFFER_COMPLETE)
     throw Error("Error creating framebuffer.")
 
+  if (withDepth) {
+    clearDepth() // Initialize the depth texture (the pixels of which are undefined until this)
+  }
   globalState.setFrameBuffer(0)
   return OffscreenBuffer(framebuffer, colorTexture, depthTexture)
 }
