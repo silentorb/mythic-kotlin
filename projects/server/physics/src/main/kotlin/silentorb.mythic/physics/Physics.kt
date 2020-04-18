@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver
 import silentorb.mythic.ent.Id
 import silentorb.mythic.ent.Table
+import silentorb.mythic.happenings.GameEvent
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.toMutableMatrix
@@ -134,7 +135,7 @@ fun allRayHits(dynamicsWorld: btDiscreteDynamicsWorld, start: Vector3, end: Vect
 data class LinearImpulse(
     val body: Id,
     val offset: Vector3
-)
+) : GameEvent
 
 data class PhysicsDeck(
     val bodies: Table<Body>,

@@ -9,6 +9,7 @@ import silentorb.mythic.spatial.*
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.happenings.filterCommands
 import silentorb.mythic.ent.firstFloatSortedBy
+import kotlin.math.abs
 import kotlin.math.min
 
 const val defaultCharacterRadius = 0.3f
@@ -21,8 +22,12 @@ const val airControlReduction = 0.4f
 
 const val maxFootStepHeight = 0.6f
 
-fun maxPositiveLookVelocityChange() = 0.1f
-fun maxNegativeLookVelocityChange() = 0.2f
+fun maxPositiveLookVelocityXChange() = 0.06f
+fun maxNegativeLookVelocityXChange() = 0.15f
+
+fun maxPositiveLookVelocityYChange() = 0.04f
+fun maxNegativeLookVelocityYChange() = 0.08f
+
 fun maxMoveVelocityChange() = 1f
 
 fun lookSensitivity() = Vector2(.7f, .7f)
@@ -168,51 +173,27 @@ fun characterMovementFp(commands: Commands, characterRig: CharacterRig, id: Id, 
   }
 }
 
-fun transitionVector(maxChange: Float, current: Vector3, target: Vector3): Vector3 {
-  val diff = target - current
-  val diffLength = diff.length()
-  return if (diffLength != 0f) {
-    if (diffLength < maxChange)
-      target
-    else {
-      val adjustment = if (diffLength > maxChange)
-        diff.normalize() * maxChange
-      else
-        diff
-
-      current + adjustment
-    }
-  } else
+fun transitionAxis(negativeMaxChange: Float, positiveMaxChange: Float, current: Float, target: Float): Float {
+  return if (target == current)
     current
-}
-
-fun transitionVector(negativeMaxChange: Float, positiveMaxChange: Float, current: Vector2, target: Vector2): Vector2 {
-  val diff = target - current
-  val diffLength = diff.length()
-  val maxChange = if (current.length() < target.length())
-    positiveMaxChange
-  else
-    negativeMaxChange
-
-  return if (diffLength != 0f) {
-    if (diffLength < maxChange)
-      target
-    else {
-      val adjustment = if (diffLength > maxChange)
-        diff.normalize() * maxChange
-      else
-        diff
-
-      current + adjustment
-    }
-  } else
-    current
+  else {
+    val (minOffset, maxOffset) = if (current == 0f)
+      Pair(positiveMaxChange, positiveMaxChange)
+    else if (current > 0f)
+      Pair(negativeMaxChange, positiveMaxChange)
+    else
+      Pair(positiveMaxChange, negativeMaxChange)
+    println(" $minOffset $maxOffset $current $target")
+    minMax(target, current - minOffset, current + maxOffset)
+  }
 }
 
 fun updateCharacterRigFacing(commands: Commands, delta: Float): (CharacterRig) -> CharacterRig = { characterRig ->
   val lookForce = characterLookForce(characterRig, commands)
-  val lookVelocity = transitionVector(maxNegativeLookVelocityChange(), maxPositiveLookVelocityChange(),
-      characterRig.lookVelocity, lookForce)
+  val lookVelocity = Vector2(
+      transitionAxis(maxNegativeLookVelocityXChange(), maxPositiveLookVelocityXChange(), characterRig.lookVelocity.x, lookForce.x),
+      transitionAxis(maxNegativeLookVelocityYChange(), maxPositiveLookVelocityYChange(), characterRig.lookVelocity.y, lookForce.y)
+  )
   val facingRotation = characterRig.facingRotation + fpCameraRotation(lookVelocity, delta)
 
   characterRig.copy(
