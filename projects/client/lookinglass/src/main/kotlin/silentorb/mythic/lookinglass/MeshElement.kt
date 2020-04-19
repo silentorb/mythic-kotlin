@@ -7,6 +7,7 @@ import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.scenery.ArmatureName
+import silentorb.mythic.scenery.Light
 
 data class ElementAnimation(
     val animationId: AnimationName,
@@ -39,7 +40,8 @@ data class ElementGroup(
     val armature: ArmatureName? = null,
     val animations: List<ElementAnimation> = listOf(),
     val attachments: List<AttachedMesh> = listOf(),
-    val billboards: List<TexturedBillboard> = listOf()
+    val billboards: List<TexturedBillboard> = listOf(),
+    val lights: List<Light> = listOf()
 )
 
 typealias ElementGroups = List<ElementGroup>

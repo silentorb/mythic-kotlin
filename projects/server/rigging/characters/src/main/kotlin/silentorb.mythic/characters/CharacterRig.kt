@@ -183,7 +183,6 @@ fun transitionAxis(negativeMaxChange: Float, positiveMaxChange: Float, current: 
       Pair(negativeMaxChange, positiveMaxChange)
     else
       Pair(positiveMaxChange, negativeMaxChange)
-    println(" $minOffset $maxOffset $current $target")
     minMax(target, current - minOffset, current + maxOffset)
   }
 }
