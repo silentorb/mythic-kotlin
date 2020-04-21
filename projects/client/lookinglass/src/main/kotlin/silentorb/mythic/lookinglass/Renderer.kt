@@ -41,6 +41,12 @@ fun getPlayerViewports(playerCount: Int, dimensions: Vector2i): List<Vector4i> {
         Vector4i(half.x, half.y, half.x, half.y),
         Vector4i(half.x, 0, half.x, half.y)
     )
+    4 -> listOf(
+        Vector4i(0, 0, half.x, half.y),
+        Vector4i(0, half.y, half.x, half.y),
+        Vector4i(half.x, half.y, half.x, half.y),
+        Vector4i(half.x, 0, half.x, half.y)
+    )
     else -> throw Error("Not supported")
   }
 }

@@ -2,6 +2,9 @@ package silentorb.mythic.debugging
 
 import io.github.cdimascio.dotenv.Dotenv
 import io.github.cdimascio.dotenv.dotenv
+import java.io.File
+import java.nio.file.Path
+import java.nio.file.Paths
 
 private var dotEnv: Dotenv? = null
 
@@ -16,6 +19,7 @@ fun incrementGlobalDebugLoopNumber(max: Int) {
 }
 
 private var debugRangeValue = 0f
+private var lastModified: Long = 0L
 
 fun getDebugRangeValue(): Float = debugRangeValue
 
@@ -26,6 +30,20 @@ fun setDebugRangeValue(value: Float) {
 fun newDotEnv() = dotenv {
   directory = System.getenv("DOTENV_DIRECTORY") ?: ""
   ignoreIfMissing = true
+}
+
+fun reloadDotEnv() {
+  dotEnv = newDotEnv()
+}
+
+fun checkDotEnvChanged() {
+  val dotEnvDirectory = System.getenv("DOTENV_DIRECTORY")
+  val modified = File(Paths.get(dotEnvDirectory, ".env").toUri()).lastModified()
+  if (modified > lastModified) {
+    lastModified = modified
+    reloadDotEnv()
+    println("Detected .env changes and reloaded ${java.util.Date()}")
+  }
 }
 
 fun getDebugString(name: String): String? {
