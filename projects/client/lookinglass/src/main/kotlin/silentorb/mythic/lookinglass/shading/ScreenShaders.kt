@@ -97,7 +97,7 @@ uniform vec4 inputColor;
 void main()
 {
   vec3 primaryColorSample = texture(colorTexture, texCoords).xyz;
-  vec3 rgb = min(vec3(1.0), primaryColorSample + inputColor.xyz * inputColor.w);
+  vec3 rgb = primaryColorSample * (1.0 - inputColor.w) + inputColor.xyz * inputColor.w;
   output_color = vec4(rgb, 1.0);
 }
 """

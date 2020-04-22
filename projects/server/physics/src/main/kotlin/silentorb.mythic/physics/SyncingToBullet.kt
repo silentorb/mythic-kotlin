@@ -6,6 +6,8 @@ import com.badlogic.gdx.physics.bullet.dynamics.btHingeConstraint
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState
 import silentorb.mythic.ent.Id
+import silentorb.mythic.ent.Table
+import silentorb.mythic.happenings.Events
 import silentorb.mythic.sculpting.ImmutableFace
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Pi
@@ -174,5 +176,19 @@ fun applyImpulses(bulletState: BulletState, linearForces: List<LinearImpulse>) {
   for (force in linearForces) {
     val btBody = bulletState.dynamicBodies[force.body]!!
     btBody.applyCentralImpulse(toGdxVector3(force.offset))
+  }
+}
+
+fun applyBodyChanges(bulletState: BulletState, previous: Table<Body>, next: Table<Body>) {
+  val changes = next.filter { (id, body) ->
+    val other = previous[id]
+    other != null && other != body
+  }
+  for ((id, body) in changes) {
+    val btBody = bulletState.dynamicBodies[id]
+    if (btBody != null) {
+      btBody.worldTransform = toGdxMatrix4(getBodyTransform(body))
+      btBody.linearVelocity = toGdxVector3(body.velocity)
+    }
   }
 }

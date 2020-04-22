@@ -9,7 +9,6 @@ const val voidNodeId = -1L
 
 interface SimpleBody {
   val position: Vector3
-  val nearestNode: Id
 }
 
 data class HingeConstraint(
@@ -22,7 +21,7 @@ data class Body(
     val velocity: Vector3 = Vector3.zero,
     val orientation: Quaternion = Quaternion(),
     val scale: Vector3 = Vector3.unit,
-    override val nearestNode: Id = voidNodeId
+    val nearestNode: Id = voidNodeId
 ) : SimpleBody
 
 data class DynamicBody(

@@ -53,7 +53,7 @@ fun prepareRender(renderer: SceneRenderer, filters: List<ScreenFilter>) {
 //    glow.operations.clearScreen()
 }
 
-fun finishRender(renderer: SceneRenderer, filters: List<ScreenFilter>) {
+fun applyFilters(renderer: SceneRenderer, filters: List<ScreenFilter>) {
   globalState.cullFaces = false
   globalState.viewport = renderer.viewport
 
