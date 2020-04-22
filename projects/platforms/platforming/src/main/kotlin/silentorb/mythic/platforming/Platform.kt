@@ -29,14 +29,14 @@ interface PlatformInput {
   fun getEvents(): List<InputEvent>
 }
 
-interface PlatformDisplayConfig {
-  var width: Int
-  var height: Int
-  var fullscreen: Boolean
-  var windowedFullscreen: Boolean // Whether fullscreen uses windowed fullscreen
-  var vsync: Boolean
-  var multisamples: Int
-}
+data class PlatformDisplayConfig(
+  val width: Int,
+  val height: Int,
+  val fullscreen: Boolean,
+  val windowedFullscreen: Boolean, // Whether fullscreen uses windowed fullscreen
+  val vsync: Boolean,
+  val multisamples: Int
+)
 
 data class RawImage(
     val buffer: ByteBuffer,

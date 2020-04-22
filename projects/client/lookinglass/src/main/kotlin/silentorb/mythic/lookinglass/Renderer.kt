@@ -52,9 +52,9 @@ fun getPlayerViewports(playerCount: Int, dimensions: Vector2i): List<Vector4i> {
 }
 
 
-fun createMultiSampler(glow: Glow, config: PlatformDisplayConfig): Multisampler {
-  val texture = Texture(config.width, config.height, null, { width: Int, height: Int, buffer: FloatBuffer? ->
-    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, config.multisamples, GL_RGB, width, height, true)
+fun createMultiSampler(glow: Glow, width: Int, height: Int, multisamples: Int): Multisampler {
+  val texture = Texture(width, height, null, { width: Int, height: Int, buffer: FloatBuffer? ->
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, multisamples, GL_RGB, width, height, true)
   }, TextureTarget.multisample)
 
   val framebuffer: Framebuffer
@@ -64,7 +64,7 @@ fun createMultiSampler(glow: Glow, config: PlatformDisplayConfig): Multisampler 
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, texture.id, 0)
 
   renderbuffer = Renderbuffer()
-  glRenderbufferStorageMultisample(GL_RENDERBUFFER, config.multisamples, GL_DEPTH24_STENCIL8, config.width, config.height);
+  glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisamples, GL_DEPTH24_STENCIL8, width, height);
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, renderbuffer.id);
 
   checkError("Initializing multisampled framebuffer.")

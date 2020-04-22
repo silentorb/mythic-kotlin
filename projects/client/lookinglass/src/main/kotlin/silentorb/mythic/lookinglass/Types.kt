@@ -8,8 +8,6 @@ import silentorb.mythic.glowing.*
 import silentorb.mythic.lookinglass.meshes.VertexSchemas
 import silentorb.mythic.lookinglass.meshes.createVertexSchemas
 import silentorb.mythic.lookinglass.shading.*
-import silentorb.mythic.lookinglass.texturing.AsyncTextureLoader
-import silentorb.mythic.lookinglass.texturing.DeferredTexture
 import silentorb.mythic.lookinglass.texturing.DynamicTextureLibrary
 import silentorb.mythic.platforming.PlatformDisplayConfig
 import silentorb.mythic.scenery.ArmatureName
@@ -25,15 +23,25 @@ enum class TextureAntialiasing {
 }
 
 data class DisplayConfig(
-    override var width: Int = 800,
-    override var height: Int = 600,
-    override var fullscreen: Boolean = false,
-    override var windowedFullscreen: Boolean = false, // Whether fullscreen uses windowed fullscreen
-    override var vsync: Boolean = true,
-    override var multisamples: Int = 0,
-    var depthOfField: Boolean = false,
-    var textureAntialiasing: TextureAntialiasing = TextureAntialiasing.trilinear
-) : PlatformDisplayConfig
+    val width: Int = 800,
+    val height: Int = 600,
+    val fullscreen: Boolean = false,
+    val windowedFullscreen: Boolean = false, // Whether fullscreen uses windowed fullscreen
+    val vsync: Boolean = true,
+    val multisamples: Int = 0,
+    val depthOfField: Boolean = false,
+    val textureAntialiasing: TextureAntialiasing = TextureAntialiasing.trilinear
+)
+
+fun toPlatformDisplayConfig(display: DisplayConfig) =
+    PlatformDisplayConfig(
+        width = display.width,
+        height = display.height,
+        fullscreen = display.fullscreen,
+        windowedFullscreen = display.windowedFullscreen,
+        vsync = display.vsync,
+        multisamples = display.multisamples
+    )
 
 data class Multisampler(
     val framebuffer: Framebuffer,
@@ -74,8 +82,8 @@ data class Renderer(
     val fonts: List<FontSet>,
     val offscreenBuffers: List<OffscreenBuffer>
 ) {
-  var renderColor: ByteTextureBuffer = ByteTextureBuffer()
-  var renderDepth: FloatTextureBuffer = FloatTextureBuffer()
+  val renderColor: ByteTextureBuffer = ByteTextureBuffer()
+  val renderDepth: FloatTextureBuffer = FloatTextureBuffer()
   val uniformBuffers = UniformBuffers(
       instance = UniformBuffer(instanceBufferSize),
       scene = UniformBuffer(sceneBufferSize),
@@ -89,6 +97,20 @@ data class Renderer(
   val textures: DynamicTextureLibrary = mutableMapOf()
   val dynamicMesh = MutableSimpleMesh(vertexSchemas.flat)
 }
+
+//fun updateOffscreenBufferAllocations(renderer: Renderer, oldConfig: DisplayConfig?) {
+//  val dimensionsChanged = oldConfig == null || renderer.config.width != oldConfig.width || renderer.config.height != oldConfig.height
+//  if (renderer.config.multisamples == 0) {
+//    val multisampler = renderer.multisampler
+//    if (multisampler != null) {
+//      multisampler.framebuffer.dispose()
+//      multisampler.renderbuffer.dispose()
+//      renderer.multisampler = null
+//    }
+//  } else if (renderer.config.multisamples != oldConfig?.multisamples || dimensionsChanged) {
+//    renderer.multisampler = createMultiSampler(renderer.glow, renderer.config)
+//  }
+//}
 
 fun emptyRenderer(config: DisplayConfig): Renderer =
     Renderer(
