@@ -62,7 +62,12 @@ fun applyFilters(renderer: SceneRenderer, filters: List<ScreenFilter>) {
     applyFrameBufferTexture(renderer, filter)
   }
 
-  globalState.setFrameBuffer(0)
+  if (renderer.renderer.multisampler != null) {
+    renderer.renderer.multisampler.framebuffer.activateDraw()
+  }
+  else {
+    globalState.setFrameBuffer(0)
+  }
 
   if (filters.any()) {
     applyFrameBufferTexture(renderer, filters.last())

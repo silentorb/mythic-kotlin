@@ -12,7 +12,6 @@ import silentorb.mythic.glowing.*
 import silentorb.mythic.lookinglass.shading.EffectsData
 import silentorb.mythic.lookinglass.shading.createSceneBuffer
 import silentorb.mythic.lookinglass.texturing.DynamicTextureLibrary
-import silentorb.mythic.platforming.PlatformDisplayConfig
 import silentorb.mythic.platforming.WindowInfo
 import silentorb.mythic.scenery.Light
 import silentorb.mythic.scenery.LightingConfig
@@ -169,7 +168,7 @@ fun applyRenderBuffer(renderer: Renderer, dimensions: Vector2i) {
   canvasDependencies.meshes.image.draw(DrawMethod.triangleFan)
 }
 
-fun applyFilters(renderer: Renderer, windowInfo: WindowInfo) {
+fun finishRender(renderer: Renderer, windowInfo: WindowInfo) {
   if (renderer.multisampler != null) {
     val width = windowInfo.dimensions.x
     val height = windowInfo.dimensions.y
@@ -203,6 +202,6 @@ fun createCanvas(renderer: Renderer, custom: Map<String, Any>, dimensions: Vecto
 fun <T> renderContainer(renderer: Renderer, windowInfo: WindowInfo, action: () -> T): T {
   prepareRender(renderer, windowInfo)
   val result = action()
-  applyFilters(renderer, windowInfo)
+  finishRender(renderer, windowInfo)
   return result
 }

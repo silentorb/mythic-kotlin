@@ -35,23 +35,6 @@ fun lookSensitivity() = Vector2(.7f, .7f)
 fun getFacingVector(orientation: Quaternion) =
     orientation * Vector3(1f, 0f, 0f)
 
-data class CharacterRig(
-    val facingRotation: Vector3 = Vector3(),
-    val isActive: Boolean,
-    val groundDistance: Float = 0f,
-    val lookVelocity: Vector2 = Vector2(),
-    val maxSpeed: Float,
-    val turnSpeed: Vector2
-) {
-  val facingQuaternion: Quaternion
-    get() = Quaternion()
-        .rotateZ(facingRotation.z)
-        .rotateY(-facingRotation.y)
-
-  val facingVector: Vector3
-    get() = getFacingVector(facingQuaternion)
-}
-
 data class AbsoluteOrientationForce(
     val body: Id,
     val orientation: Quaternion
@@ -146,75 +129,11 @@ fun updateCharacterRigBulletBodies(bulletState: BulletState, characterRigs: Tabl
 fun characterOrientationZ(characterRig: CharacterRig) =
     Quaternion().rotateZ(characterRig.facingRotation.z - Pi / 2)
 
-fun getMovementImpulseVector(baseSpeed: Float, velocity: Vector3, commandVector: Vector3): Vector3 {
-  val rawImpulseVector = commandVector * 1.5f - velocity
-  val finalImpulseVector = if (rawImpulseVector.length() > baseSpeed)
-    rawImpulseVector.normalize() * baseSpeed
-  else
-    rawImpulseVector
-
-  return finalImpulseVector
-}
-
-fun characterMovementFp(commands: Commands, characterRig: CharacterRig, id: Id, body: Body): LinearImpulse? {
-  val offsetVector = joinInputVector(commands, playerMoveMap)
-  return if (offsetVector != null) {
-    val airControlMod = if (isGrounded(characterRig)) 1f else airControlReduction
-    val direction = characterOrientationZ(characterRig) * offsetVector * airControlMod
-    val baseSpeed = characterRig.maxSpeed
-    val maxImpulseLength = baseSpeed
-    val commandVector = direction * maxImpulseLength
-    val horizontalVelocity = body.velocity.copy(z = 0f)
-    val impulseVector = getMovementImpulseVector(baseSpeed, horizontalVelocity, commandVector)
-    val finalImpulse = impulseVector * 5f
-    LinearImpulse(body = id, offset = finalImpulse)
-  } else {
-    null
-  }
-}
-
-fun transitionAxis(negativeMaxChange: Float, positiveMaxChange: Float, current: Float, target: Float): Float {
-  return if (target == current)
-    current
-  else {
-    val (minOffset, maxOffset) = if (current == 0f)
-      Pair(positiveMaxChange, positiveMaxChange)
-    else if (current > 0f)
-      Pair(negativeMaxChange, positiveMaxChange)
-    else
-      Pair(positiveMaxChange, negativeMaxChange)
-    minMax(target, current - minOffset, current + maxOffset)
-  }
-}
-
-fun updateCharacterRigFacing(commands: Commands, delta: Float): (CharacterRig) -> CharacterRig = { characterRig ->
-  val lookForce = characterLookForce(characterRig, commands)
-  val lookVelocity = Vector2(
-      transitionAxis(maxNegativeLookVelocityXChange(), maxPositiveLookVelocityXChange(), characterRig.lookVelocity.x, lookForce.x),
-      transitionAxis(maxNegativeLookVelocityYChange(), maxPositiveLookVelocityYChange(), characterRig.lookVelocity.y, lookForce.y)
-  )
-  val facingRotation = characterRig.facingRotation + fpCameraRotation(lookVelocity, delta)
-
-  characterRig.copy(
-      lookVelocity = lookVelocity,
-      facingRotation = Vector3(
-          0f,
-          minMax(facingRotation.y, -1.1f, 1.1f),
-          facingRotation.z
-      )
-  )
-}
-
 fun updateCharacterRigGroundedDistance(bulletState: BulletState, hand: CharacterRigHand): (CharacterRig) -> CharacterRig = { characterRig ->
   characterRig.copy(
       groundDistance = updateCharacterStepHeight(bulletState, hand)
   )
 }
-
-fun allCharacterMovements(deck: PhysicsDeck, characterRigs: Table<CharacterRig>, commands: Commands): List<LinearImpulse> =
-    characterRigs
-        .filter { characterRigs[it.key]!!.isActive }
-        .mapNotNull { characterMovementFp(filterCommands(it.key, commands), it.value, it.key, deck.bodies[it.key]!!) }
 
 fun interpolateCharacterRigs(scalar: Float, first: Table<CharacterRig>, second: Table<CharacterRig>) =
     interpolateTables(scalar, first, second) { s, a, b ->

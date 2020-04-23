@@ -5,6 +5,7 @@ import silentorb.mythic.happenings.CommonCharacterCommands
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.minMax
 
 data class MomentumConfig(
     val attack: Float,
@@ -70,6 +71,38 @@ fun fpCameraRotation(velocity: Vector2, delta: Float): Vector3 {
     Vector3(0f, deltaVelocity.y, deltaVelocity.x)
   } else
     Vector3()
+}
+
+fun transitionAxis(negativeMaxChange: Float, positiveMaxChange: Float, current: Float, target: Float): Float {
+  return if (target == current)
+    current
+  else {
+    val (minOffset, maxOffset) = if (current == 0f)
+      Pair(positiveMaxChange, positiveMaxChange)
+    else if (current > 0f)
+      Pair(negativeMaxChange, positiveMaxChange)
+    else
+      Pair(positiveMaxChange, negativeMaxChange)
+    minMax(target, current - minOffset, current + maxOffset)
+  }
+}
+
+fun updateCharacterRigFacing(commands: Commands, delta: Float): (CharacterRig) -> CharacterRig = { characterRig ->
+  val lookForce = characterLookForce(characterRig, commands)
+  val lookVelocity = Vector2(
+      transitionAxis(maxNegativeLookVelocityXChange(), maxPositiveLookVelocityXChange(), characterRig.lookVelocity.x, lookForce.x),
+      transitionAxis(maxNegativeLookVelocityYChange(), maxPositiveLookVelocityYChange(), characterRig.lookVelocity.y, lookForce.y)
+  )
+  val facingRotation = characterRig.facingRotation + fpCameraRotation(lookVelocity, delta)
+
+  characterRig.copy(
+      lookVelocity = lookVelocity,
+      facingRotation = Vector3(
+          0f,
+          minMax(facingRotation.y, -1.1f, 1.1f),
+          facingRotation.z
+      )
+  )
 }
 
 //fun updateTpCameraRotation(player: Player, character: CharacterRig, delta: Float): Vector3? {
