@@ -7,7 +7,7 @@ import silentorb.mythic.physics.firstRayHit
 import silentorb.mythic.spatial.*
 
 const val targetCameraDistance = 7f
-const val cameraObstaclePadding = 0.01f
+const val cameraObstaclePadding = 0.3f
 
 fun getHoverCameraOrientation(hoverCamera: HoverCamera): Quaternion =
     Quaternion()
@@ -28,7 +28,7 @@ fun adjustCameraDistance(dynamicsWorld: btDiscreteDynamicsWorld, cameraCollision
   val hit = firstRayHit(dynamicsWorld, rayStart, rayEnd, cameraCollisionMask)
   return if (hit != null) {
     val distance = hit.hitPoint.distance(rayStart)
-    distance - 0.5f
+    distance - cameraObstaclePadding
   } else
     targetCameraDistance
 }
@@ -42,7 +42,7 @@ fun updateThirdPersonCamera(dynamicsWorld: btDiscreteDynamicsWorld, cameraCollis
   val facing = characterRig.facingRotation.z
   val hoverCamera = characterRig.hoverCamera ?: HoverCamera(0f, 0f, 5f, facing, facing)
   val yaw = hoverCamera.yaw + lookVelocity.x * delta
-  val pitch = hoverCamera.pitch - lookVelocity.y * delta
+  val pitch = minMax(hoverCamera.pitch - lookVelocity.y * delta, -1.0f, 1.5f)
 
   // Not currently supporting aggregating movement events from multiple sources
   assert(movements.size < 2)
