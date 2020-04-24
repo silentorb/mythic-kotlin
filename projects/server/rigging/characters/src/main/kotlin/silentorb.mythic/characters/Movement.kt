@@ -9,10 +9,10 @@ import silentorb.mythic.physics.PhysicsDeck
 import silentorb.mythic.spatial.*
 
 val playerMoveMap = mapOf(
-    CommonCharacterCommands.moveLeft to Vector3(-1f, 0f, 0f),
-    CommonCharacterCommands.moveRight to Vector3(1f, 0f, 0f),
-    CommonCharacterCommands.moveUp to Vector3(0f, 1f, 0f),
-    CommonCharacterCommands.moveDown to Vector3(0f, -1f, 0f)
+    CharacterRigCommands.moveLeft to Vector3(-1f, 0f, 0f),
+    CharacterRigCommands.moveRight to Vector3(1f, 0f, 0f),
+    CharacterRigCommands.moveUp to Vector3(0f, 1f, 0f),
+    CharacterRigCommands.moveDown to Vector3(0f, -1f, 0f)
 )
 
 fun joinInputVector(commands: Commands, commandMap: Map<CommandName, Vector3>): Vector3? {

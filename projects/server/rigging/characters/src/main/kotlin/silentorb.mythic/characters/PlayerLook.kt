@@ -5,7 +5,6 @@ import silentorb.mythic.ent.Id
 import silentorb.mythic.ent.Table
 import silentorb.mythic.happenings.CommandName
 import silentorb.mythic.happenings.Commands
-import silentorb.mythic.happenings.CommonCharacterCommands
 import silentorb.mythic.physics.Body
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
@@ -32,10 +31,10 @@ operator fun MomentumConfig2.times(value: Vector2): MomentumConfig2 =
     MomentumConfig2(yaw * value.x, pitch * value.y)
 
 val firstPersonLookMap = mapOf(
-    CommonCharacterCommands.lookLeft to Vector3(0f, 0f, 1f),
-    CommonCharacterCommands.lookRight to Vector3(0f, 0f, -1f),
-    CommonCharacterCommands.lookUp to Vector3(0f, 1f, 0f),
-    CommonCharacterCommands.lookDown to Vector3(0f, -1f, 0f)
+    CharacterRigCommands.lookLeft to Vector3(0f, 0f, 1f),
+    CharacterRigCommands.lookRight to Vector3(0f, 0f, -1f),
+    CharacterRigCommands.lookUp to Vector3(0f, 1f, 0f),
+    CharacterRigCommands.lookDown to Vector3(0f, -1f, 0f)
 )
 
 fun applyLookForce(lookMap: Map<CommandName, Vector3>, turnSpeed: Vector2, commands: Commands): Vector2 {
