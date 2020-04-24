@@ -27,18 +27,6 @@ operator fun MomentumConfig2.times(value: Float): MomentumConfig2 =
 operator fun MomentumConfig2.times(value: Vector2): MomentumConfig2 =
     MomentumConfig2(yaw * value.x, pitch * value.y)
 
-private val gamepadLookSensitivity = Vector2(1f, 1f)
-
-private val firstPersonLookMomentum = MomentumConfig2(
-    MomentumConfig(1.7f, 4f, 1f),
-    MomentumConfig(1f, 4f, 1f)
-)
-
-private val thirdPersonLookMomentum = MomentumConfig2(
-    MomentumConfig(1.7f, 4f, 1f),
-    MomentumConfig(1f, 4f, 1f)
-)
-
 val firstPersonLookMap = mapOf(
     CommonCharacterCommands.lookLeft to Vector3(0f, 0f, 1f),
     CommonCharacterCommands.lookRight to Vector3(0f, 0f, -1f),
@@ -46,31 +34,24 @@ val firstPersonLookMap = mapOf(
     CommonCharacterCommands.lookDown to Vector3(0f, -1f, 0f)
 )
 
-val cameraLookMap = mapOf(
-    CommonCharacterCommands.cameraLookLeft to Vector3(0f, 0f, 1f),
-    CommonCharacterCommands.cameraLookRight to Vector3(0f, 0f, -1f),
-    CommonCharacterCommands.cameraLookUp to Vector3(0f, 1f, 0f),
-    CommonCharacterCommands.cameraLookDown to Vector3(0f, -1f, 0f)
-)
-
-fun applyLookForce(lookMap: Map<CommandName, Vector3>, character: CharacterRig, commands: Commands): Vector2 {
+fun applyLookForce(lookMap: Map<CommandName, Vector3>, turnSpeed: Vector2, commands: Commands): Vector2 {
   val offset3 = joinInputVector(commands, lookMap)
   return if (offset3 != null) {
     val offset2 = Vector2(offset3.z, offset3.y)
-    offset2 * lookSensitivity() * character.turnSpeed
+    offset2 * turnSpeed
   } else
     Vector2()
 }
 
-fun characterLookForce(character: CharacterRig, commands: Commands): Vector2 =
-    applyLookForce(firstPersonLookMap, character, commands)
+fun characterLookForce(turnSpeed: Vector2, commands: Commands): Vector2 =
+    applyLookForce(firstPersonLookMap, turnSpeed, commands)
 
 fun fpCameraRotation(velocity: Vector2, delta: Float): Vector3 {
   val deltaVelocity = velocity * delta
   return if (velocity.y != 0f || velocity.x != 0f) {
     Vector3(0f, deltaVelocity.y, deltaVelocity.x)
   } else
-    Vector3()
+    Vector3.zero
 }
 
 fun transitionAxis(negativeMaxChange: Float, positiveMaxChange: Float, current: Float, target: Float): Float {
@@ -87,46 +68,17 @@ fun transitionAxis(negativeMaxChange: Float, positiveMaxChange: Float, current: 
   }
 }
 
-fun updateCharacterRigFacing(commands: Commands, delta: Float): (CharacterRig) -> CharacterRig = { characterRig ->
-  val lookForce = characterLookForce(characterRig, commands)
-  val lookVelocity = Vector2(
-      transitionAxis(maxNegativeLookVelocityXChange(), maxPositiveLookVelocityXChange(), characterRig.lookVelocity.x, lookForce.x),
-      transitionAxis(maxNegativeLookVelocityYChange(), maxPositiveLookVelocityYChange(), characterRig.lookVelocity.y, lookForce.y)
-  )
-  val facingRotation = characterRig.facingRotation + fpCameraRotation(lookVelocity, delta)
-
-  characterRig.copy(
-      lookVelocity = lookVelocity,
-      facingRotation = Vector3(
-          0f,
-          minMax(facingRotation.y, -1.1f, 1.1f),
-          facingRotation.z
-      )
+fun updateLookVelocity(commands: Commands, turnSpeed: Vector2, lookVelocity: Vector2): Vector2 {
+  val lookForce = characterLookForce(turnSpeed, commands)
+  return Vector2(
+      transitionAxis(maxNegativeLookVelocityXChange(), maxPositiveLookVelocityXChange(), lookVelocity.x, lookForce.x),
+      transitionAxis(maxNegativeLookVelocityYChange(), maxPositiveLookVelocityYChange(), lookVelocity.y, lookForce.y)
   )
 }
 
-//fun updateTpCameraRotation(player: Player, character: CharacterRig, delta: Float): Vector3? {
-//  val velocity = character.lookVelocity
-//  val deltaVelocity = velocity * delta
-//  return if (velocity.y != 0f || velocity.x != 0f) {
-//    if (player.viewMode == ViewMode.firstPerson)
-//      Vector3(0f, deltaVelocity.y, deltaVelocity.x)
-//    else {
-//      val hoverCamera = player.hoverCamera
-//      hoverCamera.pitch += deltaVelocity.y
-//      hoverCamera.yaw += deltaVelocity.y
-//      val hoverPitchMin = -1.0f // Up
-//      val hoverPitchMax = 0.0f // Down
-//
-//      if (hoverCamera.pitch > hoverPitchMax)
-//        hoverCamera.pitch = hoverPitchMax
-//
-//      if (hoverCamera.pitch < hoverPitchMin)
-//        hoverCamera.pitch = hoverPitchMin
-//
-//      null
-////      println("p " + hoverCamera.pitch + ", y" + hoverCamera.yaw + " |  vp " + player.lookVelocity.y + ",vy " + player.lookVelocity.z)
-//    }
-//  } else
-//    null
-//}
+fun updateCharacterRigFacing(commands: Commands, movements: List<CharacterRigMovement>, delta: Float): (CharacterRig) -> CharacterRig = { characterRig ->
+  if (characterRig.viewMode == ViewMode.firstPerson)
+    updateFirstPersonCamera(commands, delta)(characterRig)
+  else
+    updateThirdPersonCamera(commands, movements, delta, characterRig)
+}

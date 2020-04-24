@@ -422,3 +422,16 @@ fun radiansToDegrees(radians: Float): Float =
 
 fun degreesToRadians(degrees: Float): Float =
     degrees * Pi / 180f
+
+fun getAngleCourse(source: Float, destination: Float): Float {
+  val full = Pi * 2
+  if (source == destination)
+    return 0f
+
+  val plus = (full + destination - source) % full
+  val minus = (full + source - destination) % full
+  return if (plus < minus)
+    plus
+  else
+    -minus
+}

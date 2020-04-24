@@ -129,6 +129,9 @@ fun updateCharacterRigBulletBodies(bulletState: BulletState, characterRigs: Tabl
 fun characterOrientationZ(characterRig: CharacterRig) =
     Quaternion().rotateZ(characterRig.facingRotation.z - Pi / 2)
 
+fun hoverCameraOrientationZ(characterRig: CharacterRig) =
+    Quaternion().rotateZ(characterRig.hoverCamera!!.yaw - Pi / 2)
+
 fun updateCharacterRigGroundedDistance(bulletState: BulletState, hand: CharacterRigHand): (CharacterRig) -> CharacterRig = { characterRig ->
   characterRig.copy(
       groundDistance = updateCharacterStepHeight(bulletState, hand)

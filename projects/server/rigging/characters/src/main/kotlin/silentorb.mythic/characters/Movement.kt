@@ -2,10 +2,7 @@ package silentorb.mythic.characters
 
 import silentorb.mythic.ent.Id
 import silentorb.mythic.ent.Table
-import silentorb.mythic.happenings.CommandName
-import silentorb.mythic.happenings.CommonCharacterCommands
-import silentorb.mythic.happenings.Commands
-import silentorb.mythic.happenings.filterCommands
+import silentorb.mythic.happenings.*
 import silentorb.mythic.physics.Body
 import silentorb.mythic.physics.LinearImpulse
 import silentorb.mythic.physics.PhysicsDeck
@@ -40,7 +37,7 @@ fun joinInputVector(commands: Commands, commandMap: Map<CommandName, Vector3>): 
   }
 }
 
-fun getHorizontalLookAtAngle(lookAt: Vector2fMinimal) =
+fun getHorizontalLookAtAngle(lookAt: Vector2fMinimal): Float =
     getAngle(Vector2(1f, 0f), lookAt.xy())
 
 fun getVerticalLookAtAngle(lookAt: Vector3) =
@@ -56,24 +53,39 @@ fun getMovementImpulseVector(baseSpeed: Float, velocity: Vector3, commandVector:
   return finalImpulseVector
 }
 
-fun characterMovementFp(commands: Commands, characterRig: CharacterRig, id: Id, body: Body): LinearImpulse? {
+fun characterMovement(commands: Commands, characterRig: CharacterRig, id: Id, body: Body): CharacterRigMovement? {
   val offsetVector = joinInputVector(commands, playerMoveMap)
   return if (offsetVector != null) {
     val airControlMod = if (isGrounded(characterRig)) 1f else airControlReduction
-    val direction = characterOrientationZ(characterRig) * offsetVector * airControlMod
+    val orientation = if (characterRig.viewMode == ViewMode.firstPerson)
+      characterOrientationZ(characterRig)
+    else
+      hoverCameraOrientationZ(characterRig)
+
+    val direction = orientation * offsetVector * airControlMod
     val baseSpeed = characterRig.maxSpeed
     val maxImpulseLength = baseSpeed
     val commandVector = direction * maxImpulseLength
     val horizontalVelocity = body.velocity.copy(z = 0f)
     val impulseVector = getMovementImpulseVector(baseSpeed, horizontalVelocity, commandVector)
     val finalImpulse = impulseVector * 5f
-    LinearImpulse(body = id, offset = finalImpulse)
+    CharacterRigMovement(actor = id, offset = finalImpulse)
   } else {
     null
   }
 }
 
-fun allCharacterMovements(deck: PhysicsDeck, characterRigs: Table<CharacterRig>, commands: Commands): List<LinearImpulse> =
-    characterRigs
-        .filter { characterRigs[it.key]!!.isActive }
-        .mapNotNull { characterMovementFp(filterCommands(it.key, commands), it.value, it.key, deck.bodies[it.key]!!) }
+fun allCharacterMovements(deck: PhysicsDeck, characterRigs: Table<CharacterRig>, events: Events): List<CharacterRigMovement> {
+  val commands = events
+      .filterIsInstance<CharacterCommand>()
+      .filter { playerMoveMap.keys.contains(it.type) }
+
+  return characterRigs
+      .filter { characterRigs[it.key]!!.isActive }
+      .mapNotNull { characterMovement(filterCommands(it.key, commands), it.value, it.key, deck.bodies[it.key]!!) }
+}
+
+fun characterMovementsToLinearImpulses(events: Events): List<LinearImpulse> =
+    events
+        .filterIsInstance<CharacterRigMovement>()
+        .map { LinearImpulse(body = it.actor, offset = it.offset) }

@@ -1,5 +1,7 @@
 package silentorb.mythic.characters
 
+import silentorb.mythic.ent.Id
+import silentorb.mythic.happenings.GameEvent
 import silentorb.mythic.spatial.Quaternion
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
@@ -10,9 +12,11 @@ enum class ViewMode {
 }
 
 data class HoverCamera(
-    var pitch: Float = -0.4f,
-    var yaw: Float = 0f,
-    var distance: Float = 7f
+    val pitch: Float,
+    val yaw: Float,
+    val distance: Float,
+    val facingDestination: Float,
+    val turnVelocity: Float = 0f
 )
 
 data class CharacterRig(
@@ -23,7 +27,7 @@ data class CharacterRig(
     val maxSpeed: Float,
     val turnSpeed: Vector2,
     val viewMode: ViewMode,
-    val hoverCamera: HoverCamera = HoverCamera()
+    val hoverCamera: HoverCamera?
 ) {
   val facingQuaternion: Quaternion
     get() = Quaternion()
@@ -33,3 +37,8 @@ data class CharacterRig(
   val facingVector: Vector3
     get() = getFacingVector(facingQuaternion)
 }
+
+data class CharacterRigMovement(
+    val actor: Id,
+    val offset: Vector3
+) : GameEvent
