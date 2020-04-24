@@ -49,7 +49,7 @@ private fun castFootStepRay(walkableMask: Int, dynamicsWorld: btDiscreteDynamics
   return { it: Vector3 ->
     val start = basePosition + it
     val end = start + endOffset
-    val result = castCollisionRay(dynamicsWorld, start, end, walkableMask)
+    val result = firstRayHit(dynamicsWorld, start, end, walkableMask)
     if (result != null)
       start.z - result.hitPoint.z
     else

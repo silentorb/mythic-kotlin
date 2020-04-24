@@ -1,8 +1,12 @@
 package silentorb.mythic.characters
 
+import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld
+import silentorb.mythic.ent.Id
+import silentorb.mythic.ent.Table
 import silentorb.mythic.happenings.CommandName
-import silentorb.mythic.happenings.CommonCharacterCommands
 import silentorb.mythic.happenings.Commands
+import silentorb.mythic.happenings.CommonCharacterCommands
+import silentorb.mythic.physics.Body
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.minMax
@@ -76,9 +80,12 @@ fun updateLookVelocity(commands: Commands, turnSpeed: Vector2, lookVelocity: Vec
   )
 }
 
-fun updateCharacterRigFacing(commands: Commands, movements: List<CharacterRigMovement>, delta: Float): (CharacterRig) -> CharacterRig = { characterRig ->
+fun updateCharacterRigFacing(dynamicsWorld: btDiscreteDynamicsWorld, cameraCollisionMask: Int,
+                             bodies: Table<Body>, id: Id, commands: Commands,
+                             movements: List<CharacterRigMovement>, delta: Float
+): (CharacterRig) -> CharacterRig = { characterRig ->
   if (characterRig.viewMode == ViewMode.firstPerson)
     updateFirstPersonCamera(commands, delta)(characterRig)
   else
-    updateThirdPersonCamera(commands, movements, delta, characterRig)
+    updateThirdPersonCamera(dynamicsWorld, cameraCollisionMask, bodies[id]!!, commands, movements, delta, characterRig)
 }
