@@ -6,6 +6,8 @@ import silentorb.mythic.spatial.Vector3
 
 data class CollisionObject(
     val shape: Shape,
+    val groups: Int,
+    val mask: Int,
     val isSolid: Boolean = true
 )
 

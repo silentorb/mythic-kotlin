@@ -1,15 +1,11 @@
 package silentorb.mythic.characters
 
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld
-import silentorb.mythic.spatial.times
 import silentorb.mythic.ent.Id
 import silentorb.mythic.ent.Table
+import silentorb.mythic.ent.firstFloatSortedBy
 import silentorb.mythic.physics.*
 import silentorb.mythic.spatial.*
-import silentorb.mythic.happenings.Commands
-import silentorb.mythic.happenings.filterCommands
-import silentorb.mythic.ent.firstFloatSortedBy
-import kotlin.math.abs
 import kotlin.math.min
 
 const val defaultCharacterRadius = 0.3f
@@ -45,7 +41,7 @@ fun footOffsets(radius: Float): List<Vector3> =
 
 private const val noHitValue = 1f
 
-private fun castFootStepRay(dynamicsWorld: btDiscreteDynamicsWorld, bodyPosition: Vector3, footHeight: Float,
+private fun castFootStepRay(walkableMask: Int, dynamicsWorld: btDiscreteDynamicsWorld, bodyPosition: Vector3, footHeight: Float,
                             shapeHeight: Float): (Vector3) -> Float? {
   val basePosition = bodyPosition + Vector3(0f, 0f, -shapeHeight / 2f + footHeight)
   val rayLength = footHeight * 2f
@@ -53,7 +49,7 @@ private fun castFootStepRay(dynamicsWorld: btDiscreteDynamicsWorld, bodyPosition
   return { it: Vector3 ->
     val start = basePosition + it
     val end = start + endOffset
-    val result = castCollisionRay(dynamicsWorld, start, end)
+    val result = castCollisionRay(dynamicsWorld, start, end, walkableMask)
     if (result != null)
       start.z - result.hitPoint.z
     else
@@ -67,14 +63,14 @@ data class CharacterRigHand(
     val collisionObject: CollisionObject
 )
 
-fun updateCharacterStepHeight(bulletState: BulletState, hand: CharacterRigHand): Float {
+fun updateCharacterStepHeight(bulletState: BulletState, walkableMask: Int, hand: CharacterRigHand): Float {
   val body = hand.body
   val collisionObject = hand.collisionObject
   val shape = collisionObject.shape
   val radius = shape.radius
   val footHeight = maxFootStepHeight
   val offsets = footOffsets(radius).plus(Vector3.zero)
-  val cast = castFootStepRay(bulletState.dynamicsWorld, body.position, footHeight, shape.height)
+  val cast = castFootStepRay(walkableMask, bulletState.dynamicsWorld, body.position, footHeight, shape.height)
   val centerDistance = cast(Vector3.zero)
   if (centerDistance == null) {
     return noHitValue
@@ -132,9 +128,9 @@ fun characterOrientationZ(characterRig: CharacterRig) =
 fun hoverCameraOrientationZ(characterRig: CharacterRig) =
     Quaternion().rotateZ(characterRig.hoverCamera!!.yaw - Pi / 2)
 
-fun updateCharacterRigGroundedDistance(bulletState: BulletState, hand: CharacterRigHand): (CharacterRig) -> CharacterRig = { characterRig ->
+fun updateCharacterRigGroundedDistance(bulletState: BulletState, walkableMask: Int, hand: CharacterRigHand): (CharacterRig) -> CharacterRig = { characterRig ->
   characterRig.copy(
-      groundDistance = updateCharacterStepHeight(bulletState, hand)
+      groundDistance = updateCharacterStepHeight(bulletState, walkableMask, hand)
   )
 }
 

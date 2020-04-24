@@ -435,3 +435,6 @@ fun getAngleCourse(source: Float, destination: Float): Float {
   else
     -minus
 }
+
+fun getAngleGap(a: Float, b: Float): Float =
+    abs(getAngleCourse(a, b))

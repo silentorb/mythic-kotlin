@@ -17,7 +17,7 @@ fun updateThirdPersonCamera(commands: Commands, movements: List<CharacterRigMove
                             characterRig: CharacterRig): CharacterRig {
   val lookVelocity = updateLookVelocity(commands, Vector2(4f, 2f), characterRig.lookVelocity)
   val facing = characterRig.facingRotation.z
-  val hoverCamera = characterRig.hoverCamera ?: HoverCamera(0f, 0f, 5f, facing)
+  val hoverCamera = characterRig.hoverCamera ?: HoverCamera(0f, 0f, 5f, facing, facing)
   val yaw = hoverCamera.yaw + lookVelocity.x * delta
   val pitch = hoverCamera.pitch - lookVelocity.y * delta
 
@@ -26,20 +26,31 @@ fun updateThirdPersonCamera(commands: Commands, movements: List<CharacterRigMove
 
   val movement = movements.firstOrNull()
 
-  val facingDestination = if (movement != null)
+  val facingDestinationCandidate = if (movement != null) {
     getHorizontalLookAtAngle(movement.offset)
-  else
+  } else
     hoverCamera.facingDestination
 
-  val turnVelocity = if (movement != null) {
-    val facingGap = getAngleCourse(facing, facingDestination)
-    val maxFacingChange = min(0.3f, abs(hoverCamera.turnVelocity) + 0.02f)
-    val change = minMax(facingGap, -maxFacingChange, maxFacingChange)
-//    val k = transitionAxis(0.03f, 0.06f, hoverCamera.turnVelocity, rawChange)
-    println("$change $facingGap ${movement.offset.length()}")
-    change
+  val facingDestination = if (movement != null) {
+    val range = Pi / 4f
+    if (getAngleGap(facingDestinationCandidate, facing) < range ||
+        getAngleGap(facingDestinationCandidate, hoverCamera.facingDestinationCandidate) < range) {
+      facingDestinationCandidate
+    } else {
+      hoverCamera.facingDestination
+    }
   } else
-    0f
+    hoverCamera.facingDestination
+
+  val facingRotation = if (movement != null) {
+    val facingGap = getAngleCourse(facing, facingDestination)
+    val maxFacingChange = 0.3f
+    val change = minMax(facingGap, -maxFacingChange, maxFacingChange)
+//    println("$change $facingGap ${movement.offset} ${movement.offset.length()}")
+    Vector3(0f, 0f, facing + change
+    )
+  } else
+    characterRig.facingRotation
 
   return characterRig.copy(
       lookVelocity = lookVelocity,
@@ -47,12 +58,8 @@ fun updateThirdPersonCamera(commands: Commands, movements: List<CharacterRigMove
           yaw = yaw,
           pitch = pitch,
           facingDestination = facingDestination,
-          turnVelocity = turnVelocity
+          facingDestinationCandidate = facingDestinationCandidate
       ),
-      facingRotation = if (movement != null)
-        Vector3(0f, 0f, facing + turnVelocity
-        )
-      else
-        characterRig.facingRotation
+      facingRotation = facingRotation
   )
 }

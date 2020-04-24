@@ -9,8 +9,8 @@ data class DistanceRaycastResult(
     val collisionObject: Id
 )
 
-fun castCollisionRay(dynamicsWorld: btDiscreteDynamicsWorld, start: Vector3, end: Vector3): DistanceRaycastResult? {
-  val callback = firstRayHit(dynamicsWorld, start, end)
+fun castCollisionRay(dynamicsWorld: btDiscreteDynamicsWorld, start: Vector3, end: Vector3, mask: Int?): DistanceRaycastResult? {
+  val callback = firstRayHit(dynamicsWorld, start, end, mask)
   return if (callback != null) {
 //    println(" $collisionObjectId $distance")
     return DistanceRaycastResult(

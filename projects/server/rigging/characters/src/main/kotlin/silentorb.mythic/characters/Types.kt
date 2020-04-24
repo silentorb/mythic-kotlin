@@ -16,7 +16,7 @@ data class HoverCamera(
     val yaw: Float,
     val distance: Float,
     val facingDestination: Float,
-    val turnVelocity: Float = 0f
+    val facingDestinationCandidate: Float // Delays facing changes for one frame to filter out brief input aberrations
 )
 
 data class CharacterRig(

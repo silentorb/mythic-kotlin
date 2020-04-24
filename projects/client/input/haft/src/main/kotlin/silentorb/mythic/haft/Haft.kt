@@ -1,11 +1,11 @@
 package silentorb.mythic.haft
 
 import silentorb.mythic.debugging.debugLog
+import silentorb.mythic.debugging.getDebugBoolean
 import silentorb.mythic.debugging.getDebugString
 import silentorb.mythic.platforming.InputEvent
 import silentorb.mythic.spatial.Vector2
 
-val DEBUG_INPUT = getDebugString("DEBUG_INPUT") != null
 val DEBUG_INPUT_COUNTS = getDebugString("DEBUG_INPUT_COUNTS") != null
 
 enum class DeviceIndex {
@@ -100,7 +100,7 @@ fun mapEventsToCommands(deviceStates: List<InputDeviceState>, getBinding: Bindin
         if (bindingPair != null) {
           val (binding, target, isStroke) = bindingPair
           if (!isStroke || deviceStates.dropLast(1).last().events.none(matches(event))) {
-            if (DEBUG_INPUT)
+            if (getDebugBoolean("DEBUG_INPUT"))
               debugLog("Haft Command: isStroke $isStroke ${binding.command} $target ${event.value}")
             HaftCommand(
                 type = binding.command,

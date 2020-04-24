@@ -7,7 +7,6 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState
 import silentorb.mythic.ent.Id
 import silentorb.mythic.ent.Table
-import silentorb.mythic.happenings.Events
 import silentorb.mythic.sculpting.ImmutableFace
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Pi
@@ -87,8 +86,8 @@ fun createGhostBody(body: Body, shape: btCollisionShape): btCollisionObject {
   val btBody = btCollisionObject()
   btBody.collisionShape = shape
   btBody.worldTransform = toGdxMatrix4(getBodyTransform(body))
-  val j = btBody.collisionFlags
-  btBody.collisionFlags = btBody.collisionFlags or btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE
+//  val j = btBody.collisionFlags
+//  btBody.collisionFlags = btBody.collisionFlags or btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE
   return btBody
 }
 
@@ -97,13 +96,15 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
 
   val newDynamicBodies = deck.dynamicBodies
       .filterKeys { key ->
-        !bulletState.dynamicBodies.containsKey(key) && deck.collisionShapes.contains(key)
+        !bulletState.dynamicBodies.containsKey(key) && deck.collisionObjects.contains(key)
       }
       .map { (key, dynamicBody) ->
         val body = deck.bodies[key]!!
-        val shape = createCollisionShape(deck.collisionShapes[key]!!.shape, body.scale)
+        val collisionObject = deck.collisionObjects[key]!!
+        val shape = createCollisionShape(collisionObject.shape, body.scale)
         val hingeInfo = dynamicBody.hinge
         val bulletBody = createBulletDynamicObject(body, dynamicBody, shape, hingeInfo != null)
+
         if (hingeInfo != null) {
           val hinge = btHingeConstraint(bulletBody, toGdxVector3(hingeInfo.pivot * body.scale), toGdxVector3(hingeInfo.axis), true)
 //          hinge.enableAngularMotor(true, 1f, 1f)
@@ -120,7 +121,7 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
         }
         bulletBody.userData = key
         bulletBody.linearVelocity = toGdxVector3(body.velocity)
-        bulletState.dynamicsWorld.addRigidBody(bulletBody)
+        bulletState.dynamicsWorld.addRigidBody(bulletBody, collisionObject.groups, collisionObject.mask)
 
         // Per-object bullet gravity needs to be set after the body is added to the world or the gravity is ignore.
         // (Either a design flaw or bug...)
@@ -130,7 +131,7 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
         Pair(key, bulletBody)
       }
 
-  val newStaticBodies = deck.collisionShapes
+  val newStaticBodies = deck.collisionObjects
       .filterKeys { key ->
         !deck.dynamicBodies.containsKey(key) && !bulletState.staticBodies.containsKey(key)
       }
@@ -143,7 +144,7 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
           createGhostBody(body, shape)
 
         collisionObject.userData = key
-        bulletState.dynamicsWorld.addCollisionObject(collisionObject)
+        bulletState.dynamicsWorld.addCollisionObject(collisionObject, shapeDefinition.groups, shapeDefinition.mask)
         Pair(key, collisionObject)
       }
 

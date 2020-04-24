@@ -94,10 +94,13 @@ data class BaseRayCastResult(
     val hitPoint: Vector3
 )
 
-fun firstRayHit(dynamicsWorld: btDiscreteDynamicsWorld, start: Vector3, end: Vector3): BaseRayCastResult? {
+fun firstRayHit(dynamicsWorld: btDiscreteDynamicsWorld, start: Vector3, end: Vector3, mask: Int?): BaseRayCastResult? {
   val start2 = toGdxVector3(start)
   val end2 = toGdxVector3(end)
   val callback = ClosestRayResultCallback(start2, end2)
+  if (mask != null)
+    callback.collisionFilterMask = mask
+
   dynamicsWorld.collisionWorld.rayTest(start2, end2, callback)
   val hasHit = callback.hasHit()
   val result = if (hasHit) {
@@ -139,7 +142,7 @@ data class LinearImpulse(
 
 data class PhysicsDeck(
     val bodies: Table<Body>,
-    val collisionShapes: Table<CollisionObject>,
+    val collisionObjects: Table<CollisionObject>,
     val dynamicBodies: Table<DynamicBody>
 )
 

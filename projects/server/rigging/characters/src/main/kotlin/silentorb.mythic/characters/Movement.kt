@@ -56,23 +56,26 @@ fun getMovementImpulseVector(baseSpeed: Float, velocity: Vector3, commandVector:
 fun characterMovement(commands: Commands, characterRig: CharacterRig, id: Id, body: Body): CharacterRigMovement? {
   val offsetVector = joinInputVector(commands, playerMoveMap)
   return if (offsetVector != null) {
-    val airControlMod = if (isGrounded(characterRig)) 1f else airControlReduction
     val orientation = if (characterRig.viewMode == ViewMode.firstPerson)
       characterOrientationZ(characterRig)
     else
       hoverCameraOrientationZ(characterRig)
 
-    val direction = orientation * offsetVector * airControlMod
-    val baseSpeed = characterRig.maxSpeed
-    val maxImpulseLength = baseSpeed
-    val commandVector = direction * maxImpulseLength
-    val horizontalVelocity = body.velocity.copy(z = 0f)
-    val impulseVector = getMovementImpulseVector(baseSpeed, horizontalVelocity, commandVector)
-    val finalImpulse = impulseVector * 5f
-    CharacterRigMovement(actor = id, offset = finalImpulse)
+    val offset = orientation * offsetVector
+    CharacterRigMovement(actor = id, offset = offset)
   } else {
     null
   }
+}
+
+fun characterMovementToImpulse(event: CharacterRigMovement, characterRig: CharacterRig, velocity: Vector3): LinearImpulse {
+  val baseSpeed = characterRig.maxSpeed
+  val airControlMod = if (isGrounded(characterRig)) 1f else airControlReduction
+  val commandVector = event.offset * baseSpeed * airControlMod
+  val horizontalVelocity = velocity.copy(z = 0f)
+  val impulseVector = getMovementImpulseVector(baseSpeed, horizontalVelocity, commandVector)
+  val offset = impulseVector * 5f
+  return LinearImpulse(body = event.actor, offset = offset)
 }
 
 fun allCharacterMovements(deck: PhysicsDeck, characterRigs: Table<CharacterRig>, events: Events): List<CharacterRigMovement> {
@@ -85,7 +88,8 @@ fun allCharacterMovements(deck: PhysicsDeck, characterRigs: Table<CharacterRig>,
       .mapNotNull { characterMovement(filterCommands(it.key, commands), it.value, it.key, deck.bodies[it.key]!!) }
 }
 
-fun characterMovementsToLinearImpulses(events: Events): List<LinearImpulse> =
+fun characterMovementsToImpulses(bodies: Table<Body>, characterRigs: Table<CharacterRig>,
+                                 events: Events): List<LinearImpulse> =
     events
         .filterIsInstance<CharacterRigMovement>()
-        .map { LinearImpulse(body = it.actor, offset = it.offset) }
+        .map { characterMovementToImpulse(it, characterRigs[it.actor]!!, bodies[it.actor]!!.velocity) }
