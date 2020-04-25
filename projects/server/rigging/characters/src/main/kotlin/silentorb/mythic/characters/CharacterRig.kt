@@ -131,12 +131,13 @@ fun characterOrientationZ(characterRig: CharacterRig) =
     Quaternion().rotateZ(characterRig.facingRotation.z - Pi / 2)
 
 fun hoverCameraOrientationZ(thirdPersonRig: ThirdPersonRig) =
-    Quaternion().rotateZ(thirdPersonRig.yaw - Pi / 2)
+    Quaternion().rotateZ(thirdPersonRig.orientation.angleZ - Pi / 2)
 
 fun interpolateCharacterRigs(scalar: Float, first: Table<CharacterRig>, second: Table<CharacterRig>) =
     interpolateTables(scalar, first, second) { s, a, b ->
       a.copy(
-          facingRotation = interpolate(s, a.facingRotation, b.facingRotation)
+          facingRotation = interpolate(s, a.facingRotation, b.facingRotation),
+          facingOrientation = Quaternion(a.facingOrientation).nlerp(b.facingOrientation, s)
       )
     }
 
@@ -169,6 +170,7 @@ fun updateCharacterRig(
     characterRig.copy(
         groundDistance = updateCharacterStepHeight(bulletState, walkableMask, bodies[id]!!, collisionObjects[id]!!),
         facingRotation = facingRotation,
+        facingOrientation = characterRigOrentation(facingRotation),
         firstPersonLookVelocity = firstPersonLookVelocity
     )
 

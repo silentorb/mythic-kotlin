@@ -5,7 +5,7 @@ import org.joml.*
 import org.joml.internal.Options
 import org.joml.internal.SharedLibraryLoader
 import silentorb.mythic.spatial.Matrix4f
-import silentorb.mythic.spatial.Quaternionf
+import silentorb.mythic.spatial.Quaternion
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector4
 
@@ -152,7 +152,7 @@ abstract class MemUtil {
   abstract fun copy4x3(src: Matrix4x3f, dest: Matrix4f)
   abstract fun copy(src: Vector4, dst: Vector4)
   abstract fun copy(src: Vector4i, dst: Vector4i)
-  abstract fun copy(src: Quaternionf, dst: Quaternionf)
+  abstract fun copy(src: Quaternion, dst: Quaternion)
   abstract fun copy(arr: FloatArray, off: Int, dest: Matrix4f)
   abstract fun copy(arr: FloatArray, off: Int, dest: Matrix3f)
   abstract fun copy(arr: FloatArray, off: Int, dest: Matrix4x3f)
@@ -175,7 +175,7 @@ abstract class MemUtil {
   abstract fun identity(dest: Matrix3f)
   abstract fun identity(dest: Matrix3x2f)
   abstract fun identity(dest: Matrix3x2d)
-  abstract fun identity(dest: Quaternionf)
+  abstract fun identity(dest: Quaternion)
   abstract fun swap(m1: Matrix4f, m2: Matrix4f)
   abstract fun swap(m1: Matrix4x3f, m2: Matrix4x3f)
   abstract fun swap(m1: Matrix3f, m2: Matrix3f)
@@ -187,12 +187,12 @@ abstract class MemUtil {
   abstract fun zero(dest: Vector4)
   abstract fun zero(dest: Vector4i)
 
-  abstract fun putMatrix3f(q: Quaternionf, position: Int, dest: ByteBuffer)
-  abstract fun putMatrix3f(q: Quaternionf, position: Int, dest: FloatBuffer)
-  abstract fun putMatrix4f(q: Quaternionf, position: Int, dest: ByteBuffer)
-  abstract fun putMatrix4f(q: Quaternionf, position: Int, dest: FloatBuffer)
-  abstract fun putMatrix4x3f(q: Quaternionf, position: Int, dest: ByteBuffer)
-  abstract fun putMatrix4x3f(q: Quaternionf, position: Int, dest: FloatBuffer)
+  abstract fun putMatrix3f(q: Quaternion, position: Int, dest: ByteBuffer)
+  abstract fun putMatrix3f(q: Quaternion, position: Int, dest: FloatBuffer)
+  abstract fun putMatrix4f(q: Quaternion, position: Int, dest: ByteBuffer)
+  abstract fun putMatrix4f(q: Quaternion, position: Int, dest: FloatBuffer)
+  abstract fun putMatrix4x3f(q: Quaternion, position: Int, dest: ByteBuffer)
+  abstract fun putMatrix4x3f(q: Quaternion, position: Int, dest: FloatBuffer)
 
   abstract operator fun set(dest: Matrix4f, col0: Vector4, col1: Vector4, col2: Vector4, col3: Vector4)
   abstract operator fun set(dest: Matrix4x3f, col0: Vector3m, col1: Vector3m, col2: Vector3m, col3: Vector3m)
@@ -1796,7 +1796,7 @@ abstract class MemUtil {
       dst.w = src.w
     }
 
-    override fun copy(src: Quaternionf, dst: Quaternionf) {
+    override fun copy(src: Quaternion, dst: Quaternion) {
       dst.x = src.x
       dst.y = src.y
       dst.z = src.z
@@ -2190,7 +2190,7 @@ abstract class MemUtil {
       dest._m21(0.0)
     }
 
-    override fun identity(dest: Quaternionf) {
+    override fun identity(dest: Quaternion) {
       dest.x = 0.0f
       dest.y = 0.0f
       dest.z = 0.0f
@@ -2398,7 +2398,7 @@ abstract class MemUtil {
       dest.w = 0
     }
 
-    override fun putMatrix3f(q: Quaternionf, position: Int, dest: ByteBuffer) {
+    override fun putMatrix3f(q: Quaternion, position: Int, dest: ByteBuffer) {
       val w2 = q.w * q.w
       val x2 = q.x * q.x
       val y2 = q.y * q.y
@@ -2420,7 +2420,7 @@ abstract class MemUtil {
       dest.putFloat(position + 32, z2 - y2 - x2 + w2)
     }
 
-    override fun putMatrix3f(q: Quaternionf, position: Int, dest: FloatBuffer) {
+    override fun putMatrix3f(q: Quaternion, position: Int, dest: FloatBuffer) {
       val w2 = q.w * q.w
       val x2 = q.x * q.x
       val y2 = q.y * q.y
@@ -2442,7 +2442,7 @@ abstract class MemUtil {
       dest.put(position + 8, z2 - y2 - x2 + w2)
     }
 
-    override fun putMatrix4f(q: Quaternionf, position: Int, dest: ByteBuffer) {
+    override fun putMatrix4f(q: Quaternion, position: Int, dest: ByteBuffer) {
       val w2 = q.w * q.w
       val x2 = q.x * q.x
       val y2 = q.y * q.y
@@ -2469,7 +2469,7 @@ abstract class MemUtil {
       dest.putLong(position + 56, 0x3F80000000000000L)
     }
 
-    override fun putMatrix4f(q: Quaternionf, position: Int, dest: FloatBuffer) {
+    override fun putMatrix4f(q: Quaternion, position: Int, dest: FloatBuffer) {
       val w2 = q.w * q.w
       val x2 = q.x * q.x
       val y2 = q.y * q.y
@@ -2498,7 +2498,7 @@ abstract class MemUtil {
       dest.put(position + 15, 1.0f)
     }
 
-    override fun putMatrix4x3f(q: Quaternionf, position: Int, dest: ByteBuffer) {
+    override fun putMatrix4x3f(q: Quaternion, position: Int, dest: ByteBuffer) {
       val w2 = q.w * q.w
       val x2 = q.x * q.x
       val y2 = q.y * q.y
@@ -2522,7 +2522,7 @@ abstract class MemUtil {
       dest.putFloat(position + 44, 0.0f)
     }
 
-    override fun putMatrix4x3f(q: Quaternionf, position: Int, dest: FloatBuffer) {
+    override fun putMatrix4x3f(q: Quaternion, position: Int, dest: FloatBuffer) {
       val w2 = q.w * q.w
       val x2 = q.x * q.x
       val y2 = q.y * q.y
@@ -3253,7 +3253,7 @@ abstract class MemUtil {
       dst.y = UNSAFE.getInt(null, srcAddr + 4)
     }
 
-    fun putMatrix3f(q: Quaternionf, addr: Long) {
+    fun putMatrix3f(q: Quaternion, addr: Long) {
       val dx = q.x + q.x
       val dy = q.y + q.y
       val dz = q.z + q.z
@@ -3277,7 +3277,7 @@ abstract class MemUtil {
       UNSAFE.putFloat(null, addr + 32, 1.0f - q11 - q00)
     }
 
-    fun putMatrix4f(q: Quaternionf, addr: Long) {
+    fun putMatrix4f(q: Quaternion, addr: Long) {
       val dx = q.x + q.x
       val dy = q.y + q.y
       val dz = q.z + q.z
@@ -3303,7 +3303,7 @@ abstract class MemUtil {
       putLong(null, addr + 56, 0x3F80000000000000L)
     }
 
-    fun putMatrix4x3f(q: Quaternionf, addr: Long) {
+    fun putMatrix4x3f(q: Quaternion, addr: Long) {
       val dx = q.x + q.x
       val dy = q.y + q.y
       val dz = q.z + q.z
@@ -3329,7 +3329,7 @@ abstract class MemUtil {
       UNSAFE.putFloat(null, addr + 44, 0.0f)
     }
 
-    override fun putMatrix3f(q: Quaternionf, position: Int, dest: ByteBuffer) {
+    override fun putMatrix3f(q: Quaternion, position: Int, dest: ByteBuffer) {
       if (Options.DEBUG && !dest.isDirect) {
         throwNoDirectBufferException()
       }
@@ -3337,7 +3337,7 @@ abstract class MemUtil {
       putMatrix3f(q, addr)
     }
 
-    override fun putMatrix3f(q: Quaternionf, position: Int, dest: FloatBuffer) {
+    override fun putMatrix3f(q: Quaternion, position: Int, dest: FloatBuffer) {
       if (Options.DEBUG && !dest.isDirect) {
         throwNoDirectBufferException()
       }
@@ -3345,7 +3345,7 @@ abstract class MemUtil {
       putMatrix3f(q, addr)
     }
 
-    override fun putMatrix4f(q: Quaternionf, position: Int, dest: ByteBuffer) {
+    override fun putMatrix4f(q: Quaternion, position: Int, dest: ByteBuffer) {
       if (Options.DEBUG && !dest.isDirect) {
         throwNoDirectBufferException()
       }
@@ -3353,7 +3353,7 @@ abstract class MemUtil {
       putMatrix4f(q, addr)
     }
 
-    override fun putMatrix4f(q: Quaternionf, position: Int, dest: FloatBuffer) {
+    override fun putMatrix4f(q: Quaternion, position: Int, dest: FloatBuffer) {
       if (Options.DEBUG && !dest.isDirect) {
         throwNoDirectBufferException()
       }
@@ -3361,7 +3361,7 @@ abstract class MemUtil {
       putMatrix4f(q, addr)
     }
 
-    override fun putMatrix4x3f(q: Quaternionf, position: Int, dest: ByteBuffer) {
+    override fun putMatrix4x3f(q: Quaternion, position: Int, dest: ByteBuffer) {
       if (Options.DEBUG && !dest.isDirect) {
         throwNoDirectBufferException()
       }
@@ -3369,7 +3369,7 @@ abstract class MemUtil {
       putMatrix4x3f(q, addr)
     }
 
-    override fun putMatrix4x3f(q: Quaternionf, position: Int, dest: FloatBuffer) {
+    override fun putMatrix4x3f(q: Quaternion, position: Int, dest: FloatBuffer) {
       if (Options.DEBUG && !dest.isDirect) {
         throwNoDirectBufferException()
       }
@@ -4449,15 +4449,15 @@ abstract class MemUtil {
 
       @Throws(NoSuchFieldException::class, SecurityException::class)
       private fun checkQuaternionf(): Long {
-        var f = Quaternionf::class.java.getDeclaredField("x")
+        var f = Quaternion::class.java.getDeclaredField("x")
         val Quaternionf_x = UNSAFE.objectFieldOffset(f)
         // Validate expected field offsets
         val names = arrayOf("y", "z", "w")
         for (i in 1..3) {
-          f = Quaternionf::class.java.getDeclaredField(names[i - 1])
+          f = Quaternion::class.java.getDeclaredField(names[i - 1])
           val offset = UNSAFE.objectFieldOffset(f)
           if (offset != Quaternionf_x + (i shl 2))
-            throw UnsupportedOperationException("Unexpected Quaternionf element offset")
+            throw UnsupportedOperationException("Unexpected Quaternion element offset")
         }
         return Quaternionf_x
       }

@@ -498,19 +498,19 @@ data class Vector4(
   /**
    * Rotate this vector by the given quaternion `quat` and store the result in `this`.
    *
-   * @see Quaternionf.transform
+   * @see Quaternion.transform
    * @param quat
    * the quaternion to rotate this vector
    * @return a vector holding the result
    */
-  fun rotate(quat: Quaternionfc): Vector4 {
+  fun rotate(quat: Quaternion): Vector4 {
     return rotate(quat, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Vector4#rotate(Quaternionf, Vector4)
+     * @see Vector4#rotate(Quaternion, Vector4)
      */
-  fun rotate(quat: Quaternionfc, dest: Vector4): Vector4 {
+  fun rotate(quat: Quaternion, dest: Vector4): Vector4 {
     return quat.transform(this, dest)
   }
 

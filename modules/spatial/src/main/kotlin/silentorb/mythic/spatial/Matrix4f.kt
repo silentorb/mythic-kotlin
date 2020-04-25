@@ -2058,16 +2058,16 @@ class Matrix4f {
   }
 
   /* (non-Javadoc)
-     * @see Matrix4f#getUnnormalizedRotation(Quaternionf)
+     * @see Matrix4f#getUnnormalizedRotation(Quaternion)
      */
-  fun getUnnormalizedRotation(dest: Quaternionf): Quaternionf {
+  fun getUnnormalizedRotation(dest: Quaternion): Quaternion {
     return dest.setFromUnnormalized(this)
   }
 
   /* (non-Javadoc)
-     * @see Matrix4f#getNormalizedRotation(Quaternionf)
+     * @see Matrix4f#getNormalizedRotation(Quaternion)
      */
-  fun getNormalizedRotation(dest: Quaternionf): Quaternionf {
+  fun getNormalizedRotation(dest: Quaternion): Quaternion {
     return dest.setFromNormalized(this)
   }
 
@@ -2584,7 +2584,7 @@ class Matrix4f {
   }
 
   /**
-   * Set this matrix to the rotation transformation of the given [Quaternionf].
+   * Set this matrix to the rotation transformation of the given [Quaternion].
    *
    *
    * When used with a right-handed coordinate system, the produced rotation will rotate a vector
@@ -2604,10 +2604,10 @@ class Matrix4f {
    *
    * @see .rotate
    * @param quat
-   * the [Quaternionf]
+   * the [Quaternion]
    * @return this
    */
-  fun rotation(quat: Quaternionf): Matrix4f {
+  fun rotation(quat: Quaternion): Matrix4f {
     val w2 = quat.w * quat.w
     val x2 = quat.x * quat.x
     val y2 = quat.y * quat.y
@@ -2740,7 +2740,7 @@ class Matrix4f {
    * @return this
    */
   fun translationRotateScale(translation: Vector3m,
-                             quat: Quaternionf,
+                             quat: Quaternion,
                              scale: Vector3m): Matrix4f {
     return translationRotateScale(translation.x, translation.y, translation.z, quat.x, quat.y, quat.z, quat.w, scale.x, scale.y, scale.z)
   }
@@ -2818,7 +2818,7 @@ class Matrix4f {
    * @return this
    */
   fun translationRotateScale(translation: Vector3m,
-                             quat: Quaternionf,
+                             quat: Quaternion,
                              scale: Float): Matrix4f {
     return translationRotateScale(translation.x, translation.y, translation.z, quat.x, quat.y, quat.z, quat.w, scale, scale, scale)
   }
@@ -2918,7 +2918,7 @@ class Matrix4f {
    * @return this
    */
   fun translationRotateScaleInvert(translation: Vector3m,
-                                   quat: Quaternionf,
+                                   quat: Quaternion,
                                    scale: Vector3m): Matrix4f {
     return translationRotateScaleInvert(translation.x, translation.y, translation.z, quat.x, quat.y, quat.z, quat.w, scale.x, scale.y, scale.z)
   }
@@ -2942,7 +2942,7 @@ class Matrix4f {
    * @return this
    */
   fun translationRotateScaleInvert(translation: Vector3m,
-                                   quat: Quaternionf,
+                                   quat: Quaternion,
                                    scale: Float): Matrix4f {
     return translationRotateScaleInvert(translation.x, translation.y, translation.z, quat.x, quat.y, quat.z, quat.w, scale, scale, scale)
   }
@@ -3075,7 +3075,7 @@ class Matrix4f {
    * @return this
    */
   fun translationRotateScaleMulAffine(translation: Vector3m,
-                                      quat: Quaternionf,
+                                      quat: Quaternion,
                                       scale: Vector3m,
                                       m: Matrix4f): Matrix4f {
     return translationRotateScaleMulAffine(translation.x, translation.y, translation.z, quat.x, quat.y, quat.z, quat.w, scale.x, scale.y, scale.z, m)
@@ -3169,7 +3169,7 @@ class Matrix4f {
    * the quaternion representing a rotation
    * @return this
    */
-  fun translationRotate(tx: Float, ty: Float, tz: Float, quat: Quaternionf): Matrix4f {
+  fun translationRotate(tx: Float, ty: Float, tz: Float, quat: Quaternion): Matrix4f {
     return translationRotate(tx, ty, tz, quat.x, quat.y, quat.z, quat.w)
   }
 
@@ -7781,7 +7781,7 @@ class Matrix4f {
   }
 
   /**
-   * Apply the rotation transformation of the given [Quaternionf] to this matrix and store
+   * Apply the rotation transformation of the given [Quaternion] to this matrix and store
    * the result in `dest`.
    *
    *
@@ -7804,12 +7804,12 @@ class Matrix4f {
    *
    * @see .rotation
    * @param quat
-   * the [Quaternionf]
+   * the [Quaternion]
    * @param dest
    * will hold the result
    * @return dest
    */
-  fun rotate(quat: Quaternionf, dest: Matrix4f): Matrix4f {
+  fun rotate(quat: Quaternion, dest: Matrix4f): Matrix4f {
     if (properties and Matrix4f.PROPERTY_IDENTITY != 0)
       return dest.rotation(quat)
     else if (properties and Matrix4f.PROPERTY_TRANSLATION != 0)
@@ -7819,7 +7819,7 @@ class Matrix4f {
     return rotateGeneric(quat, dest)
   }
 
-  private fun rotateGeneric(quat: Quaternionf, dest: Matrix4f): Matrix4f {
+  private fun rotateGeneric(quat: Quaternion, dest: Matrix4f): Matrix4f {
     val w2 = quat.w * quat.w
     val x2 = quat.x * quat.x
     val y2 = quat.y * quat.y
@@ -7868,7 +7868,7 @@ class Matrix4f {
   }
 
   /**
-   * Apply the rotation transformation of the given [Quaternionf] to this [affine][.isAffine] matrix and store
+   * Apply the rotation transformation of the given [Quaternion] to this [affine][.isAffine] matrix and store
    * the result in `dest`.
    *
    *
@@ -7894,12 +7894,12 @@ class Matrix4f {
    *
    * @see .rotation
    * @param quat
-   * the [Quaternionf]
+   * the [Quaternion]
    * @param dest
    * will hold the result
    * @return dest
    */
-  fun rotateAffine(quat: Quaternionf, dest: Matrix4f): Matrix4f {
+  fun rotateAffine(quat: Quaternion, dest: Matrix4f): Matrix4f {
     val w2 = quat.w * quat.w
     val x2 = quat.x * quat.x
     val y2 = quat.y * quat.y
@@ -7947,7 +7947,7 @@ class Matrix4f {
   }
 
   /**
-   * Apply the rotation transformation of the given [Quaternionf] to this matrix.
+   * Apply the rotation transformation of the given [Quaternion] to this matrix.
    *
    *
    * This method assumes `this` to be [affine][.isAffine].
@@ -7972,15 +7972,15 @@ class Matrix4f {
    *
    * @see .rotation
    * @param quat
-   * the [Quaternionf]
+   * the [Quaternion]
    * @return a matrix holding the result
    */
-  fun rotateAffine(quat: Quaternionf): Matrix4f {
+  fun rotateAffine(quat: Quaternion): Matrix4f {
     return rotateAffine(quat, thisOrNew())
   }
 
   /**
-   * Apply the rotation transformation of the given [Quaternionf] to this matrix, which is assumed to only contain a translation, and store
+   * Apply the rotation transformation of the given [Quaternion] to this matrix, which is assumed to only contain a translation, and store
    * the result in `dest`.
    *
    *
@@ -8006,12 +8006,12 @@ class Matrix4f {
    *
    * @see .rotation
    * @param quat
-   * the [Quaternionf]
+   * the [Quaternion]
    * @param dest
    * will hold the result
    * @return dest
    */
-  fun rotateTranslation(quat: Quaternionf, dest: Matrix4f): Matrix4f {
+  fun rotateTranslation(quat: Quaternion, dest: Matrix4f): Matrix4f {
     val w2 = quat.w * quat.w
     val x2 = quat.x * quat.x
     val y2 = quat.y * quat.y
@@ -8053,7 +8053,7 @@ class Matrix4f {
   }
 
   /**
-   * Apply the rotation transformation of the given [Quaternionf] to this matrix while using <tt>(ox, oy, oz)</tt> as the rotation origin.
+   * Apply the rotation transformation of the given [Quaternion] to this matrix while using <tt>(ox, oy, oz)</tt> as the rotation origin.
    *
    *
    * When used with a right-handed coordinate system, the produced rotation will rotate a vector
@@ -8073,7 +8073,7 @@ class Matrix4f {
    * Reference: [http://en.wikipedia.org](http://en.wikipedia.org/wiki/Rotation_matrix#Quaternion)
    *
    * @param quat
-   * the [Quaternionf]
+   * the [Quaternion]
    * @param ox
    * the x coordinate of the rotation origin
    * @param oy
@@ -8082,14 +8082,14 @@ class Matrix4f {
    * the z coordinate of the rotation origin
    * @return a matrix holding the result
    */
-  fun rotateAround(quat: Quaternionf, ox: Float, oy: Float, oz: Float): Matrix4f {
+  fun rotateAround(quat: Quaternion, ox: Float, oy: Float, oz: Float): Matrix4f {
     return rotateAround(quat, ox, oy, oz, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4f#rotateAround(Quaternionf, float, float, float, Matrix4f)
+     * @see Matrix4f#rotateAround(Quaternion, float, float, float, Matrix4f)
      */
-  fun rotateAround(quat: Quaternionf, ox: Float, oy: Float, oz: Float, dest: Matrix4f): Matrix4f {
+  fun rotateAround(quat: Quaternion, ox: Float, oy: Float, oz: Float, dest: Matrix4f): Matrix4f {
     val w2 = quat.w * quat.w
     val x2 = quat.x * quat.x
     val y2 = quat.y * quat.y
@@ -8141,7 +8141,7 @@ class Matrix4f {
   }
 
   /**
-   * Pre-multiply the rotation transformation of the given [Quaternionf] to this matrix and store
+   * Pre-multiply the rotation transformation of the given [Quaternion] to this matrix and store
    * the result in `dest`.
    *
    *
@@ -8164,12 +8164,12 @@ class Matrix4f {
    *
    * @see .rotation
    * @param quat
-   * the [Quaternionf]
+   * the [Quaternion]
    * @param dest
    * will hold the result
    * @return dest
    */
-  fun rotateLocal(quat: Quaternionf, dest: Matrix4f): Matrix4f {
+  fun rotateLocal(quat: Quaternion, dest: Matrix4f): Matrix4f {
     val w2 = quat.w * quat.w
     val x2 = quat.x * quat.x
     val y2 = quat.y * quat.y
@@ -8226,7 +8226,7 @@ class Matrix4f {
   }
 
   /**
-   * Pre-multiply the rotation transformation of the given [Quaternionf] to this matrix.
+   * Pre-multiply the rotation transformation of the given [Quaternion] to this matrix.
    *
    *
    * When used with a right-handed coordinate system, the produced rotation will rotate a vector
@@ -8248,17 +8248,17 @@ class Matrix4f {
    *
    * @see .rotation
    * @param quat
-   * the [Quaternionf]
+   * the [Quaternion]
    * @return a matrix holding the result
    */
-  fun rotateLocal(quat: Quaternionf): Matrix4f {
+  fun rotateLocal(quat: Quaternion): Matrix4f {
     return rotateLocal(quat, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4f#rotateAroundLocal(Quaternionf, float, float, float, Matrix4f)
+     * @see Matrix4f#rotateAroundLocal(Quaternion, float, float, float, Matrix4f)
      */
-  fun rotateAroundLocal(quat: Quaternionf, ox: Float, oy: Float, oz: Float, dest: Matrix4f): Matrix4f {
+  fun rotateAroundLocal(quat: Quaternion, ox: Float, oy: Float, oz: Float, dest: Matrix4f): Matrix4f {
     val w2 = quat.w * quat.w
     val x2 = quat.x * quat.x
     val y2 = quat.y * quat.y
@@ -8311,7 +8311,7 @@ class Matrix4f {
   }
 
   /**
-   * Pre-multiply the rotation transformation of the given [Quaternionf] to this matrix while using <tt>(ox, oy, oz)</tt>
+   * Pre-multiply the rotation transformation of the given [Quaternion] to this matrix while using <tt>(ox, oy, oz)</tt>
    * as the rotation origin.
    *
    *
@@ -8332,7 +8332,7 @@ class Matrix4f {
    * Reference: [http://en.wikipedia.org](http://en.wikipedia.org/wiki/Rotation_matrix#Quaternion)
    *
    * @param quat
-   * the [Quaternionf]
+   * the [Quaternion]
    * @param ox
    * the x coordinate of the rotation origin
    * @param oy
@@ -8341,7 +8341,7 @@ class Matrix4f {
    * the z coordinate of the rotation origin
    * @return a matrix holding the result
    */
-  fun rotateAroundLocal(quat: Quaternionf, ox: Float, oy: Float, oz: Float): Matrix4f {
+  fun rotateAroundLocal(quat: Quaternion, ox: Float, oy: Float, oz: Float): Matrix4f {
     return rotateAroundLocal(quat, ox, oy, oz, thisOrNew())
   }
 
@@ -8880,7 +8880,7 @@ class Matrix4f {
    *
    *
    * This method can be used to build a reflection transformation based on the orientation of a mirror object in the scene.
-   * It is assumed that the default mirror plane's normal is <tt>(0, 0, 1)</tt>. So, if the given [Quaternionf] is
+   * It is assumed that the default mirror plane's normal is <tt>(0, 0, 1)</tt>. So, if the given [Quaternion] is
    * the identity (does not apply any additional rotation), the reflection plane will be <tt>z=0</tt>, offset by the given `point`.
    *
    *
@@ -8895,14 +8895,14 @@ class Matrix4f {
    * a point on the plane
    * @return a matrix holding the result
    */
-  fun reflect(orientation: Quaternionf, point: Vector3m): Matrix4f {
+  fun reflect(orientation: Quaternion, point: Vector3m): Matrix4f {
     return reflect(orientation, point, thisOrNew())
   }
 
   /* (non-Javadoc)
-     * @see Matrix4f#reflect(Quaternionf, Vector3m, Matrix4f)
+     * @see Matrix4f#reflect(Quaternion, Vector3m, Matrix4f)
      */
-  fun reflect(orientation: Quaternionf, point: Vector3m, dest: Matrix4f): Matrix4f {
+  fun reflect(orientation: Quaternion, point: Vector3m, dest: Matrix4f): Matrix4f {
     val num1 = (orientation.x + orientation.x).toDouble()
     val num2 = (orientation.y + orientation.y).toDouble()
     val num3 = (orientation.z + orientation.z).toDouble()
@@ -9011,7 +9011,7 @@ class Matrix4f {
    *
    *
    * This method can be used to build a reflection transformation based on the orientation of a mirror object in the scene.
-   * It is assumed that the default mirror plane's normal is <tt>(0, 0, 1)</tt>. So, if the given [Quaternionf] is
+   * It is assumed that the default mirror plane's normal is <tt>(0, 0, 1)</tt>. So, if the given [Quaternion] is
    * the identity (does not apply any additional rotation), the reflection plane will be <tt>z=0</tt>, offset by the given `point`.
    *
    * @param orientation
@@ -9020,7 +9020,7 @@ class Matrix4f {
    * a point on the plane
    * @return this
    */
-  fun reflection(orientation: Quaternionf, point: Vector3m): Matrix4f {
+  fun reflection(orientation: Quaternion, point: Vector3m): Matrix4f {
     val num1 = (orientation.x + orientation.x).toDouble()
     val num2 = (orientation.y + orientation.y).toDouble()
     val num3 = (orientation.z + orientation.z).toDouble()

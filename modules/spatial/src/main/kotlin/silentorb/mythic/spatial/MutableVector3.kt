@@ -522,9 +522,9 @@ class MutableVector3 : Vector3int {
   }
 
   /* (non-Javadoc)
-     * @see org.joml.MutableVector3#rotationTo(float, float, float, Quaternionf)
+     * @see org.joml.MutableVector3#rotationTo(float, float, float, Quaternion)
      */
-  fun rotationTo(toDirX: Float, toDirY: Float, toDirZ: Float, dest: Quaternionf): Quaternionf {
+  fun rotationTo(toDirX: Float, toDirY: Float, toDirZ: Float, dest: Quaternion): Quaternion {
     return dest.rotationTo(x, y, z, toDirX, toDirY, toDirZ)
   }
 

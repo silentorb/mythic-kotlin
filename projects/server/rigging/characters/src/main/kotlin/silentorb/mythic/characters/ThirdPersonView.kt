@@ -13,14 +13,6 @@ import silentorb.mythic.spatial.*
 const val targetCameraDistance = 7f
 const val cameraObstaclePadding = 0.3f
 
-fun getHoverCameraOrientation(yaw: Float, pitch: Float): Quaternion =
-    Quaternion()
-        .rotateZ(yaw)
-        .rotateY(pitch)
-
-fun getHoverCameraOrientation(thirdPersonRig: ThirdPersonRig): Quaternion =
-    getHoverCameraOrientation(thirdPersonRig.yaw, thirdPersonRig.pitch)
-
 fun hoverCameraAnchorPosition(bodyPosition: Vector3): Vector3 =
     bodyPosition + Vector3(0f, 0f, 1f)
 
@@ -28,8 +20,7 @@ fun getHoverCameraPosition(bodyPosition: Vector3, thirdPersonRig: ThirdPersonRig
     hoverCameraAnchorPosition(bodyPosition) + orientation * Vector3(-thirdPersonRig.distance, 0f, 0f)
 
 fun adjustCameraDistance(dynamicsWorld: btDiscreteDynamicsWorld, cameraCollisionMask: Int,
-                         bodyPosition: Vector3, yaw: Float, pitch: Float): Float {
-  val orientation = getHoverCameraOrientation(yaw, pitch)
+                         bodyPosition: Vector3, orientation: Quaternion): Float {
   val rayStart = hoverCameraAnchorPosition(bodyPosition)
   val rayEnd = rayStart + orientation * Vector3(-targetCameraDistance * 2f, 0f, 0f)
   val hit = firstRayHit(dynamicsWorld, rayStart, rayEnd, cameraCollisionMask)
@@ -51,15 +42,25 @@ fun updateThirdPersonCamera(
     target: Vector3?,
     thirdPersonRig: ThirdPersonRig
 ): ThirdPersonRig {
-  val lookVelocity = updateLookVelocity(commands, Vector2(4f, 2f), thirdPersonRig.lookVelocity)
+  val lookVelocity = if (target == null)
+    updateLookVelocity(commands, Vector2(4f, 2f), thirdPersonRig.lookVelocity)
+  else
+    Vector2()
+
   val facing = characterRig.facingRotation.z
-  val yaw = thirdPersonRig.yaw + lookVelocity.x * delta
-  val pitch = minMax(thirdPersonRig.pitch - lookVelocity.y * delta, -1.0f, 1.5f)
+  val yaw = thirdPersonRig.orientation.angleZ + lookVelocity.x * delta
+  val pitch = minMax(thirdPersonRig.orientation.angleX - lookVelocity.y * delta, -1.0f, 1.5f)
+  val orientation = Quaternion()
+      .rotateZ(yaw)
+      .rotateY(pitch)
 
   // Not currently supporting aggregating movement events from multiple sources
   assert(movements.size < 2)
 
-  val movement = movements.firstOrNull()
+  val movement = if (target == null)
+    movements.firstOrNull()
+  else
+    null
 
   val facingDestinationCandidate = if (movement != null) {
     getHorizontalLookAtAngle(movement.offset)
@@ -74,16 +75,17 @@ fun updateThirdPersonCamera(
     } else {
       thirdPersonRig.facingDestination
     }
+  } else if (target != null) {
+    getHorizontalLookAtAngle(target - body.position)
   } else
     thirdPersonRig.facingDestination
 
   return thirdPersonRig.copy(
-      yaw = yaw,
-      pitch = pitch,
+      orientation = orientation,
       lookVelocity = lookVelocity,
       facingDestination = facingDestination,
       facingDestinationCandidate = facingDestinationCandidate,
-      distance = adjustCameraDistance(dynamicsWorld, cameraCollisionMask, body.position, yaw, pitch)
+      distance = adjustCameraDistance(dynamicsWorld, cameraCollisionMask, body.position, orientation)
   )
 }
 

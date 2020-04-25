@@ -8,7 +8,6 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
-typealias Quaternion = Quaternionf
 typealias MutableMatrix = Matrix4f
 typealias Vector4New = Vector4
 

@@ -596,9 +596,9 @@ class Vector3m : Vector2fMinimal {
   }
 
   /* (non-Javadoc)
-     * @see Vector3m#rotationTo(float, float, float, Quaternionf)
+     * @see Vector3m#rotationTo(float, float, float, Quaternion)
      */
-  fun rotationTo(toDirX: Float, toDirY: Float, toDirZ: Float, dest: Quaternionf): Quaternionf {
+  fun rotationTo(toDirX: Float, toDirY: Float, toDirZ: Float, dest: Quaternion): Quaternion {
     return dest.rotationTo(x, y, z, toDirX, toDirY, toDirZ)
   }
 
