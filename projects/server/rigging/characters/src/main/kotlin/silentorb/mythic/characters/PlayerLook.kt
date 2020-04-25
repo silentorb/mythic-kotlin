@@ -79,12 +79,18 @@ fun updateLookVelocity(commands: Commands, turnSpeed: Vector2, lookVelocity: Vec
   )
 }
 
-fun updateCharacterRigFacing(dynamicsWorld: btDiscreteDynamicsWorld, cameraCollisionMask: Int,
-                             bodies: Table<Body>, id: Id, commands: Commands,
-                             movements: List<CharacterRigMovement>, delta: Float
-): (CharacterRig) -> CharacterRig = { characterRig ->
-  if (characterRig.viewMode == ViewMode.firstPerson)
-    updateFirstPersonCamera(commands, delta)(characterRig)
-  else
-    updateThirdPersonCamera(dynamicsWorld, cameraCollisionMask, bodies[id]!!, commands, movements, delta, characterRig)
-}
+//fun updateCharacterRigFacing(
+//    dynamicsWorld: btDiscreteDynamicsWorld,
+//    cameraCollisionMask: Int,
+//    bodies: Table<Body>,
+//    id: Id,
+//    commands: Commands,
+//    movements: List<CharacterRigMovement>,
+//    target: Vector3,
+//    delta: Float
+//): (CharacterRig) -> CharacterRig = { characterRig ->
+//  if (characterRig.viewMode == ViewMode.firstPerson)
+//    updateFirstPersonCamera(commands, delta)(characterRig)
+//  else
+//    updateThirdPersonCamera(dynamicsWorld, cameraCollisionMask, bodies[id]!!, commands, movements, delta, characterRig, target)
+//}

@@ -4,6 +4,8 @@ import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld
 import silentorb.mythic.ent.Id
 import silentorb.mythic.ent.Table
 import silentorb.mythic.ent.firstFloatSortedBy
+import silentorb.mythic.happenings.CharacterCommand
+import silentorb.mythic.happenings.Events
 import silentorb.mythic.physics.*
 import silentorb.mythic.spatial.*
 import kotlin.math.min
@@ -63,9 +65,12 @@ data class CharacterRigHand(
     val collisionObject: CollisionObject
 )
 
-fun updateCharacterStepHeight(bulletState: BulletState, walkableMask: Int, hand: CharacterRigHand): Float {
-  val body = hand.body
-  val collisionObject = hand.collisionObject
+fun updateCharacterStepHeight(
+    bulletState: BulletState,
+    walkableMask: Int,
+    body: Body,
+    collisionObject: CollisionObject
+): Float {
   val shape = collisionObject.shape
   val radius = shape.radius
   val footHeight = maxFootStepHeight
@@ -125,14 +130,8 @@ fun updateCharacterRigBulletBodies(bulletState: BulletState, characterRigs: Tabl
 fun characterOrientationZ(characterRig: CharacterRig) =
     Quaternion().rotateZ(characterRig.facingRotation.z - Pi / 2)
 
-fun hoverCameraOrientationZ(characterRig: CharacterRig) =
-    Quaternion().rotateZ(characterRig.hoverCamera!!.yaw - Pi / 2)
-
-fun updateCharacterRigGroundedDistance(bulletState: BulletState, walkableMask: Int, hand: CharacterRigHand): (CharacterRig) -> CharacterRig = { characterRig ->
-  characterRig.copy(
-      groundDistance = updateCharacterStepHeight(bulletState, walkableMask, hand)
-  )
-}
+fun hoverCameraOrientationZ(thirdPersonRig: ThirdPersonRig) =
+    Quaternion().rotateZ(thirdPersonRig.yaw - Pi / 2)
 
 fun interpolateCharacterRigs(scalar: Float, first: Table<CharacterRig>, second: Table<CharacterRig>) =
     interpolateTables(scalar, first, second) { s, a, b ->
@@ -140,3 +139,43 @@ fun interpolateCharacterRigs(scalar: Float, first: Table<CharacterRig>, second: 
           facingRotation = interpolate(s, a.facingRotation, b.facingRotation)
       )
     }
+
+fun updateCharacterRig(
+    bulletState: BulletState,
+    walkableMask: Int,
+    bodies: Table<Body>,
+    collisionObjects: Table<CollisionObject>,
+    thirdPersonRigs: Table<ThirdPersonRig>,
+    events: Events,
+    delta: Float
+): (Id, CharacterRig) -> CharacterRig {
+  val allCommands = events
+      .filterIsInstance<CharacterCommand>()
+
+  return { id, characterRig ->
+    val commands = allCommands.filter { it.target == id }
+
+    val thirdPersonRig = thirdPersonRigs[id]
+    val firstPersonLookVelocity = if (thirdPersonRig == null)
+      updateLookVelocity(commands, characterRig.turnSpeed * lookSensitivity(), characterRig.firstPersonLookVelocity)
+    else
+      characterRig.firstPersonLookVelocity
+
+    val facingRotation = if (thirdPersonRig == null)
+      updateFirstPersonFacingRotation(characterRig.facingRotation, firstPersonLookVelocity, delta)
+    else
+      updateThirdPersonFacingRotation(characterRig.facingRotation, thirdPersonRig, delta)
+
+    characterRig.copy(
+        groundDistance = updateCharacterStepHeight(bulletState, walkableMask, bodies[id]!!, collisionObjects[id]!!),
+        facingRotation = facingRotation,
+        firstPersonLookVelocity = firstPersonLookVelocity
+    )
+
+//    pipe(
+//        updateMarlothCharacterRigActive(deck, id),
+//        updateCharacterRigGroundedDistance(bulletState, CollisionGroups.walkable, newCharacterRigHand(deck)(id)),
+//        updateCharacterRigFacing(bulletState.dynamicsWorld, CollisionGroups.affectsCamera, deck.bodies, id, commands, movements, simulationDelta)
+//    )(characterRig)
+  }
+}

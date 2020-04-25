@@ -12,7 +12,7 @@ data class DeckReflection<Deck : Any, Hand : Any>(
     val deckConstructor: KFunction<Deck>,
     val deckProperties: List<KProperty1<Deck, *>>,
     val handType: KClass<Hand>,
-    val handProperties: List<KProperty1<Hand, *>>
+    val handProperties: List<KProperty1<Hand, *>?>
 )
 
 fun <Deck : Any, Hand : Any> newDeckReflection(deckType: KClass<Deck>, handType: KClass<Hand>): DeckReflection<Deck, Hand> {
@@ -20,7 +20,7 @@ fun <Deck : Any, Hand : Any> newDeckReflection(deckType: KClass<Deck>, handType:
   val deckProperties = deckConstructor.parameters
       .map { p -> deckType.memberProperties.first { it.name == p.name } }
   val handProperties = deckConstructor.parameters
-      .mapNotNull { p ->
+      .map { p ->
         handType.memberProperties.firstOrNull {
           it.returnType.jvmErasure.jvmName == p.type.arguments[1].type!!.jvmErasure.jvmName
         }
@@ -71,33 +71,36 @@ fun <T> nullableList(id: Id, entity: T?): Table<T> =
       mapOf(id to entity)
 
 fun <Deck : Any, Hand : Any> genericHandToDeck(deckReflection: DeckReflection<Deck, Hand>): (Id, Hand) -> Deck = { id, hand ->
-  val additions = deckReflection.handProperties.map { property ->
-    val value = property.get(hand)
-    nullableList(id, value)
-  }
+  val additions = deckReflection.handProperties
+      .map { property ->
+        val value = property?.get(hand)
+        nullableList(id, value)
+      }
   newReflectedDeck(deckReflection.deckConstructor, additions)
 }
 
 fun <Deck : Any, Hand : Any> genericHandToDeckWithIdSource(deckReflection: DeckReflection<Deck, Hand>): (IdSource, Hand) -> Deck = { nextId, hand ->
   val id = nextId()
-  val additions = deckReflection.handProperties.map { property ->
-    val value = property.get(hand)
-    nullableList(id, value)
-  }
+  val additions = deckReflection.handProperties
+      .map { property ->
+        val value = property?.get(hand)
+        nullableList(id, value)
+      }
   val deck = newReflectedDeck(deckReflection.deckConstructor, additions)
   deck
 }
 
 fun <Deck : Any, Hand : Any> genericIdHandsToDeck(deckReflection: DeckReflection<Deck, Hand>): (List<GenericIdHand<Hand>>) -> Deck = { hands ->
-  val additions = deckReflection.handProperties.map { property ->
-    hands.mapNotNull { hand ->
-      val value = property.get(hand.hand)
-      if (value != null)
-        Pair(hand.id, value)
-      else
-        null
-    }.associate { it }
-  }
+  val additions = deckReflection.handProperties
+      .map { property ->
+        hands.mapNotNull { hand ->
+          val value = property?.get(hand.hand)
+          if (value != null)
+            Pair(hand.id, value)
+          else
+            null
+        }.associate { it }
+      }
   val deck = newReflectedDeck(deckReflection.deckConstructor, additions)
   deck
 }

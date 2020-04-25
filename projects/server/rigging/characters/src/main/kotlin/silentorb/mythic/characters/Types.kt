@@ -11,23 +11,13 @@ enum class ViewMode {
   thirdPerson
 }
 
-data class HoverCamera(
-    val pitch: Float,
-    val yaw: Float,
-    val distance: Float,
-    val facingDestination: Float,
-    val facingDestinationCandidate: Float // Delays facing changes for one frame to filter out brief input aberrations
-)
-
 data class CharacterRig(
     val facingRotation: Vector3 = Vector3(),
-    val isActive: Boolean,
+//    val isActive: Boolean,
     val groundDistance: Float = 0f,
-    val lookVelocity: Vector2 = Vector2(),
     val maxSpeed: Float,
-    val turnSpeed: Vector2,
-    val viewMode: ViewMode,
-    val hoverCamera: HoverCamera?
+    val firstPersonLookVelocity: Vector2 = Vector2(),
+    val turnSpeed: Vector2
 ) {
   val facingQuaternion: Quaternion
     get() = Quaternion()
@@ -37,6 +27,15 @@ data class CharacterRig(
   val facingVector: Vector3
     get() = getFacingVector(facingQuaternion)
 }
+
+data class ThirdPersonRig(
+    val pitch: Float,
+    val yaw: Float,
+    val lookVelocity: Vector2 = Vector2(),
+    val distance: Float,
+    val facingDestination: Float,
+    val facingDestinationCandidate: Float // Delays facing changes for one frame to filter out brief input aberrations
+)
 
 data class CharacterRigMovement(
     val actor: Id,

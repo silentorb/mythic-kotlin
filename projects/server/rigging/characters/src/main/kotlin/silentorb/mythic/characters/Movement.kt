@@ -53,13 +53,13 @@ fun getMovementImpulseVector(baseSpeed: Float, velocity: Vector3, commandVector:
   return finalImpulseVector
 }
 
-fun characterMovement(commands: Commands, characterRig: CharacterRig, id: Id, body: Body): CharacterRigMovement? {
+fun characterMovement(commands: Commands, characterRig: CharacterRig, thirdPersonRig: ThirdPersonRig?, id: Id): CharacterRigMovement? {
   val offsetVector = joinInputVector(commands, playerMoveMap)
   return if (offsetVector != null) {
-    val orientation = if (characterRig.viewMode == ViewMode.firstPerson)
+    val orientation = if (thirdPersonRig == null)
       characterOrientationZ(characterRig)
     else
-      hoverCameraOrientationZ(characterRig)
+      hoverCameraOrientationZ(thirdPersonRig)
 
     val offset = orientation * offsetVector
     CharacterRigMovement(actor = id, offset = offset)
@@ -78,14 +78,19 @@ fun characterMovementToImpulse(event: CharacterRigMovement, characterRig: Charac
   return LinearImpulse(body = event.actor, offset = offset)
 }
 
-fun allCharacterMovements(deck: PhysicsDeck, characterRigs: Table<CharacterRig>, events: Events): List<CharacterRigMovement> {
+fun allCharacterMovements(
+    deck: PhysicsDeck,
+    characterRigs: Table<CharacterRig>,
+    thirdPersonRigs: Table<ThirdPersonRig>,
+    events: Events
+): List<CharacterRigMovement> {
   val commands = events
       .filterIsInstance<CharacterCommand>()
       .filter { playerMoveMap.keys.contains(it.type) }
 
   return characterRigs
-      .filter { characterRigs[it.key]!!.isActive }
-      .mapNotNull { characterMovement(filterCommands(it.key, commands), it.value, it.key, deck.bodies[it.key]!!) }
+//      .filter { characterRigs[it.key]!!.isActive }
+      .mapNotNull { characterMovement(filterCommands(it.key, commands), it.value, thirdPersonRigs[it.key], it.key) }
 }
 
 fun characterMovementsToImpulses(bodies: Table<Body>, characterRigs: Table<CharacterRig>,
