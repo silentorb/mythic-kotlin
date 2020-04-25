@@ -11,62 +11,38 @@ fun getTargetingToggles(events: Events): List<Id> =
         .filter { it.type == toggleTargetingCommand }
         .map { it.target }
 
-fun newTargetingEvents(previousTargetings: Table<Targeting>, events: Events,
-                       getGetAvailableTargets: GetAvailableTargets, autoSelectTarget: AutoSelectTarget): Events {
-  val toggleEvents = getTargetingToggles(events)
+fun updateTargeting(previousTargets: TargetTable, toggleEvents: Set<Id>,
+                  getGetAvailableTargets: GetAvailableTargets, autoSelectTarget: AutoSelectTarget): TargetTable {
+  val (obsoleteTargets, newTargets) = toggleEvents
+      .partition { previousTargets.containsKey(it) }
 
-  val (obsoleteTargetings, newTargetings) = toggleEvents
-      .partition { previousTargetings.containsKey(it) }
-
-  val deletions = obsoleteTargetings.map { StopTargeting(it) }
-  val additions = newTargetings.mapNotNull { actor ->
+  val additions = newTargets.mapNotNull { actor ->
     val availableTargets = getGetAvailableTargets(actor)
     if (availableTargets.none())
       null
     else {
       val target = autoSelectTarget(actor, availableTargets)
-      ChangeTargeting(
-          actor = actor,
-          target = target
-      )
+      Pair(actor, target)
     }
   }
+      .associate { it }
 
-  val continuing = previousTargetings.minus(toggleEvents)
+  val continuing = previousTargets.minus(toggleEvents)
+
   val modifications = continuing
-      .mapNotNull { (actor, targeting) ->
+      .mapNotNull { (actor, previousTarget) ->
         val availableTargets = getGetAvailableTargets(actor)
         if (availableTargets.none())
-          StopTargeting(actor)
-        else if (!availableTargets.contains(targeting.target)) {
-          val target = autoSelectTarget(actor, availableTargets)
-          ChangeTargeting(
-              actor = actor,
-              target = target
-          )
-        } else
           null
+        else {
+          val newTarget = if (availableTargets.contains(previousTarget))
+            previousTarget
+          else
+            autoSelectTarget(actor, availableTargets)
+
+          Pair(actor, newTarget)
+        }
       }
 
-  return additions + deletions + modifications
+  return additions.minus(obsoleteTargets) + modifications
 }
-
-// This groups together modified and new targetings instead of handling them separately
-fun modifiedTargetings(events: Events): List<ChangeTargeting> {
-  return events.filterIsInstance<ChangeTargeting>()
-}
-
-fun targetingEventsToRecords(events: List<ChangeTargeting>): Table<Targeting> =
-    events.associate { Pair(it.actor, Targeting(it.target)) }
-
-fun updateTargetings(events: Events, targetings: Table<Targeting>): Table<Targeting> =
-    targetings + targetingEventsToRecords(modifiedTargetings(events))
-
-fun getObsoleteTargetings(events: Events): List<Id> {
-  return events
-      .filterIsInstance<StopTargeting>()
-      .map { it.actor }
-}
-
-fun pruneTargetings(events: Events, targetings: Table<Targeting>): Table<Targeting> =
-    targetings.minus(getObsoleteTargetings(events))
