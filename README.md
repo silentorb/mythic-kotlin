@@ -21,12 +21,4 @@ This project isn't being published with the expectation that people can grab it 
 
 Initially this version of Mythic was created in a monorepo alongside one of the innumerable iterations of a Marloth game.  Now it's in the middle of being extracted into it's own repo.  Most of the general modules were already separate from the game and in their own mythic folder.  Some of the general modules were slightly more tied the to game but could easily be disconnected and moved here.
 
-The Mythic Gradle files currently depend on helper code that is in the Marloth game repo and which don't seamlessly translate over to this repo because Gradle.  Getting Gradle fully sorted out with this new arrangement will take some work.
-
-In summary, the following tasks are currently being performed on Mythic:
-
-* Moving the remainder of general modules out of the Marloth game and into this repo
-* No longer using a Gradle shortcut to import other Mythic modules
-* General updates to how Gradle is handled in Mythic
-
-Eventually it would be preferable to swap out Mythic's current renderer for a better supported implementation, but all the better options are written in C/C++ and would need—*and this is said with much groaning*—JNI bindings.
+Much of Mythic as it is doesn't make sense and is incomplete without the Marloth codebase as at least a template.  The plan is to eventually release the Marloth code as open source similar to Id Software's release model.

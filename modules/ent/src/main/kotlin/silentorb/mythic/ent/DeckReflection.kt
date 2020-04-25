@@ -20,8 +20,8 @@ fun <Deck : Any, Hand : Any> newDeckReflection(deckType: KClass<Deck>, handType:
   val deckProperties = deckConstructor.parameters
       .map { p -> deckType.memberProperties.first { it.name == p.name } }
   val handProperties = deckConstructor.parameters
-      .map { p ->
-        handType.memberProperties.first {
+      .mapNotNull { p ->
+        handType.memberProperties.firstOrNull {
           it.returnType.jvmErasure.jvmName == p.type.arguments[1].type!!.jvmErasure.jvmName
         }
       }
