@@ -1,4 +1,3 @@
-
 package silentorb.mythic.spatial
 
 import org.joml.*
@@ -10,54 +9,12 @@ import java.io.ObjectOutput
 import java.text.DecimalFormat
 import java.text.NumberFormat
 
-class Quaternion {
-
-  /**
-   * The first component of the vector part.
-   */
-  var x: Float = 0.toFloat()
-
-  /**
-   * The second component of the vector part.
-   */
-  var y: Float = 0.toFloat()
-
-  /**
-   * The third component of the vector part.
-   */
-  var z: Float = 0.toFloat()
-
-  /**
-   * The real/scalar part of the quaternion.
-   */
-  var w: Float = 0.toFloat()
-
-  /**
-   * Create a new [Quaternion] and initialize it with <tt>(x=0, y=0, z=0, w=1)</tt>,
-   * where <tt>(x, y, z)</tt> is the vector part of the quaternion and <tt>w</tt> is the real/scalar part.
-   */
-  constructor() {
-    this.w = 1.0f
-  }
-
-  /**
-   * Create a new [Quaternion] and initialize its components to the given values.
-   *
-   * @param x
-   * the first component of the imaginary part
-   * @param y
-   * the second component of the imaginary part
-   * @param z
-   * the third component of the imaginary part
-   * @param w
-   * the real part
-   */
-  constructor(x: Float, y: Float, z: Float, w: Float) {
-    this.x = x
-    this.y = y
-    this.z = z
-    this.w = w
-  }
+data class Quaternion(
+    var x: Float = 0f,
+    var y: Float = 0f,
+    var z: Float = 0f,
+    var w: Float = 1f
+) {
 
   /**
    * Create a new [Quaternion] and initialize its components to the same values as the given [Quaternion].
@@ -66,21 +23,6 @@ class Quaternion {
    * the [Quaternion] to take the component values from
    */
   constructor(source: Quaternion) : this(source.x, source.y, source.z, source.w)
-
-  /**
-   * Create a new [Quaternion] which represents the rotation of the given [AxisAngle4f].
-   *
-   * @param axisAngle
-   * the [AxisAngle4f]
-   */
-  constructor(axisAngle: AxisAngle4f) {
-    val sin = Math.sin(axisAngle.angle * 0.5).toFloat()
-    val cos = Math.cosFromSin(sin.toDouble(), axisAngle.angle * 0.5).toFloat()
-    x = axisAngle.x * sin
-    y = axisAngle.y * sin
-    z = axisAngle.z * sin
-    w = cos
-  }
 
   /**
    * Normalize this quaternion.
@@ -176,10 +118,11 @@ class Quaternion {
   /* (non-Javadoc)
      * @see Quaternion#angle()
      */
-  fun angle(): Float {
-    val angle = (2.0 * Math.acos(w.toDouble())).toFloat()
-    return if (angle <= Math.PI) angle else Pi + Pi - angle
-  }
+  val angle: Float
+    get() {
+      val angle = (2.0 * Math.acos(w.toDouble())).toFloat()
+      return if (angle <= Math.PI) angle else Pi + Pi - angle
+    }
 
   /* (non-Javadoc)
      * @see Quaternion#get(org.joml.AxisAngle4f)
@@ -2651,7 +2594,7 @@ class Quaternion {
    * @return this
    */
   fun difference(other: Quaternion): Quaternion {
-    return difference(other, this)
+    return difference(other, Quaternion())
   }
 
   /* (non-Javadoc)
@@ -2666,6 +2609,9 @@ class Quaternion {
     dest[w * other.x + x * other.w + y * other.z - z * other.y, w * other.y - x * other.z + y * other.w + z * other.x, w * other.z + x * other.y - y * other.x + z * other.w] = w * other.w - x * other.x - y * other.y - z * other.z
     return dest
   }
+
+  fun distance(other: Quaternion): Float =
+      difference(other).angle
 
   /* (non-Javadoc)
      * @see Quaternion#positiveX(Vector3m)
@@ -2757,4 +2703,22 @@ class Quaternion {
     dir.z = -x * dx - y * dy + 1.0f
     return dir
   }
+
+  operator fun unaryMinus() = conjugate()
+  operator fun times(v: Vector3m) = transform(v, Vector3m())
+  operator fun times(v: Vector3) = transform(v)
+  operator fun times(q: Quaternion) = mul(q, Quaternion())
+
+  companion object {
+    val zero = Quaternion(0f, 0f, 0f, 1f)
+
+    fun lookAt(vector: Vector3): Quaternion {
+      val yaw = getHorizontalLookAtAngle(vector.xy())
+      val pitch = -getVerticalLookAtAngle(vector)
+      return Quaternion()
+          .rotateZ(yaw)
+          .rotateY(pitch)
+    }
+  }
 }
+

@@ -437,3 +437,9 @@ fun getAngleCourse(source: Float, destination: Float): Float {
 
 fun getAngleGap(a: Float, b: Float): Float =
     abs(getAngleCourse(a, b))
+
+fun getHorizontalLookAtAngle(lookAt: Vector2fMinimal): Float =
+    getAngle(Vector2(1f, 0f), lookAt.xy())
+
+fun getVerticalLookAtAngle(lookAt: Vector3) =
+    getAngle(Vector2(1f, 0f), Vector2(lookAt.xy().length(), lookAt.z))

@@ -85,11 +85,11 @@ operator fun Vector4.unaryMinus() = negate()
 
 /* Quaternion */
 
-operator fun Quaternion.get(e: Int): Float = get(e)
-operator fun Quaternion.unaryMinus() = conjugate()
-operator fun Quaternion.times(v: Vector3m) = transform(v, Vector3m())
-operator fun Quaternion.times(v: Vector3) = transform(v)
-operator fun Quaternion.times(q: Quaternion) = mul(q, Quaternion())
+//operator fun Quaternion.get(e: Int): Float = get(e)
+//operator fun Quaternion.unaryMinus() = conjugate()
+//operator fun Quaternion.times(v: Vector3m) = transform(v, Vector3m())
+//operator fun Quaternion.times(v: Vector3) = transform(v)
+//operator fun Quaternion.times(q: Quaternion) = mul(q, Quaternion())
 //operator fun Quaternion.times(v: Vector4) = transform(v)
 
 //val Vector3m.xy(): Vector2f

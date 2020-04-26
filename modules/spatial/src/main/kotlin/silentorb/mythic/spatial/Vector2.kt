@@ -44,7 +44,8 @@ data class Vector2(
   operator fun plus(v: Float): Vector2 = Vector2(x + v, y + v)
   operator fun times(other: Float): Vector2 = Vector2(x * other, y * other)
   operator fun times(other: Vector2): Vector2 = Vector2(x * other.x, y * other.y)
-//  operator fun minus(other: Vector2f) = Vector2(x - other.x, y - other.y)
+
+  //  operator fun minus(other: Vector2f) = Vector2(x - other.x, y - other.y)
   operator fun minus(v: Float) = Vector2(x - v, y - v)
   operator fun div(v: Float) = Vector2(x / v, y / v)
   operator fun div(v: Vector2) = Vector2(x / v.x, y / v.y)
@@ -87,7 +88,7 @@ data class Vector2(
     return "(" + formatter.format(x.toDouble()) + ", " + formatter.format(y.toDouble()) + ")"
   }
 
-//  fun roughlyEquals(margin: Float, value: Vector2): Boolean =
+  //  fun roughlyEquals(margin: Float, value: Vector2): Boolean =
 //      x >= value.x - margin && x <= value.x + margin
 //          && y >= value.y - margin && y <= value.y + margin
 //          && z >= value.z - margin && z <= value.z + margin
@@ -96,4 +97,7 @@ data class Vector2(
 //      x >= value.x - epsilon && x <= value.x + epsilon
 //          && y >= value.y - epsilon && y <= value.y + epsilon
 //          && z >= value.z - epsilon && z <= value.z + epsilon
+  companion object {
+    val zero = Vector2()
+  }
 }

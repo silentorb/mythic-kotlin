@@ -31,6 +31,7 @@ data class Vector3(
   companion object {
     val zero: Vector3 = _zero
     val unit: Vector3 = _unit
+    val up: Vector3 = Vector3(0f, 0f, 1f)
   }
 
   override operator fun minus(v: Vector2fMinimal): Vector2 = Vector2(x - v.x, y - v.y)

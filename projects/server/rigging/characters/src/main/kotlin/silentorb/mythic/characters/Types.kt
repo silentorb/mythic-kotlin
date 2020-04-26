@@ -31,10 +31,12 @@ data class CharacterRig(
 
 data class ThirdPersonRig(
     val orientation: Quaternion,
-    val lookVelocity: Vector2 = Vector2(),
-    val distance: Float,
-    val facingDestination: Float,
-    val facingDestinationCandidate: Float // Delays facing changes for one frame to filter out brief input aberrations
+    val pivot: Quaternion,
+    val pivotVelocity: Vector2 = Vector2.zero,
+//    val orientationDestination: Quaternion = orientation,
+    val location: Vector3,
+    val locationVelocity: Vector3 = Vector3.zero
+//    val locationDestination: Vector3 = location
 )
 
 data class CharacterRigMovement(

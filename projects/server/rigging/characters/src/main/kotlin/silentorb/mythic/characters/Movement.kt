@@ -37,12 +37,6 @@ fun joinInputVector(commands: Commands, commandMap: Map<CommandName, Vector3>): 
   }
 }
 
-fun getHorizontalLookAtAngle(lookAt: Vector2fMinimal): Float =
-    getAngle(Vector2(1f, 0f), lookAt.xy())
-
-fun getVerticalLookAtAngle(lookAt: Vector3) =
-    getAngle(Vector2(1f, 0f), Vector2(lookAt.xy().length(), lookAt.z))
-
 fun getMovementImpulseVector(baseSpeed: Float, velocity: Vector3, commandVector: Vector3): Vector3 {
   val rawImpulseVector = commandVector * 1.5f - velocity
   val finalImpulseVector = if (rawImpulseVector.length() > baseSpeed)
