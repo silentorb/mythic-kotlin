@@ -30,13 +30,10 @@ data class CharacterRig(
 }
 
 data class ThirdPersonRig(
+    val pivotLocation: Vector3,
     val orientation: Quaternion,
-    val pivot: Quaternion,
-    val pivotVelocity: Vector2 = Vector2.zero,
-//    val orientationDestination: Quaternion = orientation,
-    val location: Vector3,
-    val locationVelocity: Vector3 = Vector3.zero
-//    val locationDestination: Vector3 = location
+    val orientationVelocity: Vector2 = Vector2.zero,
+    val distance: Float
 )
 
 data class CharacterRigMovement(

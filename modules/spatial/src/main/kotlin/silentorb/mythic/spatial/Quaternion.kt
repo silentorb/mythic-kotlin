@@ -1,13 +1,13 @@
 package silentorb.mythic.spatial
 
 import org.joml.*
-import silentorb.mythic.spatial.Math.asin
-import silentorb.mythic.spatial.Math.atan2
 import java.io.IOException
 import java.io.ObjectInput
 import java.io.ObjectOutput
 import java.text.DecimalFormat
 import java.text.NumberFormat
+import kotlin.math.asin
+import kotlin.math.atan2
 
 data class Quaternion(
     var x: Float = 0f,
@@ -1265,10 +1265,11 @@ data class Quaternion(
    * @return this
    */
   fun conjugate(): Quaternion {
-    x = -x
-    y = -y
-    z = -z
-    return this
+    return this.copy(
+        x = -x,
+        y = -y,
+        z = -z
+    )
   }
 
   /* (non-Javadoc)
@@ -1450,14 +1451,16 @@ data class Quaternion(
     return eulerAngles
   }
 
-  val angleX: Float =
+  val angleX: Float
+    get() =
       atan2(2.0 * (x * w - y * z), 1.0 - 2.0 * (x * x + y * y)).toFloat()
 
-  val angleY: Float =
+  val angleY: Float
+    get() =
       asin(2.0 * (x * z + y * w)).toFloat()
 
-  val angleZ: Float =
-      atan2(2.0 * (z * w - x * y), 1.0 - 2.0 * (y * y + z * z)).toFloat()
+  val angleZ: Float
+    get() = atan2(2f * (z * w - x * y), 1f - 2f * (y * y + z * z))
 
   /* (non-Javadoc)
      * @see Quaternion#lengthSquared()

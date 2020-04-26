@@ -11,16 +11,20 @@ import silentorb.mythic.physics.firstRayHit
 import silentorb.mythic.spatial.Quaternion
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.minMax
 import kotlin.math.min
 
-const val targetCameraDistance = 7f
+const val targetCameraDistance = 5f
 const val cameraObstaclePadding = 0.3f
 
-fun hoverCameraAnchorPosition(bodyPosition: Vector3): Vector3 =
-    bodyPosition + Vector3(0f, 0f, 1f)
+fun hoverCameraAnchorPosition(actorLocation: Vector3): Vector3 =
+    actorLocation + Vector3(0f, 0f, 1f)
 
-fun getCameraDestination(bodyPosition: Vector3, thirdPersonRig: ThirdPersonRig, orientation: Quaternion): Vector3 =
-    hoverCameraAnchorPosition(bodyPosition) + orientation * Vector3(-7f, 0f, 0f)
+fun getCameraDestination(actorLocation: Vector3): Vector3 =
+    actorLocation + Vector3(0f, 0f, 1f)
+
+fun getCameraLocation(bodyPosition: Vector3, orientation: Quaternion, distance: Float): Vector3 =
+    hoverCameraAnchorPosition(bodyPosition) + orientation * Vector3(-distance, 0f, 0f)
 
 fun adjustCameraDistance(dynamicsWorld: btDiscreteDynamicsWorld, cameraCollisionMask: Int,
                          bodyPosition: Vector3, orientation: Quaternion): Float {
@@ -45,66 +49,51 @@ fun updateThirdPersonCamera(
     target: Vector3?,
     camera: ThirdPersonRig
 ): ThirdPersonRig {
-  val pivotVelocity = if (target == null) {
-    updateLookVelocity(commands, Vector2(4f, 2f), camera.pivotVelocity)
+//  return camera
+  val orientationVelocity = if (target == null) {
+    updateLookVelocity(commands, Vector2(4f, 2f), camera.orientationVelocity)
   } else
     Vector2.zero
-//    Vector2()
-  val newPivot = Quaternion(camera.pivot).rotateZ(pivotVelocity.x).rotateY(pivotVelocity.y)
 
-  val anchorLocation = body.position + Vector3(0f, 0f, 1f)
-  val idealDistance = 4f
-  val locationDestination = anchorLocation + camera.pivot * Vector3(idealDistance, 0f, 0f)
-  val newLocation = if (camera.location != anchorLocation) {
-    val locationDifference = locationDestination - camera.location
+  val pivotDestination = getCameraDestination(body.position)
+  val newLocation = if (camera.pivotLocation != pivotDestination) {
+    val locationDifference = pivotDestination - camera.pivotLocation
     val locationDifferenceLength = locationDifference.length()
     val locationChangeDistance = min(10f, locationDifferenceLength) * 2f * delta
     val locationOffset = locationDifference.normalize() * locationChangeDistance
-    val moved = camera.location + locationOffset
-    val movedVector = moved - anchorLocation
-    if (movedVector.length() < idealDistance)
-      anchorLocation + movedVector.normalize() * idealDistance
-    else
-      moved
+    camera.pivotLocation + locationOffset
   } else
-    camera.location
+    camera.pivotLocation
 
-  val newOrientation = if (anchorLocation != newLocation) {
-//    val transitionScale = locationChangeDistance / locationDifferenceLength
-//    val orientationDestination = Quaternion.lookAt((anchorLocation - locationDestination).normalize())
-//    Quaternion(camera.orientation).slerp(orientationDestination, transitionScale)
-    Quaternion.lookAt(anchorLocation - newLocation)
+  val orientation = if (orientationVelocity.x != 0f || orientationVelocity.y != 0f) {
+    val pitch = minMax(camera.orientation.angleX - orientationVelocity.y * delta, -1.0f, 1.5f)
+    println(camera.orientation.angleZ)
+    Quaternion()
+        .rotateZ(camera.orientation.angleZ + orientationVelocity.x * delta)
+        .rotateY(pitch)
   } else
     camera.orientation
-
-  assert(!newOrientation.x.isNaN())
-//  val yaw = camera.orientation.angleZ + lookVelocity.x * delta
-//  val pitch = minMax(camera.orientation.angleX - lookVelocity.y * delta, -1.0f, 1.5f)
-//  val orientation = Quaternion()
-//      .rotateZ(yaw)
-//      .rotateY(pitch)
-
   // Not currently supporting aggregating movement events from multiple sources
   assert(movements.size < 2)
 
-  val movement = if (target == null)
-    movements.firstOrNull()
-  else
-    null
+//  val movement = if (target == null)
+//    movements.firstOrNull()
+//  else
+//    null
 
-  val facingDestination = if (movement != null) {
-    Quaternion.lookAt((movement.offset).normalize())
-  } else if (target != null) {
-    Quaternion.lookAt((target - body.position).normalize())
-  } else
-    null
+//  val facingDestination = if (movement != null) {
+//    Quaternion.lookAt((movement.offset).normalize())
+//  } else if (target != null) {
+//    Quaternion.lookAt((target - body.position).normalize())
+//  } else
+//    null
 
+//  println(camera.orientation)
   return camera.copy(
-      orientation = newOrientation,
-      pivotVelocity = pivotVelocity,
-      location = newLocation,
-      pivot = newPivot
-//      distance = adjustCameraDistance(dynamicsWorld, cameraCollisionMask, body.position, orientation)
+      orientation = orientation,
+      orientationVelocity = orientationVelocity,
+      pivotLocation = newLocation,
+      distance = adjustCameraDistance(dynamicsWorld, cameraCollisionMask, body.position, orientation)
   )
 }
 
@@ -147,4 +136,12 @@ fun updateThirdPersonFacingRotation(facingRotation: Vector3, thirdPersonRig: Thi
 //    )
 //  } else
 //    facingRotation
+}
+
+fun newThirdPersonRig(actorLocation: Vector3, actorFacingZ: Float): ThirdPersonRig {
+  return ThirdPersonRig(
+      pivotLocation = getCameraDestination(actorLocation),
+      orientation = -Quaternion().rotateZ(actorFacingZ),
+      distance = targetCameraDistance
+  )
 }
