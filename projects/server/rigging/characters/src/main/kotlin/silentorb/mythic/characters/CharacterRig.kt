@@ -10,7 +10,7 @@ import silentorb.mythic.physics.*
 import silentorb.mythic.spatial.*
 import kotlin.math.min
 
-const val defaultCharacterRadius = 0.3f
+const val defaultCharacterRadius = 0.5f
 const val defaultCharacterHeight = 2.5f
 const val characterGroundBuffer = 0.02f
 
@@ -131,7 +131,7 @@ fun characterOrientationZ(characterRig: CharacterRig) =
     Quaternion().rotateZ(characterRig.facingRotation.z - Pi / 2)
 
 fun hoverCameraOrientationZ(thirdPersonRig: ThirdPersonRig) =
-    Quaternion().rotateZ(thirdPersonRig.orientation.angleZ - Pi / 2)
+    Quaternion().rotateZ(thirdPersonRig.rotation.x - Pi / 2)
 
 fun interpolateCharacterRigs(scalar: Float, first: Table<CharacterRig>, second: Table<CharacterRig>) =
     interpolateTables(scalar, first, second) { s, a, b ->

@@ -443,3 +443,13 @@ fun getHorizontalLookAtAngle(lookAt: Vector2fMinimal): Float =
 
 fun getVerticalLookAtAngle(lookAt: Vector3) =
     getAngle(Vector2(1f, 0f), Vector2(lookAt.xy().length(), lookAt.z))
+
+fun horizontalFacingDistance(angle: Float, lookAt: Vector3): Float {
+  val secondAngle = getHorizontalLookAtAngle(lookAt)
+  return getAngleCourse(angle, secondAngle)
+}
+
+fun verticalFacingDistance(angle: Float, lookAt: Vector3): Float {
+  val secondAngle = getVerticalLookAtAngle(lookAt)
+  return getAngleCourse(angle, secondAngle)
+}
