@@ -104,8 +104,6 @@ fun updateThirdPersonCamera(
   val rotationAlignment = if (movement != null && (initialRotation.x != idealRotationX || initialRotation.y != idealRotationY)) {
     val initialGapX = getAngleCourse(initialRotation.x, idealRotationX)
     val gapY = getAngleCourse(initialRotation.y, idealRotationY)
-    assert(!gapY.isNaN())
-    println(gapY)
     val isCleanlyReversed = abs(initialGapX) > Pi * 0.8f
     val gapX = if (isCleanlyReversed)
       0f
