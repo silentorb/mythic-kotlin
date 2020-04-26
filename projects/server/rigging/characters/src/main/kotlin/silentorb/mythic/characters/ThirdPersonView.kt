@@ -13,7 +13,7 @@ import kotlin.math.abs
 import kotlin.math.min
 
 const val targetCameraDistance = 5f
-const val cameraObstaclePadding = 0.1f
+const val cameraObstaclePadding = 0.01f
 
 fun getCameraOrientation(rotation: Vector2): Quaternion =
     Quaternion()
@@ -92,24 +92,42 @@ fun updateThirdPersonCamera(
   } else
     null
 
-  val idealRotation = (characterRig.facingRotation.z + Pi) % Pi * 2f
-  val rotation = if (orientationVelocity.x != 0f || orientationVelocity.y != 0f) {
-    val pitch = minMax(camera.rotation.y - orientationVelocity.y * delta, -1.0f, 1.5f)
+  val initialRotation = if (orientationVelocity.x != 0f || orientationVelocity.y != 0f) {
+    val pitch = minMax(camera.rotation.y - orientationVelocity.y * delta, -1.0f, 1.4f)
     val yaw = camera.rotation.x + orientationVelocity.x * delta
     Vector2(yaw, pitch)
-  } else if (movement != null && facingDestination != idealRotation) {
-    val gap = getAngleCourse(characterRig.facingRotation.z, idealRotation)
-    if (abs(gap) > Pi * 0.8f)
-      camera.rotation
-    else {
-      val maxChange = 0.3f * delta
-      val rotationAlignment = minMax(gap, -maxChange, maxChange)
-      camera.rotation.copy(
-          x = camera.rotation.x + rotationAlignment
-      )
-    }
   } else
     camera.rotation
+
+  val idealRotationX = (characterRig.facingRotation.z + Pi) % Pi * 2f
+  val idealRotationY = 0f
+  val rotationAlignment = if (movement != null && (initialRotation.x != idealRotationX || initialRotation.y != idealRotationY)) {
+    val initialGapX = getAngleCourse(initialRotation.x, idealRotationX)
+    val gapY = getAngleCourse(initialRotation.y, idealRotationY)
+    assert(!gapY.isNaN())
+    println(gapY)
+    val isCleanlyReversed = abs(initialGapX) > Pi * 0.8f
+    val gapX = if (isCleanlyReversed)
+      0f
+    else
+      initialGapX
+
+    val maxChange = 0.4f * delta
+    if (gapX == 0f && gapY == 0f)
+      Vector2.zero
+    else {
+      val gapVector = Vector2(gapX, gapY)
+      val changeLength = minMax(gapVector.length(), -maxChange, maxChange)
+      if (changeLength < maxChange && !isCleanlyReversed)
+        Vector2(idealRotationX, idealRotationY)
+      else {
+        gapVector.normalize() * changeLength
+      }
+    }
+  } else
+    Vector2.zero
+
+  val rotation = initialRotation + rotationAlignment
 
   return camera.copy(
       rotation = rotation,
