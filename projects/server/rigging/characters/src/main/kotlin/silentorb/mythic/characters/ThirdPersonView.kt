@@ -99,9 +99,14 @@ fun updateThirdPersonCamera(
   } else
     camera.rotation
 
-  val idealRotationX = (characterRig.facingRotation.z + Pi) % Pi * 2f
-  val idealRotationY = 0f
-  val rotationAlignment = if (movement != null && (initialRotation.x != idealRotationX || initialRotation.y != idealRotationY)) {
+  val idealRotationX = if (target == null)
+    characterRig.facingRotation.z
+  else
+    atan(target.xy() - newLocation.xy())
+
+  val idealRotationY = 0.3f
+  val isAlignedWithIdeal = initialRotation.x == idealRotationX && initialRotation.y == idealRotationY
+  val rotationAlignment = if (movement != null && !isAlignedWithIdeal) {
     val initialGapX = getAngleCourse(initialRotation.x, idealRotationX)
     val gapY = getAngleCourse(initialRotation.y, idealRotationY)
     val isCleanlyReversed = abs(initialGapX) > Pi * 0.8f
@@ -110,23 +115,44 @@ fun updateThirdPersonCamera(
     else
       initialGapX
 
-    val maxChange = 0.4f * delta
+    val maxChange = 0.5f * delta
     if (gapX == 0f && gapY == 0f)
       Vector2.zero
     else {
       val gapVector = Vector2(gapX, gapY)
       val changeLength = minMax(gapVector.length(), -maxChange, maxChange)
-      if (changeLength < maxChange && !isCleanlyReversed)
-        Vector2(idealRotationX, idealRotationY)
-      else {
-        gapVector.normalize() * changeLength
-      }
+//      if (changeLength < maxChange && !isCleanlyReversed)
+//        Vector2(idealRotationX, idealRotationY)
+//      else {
+      gapVector.normalize() * changeLength
+//      }
     }
+  } else if (!isAlignedWithIdeal && target != null) {
+    val gapX = getAngleCourse(initialRotation.x, idealRotationX)
+    val gapY = getAngleCourse(initialRotation.y, idealRotationY)
+    val maxChange = 4f * delta
+    val gapVector = Vector2(gapX, gapY)
+//    val gapVector = Vector2(
+//        if (abs(gapX) < Pi * 0.01f) 0f else gapX,
+//        if (abs(gapY) < Pi * 0.01f) 0f else gapY
+//    )
+    if (gapVector.x == 0f && gapVector.y == 0f)
+      Vector2.zero
+    else {
+      val changeLength = min(gapVector.length(), maxChange) * 0.9f
+//    if (changeLength < maxChange)
+//      Vector2(idealRotationX, idealRotationY)
+//    else {
+      assert(!(gapVector.normalize() * changeLength).x.isNaN())
+      gapVector.normalize() * changeLength
+//      gapVector
+    }
+//    }
   } else
     Vector2.zero
 
   val rotation = initialRotation + rotationAlignment
-
+  assert(!rotation.x.isNaN())
   return camera.copy(
       rotation = rotation,
       orientationVelocity = orientationVelocity,
