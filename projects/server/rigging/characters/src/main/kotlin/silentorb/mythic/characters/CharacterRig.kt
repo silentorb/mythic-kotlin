@@ -147,6 +147,7 @@ fun updateCharacterRig(
     bodies: Table<Body>,
     collisionObjects: Table<CollisionObject>,
     thirdPersonRigs: Table<ThirdPersonRig>,
+    freedomTable: Table<Freedoms>,
     events: Events,
     delta: Float
 ): (Id, CharacterRig) -> CharacterRig {
@@ -155,14 +156,17 @@ fun updateCharacterRig(
 
   return { id, characterRig ->
     val commands = allCommands.filter { it.target == id }
+    val freedoms = freedomTable[id] ?: Freedom.none
 
     val thirdPersonRig = thirdPersonRigs[id]
-    val firstPersonLookVelocity = if (thirdPersonRig == null)
+    val firstPersonLookVelocity = if (hasFreedom(freedoms, Freedom.turning) && thirdPersonRig == null)
       updateLookVelocity(commands, characterRig.turnSpeed * lookSensitivity(), characterRig.firstPersonLookVelocity)
     else
       characterRig.firstPersonLookVelocity
 
-    val facingRotation = if (thirdPersonRig == null)
+    val facingRotation = if (!hasFreedom(freedoms, Freedom.turning))
+      characterRig.facingRotation
+    else if (thirdPersonRig == null)
       updateFirstPersonFacingRotation(characterRig.facingRotation, firstPersonLookVelocity, delta)
     else
       updateThirdPersonFacingRotation(characterRig.facingRotation, thirdPersonRig, delta)
@@ -173,11 +177,5 @@ fun updateCharacterRig(
         facingOrientation = characterRigOrentation(facingRotation),
         firstPersonLookVelocity = firstPersonLookVelocity
     )
-
-//    pipe(
-//        updateMarlothCharacterRigActive(deck, id),
-//        updateCharacterRigGroundedDistance(bulletState, CollisionGroups.walkable, newCharacterRigHand(deck)(id)),
-//        updateCharacterRigFacing(bulletState.dynamicsWorld, CollisionGroups.affectsCamera, deck.bodies, id, commands, movements, simulationDelta)
-//    )(characterRig)
   }
 }

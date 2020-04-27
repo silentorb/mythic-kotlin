@@ -88,7 +88,9 @@ fun allCharacterMovements(
 }
 
 fun characterMovementsToImpulses(bodies: Table<Body>, characterRigs: Table<CharacterRig>,
+                                 freedomTable: FreedomTable,
                                  events: Events): List<LinearImpulse> =
     events
         .filterIsInstance<CharacterRigMovement>()
+        .filter { hasFreedom(freedomTable[it.actor] ?: Freedom.none, Freedom.walking) }
         .map { characterMovementToImpulse(it, characterRigs[it.actor]!!, bodies[it.actor]!!.velocity) }

@@ -169,6 +169,7 @@ fun updateThirdPersonCamera(
     bodies: Table<Body>,
     characterRigs: Table<CharacterRig>,
     targets: Table<Id>,
+    freedomTable: Table<Freedoms>,
     delta: Float
 ): (Id, ThirdPersonRig) -> ThirdPersonRig {
   val allCommands = events
@@ -178,13 +179,16 @@ fun updateThirdPersonCamera(
       .filterIsInstance<CharacterRigMovement>()
 
   return { id, thirdPersonRig ->
+    val freedoms = freedomTable[id] ?: Freedom.none
     val body = bodies[id]!!
     val characterRig = characterRigs[id]!!
     val target = bodies[targets[id]]?.position
     val commands = allCommands.filter { it.target == id }
     val movements = allMovements.filter { it.actor == id }
-
-    updateThirdPersonCamera(dynamicsWorld, cameraCollisionMask, commands, movements, delta, body, characterRig, target, thirdPersonRig)
+    if (hasFreedom(freedoms, Freedom.orbiting))
+      updateThirdPersonCamera(dynamicsWorld, cameraCollisionMask, commands, movements, delta, body, characterRig, target, thirdPersonRig)
+    else
+      thirdPersonRig
   }
 }
 

@@ -1,6 +1,7 @@
 package silentorb.mythic.characters
 
 import silentorb.mythic.ent.Id
+import silentorb.mythic.ent.Table
 import silentorb.mythic.happenings.GameEvent
 import silentorb.mythic.spatial.Quaternion
 import silentorb.mythic.spatial.Vector2
@@ -41,3 +42,20 @@ data class CharacterRigMovement(
     val actor: Id,
     val offset: Vector3
 ) : GameEvent
+
+object Freedom {
+  const val none = 0
+  const val walking = 1
+  const val turning = 2
+  const val orbiting = 4
+  const val acting = 8
+
+  const val all = -1
+}
+
+typealias Freedoms = Int
+
+typealias FreedomTable = Table<Freedoms>
+
+fun hasFreedom(freedoms: Freedoms, freedom: Freedoms): Boolean =
+    freedoms and freedom != 0
