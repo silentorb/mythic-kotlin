@@ -1,11 +1,7 @@
 package silentorb.mythic.characters
 
-import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld
-import silentorb.mythic.ent.Id
-import silentorb.mythic.ent.Table
 import silentorb.mythic.happenings.CommandName
 import silentorb.mythic.happenings.Commands
-import silentorb.mythic.physics.Body
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.minMax
@@ -69,6 +65,22 @@ fun transitionAxis(negativeMaxChange: Float, positiveMaxChange: Float, current: 
       Pair(positiveMaxChange, negativeMaxChange)
     minMax(target, current - minOffset, current + maxOffset)
   }
+}
+
+data class AxisVelocityLimits(
+    val positiveX: Float,
+    val negativeX: Float,
+    val positiveY: Float,
+    val negativeY: Float
+)
+
+fun updateLookVelocity(commands: Commands, turnSpeed: Vector2, velocityLimits: AxisVelocityLimits,
+                       lookVelocity: Vector2): Vector2 {
+  val lookForce = characterLookForce(turnSpeed, commands)
+  return Vector2(
+      transitionAxis(velocityLimits.negativeX, velocityLimits.positiveX, lookVelocity.x, lookForce.x),
+      transitionAxis(velocityLimits.negativeY, velocityLimits.positiveY, lookVelocity.y, lookForce.y)
+  )
 }
 
 fun updateLookVelocity(commands: Commands, turnSpeed: Vector2, lookVelocity: Vector2): Vector2 {

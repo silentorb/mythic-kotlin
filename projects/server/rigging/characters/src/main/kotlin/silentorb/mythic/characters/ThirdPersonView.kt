@@ -31,7 +31,7 @@ fun adjustCameraDistance(dynamicsWorld: btDiscreteDynamicsWorld, cameraCollision
   val rayEnd = rayStart + orientation * Vector3(-targetCameraDistance * 2f, 0f, 0f)
   val hit = firstRayHit(dynamicsWorld, rayStart, rayEnd, cameraCollisionMask)
   val newDistance = if (hit != null) {
-    hit.hitPoint.distance(rayStart) - cameraObstaclePadding
+    min(targetCameraDistance, hit.hitPoint.distance(rayStart) - cameraObstaclePadding)
   } else {
     targetCameraDistance
   }
@@ -54,8 +54,7 @@ fun lookAtTargetOffset(location: Vector3, target: Vector3, rotation: Vector2, id
   return if (gapX == 0f && gapY == 0f) {
     println("* ${rotation.x} $gapX $targetRotationX")
     Vector2.zero
-  }
-  else {
+  } else {
     val length = abs(gapX * gapX * gapX) * 2f * delta
     val changeX = minMax(gapX, -length, length)
     if (gapX != 0f)
@@ -88,7 +87,13 @@ fun updateThirdPersonCamera(
     camera: ThirdPersonRig
 ): ThirdPersonRig {
   val orientationVelocity = if (target == null) {
-    updateLookVelocity(commands, Vector2(8f, 2f), camera.orientationVelocity)
+    val limits = AxisVelocityLimits(
+        positiveX = 0.2f,
+        negativeX = 0.3f,
+        positiveY = 0.1f,
+        negativeY = 0.15f
+    )
+    updateLookVelocity(commands, Vector2(3.5f, 2f), limits, camera.orientationVelocity)
   } else
     Vector2.zero
 
@@ -135,26 +140,24 @@ fun updateThirdPersonCamera(
   val rotationAlignment = if (target != null)
     lookAtTargetOffset(newLocation, target, initialRotation, idealRotationY, delta)
   else if (movement != null && (initialRotation.x != idealRotationX || initialRotation.y != idealRotationY)) {
-    val initialGapX = getAngleCourse(initialRotation.x, idealRotationX)
-    val gapY = getAngleCourse(initialRotation.y, idealRotationY)
-    val isCleanlyReversed = abs(initialGapX) > Pi * 0.8f
-    val gapX = if (isCleanlyReversed)
-      0f
-    else
-      initialGapX
-
-    val maxChange = 0.4f * delta
-    if (gapX == 0f && gapY == 0f)
-      Vector2.zero
-    else {
-      val gapVector = Vector2(gapX, gapY)
-      val changeLength = minMax(gapVector.length(), -maxChange, maxChange)
-//      if (changeLength < maxChange && !isCleanlyReversed)
-//        Vector2(idealRotationX, idealRotationY)
-//      else {
-      gapVector.normalize() * changeLength
-//      }
-    }
+    Vector2.zero
+//    val initialGapX = getAngleCourse(initialRotation.x, idealRotationX)
+//    val gapY = getAngleCourse(initialRotation.y, idealRotationY)
+//    val isCleanlyReversed = abs(initialGapX) > Pi * 0.8f
+//    val gapX = if (isCleanlyReversed)
+//      0f
+//    else
+//      initialGapX
+//
+//    if (gapX == 0f && gapY == 0f)
+//      Vector2.zero
+//    else {
+//      val gapVector = Vector2(gapX, gapY)
+//      val gapLength = gapVector.length()
+//      val mod = gapLength * gapLength * delta
+//      val changeLength = minMax(gapVector.length(), -mod, mod)
+//      gapVector.normalize() * changeLength
+//    }
   } else
     Vector2.zero
 
@@ -208,7 +211,7 @@ fun updateThirdPersonFacingRotation(facingRotation: Vector3, thirdPersonRig: Thi
   val facingDestination = thirdPersonRig.facingDestination
   return if (facingDestination != null && facingDestination != facing) {
     val facingGap = getAngleCourse(facing, facingDestination)
-    val maxFacingChange = 18f * delta
+    val maxFacingChange = facingGap * facingGap * 2f * delta
     val change = minMax(facingGap, -maxFacingChange, maxFacingChange)
 //    println("$change $facingGap ${movement.offset} ${movement.offset.length()}")
     Vector3(0f, 0f, normalizeRadialAngle(facing + change))
