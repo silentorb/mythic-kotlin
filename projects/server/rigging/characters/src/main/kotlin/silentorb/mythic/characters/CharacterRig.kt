@@ -171,6 +171,7 @@ fun updateCharacterRig(
     else
       updateThirdPersonFacingRotation(characterRig.facingRotation, thirdPersonRig, delta)
 
+//    assert(facingRotation.z > - Pi * 2 && facingRotation.z < Pi * 2)
     characterRig.copy(
         groundDistance = updateCharacterStepHeight(bulletState, walkableMask, bodies[id]!!, collisionObjects[id]!!),
         facingRotation = facingRotation,

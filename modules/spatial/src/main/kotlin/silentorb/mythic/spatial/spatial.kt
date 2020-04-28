@@ -417,18 +417,20 @@ fun createArcZ(radius: Float, count: Int, sweep: Float = Pi * 2, offset: Float =
 }
 
 fun radiansToDegrees(radians: Float): Float =
-  radians * 180f / Pi
+    radians * 180f / Pi
 
 fun degreesToRadians(degrees: Float): Float =
     degrees * Pi / 180f
 
 fun getAngleCourse(source: Float, destination: Float): Float {
   val full = Pi * 2
-  if (source == destination)
+  val a = normalizeRadialAngle(source)
+  val b = normalizeRadialAngle(destination)
+  if (a == b)
     return 0f
 
-  val plus = (full + destination - source) % full
-  val minus = (full + source - destination) % full
+  val plus = normalizeRadialAngle(full + destination - source)
+  val minus = normalizeRadialAngle(full + source - destination)
   return if (plus < minus)
     plus
   else
@@ -452,4 +454,13 @@ fun horizontalFacingDistance(angle: Float, lookAt: Vector3): Float {
 fun verticalFacingDistance(angle: Float, lookAt: Vector3): Float {
   val secondAngle = getVerticalLookAtAngle(lookAt)
   return getAngleCourse(angle, secondAngle)
+}
+
+tailrec fun normalizeRadialAngle(angle: Float): Float {
+  val cycle = Pi * 2f
+  return when {
+    angle > cycle -> normalizeRadialAngle(angle - cycle)
+    angle < 0f -> normalizeRadialAngle(angle + cycle)
+    else -> angle
+  }
 }

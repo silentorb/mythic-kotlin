@@ -19,7 +19,7 @@ fun firstRayHit(dynamicsWorld: btDiscreteDynamicsWorld, start: Vector3, end: Vec
   val callback = ClosestRayResultCallback(start2, end2)
   callback.collisionFilterGroup = -1
   if (mask != -1)
-    callback.collisionFilterMask = -1
+    callback.collisionFilterMask = mask
 
   dynamicsWorld.collisionWorld.rayTest(start2, end2, callback)
   val hasHit = callback.hasHit()
