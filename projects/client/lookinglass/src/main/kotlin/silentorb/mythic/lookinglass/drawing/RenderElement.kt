@@ -3,6 +3,7 @@ package silentorb.mythic.lookinglass.drawing
 import silentorb.mythic.breeze.MultiAnimationPart
 import silentorb.mythic.breeze.transformAnimatedSkeleton
 import silentorb.mythic.glowing.DrawMethod
+import silentorb.mythic.glowing.PrimitiveType
 import silentorb.mythic.glowing.drawMesh
 import silentorb.mythic.spatial.*
 import silentorb.mythic.lookinglass.*
@@ -35,7 +36,7 @@ fun renderElement(renderer: Renderer, primitive: Primitive, material: Material, 
   ))
 
   effect.activate(config)
-  drawMesh(primitive.mesh, DrawMethod.triangleFan)
+  drawMesh(primitive.mesh, material.drawMethod)
 }
 
 fun armatureTransforms(armature: Armature, group: ElementGroup): List<Matrix> =
