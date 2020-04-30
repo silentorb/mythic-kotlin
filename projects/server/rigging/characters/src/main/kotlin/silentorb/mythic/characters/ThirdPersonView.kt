@@ -48,7 +48,7 @@ fun adjustCameraDistance(dynamicsWorld: btDiscreteDynamicsWorld, cameraCollision
 fun lookAtTargetOffset(location: Vector3, target: Vector3, rotation: Vector2, idealRotationY: Float, delta: Float): Vector2 {
   val targetRotationX = atan(target.xy() - location.xy())
   val rawGapX = getAngleCourse(rotation.x, targetRotationX)
-  val gapY = getAngleCourse(rotation.y, idealRotationY)
+  val gapY = getAngleCourse(rotation.y, idealRotationY - getVerticalLookAtAngle((target - location).normalize()))
   val margin = 0.4f
   val gapX = if (abs(rawGapX) < margin) 0f else rawGapX
   return if (gapX == 0f && gapY == 0f) {
@@ -211,7 +211,7 @@ fun updateThirdPersonFacingRotation(facingRotation: Vector3, thirdPersonRig: Thi
   val facingDestination = thirdPersonRig.facingDestination
   return if (facingDestination != null && facingDestination != facing) {
     val facingGap = getAngleCourse(facing, facingDestination)
-    val maxFacingChange = facingGap * facingGap * 2f * delta
+    val maxFacingChange = 0.3f * delta + facingGap * facingGap * 2f * delta
     val change = minMax(facingGap, -maxFacingChange, maxFacingChange)
 //    println("$change $facingGap ${movement.offset} ${movement.offset.length()}")
     Vector3(0f, 0f, normalizeRadialAngle(facing + change))
