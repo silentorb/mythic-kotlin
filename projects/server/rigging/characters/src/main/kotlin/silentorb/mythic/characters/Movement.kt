@@ -50,10 +50,10 @@ fun getMovementImpulseVector(baseSpeed: Float, velocity: Vector3, commandVector:
 fun characterMovement(commands: Commands, characterRig: CharacterRig, thirdPersonRig: ThirdPersonRig?, id: Id): CharacterRigMovement? {
   val offsetVector = joinInputVector(commands, playerMoveMap)
   return if (offsetVector != null) {
-    val orientation = if (thirdPersonRig == null)
+    val orientation = if (characterRig.viewMode == ViewMode.firstPerson)
       characterOrientationZ(characterRig)
     else
-      hoverCameraOrientationZ(thirdPersonRig)
+      hoverCameraOrientationZ(thirdPersonRig!!)
 
     val offset = orientation * offsetVector
     CharacterRigMovement(actor = id, offset = offset)

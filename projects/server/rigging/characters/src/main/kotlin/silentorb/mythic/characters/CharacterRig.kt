@@ -158,25 +158,30 @@ fun updateCharacterRig(
     val commands = allCommands.filter { it.target == id }
     val freedoms = freedomTable[id] ?: Freedom.none
 
-    val thirdPersonRig = thirdPersonRigs[id]
-    val firstPersonLookVelocity = if (hasFreedom(freedoms, Freedom.turning) && thirdPersonRig == null)
+    val firstPersonLookVelocity = if (hasFreedom(freedoms, Freedom.turning) && characterRig.viewMode == ViewMode.firstPerson)
       updateLookVelocity(commands, characterRig.turnSpeed * lookSensitivity(), characterRig.firstPersonLookVelocity)
     else
       characterRig.firstPersonLookVelocity
 
     val facingRotation = if (!hasFreedom(freedoms, Freedom.turning))
       characterRig.facingRotation
-    else if (thirdPersonRig == null)
+    else if (characterRig.viewMode == ViewMode.firstPerson)
       updateFirstPersonFacingRotation(characterRig.facingRotation, firstPersonLookVelocity, delta)
     else
-      updateThirdPersonFacingRotation(characterRig.facingRotation, thirdPersonRig, delta)
+      updateThirdPersonFacingRotation(characterRig.facingRotation, thirdPersonRigs[id]!!, delta)
+
+    val viewMode = if (commands.any { it.type == CharacterRigCommands.switchView })
+      if (characterRig.viewMode == ViewMode.firstPerson) ViewMode.thirdPerson else ViewMode.firstPerson
+    else
+      characterRig.viewMode
 
 //    assert(facingRotation.z > - Pi * 2 && facingRotation.z < Pi * 2)
     characterRig.copy(
         groundDistance = updateCharacterStepHeight(bulletState, walkableMask, bodies[id]!!, collisionObjects[id]!!),
         facingRotation = facingRotation,
         facingOrientation = characterRigOrentation(facingRotation),
-        firstPersonLookVelocity = firstPersonLookVelocity
+        firstPersonLookVelocity = firstPersonLookVelocity,
+        viewMode = viewMode
     )
   }
 }

@@ -3,7 +3,7 @@ package silentorb.mythic.randomly
 import silentorb.mythic.spatial.Vector2
 import java.util.*
 
-class Dice(private val seed: Long? = null) {
+class Dice(val seed: Long? = null) {
   private val random = Random(seed ?: System.currentTimeMillis())
 
   fun getInt(min: Int, max: Int) = min + random.nextInt(1 + max - min)
@@ -75,8 +75,4 @@ class Dice(private val seed: Long? = null) {
   }
 
   fun <T> shuffle(set: Set<T>): List<T> = shuffle(set.toList())
-
-  companion object {
-    val global = Dice()
-  }
 }

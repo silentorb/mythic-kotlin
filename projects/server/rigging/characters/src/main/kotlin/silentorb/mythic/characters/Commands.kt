@@ -13,6 +13,8 @@ object CharacterRigCommands {
   const val moveDown = "moveDown"
   const val moveLeft = "moveLeft"
   const val moveRight = "moveRight"
+
+  const val switchView = "switchView"
 }
 
 val characterRigCommands = reflectProperties<CommandName>(CharacterRigCommands)
