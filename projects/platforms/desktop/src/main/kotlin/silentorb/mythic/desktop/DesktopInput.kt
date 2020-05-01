@@ -167,7 +167,7 @@ class DesktopInput(val window: Long) : PlatformInput {
   }
 
   override fun isMouseVisible(value: Boolean) {
-    val mode = if (value == true) GLFW_CURSOR_NORMAL else GLFW_CURSOR_DISABLED
+    val mode = if (value) GLFW_CURSOR_NORMAL else GLFW_CURSOR_DISABLED
     glfwSetInputMode(window, GLFW_CURSOR, mode)
   }
 

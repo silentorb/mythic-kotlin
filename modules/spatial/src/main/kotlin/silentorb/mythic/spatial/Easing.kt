@@ -41,5 +41,8 @@ fun invertCurve(curve: EasingFunction): EasingFunction = { t ->
 fun interpolate(scalar: Float, a: Vector3, b: Vector3): Vector3 =
     b * scalar + a * (1f - scalar)
 
+fun interpolate(scalar: Float, a: Vector2, b: Vector2): Vector2 =
+    b * scalar + a * (1f - scalar)
+
 fun interpolate(scalar: Float, a: Quaternion, b: Quaternion): Quaternion =
     Quaternion(a).slerp(b, scalar)

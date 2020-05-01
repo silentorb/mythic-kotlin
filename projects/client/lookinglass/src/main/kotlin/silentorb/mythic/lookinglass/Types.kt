@@ -12,6 +12,7 @@ import silentorb.mythic.lookinglass.texturing.DynamicTextureLibrary
 import silentorb.mythic.platforming.PlatformDisplayConfig
 import silentorb.mythic.scenery.ArmatureName
 import silentorb.mythic.spatial.Matrix
+import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.typography.FontSet
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
@@ -31,7 +32,9 @@ data class DisplayConfig(
     val multisamples: Int = 0,
     val depthOfField: Boolean = false,
     val textureAntialiasing: TextureAntialiasing = TextureAntialiasing.trilinear
-)
+) {
+  val dimensions: Vector2i get() = Vector2i(width, height)
+}
 
 fun toPlatformDisplayConfig(display: DisplayConfig) =
     PlatformDisplayConfig(

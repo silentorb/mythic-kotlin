@@ -9,7 +9,8 @@ typealias CommandName = String
 data class CharacterCommand(
     val type: CommandName,
     val target: Id,
-    val value: Float = 1f
+    val value: Float = 1f,
+    val device: Int = 0
 ) : GameEvent
 
 typealias Commands = List<CharacterCommand>

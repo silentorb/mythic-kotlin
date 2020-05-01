@@ -6,84 +6,6 @@ import silentorb.mythic.debugging.getDebugString
 import silentorb.mythic.platforming.InputEvent
 import silentorb.mythic.spatial.Vector2
 
-val DEBUG_INPUT_COUNTS = getDebugString("DEBUG_INPUT_COUNTS") != null
-
-enum class DeviceIndex {
-  keyboard,
-  mouse,
-  gamepad
-}
-
-data class InputDeviceState(
-    val events: List<InputEvent>,
-    val mousePosition: Vector2
-)
-
-data class Binding(
-    val device: DeviceIndex,
-    val trigger: Int,
-    val command: Any
-)
-
-data class HaftCommand(
-    val type: Any,
-    val target: Long = 0,
-    val value: Float = 0f
-)
-
-fun  simpleCommand(type: Any, target: Long = 0): HaftCommand =
-    HaftCommand(
-        type = type,
-        target = target,
-        value = 1f
-    )
-
-data class Gamepad(val id: Int, val name: String)
-
-typealias HaftCommands = List<HaftCommand>
-
-typealias CommandHandler = (HaftCommand) -> Unit
-
-//typealias InputTriggerState = Map<Binding, TriggerState?>
-
-typealias Bindings = List<Binding>
-
-typealias ScalarInputSource = (trigger: Int) -> Float
-
-typealias MultiDeviceScalarInputSource = (device: Int, trigger: Int) -> Float
-
-typealias InputProfiles = List<Bindings>
-
-val disconnectedScalarInputSource: ScalarInputSource = { 0f }
-
-const val MouseMovementLeft = 5
-const val MouseMovementRight = 6
-const val MouseMovementUp = 7
-const val MouseMovementDown = 8
-
-fun newInputDeviceState() =
-    InputDeviceState(
-        events = listOf(),
-        mousePosition = Vector2()
-    )
-
-fun applyMouseAxis(device: Int, value: Float, firstIndex: Int, secondIndex: Int, scale: Float) =
-    if (value > 0)
-      InputEvent(device, firstIndex, value * scale)
-    else if (value < 0)
-      InputEvent(device, secondIndex, -value * scale)
-    else
-      null
-
-fun applyMouseMovement(device: Int, mouseOffset: Vector2): List<InputEvent> =
-    listOfNotNull(
-        applyMouseAxis(device, mouseOffset.x, MouseMovementRight, MouseMovementLeft, 1f),
-        applyMouseAxis(device, mouseOffset.y, MouseMovementDown, MouseMovementUp, 1f)
-    )
-
-typealias BindingSourceTarget = Long
-typealias BindingSource = (InputEvent) -> Triple<Binding, BindingSourceTarget, Boolean>?
-
 fun matches(event: InputEvent): (InputEvent) -> Boolean = { other ->
   event.device == other.device && event.index == other.index
 }
@@ -105,7 +27,8 @@ fun mapEventsToCommands(deviceStates: List<InputDeviceState>, getBinding: Bindin
             HaftCommand(
                 type = binding.command,
                 target = target,
-                value = event.value
+                value = event.value,
+                device = event.device
             )
           } else
             null
@@ -125,19 +48,19 @@ fun getBindingSimple(bindings: List<Binding>, strokes: Set<Any>): BindingSource 
     null
 }
 
-fun  applyCommands(commands: HaftCommands, actions: Map<Any, (HaftCommand) -> Unit>) {
-  commands.filter({ actions.containsKey(it.type) })
-      .forEach({ actions[it.type]!!(it) })
+fun applyCommands(commands: HaftCommands, actions: Map<Any, (HaftCommand) -> Unit>) {
+  commands.filter { actions.containsKey(it.type) }
+      .forEach { actions[it.type]!!(it) }
 }
 
-fun  createBindings(device: DeviceIndex, bindings: Map<Int, Any>) =
-    bindings.map({ Binding(device, it.key, it.value) })
+fun createBindings(device: DeviceIndex, bindings: Map<Int, Any>) =
+    bindings.map { Binding(device, it.key, it.value) }
 
-fun  isActive(commands: List<HaftCommand>, commandType: Any): Boolean =
+fun isActive(commands: List<HaftCommand>, commandType: Any): Boolean =
     commands.any { it.type == commandType }
 
-fun  isActive(commands: List<HaftCommand>): (Any) -> Boolean =
+fun isActive(commands: List<HaftCommand>): (Any) -> Boolean =
     { commandType -> isActive(commands, commandType) }
 
-fun  getCommand(commands: List<HaftCommand>, commandType: Any) =
+fun getCommand(commands: List<HaftCommand>, commandType: Any) =
     commands.first { it.type == commandType }

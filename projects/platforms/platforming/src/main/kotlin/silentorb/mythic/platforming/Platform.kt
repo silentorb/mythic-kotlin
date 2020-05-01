@@ -15,17 +15,12 @@ data class InputEvent(
 
 const val keyboardDeviceIndex = 0
 const val mouseDeviceIndex = 1
+const val generalGamepadDeviceIndex = 2
 
 interface PlatformInput {
-  //  val KeyboardInputSource: ScalarInputSource
-//  val GamepadInputSource: MultiDeviceScalarInputSource
-//  val MouseInputSource: ScalarInputSource
   fun update()
-
   fun getMousePosition(): Vector2
-  //  fun getGamepads(): List<Gamepad>
   fun isMouseVisible(value: Boolean)
-
   fun getEvents(): List<InputEvent>
 }
 
