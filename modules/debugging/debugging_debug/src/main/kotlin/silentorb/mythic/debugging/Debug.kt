@@ -61,11 +61,6 @@ fun getDebugBoolean(name: String): Boolean =
 fun getDebugFloat(name: String): Float? =
     getDebugString(name)?.toFloatOrNull()
 
-fun isDebugSet(name: String): Boolean {
-  val value = getDebugString(name)
-  return value == "1"
-}
-
 fun debugLog(message: String) {
   println("($privateLoopNumber) $message")
 }

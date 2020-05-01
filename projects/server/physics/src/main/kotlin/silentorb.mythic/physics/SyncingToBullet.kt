@@ -87,7 +87,7 @@ fun createGhostBody(body: Body, shape: btCollisionShape): btCollisionObject {
   btBody.collisionShape = shape
   btBody.worldTransform = toGdxMatrix4(getBodyTransform(body))
 //  val j = btBody.collisionFlags
-//  btBody.collisionFlags = btBody.collisionFlags or btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE
+  btBody.collisionFlags = btBody.collisionFlags or btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE
   return btBody
 }
 
