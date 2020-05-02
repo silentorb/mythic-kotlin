@@ -122,8 +122,8 @@ fun renderElementGroup(renderer: SceneRenderer, camera: Camera, group: ElementGr
     renderBillboard(renderer.renderer, camera, group.billboards)
   }
 
-  val text = group.text
+  val text = group.textBillboard
   if (text != null) {
-    drawText(renderer, text.content, text.position, text.style)
+    drawText(renderer, text.content, text.position, text.style, text.depthOffset)
   }
 }

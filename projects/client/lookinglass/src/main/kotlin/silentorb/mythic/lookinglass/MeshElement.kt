@@ -39,7 +39,8 @@ data class TexturedBillboard(
 data class TextBillboard(
     val content: String,
     val position: Vector3,
-    val style: IndexedTextStyle
+    val style: IndexedTextStyle,
+    val depthOffset: Float = 0f
 )
 
 data class ElementGroup(
@@ -49,7 +50,7 @@ data class ElementGroup(
     val attachments: List<AttachedMesh> = listOf(),
     val billboards: List<TexturedBillboard> = listOf(),
     val lights: List<Light> = listOf(),
-    val text: TextBillboard? = null
+    val textBillboard: TextBillboard? = null
 )
 
 typealias ElementGroups = List<ElementGroup>

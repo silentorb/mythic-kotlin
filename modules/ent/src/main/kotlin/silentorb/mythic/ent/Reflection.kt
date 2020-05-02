@@ -1,6 +1,8 @@
 package silentorb.mythic.ent
 
-inline fun <reified T : Any> reflectProperties(source: Any): List<T> = source::class.java.kotlin.members
+import kotlin.reflect.full.memberProperties
+
+inline fun <reified T : Any> reflectProperties(source: Any): List<T> = source::class.java.kotlin.memberProperties
     .filter {
       it.returnType.classifier == T::class
     }

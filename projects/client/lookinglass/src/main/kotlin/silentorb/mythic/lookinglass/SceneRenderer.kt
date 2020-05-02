@@ -2,7 +2,6 @@ package silentorb.mythic.lookinglass
 
 import silentorb.mythic.drawing.drawTextRaw
 import silentorb.mythic.drawing.getStaticCanvasDependencies
-import silentorb.mythic.drawing.prepareTextMatrix
 import silentorb.mythic.glowing.DrawMethod
 import silentorb.mythic.glowing.OffscreenBuffer
 import silentorb.mythic.glowing.globalState
@@ -97,7 +96,7 @@ data class SceneRenderer(
     get() = renderer.getShader
 }
 
-fun drawText(renderer: SceneRenderer, content: String, position: Vector3, style: TextStyle) {
+fun drawText(renderer: SceneRenderer, content: String, position: Vector3, style: TextStyle, depthOffset: Float = 0f) {
   val dimensions = Vector2i(renderer.viewport.z, renderer.viewport.w)
   val point = transformToScreen(renderer.cameraEffectsData.transform, position)
   if (point != null) {
@@ -110,7 +109,7 @@ fun drawText(renderer: SceneRenderer, content: String, position: Vector3, style:
     // It looks like I'm just multiplying by the dimensions and then dividing by the dimensions, but somehow it makes a difference.
     val transform = Matrix.identity
         .mul(pixelsToScalar)
-        .translate((point.x + 1f) / 2f * dimensions.x, (1f - point.y) / 2f * dimensions.y, rawPoint.z / rawPoint.w)
+        .translate((point.x + 1f) / 2f * dimensions.x, (1f - point.y) / 2f * dimensions.y, (rawPoint.z + depthOffset) / rawPoint.w)
 
     drawTextRaw(
         config,
@@ -121,8 +120,8 @@ fun drawText(renderer: SceneRenderer, content: String, position: Vector3, style:
   }
 }
 
-fun drawText(renderer: SceneRenderer, content: String, position: Vector3, style: IndexedTextStyle) =
-    drawText(renderer, content, position, resolveTextStyle(renderer.renderer.fonts, style))
+fun drawText(renderer: SceneRenderer, content: String, position: Vector3, style: IndexedTextStyle, depthOffset: Float = 0f) =
+    drawText(renderer, content, position, resolveTextStyle(renderer.renderer.fonts, style), depthOffset)
 
 fun drawSolidFace(renderer: Renderer, vertices: List<Float>, color: Vector4) {
   renderer.dynamicMesh.load(vertices)
