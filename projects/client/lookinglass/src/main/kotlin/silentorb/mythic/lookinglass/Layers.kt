@@ -13,7 +13,7 @@ data class SceneLayer(
 
 typealias SceneLayers = List<SceneLayer>
 
-fun renderSceneLayer(renderer: Renderer, camera: Camera, layer: SceneLayer) {
+fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer) {
   val previousDepthEnabled = globalState.depthEnabled
   globalState.depthEnabled = layer.useDepth
   if (layer.resetDepth)
@@ -25,7 +25,7 @@ fun renderSceneLayer(renderer: Renderer, camera: Camera, layer: SceneLayer) {
   globalState.depthEnabled = previousDepthEnabled
 }
 
-fun renderSceneLayers(renderer: Renderer, camera: Camera, layers: SceneLayers) {
+fun renderSceneLayers(renderer: SceneRenderer, camera: Camera, layers: SceneLayers) {
   for (layer in layers) {
     renderSceneLayer(renderer, camera, layer)
   }

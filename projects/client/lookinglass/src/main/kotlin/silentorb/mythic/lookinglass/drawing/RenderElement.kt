@@ -2,8 +2,6 @@ package silentorb.mythic.lookinglass.drawing
 
 import silentorb.mythic.breeze.MultiAnimationPart
 import silentorb.mythic.breeze.transformAnimatedSkeleton
-import silentorb.mythic.glowing.DrawMethod
-import silentorb.mythic.glowing.PrimitiveType
 import silentorb.mythic.glowing.drawMesh
 import silentorb.mythic.spatial.*
 import silentorb.mythic.lookinglass.*
@@ -14,7 +12,7 @@ import silentorb.mythic.lookinglass.shading.populateBoneBuffer
 import silentorb.mythic.scenery.Camera
 import silentorb.mythic.scenery.MeshName
 
-fun renderElement(renderer: Renderer, primitive: Primitive, material: Material, transform: Matrix, isAnimated: Boolean) {
+fun renderElement(renderer: SceneRenderer, primitive: Primitive, material: Material, transform: Matrix, isAnimated: Boolean) {
   val orientationTransform = getRotationMatrix(transform)
   val texture = renderer.textures[material.texture]
 
@@ -75,7 +73,7 @@ private fun useMesh(meshes: ModelMeshMap, MeshName: MeshName, action: (ModelMesh
   }
 }
 
-fun renderMeshElement(renderer: Renderer, element: MeshElement, armature: Armature? = null, transforms: List<Matrix>? = null) {
+fun renderMeshElement(renderer: SceneRenderer, element: MeshElement, armature: Armature? = null, transforms: List<Matrix>? = null) {
   val meshes = renderer.meshes
   useMesh(meshes, element.mesh) { mesh ->
     for (primitive in mesh.primitives) {
@@ -87,7 +85,7 @@ fun renderMeshElement(renderer: Renderer, element: MeshElement, armature: Armatu
   }
 }
 
-fun renderElementGroup(renderer: Renderer, camera: Camera, group: ElementGroup) {
+fun renderElementGroup(renderer: SceneRenderer, camera: Camera, group: ElementGroup) {
   val armature = renderer.armatures[group.armature]
   val transforms = if (armature != null)
     armatureTransforms(armature, group)
@@ -121,6 +119,11 @@ fun renderElementGroup(renderer: Renderer, camera: Camera, group: ElementGroup) 
   }
 
   if (group.billboards.any()) {
-    renderBillboard(renderer, camera, group.billboards)
+    renderBillboard(renderer.renderer, camera, group.billboards)
+  }
+
+  val text = group.text
+  if (text != null) {
+    drawText(renderer, text.content, text.position, text.style)
   }
 }

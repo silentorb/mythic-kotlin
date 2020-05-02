@@ -218,8 +218,8 @@ fun getAngle(a: Vector2, b: Vector2): Float {
 //  return getAngle(a - b, c - b)
 //}
 
-val Vector4.xyz: Vector3m
-  get() = Vector3m(x, y, z)
+val Vector4.xyz: Vector3
+  get() = Vector3(x, y, z)
 
 fun Vector4.xy(): Vector2 = Vector2(x, y)
 
@@ -234,10 +234,6 @@ fun Vector3m.copy() = Vector3m(this)
 fun Vector3m.transform(m: Matrix) = m.transform(Vector4(this.x, this.y, this.z, 1f)).xyz
 
 private val tempVector = Vector4()
-fun transformVector(m: Matrix): Vector3m {
-  tempVector.set(0f, 0f, 0f, 1f)
-  return m.transform(tempVector).xyz
-}
 
 //fun Vector2.transform(m: Matrix) = m.transform(Vector4(x, y, 0f, 1f)).xy()
 

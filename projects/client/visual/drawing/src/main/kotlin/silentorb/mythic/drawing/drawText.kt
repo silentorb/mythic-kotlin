@@ -23,17 +23,10 @@ fun prepareTextMatrix(pixelsToScalar: Matrix, position: Vector2) =
     .translate(position.x, position.y, 0f)
 
 fun renderText(config: TextConfiguration, effect: ColoredImageShader, textPackage: TextPackage, transform: Matrix) {
-//  val position = config.position
-//  val scale = config.size * 0.1f
-//  val scale = 1f
-//      .scale(scale, scale, 1f)
-
   effect.activate(transform, config.style.color, config.style.font.texture)
 
   globalState.blendEnabled = true
   globalState.blendFunction = Pair(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-//  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-//  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
   textPackage.mesh.draw(DrawMethod.triangleFan)
 }
 

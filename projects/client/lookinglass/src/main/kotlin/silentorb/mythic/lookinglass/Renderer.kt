@@ -179,13 +179,14 @@ fun finishRender(renderer: Renderer, windowInfo: WindowInfo) {
   }
 }
 
-fun rasterizeCoordinates(position: Vector3, cameraEffectsData: CameraEffectsData, dimensions: Vector2i): Vector2 {
-  val modelTransform = Matrix.identity
-      .translate(position)
+fun transformToScreen(transform: Matrix, target: Vector3): Vector2? {
+  val coordinate = transform * Vector4(target.x, target.y, target.z, 1f)
 
-  val transform2 = cameraEffectsData.transform * modelTransform
-  val i = transform2.transform(Vector4(0f, 0f, 0f, 1f))
-  return Vector2(((i.x + 1) / 2) * dimensions.x, (1 - ((i.y + 1) / 2)) * dimensions.y)
+  // The w condition filters out targets behind the camera
+  return if (coordinate.w > 0f)
+    coordinate.xy() / coordinate.w
+  else
+    null
 }
 
 fun createCanvas(renderer: Renderer, custom: Map<String, Any>, dimensions: Vector2i): Canvas {

@@ -4,12 +4,11 @@ import silentorb.mythic.drawing.drawTextRaw
 import silentorb.mythic.drawing.getStaticCanvasDependencies
 import silentorb.mythic.drawing.prepareTextMatrix
 import silentorb.mythic.glowing.DrawMethod
+import silentorb.mythic.glowing.OffscreenBuffer
 import silentorb.mythic.glowing.globalState
-import silentorb.mythic.lookinglass.drawing.renderElementGroup
-import silentorb.mythic.lookinglass.shading.GeneralPerspectiveShader
-import silentorb.mythic.lookinglass.shading.ObjectShaderConfig
-import silentorb.mythic.lookinglass.shading.ShaderFeatureConfig
-import silentorb.mythic.lookinglass.shading.Shaders
+import silentorb.mythic.lookinglass.shading.*
+import silentorb.mythic.lookinglass.texturing.DynamicTextureLibrary
+import silentorb.mythic.scenery.ArmatureName
 import silentorb.mythic.scenery.Camera
 import silentorb.mythic.spatial.*
 import silentorb.mythic.typography.*
@@ -65,23 +64,6 @@ data class SceneRenderer(
     renderer.dynamicMesh.draw(DrawMethod.lines)
   }
 
-  fun drawText(content: String, position: Vector3, style: TextStyle) {
-    val dimensions = Vector2i(viewport.z, viewport.w)
-    val pos = rasterizeCoordinates(position, cameraEffectsData, dimensions)
-    val config = TextConfiguration(content, pos, style)
-    val textDimensions = calculateTextDimensions(config)
-    val pos2 = Vector2(pos.x - textDimensions.x / 2f, pos.y)
-    val pixelsToScalar = Matrix.identity.scale(1f / dimensions.x, 1f / dimensions.y, 1f)
-    val transform = prepareTextMatrix(pixelsToScalar, pos2)
-
-    drawTextRaw(
-        config,
-        renderer.drawing.coloredImage,
-        renderer.vertexSchemas.drawing.image,
-        transform
-    )
-  }
-
   fun drawCircle(position: Vector3, radius: Float, method: DrawMethod) {
     val resources = getStaticCanvasDependencies()
     val mesh = resources.meshes.circle
@@ -96,24 +78,51 @@ data class SceneRenderer(
     mesh.draw(method)
   }
 
-  fun drawText(content: String, position: Vector3, style: IndexedTextStyle) =
-      drawText(content, position, resolveTextStyle(renderer.fonts, style))
+  val armatures: Map<ArmatureName, Armature>
+    get() = renderer.armatures
 
   val meshes: ModelMeshMap
     get() = renderer.meshes
+
+  val offscreenBuffers: List<OffscreenBuffer>
+    get() = renderer.offscreenBuffers
+
+  val uniformBuffers: UniformBuffers
+    get() = renderer.uniformBuffers
+
+  val textures: DynamicTextureLibrary
+    get() = renderer.textures
+
+  val getShader: ShaderGetter
+    get() = renderer.getShader
 }
 
-fun renderElements(renderer: Renderer, camera: Camera, opaqueElementGroups: ElementGroups, transparentElementGroups: ElementGroups) {
-  for (group in opaqueElementGroups) {
-    renderElementGroup(renderer, camera, group)
-  }
+fun drawText(renderer: SceneRenderer, content: String, position: Vector3, style: TextStyle) {
+  val dimensions = Vector2i(renderer.viewport.z, renderer.viewport.w)
+  val point = transformToScreen(renderer.cameraEffectsData.transform, position)
+  if (point != null) {
+    val config = TextConfiguration(content, point, style)
+    val pixelsToScalar = Matrix.identity.scale(1f / dimensions.x, 1f / dimensions.y, 1f)
+//    val transform = prepareTextMatrix(pixelsToScalar, pos2)
+    val rawPoint = renderer.cameraEffectsData.transform * Vector4(position.x, position.y, position.z, 1f)
 
-  globalState.depthWrite = false
-  for (group in transparentElementGroups) {
-    renderElementGroup(renderer, camera, group)
+    // I don't understand why the pixelsToScalar part is needed.
+    // It looks like I'm just multiplying by the dimensions and then dividing by the dimensions, but somehow it makes a difference.
+    val transform = Matrix.identity
+        .mul(pixelsToScalar)
+        .translate((point.x + 1f) / 2f * dimensions.x, (1f - point.y) / 2f * dimensions.y, rawPoint.z / rawPoint.w)
+
+    drawTextRaw(
+        config,
+        renderer.renderer.drawing.coloredImage,
+        renderer.renderer.vertexSchemas.drawing.image,
+        transform
+    )
   }
-  globalState.depthWrite = true
 }
+
+fun drawText(renderer: SceneRenderer, content: String, position: Vector3, style: IndexedTextStyle) =
+    drawText(renderer, content, position, resolveTextStyle(renderer.renderer.fonts, style))
 
 fun drawSolidFace(renderer: Renderer, vertices: List<Float>, color: Vector4) {
   renderer.dynamicMesh.load(vertices)

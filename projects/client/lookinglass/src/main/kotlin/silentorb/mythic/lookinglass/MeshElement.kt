@@ -8,6 +8,7 @@ import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.scenery.ArmatureName
 import silentorb.mythic.scenery.Light
+import silentorb.mythic.typography.IndexedTextStyle
 
 data class ElementAnimation(
     val animationId: AnimationName,
@@ -35,13 +36,20 @@ data class TexturedBillboard(
     val step: Int = 0
 )
 
+data class TextBillboard(
+    val content: String,
+    val position: Vector3,
+    val style: IndexedTextStyle
+)
+
 data class ElementGroup(
     val meshes: List<MeshElement> = listOf(),
     val armature: ArmatureName? = null,
     val animations: List<ElementAnimation> = listOf(),
     val attachments: List<AttachedMesh> = listOf(),
     val billboards: List<TexturedBillboard> = listOf(),
-    val lights: List<Light> = listOf()
+    val lights: List<Light> = listOf(),
+    val text: TextBillboard? = null
 )
 
 typealias ElementGroups = List<ElementGroup>
