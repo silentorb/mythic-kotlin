@@ -8,6 +8,7 @@ import silentorb.mythic.spatial.Vector3
 typealias SoundBuffer = Int
 
 typealias SoundType = String
+
 typealias SoundDurations = Map<SoundType, Float>
 data class SoundData(
     val type: SoundType,

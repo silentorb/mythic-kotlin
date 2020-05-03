@@ -42,12 +42,16 @@ fun armatureTransforms(armature: Armature, group: ElementGroup): List<Matrix> =
       val animation = group.animations.first()
       transformAnimatedSkeleton(armature.bones, armature.animations[animation.animationId]!!, animation.timeOffset)
     } else {
-      val animations = group.animations.map { animation ->
-        MultiAnimationPart(
-            animation = armature.animations[animation.animationId]!!,
-            strength = animation.strength,
-            timeOffset = animation.timeOffset
-        )
+      val animations = group.animations.mapNotNull { animation ->
+        val definition = armature.animations[animation.animationId]
+        if (definition != null)
+          MultiAnimationPart(
+              animation = definition,
+              strength = animation.strength,
+              timeOffset = animation.timeOffset
+          )
+        else
+          null
       }
       transformAnimatedSkeleton(armature.bones, animations)
     }
@@ -122,8 +126,7 @@ fun renderElementGroup(renderer: SceneRenderer, camera: Camera, group: ElementGr
     renderBillboard(renderer.renderer, camera, group.billboards)
   }
 
-  val text = group.textBillboard
-  if (text != null) {
+  for (text in group.textBillboards) {
     drawText(renderer, text.content, text.position, text.style, text.depthOffset)
   }
 }

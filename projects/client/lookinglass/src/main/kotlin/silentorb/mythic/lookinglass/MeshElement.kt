@@ -50,7 +50,7 @@ data class ElementGroup(
     val attachments: List<AttachedMesh> = listOf(),
     val billboards: List<TexturedBillboard> = listOf(),
     val lights: List<Light> = listOf(),
-    val textBillboard: TextBillboard? = null
+    val textBillboards: List<TextBillboard> = listOf()
 )
 
 typealias ElementGroups = List<ElementGroup>
