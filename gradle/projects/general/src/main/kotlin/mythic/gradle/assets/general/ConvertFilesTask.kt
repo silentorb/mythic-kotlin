@@ -22,6 +22,7 @@ abstract class ConvertFilesTask : DefaultTask() {
 
   abstract fun getArgs(inputPath: Path): List<String>
 
+  @get:Input
   abstract val inputExtension: String
 
   fun getFlatOutputPath(fileName: String, outputExtension: String): Path =
@@ -30,9 +31,11 @@ abstract class ConvertFilesTask : DefaultTask() {
   @TaskAction
   fun execute(inputs: InputChanges) {
     for (change in inputs.getFileChanges(inputDir)) {
-      if (change.fileType == FileType.DIRECTORY || change.file.extension != inputExtension) break
-      if (change.changeType == ChangeType.REMOVED) {
-
+      if (change.fileType == FileType.DIRECTORY || change.file.extension != inputExtension) {
+        println("Ignoring change ${change.file.name}")
+      }
+      else if (change.changeType == ChangeType.REMOVED) {
+        println("Ignoring removed ${change.file.name}")
       } else {
         println("out of date: ${change.file.toPath()}")
         val args = getArgs(change.file.toPath())
