@@ -9,6 +9,9 @@ fun <T> mapTable(table: Table<T>, action: (Id, T) -> T): Table<T> =
 fun <T> mapTableValues(table: Table<T>, action: (T) -> T): Table<T> =
     table.mapValues { (_, value) -> action(value) }
 
+fun <T> mapTableKeys(table: Table<T>, action: (Id) -> T): Table<T> =
+    table.mapValues { (key, _) -> action(key) }
+
 fun <T> mapTableValues(action: (T) -> T): (Table<T>) -> Table<T> = { table ->
   table.mapValues { (_, value) -> action(value) }
 }

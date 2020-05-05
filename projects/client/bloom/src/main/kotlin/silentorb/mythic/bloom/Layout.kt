@@ -65,6 +65,12 @@ val centered: ReversePlanePositioner = { plane ->
   }
 }
 
+val justifiedEnd: ReversePlanePositioner = { plane ->
+  { parent, _, child ->
+    plane.x(parent) - plane.x(child.dimensions)
+  }
+}
+
 fun fixedReverse(value: Int): ReversePlanePositioner = { plane ->
   { _, _, _ ->
     value
