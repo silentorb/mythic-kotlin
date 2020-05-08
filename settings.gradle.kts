@@ -4,9 +4,9 @@ includeBuild("../imp")
 
 Files.list(file("modules").toPath())
     .forEach { path ->
+        println(path)
       includeBuild(path)
     }
-
 
 fun scanProjects(action: (String, String) -> Unit): (java.nio.file.Path) -> Unit = { path ->
   val name = path.toFile().name
