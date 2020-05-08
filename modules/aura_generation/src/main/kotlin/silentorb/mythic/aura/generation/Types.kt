@@ -6,7 +6,8 @@ enum class FieldType {
     float,
     double,
     long,
-    string
+    string,
+    timestamp
 }
 
 data class Argument(

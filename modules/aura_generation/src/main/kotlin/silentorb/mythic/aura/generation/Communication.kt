@@ -15,14 +15,34 @@ fun getPaddedStringLength(text: String): Int {
     return text.length + padding
 }
 
+fun getFieldTypePrefix(type: FieldType): Char =
+    when (type) {
+        FieldType.bytes -> 'b'
+        FieldType.int -> 'i'
+        FieldType.float -> 'f'
+        FieldType.double -> 'd'
+        FieldType.long -> 'l'
+        FieldType.string -> 's'
+        FieldType.timestamp -> 't'
+    }
+
 fun writeMessage(output: DataOutputStream, message: Message) {
     val command = message.command
+    val arguments = message.arguments
     val commandLength = getPaddedStringLength(command)
     val length = commandLength + getArgumentLength(message.arguments)
     output.writeInt(length)
     output.writeBytes(command)
     for (i in (0 until (commandLength - command.length))) {
         output.writeByte(0)
+    }
+    if (arguments.any()) {
+        output.writeByte(",".toByte().toInt())
+        for (argument in arguments) {
+            val prefix = getFieldTypePrefix(argument.type).toInt()
+            output.writeByte(prefix)
+            output.write(argument.content)
+        }
     }
 }
 
