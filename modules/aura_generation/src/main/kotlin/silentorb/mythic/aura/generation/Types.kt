@@ -5,9 +5,8 @@ enum class FieldType {
     int,
     float,
     double,
-    long,
     string,
-    timestamp
+    longTimestamp
 }
 
 data class Argument(
@@ -19,3 +18,9 @@ data class Message(
     val command: String,
     val arguments: List<Argument>
 )
+
+enum class CalculationRate(val value: Int) {
+    scalar(0),
+    control(1),
+    audio(2)
+}
