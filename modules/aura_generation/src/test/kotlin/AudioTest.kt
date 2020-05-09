@@ -7,7 +7,7 @@ class AudioTest {
     fun canPlaySineWave() {
         val synthDefinition = SynthDefinition(
             name = "test",
-            constants = listOf(440f, 0f, 0.2f),
+            constants = listOf(440f, 0f, 0.2f, 0f),
             parameters = listOf(),
             parameterNames = listOf(),
             unitGenerators = listOf(
@@ -22,13 +22,33 @@ class AudioTest {
                     outputs = listOf(
                         CalculationRate.audio
                     )
+                ),
+                UnitGenerator(
+                    className = "Out",
+                    calculationRate = CalculationRate.audio,
+                    inputs = listOf(
+                        Input(-1, 3),
+                        Input(0, 0)
+                    ),
+                    outputs = listOf(
+                        CalculationRate.audio
+                    )
                 )
             )
         )
         val buffer = serializeSynthDefinitions(listOf(synthDefinition))
-        sendMessages(listOf(
+        val synthId = 1
+        val instantiateSynth = newSynthMessage(synthDefinition.name, synthId, PlacementMethod.append, 0)
+
+        sendMessages(
+            listOf(
+                Message(Commands.freeAll, listOf(0)),
 //            Message(Commands.dumpOsc, listOf(3)),
-            Message(Commands.receiveSynth, listOf(buffer))
-        ))
+//                Message(Commands.receiveSynth, listOf(buffer, serializeMessage(instantiateSynth))),
+                Message(Commands.receiveSynth, listOf(buffer)),
+                newSynthMessage(synthDefinition.name, synthId, PlacementMethod.append, 0),
+                Message(Commands.runNode, listOf(synthId, 1))
+            )
+        )
     }
 }

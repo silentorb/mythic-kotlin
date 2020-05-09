@@ -47,12 +47,11 @@ fun writeArgument(buffer: ByteBuffer, value: Argument) {
             buffer.putLong(value)
         }
         is ByteArray -> {
-            buffer.putInt(getPaddedByteArrayLength(value.size))
+            buffer.putInt(value.size)
             buffer.put(value)
             padBytes(buffer, getBasePaddingLength(value.size))
         }
         is String -> {
-            buffer.putInt(getPaddedStringLength(value.length))
             writeString(buffer, value)
         }
         else -> throw Error("Unsupported type to serialize: ${value.javaClass.name}")
