@@ -9,10 +9,7 @@ enum class FieldType {
     longTimestamp
 }
 
-data class Argument(
-    val type: FieldType,
-    val content: ByteArray
-)
+typealias Argument = Any
 
 data class Message(
     val command: String,

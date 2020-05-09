@@ -27,7 +27,7 @@ data class SynthDefinition(
     val unitGenerators: List<UnitGenerator>
 )
 
-fun serializeString(buffer: ByteBuffer, text: String) {
+fun writePascalString(buffer: ByteBuffer, text: String) {
     buffer.put(text.length.toByte())
     buffer.put(text.toByteArray())
 }
@@ -40,6 +40,7 @@ fun serializeSynthDefinitionsHeader(buffer: ByteBuffer, definitions: List<SynthD
 }
 
 fun serializeSynthDefinition(buffer: ByteBuffer, definition: SynthDefinition) {
+    writePascalString(buffer, definition.name)
     buffer.putInt(definition.constants.size)
     for (constant in definition.constants) {
         buffer.putFloat(constant)
@@ -52,13 +53,13 @@ fun serializeSynthDefinition(buffer: ByteBuffer, definition: SynthDefinition) {
 
     buffer.putInt(definition.parameterNames.size)
     for (name in definition.parameterNames) {
-        serializeString(buffer, name)
+        writePascalString(buffer, name)
         buffer.putInt(1) // TODO: "its index in the parameter array"
     }
 
     buffer.putInt(definition.unitGenerators.size)
     for (unitGenerator in definition.unitGenerators) {
-        serializeString(buffer, unitGenerator.className)
+        writePascalString(buffer, unitGenerator.className)
         buffer.put(unitGenerator.calculationRate.value.toByte())
         buffer.putInt(unitGenerator.inputs.size)
         buffer.putInt(unitGenerator.outputs.size)
