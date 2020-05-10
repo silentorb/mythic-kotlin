@@ -21,9 +21,9 @@ fun getPaddedStringLength(length: Int): Int =
 fun getPaddedByteArrayLength(length: Int): Int =
     length + getBasePaddingLength(length)
 
-fun padBytes(output: ByteBuffer, padding: Int) {
+fun padBytes(buffer: ByteBuffer, padding: Int) {
     for (i in (0 until padding)) {
-        output.put(0)
+        buffer.put(0)
     }
 }
 

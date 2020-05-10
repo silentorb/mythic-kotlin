@@ -42,9 +42,9 @@ class AudioTest {
 
         sendMessages(
             listOf(
+//                Message(Commands.status, listOf())
                 Message(Commands.freeAll, listOf(0)),
-//            Message(Commands.dumpOsc, listOf(3)),
-//                Message(Commands.receiveSynth, listOf(buffer, serializeMessage(instantiateSynth))),
+//                Message(Commands.dumpOsc, listOf(2)),
                 Message(Commands.receiveSynth, listOf(buffer)),
                 newSynthMessage(synthDefinition.name, synthId, PlacementMethod.append, 0),
                 Message(Commands.runNode, listOf(synthId, 1))

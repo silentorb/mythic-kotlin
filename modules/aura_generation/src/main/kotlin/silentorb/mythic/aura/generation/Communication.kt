@@ -10,18 +10,23 @@ fun post(socket: Socket, messages: List<ByteArray>) {
         return
 
     val isBundle = messages.size > 1
-    val additionalLength = if (isBundle) 4 else 0
-    val length = 8 + additionalLength + messages.sumBy { it.size } + messages.size * 4
+    val additionalLength = if (isBundle) 12 + messages.size * 4 else 0
+    val length = additionalLength + messages.sumBy { it.size }
     output.writeInt(length)
-    output.writeBytes("#bundle")
-    output.writeByte(0)
     if (isBundle) {
+        output.writeBytes("#bundle")
+        output.writeByte(0)
         output.writeLong(1)
     }
 
-    for (message in messages) {
-        output.writeInt(message.size)
-        output.write(message)
+    if (isBundle) {
+        for (message in messages) {
+            output.writeInt(message.size)
+            output.write(message)
+        }
+    }
+    else {
+        output.write(messages.first())
     }
 
     output.flush()

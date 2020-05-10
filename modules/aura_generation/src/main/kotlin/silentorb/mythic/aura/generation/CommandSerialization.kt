@@ -67,14 +67,12 @@ fun serializeMessage(message: Message): ByteArray {
     writeString(buffer, command)
     if (arguments.any()) {
         buffer.put(','.toByte())
-        for ((index, argument) in arguments.withIndex()) {
+        for (argument in arguments) {
             val prefix = getFieldTypePrefix(argument).toByte()
             buffer.put(prefix)
-            buffer.put(0)
-            buffer.put(0)
-            if (index > 0) {
-                buffer.put(0)
-            }
+        }
+        padBytes(buffer, getBasePaddingLength(1 + arguments.size))
+        for (argument in arguments) {
             writeArgument(buffer, argument)
         }
     }
