@@ -13,6 +13,9 @@ dependencies {
   implementation(kotlin("stdlib-jdk8"))
   testImplementation("org.junit.jupiter:junit-jupiter:5.6.1")
   api("silentorb.mythic:randomly")
+  implementation("silentorb.imp:execution")
+  implementation("silentorb.imp:libraries_standard")
+  implementation("silentorb.imp:libraries_standard_implementation")
 }
 
 tasks {
