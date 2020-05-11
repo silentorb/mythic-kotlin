@@ -1,23 +1,24 @@
 package silentorb.mythic.aura.generation
 
-enum class FieldType {
-    bytes,
-    int,
-    float,
-    double,
-    string,
-    longTimestamp
-}
+typealias AudioTime = Int
+typealias AudioSample = Float
+typealias SampleRate = Int
+typealias SamplerAudioTime = Double
+typealias SamplerSampleRate = Int
+typealias AudioSampler = (SamplerSampleRate, SamplerAudioTime) -> AudioSample
+typealias SignalGenerator = (Float) -> Float
 
-typealias Argument = Any
-
-data class Message(
-    val command: String,
-    val arguments: List<Argument>
+data class TimeRange(
+    val start: AudioTime,
+    val end: AudioTime
 )
 
-enum class CalculationRate(val value: Int) {
-    scalar(0),
-    control(1),
-    audio(2)
-}
+data class AudioOutput(
+    val samplers: List<AudioSampler>,
+    val start: AudioTime,
+    val end: AudioTime
+)
+
+data class AudioConfig(
+    val sampleRate: Int
+)
