@@ -18,16 +18,10 @@ fun renderAudioTo16bit(config: AudioConfig, output: AudioOutput): ShortBuffer {
 
   val bufferLength = timeLength * channelCount
   val buffer = BufferUtils.createShortBuffer(bufferLength)
-var i = 0
-  val iStep = timeLength / 200
   for (step in (start until end)) {
     for (sampler in output.samplers) {
-      val sample = sampler(sampleRate, step.toDouble())
+      val sample = sampler(sampleRate, step)
       val shortValue = floatSampleToShort(sample)
-      i++
-      if (i % iStep == 0) {
-        println(shortValue)
-      }
       buffer.put(shortValue)
     }
   }

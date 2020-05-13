@@ -6,9 +6,19 @@ import silentorb.imp.execution.TypeAlias
 import silentorb.mythic.aura.generation.*
 
 fun signalGenerators() = mapOf(
-    "sine" to ::sine
+    "sineOsc" to oscillateInfinite(::sine)
 )
     .map { signalGeneratorFunction(it.key, it.value) }
+    .plus(
+        CompleteFunction(
+            path = PathKey(auraPath, "random"),
+            signature = Signature(
+                parameters = listOf(),
+                output = monoSignalKey
+            ),
+            implementation = { randomSampler }
+        )
+    )
 
 fun auraFunctions() = signalGenerators() +
     listOf(
@@ -26,21 +36,6 @@ fun auraFunctions() = signalGenerators() +
                   seconds = arguments["seconds"] as Int,
                   milliseconds = arguments["milliseconds"] as Int
               )
-            }
-        ),
-        CompleteFunction(
-            path = PathKey(auraPath, "oscillator"),
-            signature = Signature(
-                parameters = listOf(
-                    Parameter("generator", signalGeneratorKey),
-                    Parameter("frequency", frequencyKey)
-                ),
-                output = monoSignalKey
-            ),
-            implementation = { arguments ->
-              val generator = arguments["generator"] as SignalGenerator
-              val frequency = arguments["frequency"] as Float
-              oscillate(generator, frequency)
             }
         ),
         CompleteFunction(

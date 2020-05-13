@@ -5,7 +5,7 @@ import silentorb.imp.core.PathKey
 const val auraPath = "silentorb.mythic.aura.generation"
 val monoSignalKey = PathKey(auraPath, "MonoSignal")
 val audioOutputKey = PathKey(auraPath, "AudioOutput")
-val signalGeneratorKey = PathKey(auraPath, "SignalGenerator")
+val frequencySignalGeneratorKey = PathKey(auraPath, "FrequencySignalGenerator")
 val frequencyKey = PathKey(auraPath, "Frequency")
 val absoluteTimeKey = PathKey(auraPath, "Time")
 

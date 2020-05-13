@@ -1,16 +1,22 @@
 package silentorb.mythic.aura.generation.imp
 
+import silentorb.imp.core.Parameter
 import silentorb.imp.core.PathKey
 import silentorb.imp.core.Signature
 import silentorb.imp.execution.CompleteFunction
-import silentorb.mythic.aura.generation.SignalGenerator
+import silentorb.mythic.aura.generation.FrequencySignalGenerator
 
-fun signalGeneratorFunction(name: String, method: SignalGenerator) =
+fun signalGeneratorFunction(name: String, generator: FrequencySignalGenerator) =
     CompleteFunction(
         path = PathKey(auraPath, name),
         signature = Signature(
-            parameters = listOf(),
-            output = signalGeneratorKey
+            parameters = listOf(
+                Parameter("frequency", frequencyKey)
+            ),
+            output = monoSignalKey
         ),
-        implementation = { method }
+        implementation = { arguments ->
+          val frequency = arguments["frequency"] as Float
+          generator(frequency)
+        }
     )

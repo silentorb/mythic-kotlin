@@ -4,11 +4,11 @@ import silentorb.mythic.randomly.Dice
 import silentorb.mythic.spatial.Pi
 import kotlin.math.sin
 
-fun random(dice: Dice): SignalGenerator =
-    { position: Float -> dice.getFloat(-1f, 1f) }
+fun random(dice: Dice): Float =
+    dice.getFloat(-1f, 1f)
 
-fun sine(position: Float): Float =
-    sin(position * 2 * Pi)
+fun sine(position: Double): Float =
+    sin(position * 2 * Pi).toFloat()
 
 fun saw(position: Float): Float =
     position - 1
