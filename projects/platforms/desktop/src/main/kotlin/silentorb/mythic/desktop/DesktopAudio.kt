@@ -12,6 +12,23 @@ import org.lwjgl.system.libc.LibCStdlib.free
 import silentorb.mythic.platforming.LoadSoundResult
 import silentorb.mythic.platforming.PlatformAudio
 import silentorb.mythic.spatial.Vector3
+import java.nio.ShortBuffer
+
+fun loadSoundFromBuffer(inputBuffer: ShortBuffer, channels: Int, sampleRate: Int): LoadSoundResult {
+  val format = when (channels) {
+    1 -> AL_FORMAT_MONO16
+    2 -> AL_FORMAT_STEREO16
+    else -> throw Error("Invalid channel count: $channels")
+  }
+  val duration = inputBuffer.limit().toFloat() / channels.toFloat() / sampleRate.toFloat()
+  val buffer: Int = alGenBuffers()
+  alBufferData(buffer, format, inputBuffer, sampleRate)
+
+  return LoadSoundResult(
+      buffer = buffer,
+      duration = duration
+  )
+}
 
 fun loadSoundFromFile(filename: String): LoadSoundResult {
   // Allocate space to store return information from the function
@@ -22,7 +39,7 @@ fun loadSoundFromFile(filename: String): LoadSoundResult {
 
   val inputBuffer = stb_vorbis_decode_filename(filename, channelsBuffer, sampleRateBuffer)
 
-  // Retreive the extra information that was stored in the buffers by the function
+  // Retrieve the extra information that was stored in the buffers by the function
   val channels = channelsBuffer.get()
   val sampleRate = sampleRateBuffer.get()
 
@@ -31,20 +48,14 @@ fun loadSoundFromFile(filename: String): LoadSoundResult {
   stackPop()
 
   assert(inputBuffer != null)
-  val format = when (channels) {
+  when (channels) {
     1 -> AL_FORMAT_MONO16
     2 -> AL_FORMAT_STEREO16
     else -> throw Error("Invalid channel count for audio file $filename: $channels")
   }
-  val duration = inputBuffer.limit().toFloat() / channels.toFloat() / sampleRate.toFloat()
-  val buffer: Int = alGenBuffers()
-  alBufferData(buffer, format, inputBuffer, sampleRate)
-
+  val result = loadSoundFromBuffer(inputBuffer, channels, sampleRate)
   free(inputBuffer)
-  return LoadSoundResult(
-      buffer = buffer,
-      duration = duration
-  )
+  return result
 }
 
 fun millisecondsToBytes(milliseconds: Int): Int {
@@ -59,6 +70,8 @@ class DesktopAudio : PlatformAudio {
   var context: Long = 0L
   val buffers: MutableSet<Int> = mutableSetOf()
   val sources: MutableSet<Int> = mutableSetOf()
+
+  val isActive: Boolean get() = device != 0L
 
   override fun start(latency: Int) {
     val defaultDeviceName: String = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER)
@@ -94,14 +107,18 @@ class DesktopAudio : PlatformAudio {
     }
 
     finished.forEach(::alDeleteSources)
-    sources.removeAll(sources)
+    sources.removeAll(finished)
   }
 
-  override fun stop() {
+  override fun unloadAllSounds() {
     sources.forEach(::alDeleteSources)
     sources.clear()
     buffers.forEach(::alDeleteBuffers)
     buffers.clear()
+  }
+
+  override fun stop() {
+    unloadAllSounds()
     alcDestroyContext(context)
     alcCloseDevice(device)
     device = 0
@@ -111,5 +128,18 @@ class DesktopAudio : PlatformAudio {
     val result = loadSoundFromFile(filename)
     buffers.add(result.buffer)
     return result
+  }
+
+  override fun loadSound(buffer: ShortBuffer, channels: Int, sampleRate: Int): LoadSoundResult {
+    val result = loadSoundFromBuffer(buffer, channels, sampleRate)
+    buffers.add(result.buffer)
+    return result
+  }
+
+  override fun unloadSound(buffer: Int) {
+    if (buffers.contains(buffer)) {
+      buffers.remove(buffer)
+      alDeleteBuffers(buffer)
+    }
   }
 }

@@ -4,6 +4,7 @@ import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector3
 import java.nio.ByteBuffer
+import java.nio.ShortBuffer
 
 data class WindowInfo(val dimensions: Vector2i)
 
@@ -25,12 +26,12 @@ interface PlatformInput {
 }
 
 data class PlatformDisplayConfig(
-  val width: Int,
-  val height: Int,
-  val fullscreen: Boolean,
-  val windowedFullscreen: Boolean, // Whether fullscreen uses windowed fullscreen
-  val vsync: Boolean,
-  val multisamples: Int
+    val width: Int,
+    val height: Int,
+    val fullscreen: Boolean,
+    val windowedFullscreen: Boolean, // Whether fullscreen uses windowed fullscreen
+    val vsync: Boolean,
+    val multisamples: Int
 )
 
 data class RawImage(
@@ -61,6 +62,9 @@ interface PlatformAudio {
   fun playingSounds(): Set<Int>
   fun update(listenerPosition: Vector3?)
   fun loadSound(filename: String): LoadSoundResult
+  fun loadSound(buffer: ShortBuffer, channels: Int, sampleRate: Int): LoadSoundResult
+  fun unloadAllSounds()
+  fun unloadSound(buffer: Int)
   fun stop()
 }
 

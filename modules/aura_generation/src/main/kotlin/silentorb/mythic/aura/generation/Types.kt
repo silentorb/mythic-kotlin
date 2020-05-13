@@ -1,5 +1,7 @@
 package silentorb.mythic.aura.generation
 
+import silentorb.mythic.aura.generation.imp.AbsoluteTime
+
 typealias AudioTime = Int
 typealias AudioSample = Float
 typealias SampleRate = Int
@@ -15,8 +17,8 @@ data class TimeRange(
 
 data class AudioOutput(
     val samplers: List<AudioSampler>,
-    val start: AudioTime,
-    val end: AudioTime
+    val start: AbsoluteTime,
+    val end: AbsoluteTime
 )
 
 data class AudioConfig(

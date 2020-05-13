@@ -1,19 +1,36 @@
 package silentorb.mythic.aura.generation
 
-import java.nio.ByteBuffer
+import org.lwjgl.BufferUtils
+import java.nio.ShortBuffer
 
-fun renderAudio(config: AudioConfig, output: AudioOutput): ByteArray {
+fun floatSampleToShort(value: Float): Short =
+    (value * Short.MAX_VALUE).toShort()
+
+fun renderAudioTo16bit(config: AudioConfig, output: AudioOutput): ShortBuffer {
   val channelCount = output.samplers.size
   val sampleRate = config.sampleRate
   assert(channelCount == 1 || channelCount == 2)
-  val timeLength = output.end - output.start
-  val bufferLength = timeLength * config.sampleRate * channelCount
-  val result = ByteArray(bufferLength)
-  val buffer = ByteBuffer.wrap(result)
-  for (step in (output.start until output.end)) {
+  val start = resolveTime(output.start, sampleRate)
+  val end = resolveTime(output.end, sampleRate)
+  val timeLength = end - start
+  if (end < start)
+    throw Error("Invalid time range")
+
+  val bufferLength = timeLength * channelCount
+  val buffer = BufferUtils.createShortBuffer(bufferLength)
+var i = 0
+  val iStep = timeLength / 200
+  for (step in (start until end)) {
     for (sampler in output.samplers) {
-      buffer.putFloat(sampler(sampleRate, step.toDouble()))
+      val sample = sampler(sampleRate, step.toDouble())
+      val shortValue = floatSampleToShort(sample)
+      i++
+      if (i % iStep == 0) {
+        println(shortValue)
+      }
+      buffer.put(shortValue)
     }
   }
-  return result
+  buffer.rewind()
+  return buffer
 }
