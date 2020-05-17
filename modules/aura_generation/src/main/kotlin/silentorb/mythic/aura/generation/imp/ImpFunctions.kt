@@ -4,6 +4,8 @@ import silentorb.imp.core.*
 import silentorb.imp.execution.CompleteFunction
 import silentorb.imp.execution.TypeAlias
 import silentorb.mythic.aura.generation.*
+import kotlin.math.max
+import kotlin.math.min
 
 fun signalGenerators() = mapOf(
     "sineOsc" to oscillateInfinite(::sine)
@@ -22,22 +24,6 @@ fun signalGenerators() = mapOf(
 
 fun auraFunctions() = signalGenerators() +
     listOf(
-        CompleteFunction(
-            path = absoluteTimeKey,
-            signature = Signature(
-                parameters = listOf(
-                    Parameter("seconds", intKey),
-                    Parameter("milliseconds", intKey)
-                ),
-                output = absoluteTimeKey
-            ),
-            implementation = { arguments ->
-              AbsoluteTime(
-                  seconds = arguments["seconds"] as Int,
-                  milliseconds = arguments["milliseconds"] as Int
-              )
-            }
-        ),
         CompleteFunction(
             path = PathKey(auraPath, "period"),
             signature = Signature(
@@ -58,6 +44,32 @@ fun auraFunctions() = signalGenerators() +
                   end = end
               )
             }
+        ),
+        CompleteFunction(
+            path = PathKey(auraPath, "+"),
+            signature = Signature(
+                parameters = listOf(
+                    Parameter("first", audioOutputKey),
+                    Parameter("second", audioOutputKey)
+                ),
+                output = audioOutputKey
+            ),
+            implementation = { arguments ->
+              val first = arguments["first"] as AudioOutput
+              val second = arguments["second"] as AudioOutput
+              AudioOutput(
+                  samplers = listOf { sampleRate ->
+                    val a = renderPeriod(first.samplers.first(), first.start, first.end)(sampleRate)
+                    val b = renderPeriod(second.samplers.first(), second.start, second.end)(sampleRate)
+                    val lineBreak = 0
+                    { position ->
+                      a(position) + b(position)
+                    }
+                  },
+                  start = min(first.start, second.start),
+                  end = max(first.end, second.end)
+              )
+            }
         )
     )
 
@@ -67,5 +79,10 @@ fun auraAliases() =
             path = frequencyKey,
             alias = floatKey,
             numericConstraint = newNumericConstraint(1f, 33000f)
+        ),
+        TypeAlias(
+            path = absoluteTimeKey,
+            alias = floatKey,
+            numericConstraint = newNumericConstraint(0f, 1000f)
         )
     )

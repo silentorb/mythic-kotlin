@@ -8,7 +8,7 @@ typealias SampleRate = Int
 typealias SamplerAudioTime = Int
 typealias SamplerSampleRate = Int
 typealias Frequency = Float
-typealias AudioSampler = (SamplerSampleRate, SamplerAudioTime) -> AudioSample
+typealias AudioSampler = (SamplerSampleRate) -> (SamplerAudioTime) -> AudioSample
 typealias FrequencySignalGenerator = (Frequency) -> AudioSampler
 
 data class TimeRange(
