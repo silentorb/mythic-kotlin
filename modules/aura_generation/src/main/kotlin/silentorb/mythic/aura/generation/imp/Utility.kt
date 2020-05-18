@@ -11,9 +11,9 @@ fun signalGeneratorFunction(name: String, generator: FrequencySignalGenerator) =
         path = PathKey(auraPath, name),
         signature = Signature(
             parameters = listOf(
-                Parameter("frequency", frequencyKey)
+                Parameter("frequency", frequencyType)
             ),
-            output = monoSignalKey
+            output = monoSignalType
         ),
         implementation = { arguments ->
           val frequency = arguments["frequency"] as Float

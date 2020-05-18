@@ -18,16 +18,23 @@ typealias GrayscaleColor = Float
 
 // Type Keys
 val rgbColorKey = PathKey(texturingPath, "RgbColor")
+val rgbColorType = rgbColorKey.hashCode()
 val transparentColorKey = PathKey(texturingPath, "RgbaColor")
 
 val rgbBitmapKey = PathKey(texturingPath, "RgbBitmap")
+val rgbBitmapType = rgbBitmapKey.hashCode()
 val transparentColorBitmapKey = PathKey(texturingPath, "RgbaBitmap")
 val grayscaleBitmapKey = PathKey(texturingPath, "GrayscaleBitmap")
+val grayscaleBitmapType = grayscaleBitmapKey.hashCode()
 val absoluteDimensionsKey = PathKey(texturingPath, "Dimensions")
+val absoluteDimensionsType = absoluteDimensionsKey.hashCode()
 val relativeDimensionsKey = PathKey(texturingPath, "RelativeDimensions")
+val relativeDimensionsType = relativeDimensionsKey.hashCode()
 
 val floatSampler2dKey = PathKey(texturingPath, "FloatSampler")
+val floatSampler2dType = floatSampler2dKey.hashCode()
 val rgbSampler2dKey = PathKey(texturingPath, "RgbSampler")
+val rgbSampler2dType = rgbSampler2dKey.hashCode()
 
 typealias FloatSampler = GetSample2d<Float>
 

@@ -16,7 +16,7 @@ fun signalGenerators() = mapOf(
             path = PathKey(auraPath, "random"),
             signature = Signature(
                 parameters = listOf(),
-                output = monoSignalKey
+                output = monoSignalType
             ),
             implementation = { randomSampler }
         )
@@ -28,11 +28,11 @@ fun auraFunctions() = signalGenerators() +
             path = PathKey(auraPath, "period"),
             signature = Signature(
                 parameters = listOf(
-                    Parameter("signal", monoSignalKey),
-                    Parameter("start", absoluteTimeKey),
-                    Parameter("end", absoluteTimeKey)
+                    Parameter("signal", monoSignalType),
+                    Parameter("start", absoluteTimeType),
+                    Parameter("end", absoluteTimeType)
                 ),
-                output = audioOutputKey
+                output = audioOutputType
             ),
             implementation = { arguments ->
               val signal = arguments["signal"] as AudioSampler
@@ -49,10 +49,10 @@ fun auraFunctions() = signalGenerators() +
             path = PathKey(auraPath, "+"),
             signature = Signature(
                 parameters = listOf(
-                    Parameter("first", audioOutputKey),
-                    Parameter("second", audioOutputKey)
+                    Parameter("first", audioOutputType),
+                    Parameter("second", audioOutputType)
                 ),
-                output = audioOutputKey
+                output = audioOutputType
             ),
             implementation = { arguments ->
               val first = arguments["first"] as AudioOutput
@@ -76,13 +76,13 @@ fun auraFunctions() = signalGenerators() +
 fun auraAliases() =
     listOf(
         TypeAlias(
-            path = frequencyKey,
-            alias = floatKey,
+            path = frequencyType,
+            alias = floatType,
             numericConstraint = newNumericConstraint(1f, 33000f)
         ),
         TypeAlias(
-            path = absoluteTimeKey,
-            alias = floatKey,
+            path = absoluteTimeType,
+            alias = floatType,
             numericConstraint = newNumericConstraint(0f, 1000f)
         )
     )

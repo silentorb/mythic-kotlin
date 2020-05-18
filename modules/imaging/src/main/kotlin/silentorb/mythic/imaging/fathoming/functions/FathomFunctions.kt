@@ -1,9 +1,6 @@
 package silentorb.mythic.imaging.fathoming.functions
 
-import silentorb.imp.core.Parameter
-import silentorb.imp.core.PathKey
-import silentorb.imp.core.Signature
-import silentorb.imp.core.floatKey
+import silentorb.imp.core.*
 import silentorb.imp.execution.CompleteFunction
 import silentorb.mythic.imaging.fathoming.*
 import silentorb.mythic.spatial.Quaternion
@@ -16,9 +13,9 @@ fun fathomFunctions() = listOf(
         path = PathKey(fathomPath, "sphere"),
         signature = Signature(
             parameters = listOf(
-                Parameter("radius", floatKey)
+                Parameter("radius", floatType)
             ),
-            output = distanceFunctionKey
+            output = distanceFunctionType
         ),
         implementation = { arguments ->
             val radius = arguments["radius"] as Float
@@ -30,9 +27,9 @@ fun fathomFunctions() = listOf(
         path = PathKey(fathomPath, "cube"),
         signature = Signature(
             parameters = listOf(
-                Parameter("dimensions", vector3Key)
+                Parameter("dimensions", vector3Type)
             ),
-            output = distanceFunctionKey
+            output = distanceFunctionType
         ),
         implementation = { arguments ->
             val dimensions = arguments["dimensions"] as Vector3
@@ -44,10 +41,10 @@ fun fathomFunctions() = listOf(
         path = PathKey(fathomPath, "translate"),
         signature = Signature(
             parameters = listOf(
-                Parameter("offset", translation3Key),
-                Parameter("source", distanceFunctionKey)
+                Parameter("offset", translation3Type),
+                Parameter("source", distanceFunctionType)
             ),
-            output = distanceFunctionKey
+            output = distanceFunctionType
         ),
         implementation = { arguments ->
             val offset = arguments["offset"] as Vector3
@@ -60,10 +57,10 @@ fun fathomFunctions() = listOf(
         path = PathKey(fathomPath, "rotate"),
         signature = Signature(
             parameters = listOf(
-                Parameter("rotation", quaternionKey),
-                Parameter("source", distanceFunctionKey)
+                Parameter("rotation", quaternionType),
+                Parameter("source", distanceFunctionType)
             ),
-            output = distanceFunctionKey
+            output = distanceFunctionType
         ),
         implementation = { arguments ->
           val orientation = arguments["rotation"] as Quaternion
@@ -76,11 +73,11 @@ fun fathomFunctions() = listOf(
         path = vector3Key,
         signature = Signature(
             parameters = listOf(
-                Parameter("x", floatKey),
-                Parameter("y", floatKey),
-                Parameter("z", floatKey)
+                Parameter("x", floatType),
+                Parameter("y", floatType),
+                Parameter("z", floatType)
             ),
-            output = vector3Key
+            output = vector3Type
         ),
         implementation = { arguments ->
             Vector3(arguments["x"] as Float, arguments["y"] as Float, arguments["z"] as Float)
@@ -91,11 +88,11 @@ fun fathomFunctions() = listOf(
         path = PathKey(fathomPath, "rotationFromAxis"),
         signature = Signature(
             parameters = listOf(
-                Parameter("x", floatKey),
-                Parameter("y", floatKey),
-                Parameter("z", floatKey)
+                Parameter("x", floatType),
+                Parameter("y", floatType),
+                Parameter("z", floatType)
             ),
-            output = quaternionKey
+            output = quaternionType
         ),
         implementation = { arguments ->
           Quaternion()

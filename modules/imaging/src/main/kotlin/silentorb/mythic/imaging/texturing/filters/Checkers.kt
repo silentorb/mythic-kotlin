@@ -4,10 +4,11 @@ import silentorb.imp.core.*
 import silentorb.imp.execution.CompleteFunction
 import silentorb.imp.execution.TypeAlias
 import silentorb.mythic.imaging.common.GetSample2d
-import silentorb.mythic.imaging.texturing.floatSampler2dKey
+import silentorb.mythic.imaging.texturing.floatSampler2dType
 import silentorb.mythic.imaging.texturing.texturingPath
 
-val CheckersIterations = PathKey(texturingPath, "CheckersIterations")
+val CheckersIterationsKey = PathKey(texturingPath, "CheckersIterations")
+val CheckersIterationsType = CheckersIterationsKey.hashCode()
 
 fun checkerPattern(iterationsX: Int, iterationsY: Int): GetSample2d<Float> {
   val scaleX = iterationsX.toFloat() * 2f
@@ -24,10 +25,10 @@ fun checkersFunctions() = listOf(
         path = PathKey(texturingPath, "checkers"),
         signature = Signature(
             parameters = listOf(
-                Parameter("iterationsX", oneToOneHundredKey),
-                Parameter("iterationsY", oneToOneHundredKey)
+                Parameter("iterationsX", oneToOneHundredType),
+                Parameter("iterationsY", oneToOneHundredType)
             ),
-            output = floatSampler2dKey
+            output = floatSampler2dType
         ),
         implementation = { arguments ->
           val iterationsX = arguments["iterationsX"] as Int
@@ -39,8 +40,8 @@ fun checkersFunctions() = listOf(
 
 fun checkersAliases() = listOf(
     TypeAlias(
-        path = CheckersIterations,
-        alias = intKey,
+        path = CheckersIterationsType,
+        alias = intType,
         numericConstraint = newNumericConstraint(1, 64)
     )
 )

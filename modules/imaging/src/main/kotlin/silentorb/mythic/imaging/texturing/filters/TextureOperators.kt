@@ -101,11 +101,11 @@ fun completeTexturingFunctions() = listOf(
         path = rgbColorKey,
         signature = Signature(
             parameters = listOf(
-                Parameter("red", intKey),
-                Parameter("green", intKey),
-                Parameter("blue", intKey)
+                Parameter("red", intType),
+                Parameter("green", intType),
+                Parameter("blue", intType)
             ),
-            output = rgbColorKey
+            output = rgbColorType
         ),
         implementation = { arguments ->
             Vector3i(arguments["red"] as Int, arguments["green"] as Int, arguments["blue"] as Int)
@@ -115,10 +115,10 @@ fun completeTexturingFunctions() = listOf(
         path = absoluteDimensionsKey,
         signature = Signature(
             parameters = listOf(
-                Parameter("width", intKey),
-                Parameter("height", intKey)
+                Parameter("width", intType),
+                Parameter("height", intType)
             ),
-            output = absoluteDimensionsKey
+            output = absoluteDimensionsType
         ),
         implementation = { arguments ->
           Vector2i(arguments["width"] as Int, arguments["height"] as Int)
@@ -128,11 +128,11 @@ fun completeTexturingFunctions() = listOf(
         path = coloredCheckersKey,
         signature = Signature(
             parameters = listOf(
-                Parameter("dimensions", absoluteDimensionsKey),
-                Parameter("firstColor", rgbColorKey),
-                Parameter("secondColor", rgbColorKey)
+                Parameter("dimensions", absoluteDimensionsType),
+                Parameter("firstColor", rgbColorType),
+                Parameter("secondColor", rgbColorType)
             ),
-            output = rgbBitmapKey
+            output = rgbBitmapType
         ),
         implementation = coloredCheckers
     ),
@@ -140,10 +140,10 @@ fun completeTexturingFunctions() = listOf(
         path = PathKey(texturingPath, "Bitmap"),
         signature = Signature(
             parameters = listOf(
-                Parameter("dimensions", absoluteDimensionsKey),
-                Parameter("color", rgbColorKey)
+                Parameter("dimensions", absoluteDimensionsType),
+                Parameter("color", rgbColorType)
             ),
-            output = rgbBitmapKey
+            output = rgbBitmapType
         ),
         implementation = withBuffer("dimensions", withBitmapBuffer) { arguments ->
           val color = arguments["color"]!! as SolidColor
@@ -154,10 +154,10 @@ fun completeTexturingFunctions() = listOf(
         path = PathKey(texturingPath, "Bitmap"),
         signature = Signature(
             parameters = listOf(
-                Parameter("dimensions", absoluteDimensionsKey),
-                Parameter("value", floatKey)
+                Parameter("dimensions", absoluteDimensionsType),
+                Parameter("value", floatType)
             ),
-            output = grayscaleBitmapKey
+            output = grayscaleBitmapType
         ),
         implementation = withBuffer("dimensions", withGrayscaleBuffer) { arguments ->
           val value = arguments["value"]!! as Float
@@ -168,11 +168,11 @@ fun completeTexturingFunctions() = listOf(
         path = colorizeKey,
         signature = Signature(
             parameters = listOf(
-                Parameter("sampler", floatSampler2dKey),
-                Parameter("firstColor", rgbColorKey),
-                Parameter("secondColor", rgbColorKey)
+                Parameter("sampler", floatSampler2dType),
+                Parameter("firstColor", rgbColorType),
+                Parameter("secondColor", rgbColorType)
             ),
-            output = rgbSampler2dKey
+            output = rgbSampler2dType
         ),
         implementation = { arguments ->
           val sampler = arguments["sampler"]!! as FloatSampler
@@ -187,11 +187,11 @@ fun completeTexturingFunctions() = listOf(
         path = PathKey(texturingPath, "mask"),
         signature = Signature(
             parameters = listOf(
-                Parameter("first", rgbSampler2dKey),
-                Parameter("second", rgbSampler2dKey),
-                Parameter("mask", floatSampler2dKey)
+                Parameter("first", rgbSampler2dType),
+                Parameter("second", rgbSampler2dType),
+                Parameter("mask", floatSampler2dType)
             ),
-            output = rgbSampler2dKey
+            output = rgbSampler2dType
         ),
         implementation = { arguments ->
           val first = arguments["first"]!! as RgbSampler
@@ -208,11 +208,11 @@ fun completeTexturingFunctions() = listOf(
         path = mixBitmapsKey,
         signature = Signature(
             parameters = listOf(
-                Parameter("degree", floatKey),
-                Parameter("first", rgbBitmapKey),
-                Parameter("second", grayscaleBitmapKey)
+                Parameter("degree", floatType),
+                Parameter("first", rgbBitmapType),
+                Parameter("second", grayscaleBitmapType)
             ),
-            output = rgbBitmapKey
+            output = rgbBitmapType
         ),
         implementation = mixBitmaps
     ),
@@ -223,9 +223,9 @@ fun completeTexturingFunctions() = listOf(
         path = voronoiBoundariesKey,
         signature = Signature(
             parameters = listOf(
-                Parameter("dimensions", absoluteDimensionsKey)
+                Parameter("dimensions", absoluteDimensionsType)
             ),
-            output = grayscaleBitmapKey
+            output = grayscaleBitmapType
         ),
         implementation = voronoiBoundaryOperator
     )

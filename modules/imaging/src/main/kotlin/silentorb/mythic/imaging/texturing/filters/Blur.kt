@@ -10,19 +10,19 @@ import silentorb.mythic.spatial.Vector3
 
 
 private fun commonDistortionParameters() = listOf(
-    Parameter("radius", zeroToOneHundredKey)
+    Parameter("radius", zeroToOneHundredType)
 )
 
 val blurSignatureRgb = Signature(
     parameters = commonDistortionParameters()
-        .plus(Parameter("source", rgbSampler2dKey)),
-    output = rgbSampler2dKey
+        .plus(Parameter("source", rgbSampler2dType)),
+    output = rgbSampler2dType
 )
 
 val blurSignatureFloat = Signature(
     parameters = commonDistortionParameters()
-        .plus(Parameter("source", floatSampler2dKey)),
-    output = floatSampler2dKey
+        .plus(Parameter("source", floatSampler2dType)),
+    output = floatSampler2dType
 )
 
 fun newBlurConvolutionMatrix(radius: Int): FloatArray {

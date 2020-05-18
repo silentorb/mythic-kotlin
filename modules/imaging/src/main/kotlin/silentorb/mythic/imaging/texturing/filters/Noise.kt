@@ -79,27 +79,30 @@ fun nonTilingOpenSimplex2D(seed: Long = 1L): GetSample2d<Float> {
 
 //val noiseOctaveKey = PathKey(texturingPath, "NoiseOctave")
 val zeroToOneHundredKey = PathKey(texturingPath, "NoiseDetail")
+val zeroToOneHundredType = zeroToOneHundredKey.hashCode()
 val oneToOneHundredKey = PathKey(texturingPath, "ZeroToOneHundred")
+val oneToOneHundredType = oneToOneHundredKey.hashCode()
 val noiseVariationKey = PathKey(texturingPath, "NoiseVariation")
+val noiseVariationType = noiseVariationKey.hashCode()
 
 val coloredNoiseSignature = Signature(
     parameters = listOf(
-        Parameter("dimensions", absoluteDimensionsKey),
-        Parameter("scale", oneToOneHundredKey),
-        Parameter("detail", zeroToOneHundredKey),
-        Parameter("firstColor", rgbColorKey),
-        Parameter("secondColor", rgbColorKey)
+        Parameter("dimensions", absoluteDimensionsType),
+        Parameter("scale", oneToOneHundredType),
+        Parameter("detail", zeroToOneHundredType),
+        Parameter("firstColor", rgbColorType),
+        Parameter("secondColor", rgbColorType)
     ),
-    output = rgbBitmapKey
+    output = rgbBitmapType
 )
 
 val noiseSignature = Signature(
     parameters = listOf(
-        Parameter("scale", oneToOneHundredKey),
-        Parameter("detail", zeroToOneHundredKey),
-        Parameter("variation", noiseVariationKey)
+        Parameter("scale", oneToOneHundredType),
+        Parameter("detail", zeroToOneHundredType),
+        Parameter("variation", noiseVariationType)
     ),
-    output = floatSampler2dKey
+    output = floatSampler2dType
 )
 
 val noiseFunction = CompleteFunction(
@@ -144,22 +147,22 @@ fun noiseAliases() =
     listOf(
 //        TypeAlias(
 //            path = noiseOctaveKey,
-//            alias = intKey,
+//            alias = intType,
 //            numericConstraint = newNumericConstraint(1, 8)
 //        ),
         TypeAlias(
-            path = oneToOneHundredKey,
-            alias = intKey,
+            path = oneToOneHundredType,
+            alias = intType,
             numericConstraint = newNumericConstraint(1, 100)
         ),
         TypeAlias(
-            path = zeroToOneHundredKey,
-            alias = intKey,
+            path = zeroToOneHundredType,
+            alias = intType,
             numericConstraint = newNumericConstraint(0, 100)
         ),
         TypeAlias(
-            path = noiseVariationKey,
-            alias = intKey,
+            path = noiseVariationType,
+            alias = intType,
             numericConstraint = newNumericConstraint(1, 1000)
         )
     )

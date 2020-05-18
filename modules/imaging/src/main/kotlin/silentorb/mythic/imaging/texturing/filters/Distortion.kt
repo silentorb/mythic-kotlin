@@ -6,27 +6,27 @@ import silentorb.imp.core.Signature
 import silentorb.imp.execution.CompleteFunction
 import silentorb.imp.execution.FunctionImplementation
 import silentorb.mythic.imaging.texturing.AnySampler
-import silentorb.mythic.imaging.texturing.floatSampler2dKey
-import silentorb.mythic.imaging.texturing.rgbSampler2dKey
+import silentorb.mythic.imaging.texturing.floatSampler2dType
+import silentorb.mythic.imaging.texturing.rgbSampler2dType
 import silentorb.mythic.imaging.texturing.texturingPath
 
 private fun commonDistortionParameters() = listOf(
-    Parameter("strength", zeroToOneHundredKey),
-    Parameter("scale", oneToOneHundredKey),
-    Parameter("detail", zeroToOneHundredKey),
-    Parameter("variation", noiseVariationKey)
+    Parameter("strength", zeroToOneHundredType),
+    Parameter("scale", oneToOneHundredType),
+    Parameter("detail", zeroToOneHundredType),
+    Parameter("variation", noiseVariationType)
 )
 
 val distortSignatureRgb = Signature(
     parameters = commonDistortionParameters()
-        .plus(Parameter("source", rgbSampler2dKey)),
-    output = rgbSampler2dKey
+        .plus(Parameter("source", rgbSampler2dType)),
+    output = rgbSampler2dType
 )
 
 val distortSignatureFloat = Signature(
     parameters = commonDistortionParameters()
-        .plus(Parameter("source", floatSampler2dKey)),
-    output = floatSampler2dKey
+        .plus(Parameter("source", floatSampler2dType)),
+    output = floatSampler2dType
 )
 
 val distortionImplementation: FunctionImplementation = { arguments ->
