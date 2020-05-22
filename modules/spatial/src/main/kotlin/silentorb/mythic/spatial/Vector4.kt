@@ -930,3 +930,11 @@ data class Vector4(
 
 fun newVector4(xyz: Vector3, w: Float) =
     Vector4(xyz.x, xyz.y, xyz.z, w)
+
+fun toList(value: Vector4): List<Float> =
+    listOf(
+        value.x,
+        value.y,
+        value.z,
+        value.w
+    )

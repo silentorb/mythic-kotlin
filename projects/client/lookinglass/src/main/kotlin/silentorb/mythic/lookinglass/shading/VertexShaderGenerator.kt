@@ -35,6 +35,14 @@ private const val shadingOperations = """
   fragmentNormal = normalize((normalTransform * vec4(normal, 1.0)).xyz);
 """
 
+private const val pointSizeHeader = """
+uniform float nearPlaneHeight;
+"""
+
+private const val pointSizeOutput = """
+  gl_PointSize = (nearPlaneHeight * pointSize) / gl_Position.w;
+"""
+
 private fun textureOperations(config: ShaderFeatureConfig) =
     if (config.animatedTexture && config.instanced)
       "textureCoordinates = uv * uniformTextureScale + instanceSection.instances[gl_InstanceID].textureOffset;"
@@ -65,6 +73,7 @@ ${if (config.shading) shadingHeader else ""}
 ${if (config.texture) textureHeader else ""}
 ${if (config.animatedTexture) "uniform vec2 uniformTextureScale;" else ""}
 ${if (config.skeleton) weightHeader else ""}
+${if (config.pointSize) pointSizeHeader else ""}
 
 void main() {
   vec4 position4 = vec4(position, 1.0);
@@ -73,14 +82,21 @@ ${instanceOperations(config.instanced)}
  vec4 modelPosition = modelTransform * position4;
   gl_Position = scene.cameraTransform * modelPosition;
 ${if (config.shading) shadingOperations else ""}
+${if (config.pointSize) pointSizeOutput else ""}
 ${textureOperations(config)}
 }
 """
 }
 
+fun shaderFieldType(size: Int): String =
+    when(size) {
+      1 -> "float"
+      else -> "vec$size"
+    }
+
 fun generateInputsHeader(vertexSchema: VertexSchema): String =
     vertexSchema.attributes.mapIndexed { i, it ->
-      "layout(location = ${i}) in vec${it.size} ${it.name.toString()};"
+      "layout(location = ${i}) in ${shaderFieldType(it.size)} ${it.name.toString()};"
     }.joinToString("\n")
 
 fun generateVertexCode(config: ShaderFeatureConfig): (VertexSchema) -> String = { vertexSchema ->

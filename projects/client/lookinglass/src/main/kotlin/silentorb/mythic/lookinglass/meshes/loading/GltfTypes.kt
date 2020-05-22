@@ -46,11 +46,11 @@ enum class AttributeType {
 }
 
 val attributeMap2 = mapOf(
-    AttributeName.normal.name to AttributeType.NORMAL,
-    AttributeName.position.name to AttributeType.POSITION,
-    AttributeName.uv.name to AttributeType.TEXCOORD_0,
-    AttributeName.joints.name to AttributeType.JOINTS_0,
-    AttributeName.weights.name to AttributeType.WEIGHTS_0
+    AttributeName.normal to AttributeType.NORMAL,
+    AttributeName.position to AttributeType.POSITION,
+    AttributeName.uv to AttributeType.TEXCOORD_0,
+    AttributeName.joints to AttributeType.JOINTS_0,
+    AttributeName.weights to AttributeType.WEIGHTS_0
 )
 
 data class Accessor(

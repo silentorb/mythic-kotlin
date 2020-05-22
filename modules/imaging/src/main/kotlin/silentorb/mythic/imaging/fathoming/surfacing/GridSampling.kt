@@ -31,6 +31,12 @@ fun snapToSurface(getDistance: DistanceFunction, position: Vector3): Vector3 {
   return snapToSurface(position, normal, distance)
 }
 
+fun snapToSurfaceIncludingNormal(getDistance: DistanceFunction, position: Vector3): Pair<Vector3, Vector3> {
+  val normal = getNormal(getDistance, position)
+  val distance = getDistance(position)
+  return Pair(snapToSurface(position, normal, distance), normal)
+}
+
 tailrec fun snapToSurface(getDistance: DistanceFunction, tolerance: Float, normal: Vector3, position: Vector3, distance: Float, step: Int): Vector3 {
   return if (abs(distance) <= tolerance || step > 5)
     position

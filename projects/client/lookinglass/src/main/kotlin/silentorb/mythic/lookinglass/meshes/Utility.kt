@@ -10,13 +10,14 @@ import silentorb.mythic.lookinglass.Material
 import silentorb.mythic.lookinglass.Model
 import silentorb.mythic.lookinglass.WeightMap
 
-enum class AttributeName {
-  position,
-  normal,
-  color,
-  uv,
-  joints,
-  weights
+object AttributeName {
+  const val position = "position"
+  const val normal = "normal"
+  const val color = "color"
+  const val uv = "uv"
+  const val joints = "joints"
+  const val weights = "weights"
+  const val pointSize = "pointSize"
 }
 
 fun animatedVertexSerializer(weightMap: WeightMap): ImmutableVertexSerializer {

@@ -50,13 +50,13 @@ fun createVertexConverter(info: GltfInfo, transformBuffer: ByteBuffer, boneMap: 
     var lastJoints: List<Int> = listOf()
     var lastWeights: List<Float> = listOf()
     return { buffer, vertices, attribute, componentType, vertexIndex ->
-      if (attribute.name == AttributeName.weights.name) {
+      if (attribute.name == AttributeName.weights) {
         lastWeights = (0 until attribute.size).map {
           val value = buffer.float
           vertices.put(value)
           value
         }
-      } else if (attribute.name == AttributeName.joints.name) {
+      } else if (attribute.name == AttributeName.joints) {
         lastJoints = (0 until attribute.size).map {
           val value = getComponentIntValue(buffer, componentType)
           val jointIndex = jointMap[value]!!
@@ -135,7 +135,7 @@ fun loadVertices(buffer: ByteBuffer, info: GltfInfo, vertexSchema: VertexSchema,
 fun loadPositionVertices(buffer: ByteBuffer, info: GltfInfo, primitive: Primitive): List<Vector3> {
   val vertexAccessor = info.accessors[primitive.attributes.getValue(AttributeType.POSITION)]
   val vertexCount = vertexAccessor.count
-  val mappedAttribute = attributeMap2.getValue(AttributeName.position.name)
+  val mappedAttribute = attributeMap2.getValue(AttributeName.position)
   val attributeAccessorIndex = primitive.attributes.getValue(mappedAttribute)
   val attributeAccessor = info.accessors[attributeAccessorIndex]
   val bufferView = info.bufferViews[attributeAccessor.bufferView]

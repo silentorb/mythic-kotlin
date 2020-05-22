@@ -43,6 +43,7 @@ fun populateBoneBuffer(boneBuffer: UniformBuffer, originalTransforms: List<Matri
 }
 
 data class ShaderFeatureConfig(
+    val pointSize: Boolean = false,
     val shading: Boolean = false,
     val skeleton: Boolean = false,
     val texture: Boolean = false,
@@ -57,7 +58,8 @@ data class ObjectShaderConfig(
     val glow: Float = 0f,
     val normalTransform: Matrix? = null,
     val boneBuffer: UniformBuffer? = null,
-    val textureScale: Vector2? = null
+    val textureScale: Vector2? = null,
+    val nearPlaneHeight: Float? = null // Used for scaling point size
 )
 
 fun generateShaderProgram(vertexSchema: VertexSchema, featureConfig: ShaderFeatureConfig): ShaderProgram {
@@ -75,6 +77,7 @@ class GeneralPerspectiveShader(buffers: UniformBuffers, vertexSchema: VertexSche
   val sceneProperty = bindUniformBuffer(UniformBufferId.SceneUniform, program, buffers.scene)
   val shading: ShadingFeature? = if (featureConfig.shading) ShadingFeature(program, buffers.section) else null
   val skeleton: SkeletonFeature? = if (featureConfig.skeleton) SkeletonFeature(program, buffers.bone) else null
+  val nearPlaneHeight: FloatProperty? = if (featureConfig.pointSize) FloatProperty(program, "nearPlaneHeight") else null
 
   // IntelliJ will flag this use of inline as a warning, but using inline here
   // causes the JVM to optimize away the ObjectShaderConfig allocation and significantly
@@ -87,7 +90,7 @@ class GeneralPerspectiveShader(buffers: UniformBuffers, vertexSchema: VertexSche
 
     if (shading != null) {
       shading.glowProperty.setValue(config.glow)
-      shading.normalTransformProperty.setValue(config.normalTransform!!)
+      shading.normalTransformProperty.setValue(config.normalTransform ?: Matrix.identity)
     }
 
     if (config.texture != null) {
@@ -96,6 +99,10 @@ class GeneralPerspectiveShader(buffers: UniformBuffers, vertexSchema: VertexSche
 
     if (textureScale != null && config.textureScale != null) {
       textureScale.setValue(config.textureScale)
+    }
+
+    if (nearPlaneHeight != null && config.nearPlaneHeight != null) {
+      nearPlaneHeight.setValue(config.nearPlaneHeight)
     }
   }
 }

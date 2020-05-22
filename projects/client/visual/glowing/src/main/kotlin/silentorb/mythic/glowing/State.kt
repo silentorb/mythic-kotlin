@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL13.GL_MULTISAMPLE
 import org.lwjgl.opengl.GL13.glActiveTexture
 import org.lwjgl.opengl.GL14.GL_BLEND_DST_RGB
 import org.lwjgl.opengl.GL14.GL_BLEND_SRC_RGB
+import org.lwjgl.opengl.GL20.GL_VERTEX_PROGRAM_POINT_SIZE
 import org.lwjgl.opengl.GL30.*
 import org.lwjgl.opengl.GL31.GL_UNIFORM_BUFFER
 import org.lwjgl.opengl.GL32
@@ -218,6 +219,13 @@ class State {
       }
     }
 
+  var vertexProgramPointSizeEnabled: Boolean = false
+    set(value) {
+      if (field != value) {
+        field = value
+        setEnabled(GL_VERTEX_PROGRAM_POINT_SIZE, value)
+      }
+    }
 }
 
 val globalState = State()
