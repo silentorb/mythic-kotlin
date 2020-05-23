@@ -2,6 +2,7 @@ package silentorb.mythic.imaging.texturing
 
 import silentorb.imp.core.PathKey
 import silentorb.mythic.imaging.common.GetSample2d
+import silentorb.mythic.imaging.common.GetSample3d
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector3i
@@ -36,7 +37,8 @@ val floatSampler2dType = floatSampler2dKey.hashCode()
 val rgbSampler2dKey = PathKey(texturingPath, "RgbSampler")
 val rgbSampler2dType = rgbSampler2dKey.hashCode()
 
-typealias FloatSampler = GetSample2d<Float>
+typealias FloatSampler2d = GetSample2d<Float>
+typealias FloatSampler3d = GetSample3d<Float>
 
 typealias RgbSampler = GetSample2d<Vector3>
 typealias AnySampler = GetSample2d<Any>

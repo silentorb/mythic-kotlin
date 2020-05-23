@@ -65,7 +65,7 @@ data class SamplerAwtWriter(
     val write: (Float, Float, WritableRaster, Int, Int) -> Unit
 )
 
-fun newFloatSampleWriter(sampler: FloatSampler) =
+fun newFloatSampleWriter(sampler: FloatSampler2d) =
     SamplerAwtWriter(depth = 1) { x, y, raster, intX, intY ->
       val sample = sampler(x, y)
       raster.setSample(intX, intY, 0, (sample * 255).toInt())

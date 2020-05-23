@@ -31,8 +31,8 @@ val distortSignatureFloat = Signature(
 
 val distortionImplementation: FunctionImplementation = { arguments ->
   val variation = (arguments["variation"] as Int).toLong()
-  val horizontalNoise = noise(arguments, nonTilingOpenSimplex2D(variation))
-  val verticalNoise = noise(arguments, nonTilingOpenSimplex2D(variation + 1))
+  val horizontalNoise = noise2d(arguments, nonTilingOpenSimplex2D(variation))
+  val verticalNoise = noise2d(arguments, nonTilingOpenSimplex2D(variation + 1))
   val strength = (arguments["strength"] as Int).toFloat() / 100f
   val sampler = arguments["source"] as AnySampler
   ;

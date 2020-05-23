@@ -175,7 +175,7 @@ fun completeTexturingFunctions() = listOf(
             output = rgbSampler2dType
         ),
         implementation = { arguments ->
-          val sampler = arguments["sampler"]!! as FloatSampler
+          val sampler = arguments["sampler"]!! as FloatSampler2d
           val colorize = colorizeValue(arguments)
           ;
           { x: Float, y: Float ->
@@ -196,7 +196,7 @@ fun completeTexturingFunctions() = listOf(
         implementation = { arguments ->
           val first = arguments["first"]!! as RgbSampler
           val second = arguments["second"]!! as RgbSampler
-          val mask = arguments["mask"]!! as FloatSampler
+          val mask = arguments["mask"]!! as FloatSampler2d
           ;
           { x: Float, y: Float ->
             val degree = mask(x, y)

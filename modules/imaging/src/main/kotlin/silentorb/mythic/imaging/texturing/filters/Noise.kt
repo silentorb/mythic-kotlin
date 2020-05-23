@@ -5,10 +5,11 @@ import silentorb.imp.execution.Arguments
 import silentorb.imp.execution.CompleteFunction
 import silentorb.imp.execution.TypeAlias
 import silentorb.mythic.imaging.common.GetSample2d
+import silentorb.mythic.imaging.common.GetSample3d
 import silentorb.mythic.imaging.texturing.*
 import thirdparty.noise.OpenSimplexNoise
 
-tailrec fun noiseIteration(octaves: List<Pair<Float, Float>>, x: Float, y: Float, algorithm: GetSample2d<Float>, step: Int, output: Float): Float {
+tailrec fun noiseIteration(octaves: List<Octave>, x: Float, y: Float, algorithm: GetSample2d<Float>, step: Int, output: Float): Float {
   return if (step >= octaves.size)
     output
   else {
@@ -18,8 +19,23 @@ tailrec fun noiseIteration(octaves: List<Pair<Float, Float>>, x: Float, y: Float
   }
 }
 
+tailrec fun noiseIteration(octaves: List<Octave>, x: Float, y: Float, z: Float, algorithm: GetSample3d<Float>, step: Int, output: Float): Float {
+  return if (step >= octaves.size)
+    output
+  else {
+    val (frequency, amplitude) = octaves[step]
+    val nextOutput = output + (algorithm(x * frequency, y * frequency, z * frequency) * 0.5f + 0.5f) * amplitude
+    noiseIteration(octaves, x, y, z, algorithm, step + 1, nextOutput)
+  }
+}
+
+data class Octave(
+    val frequency: Float,
+    val amplitude: Float
+)
+
 data class NoiseOctaves(
-    val octaves: List<Pair<Float, Float>>,
+    val octaves: List<Octave>,
     val amplitudeMax: Float
 )
 
@@ -41,11 +57,11 @@ fun getNoiseOctaves(arguments: Arguments): NoiseOctaves {
   val octaveCount = detailToOctaves(detail)
   val amplitudeMod = detail.toFloat() / 100f
   val (octaves) = (0 until octaveCount)
-      .fold(Triple(listOf<Pair<Float, Float>>(), 1f, 1f)) { (accumulator, amplitude, frequency), b ->
-        val octave = Pair(frequency / scale, amplitude)
+      .fold(Triple(listOf<Octave>(), 1f, 1f)) { (accumulator, amplitude, frequency), b ->
+        val octave = Octave(frequency / scale, amplitude)
         Triple(accumulator.plus(octave), amplitude * amplitudeMod, frequency * 2f)
       }
-  val amplitudeMax = octaves.fold(0f) { a, b -> a + b.second }
+  val amplitudeMax = octaves.fold(0f) { a, b -> a + b.amplitude }
 
   return NoiseOctaves(
       octaves = octaves,
@@ -53,7 +69,7 @@ fun getNoiseOctaves(arguments: Arguments): NoiseOctaves {
   )
 }
 
-fun noise(arguments: Arguments, algorithm: GetSample2d<Float>): GetSample2d<Float> {
+fun noise2d(arguments: Arguments, algorithm: GetSample2d<Float>): GetSample2d<Float> {
   val (octaves, amplitudeMax) = getNoiseOctaves(arguments)
   return { x, y ->
     //    var rawValue = 0f
@@ -69,11 +85,35 @@ fun noise(arguments: Arguments, algorithm: GetSample2d<Float>): GetSample2d<Floa
   }
 }
 
+fun noise3d(arguments: Arguments, algorithm: FloatSampler3d): FloatSampler3d {
+  val (octaves, amplitudeMax) = getNoiseOctaves(arguments)
+  return { x, y, z ->
+    //    var rawValue = 0f
+//    for ((frequency, amplitude) in octaves) {
+//    rawValue += (algorithm(x * frequency, y * frequency) * 0.5f + 0.5f) * amplitude
+//  }
+    val rawValue = noiseIteration(octaves, x, y, z, algorithm, 0, 0f)
+//    val rawValue = octaves.fold(0f) { a, (frequency, amplitude) ->
+//      a + (algorithm(x * frequency, y * frequency) * 0.5f + 0.5f) * amplitude
+//    }
+    rawValue / amplitudeMax
+//    minMax(rawValue, 0f, 1f)
+  }
+}
+
 fun nonTilingOpenSimplex2D(seed: Long = 1L): GetSample2d<Float> {
   val generator = OpenSimplexNoise(seed)
   return { x, y ->
 //    0.5f
     generator.eval(x, y)
+  }
+}
+
+fun nonTilingOpenSimplex3D(seed: Long = 1L): GetSample3d<Float> {
+  val generator = OpenSimplexNoise(seed)
+  return { x, y, z ->
+//    0.5f
+    generator.eval(x.toDouble(), y.toDouble(), z.toDouble()).toFloat()
   }
 }
 
@@ -109,8 +149,8 @@ val noiseFunction = CompleteFunction(
     path = PathKey(texturingPath, "noise"),
     signature = noiseSignature,
     implementation = { arguments ->
-      val variation = arguments ["variation"] as Int
-      noise(arguments, nonTilingOpenSimplex2D(variation.toLong()))
+      val variation = arguments["variation"] as Int
+      noise2d(arguments, nonTilingOpenSimplex2D(variation.toLong()))
     }
 )
 
@@ -118,7 +158,7 @@ val seamlessColoredNoiseFunction = CompleteFunction(
     path = PathKey(texturingPath, "seamlessColoredNoise"),
     signature = coloredNoiseSignature,
     implementation = withBuffer("dimensions", withBitmapBuffer) { arguments ->
-      val getNoise = noise(arguments, nonTilingOpenSimplex2D())
+      val getNoise = noise2d(arguments, nonTilingOpenSimplex2D())
       val colorize = colorizeValue(arguments)
       ;
       { x, y ->

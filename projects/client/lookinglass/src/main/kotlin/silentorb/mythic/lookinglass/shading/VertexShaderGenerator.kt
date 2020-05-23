@@ -37,10 +37,12 @@ private const val shadingOperations = """
 
 private const val pointSizeHeader = """
 uniform float nearPlaneHeight;
+out vec4 fragmentColor;
 """
 
 private const val pointSizeOutput = """
   gl_PointSize = (nearPlaneHeight * pointSize) / gl_Position.w;
+  fragmentColor = color;
 """
 
 private fun textureOperations(config: ShaderFeatureConfig) =

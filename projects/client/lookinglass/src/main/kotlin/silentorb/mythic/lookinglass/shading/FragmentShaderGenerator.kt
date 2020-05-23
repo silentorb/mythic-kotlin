@@ -32,7 +32,11 @@ private fun textureOperations(config: ShaderFeatureConfig) =
 
 fun generateFragmentShader(config: ShaderFeatureConfig): String {
   val outColor = listOfNotNull(
-      if (config.shading) null else if (config.instanced) "fragmentColor" else "uniformColor",
+      when {
+        config.pointSize || config.instanced -> "fragmentColor"
+        config.shading -> null
+        else -> "uniformColor"
+      },
       if (config.texture) "sampled" else null,
       if (config.shading) lightingApplication2 else null
   ).joinToString(" * ")
@@ -48,7 +52,7 @@ fun generateFragmentShader(config: ShaderFeatureConfig): String {
       Pair(3, "fragmentNormal"),
       Pair(2, "fragmentUv"),
       Pair(4, "fragmentColor")
-      )
+  )
       .filter { mainBody.contains(it.second) }
       .map { (size, name) ->
         "in vec$size $name;"
