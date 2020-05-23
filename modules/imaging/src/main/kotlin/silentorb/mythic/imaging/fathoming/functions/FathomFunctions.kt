@@ -138,8 +138,8 @@ fun fathomFunctions() = listOf(
           val sampler = arguments["sampler"]!! as FloatSampler3d
           val colorize = colorizeValue(arguments)
           ;
-          { x: Float, y: Float, z: Float ->
-            colorize(sampler(x, y, z))
+          { location: Vector3 ->
+            colorize(sampler(location))
           }
         }
     ),
@@ -149,13 +149,13 @@ fun fathomFunctions() = listOf(
         signature = Signature(
             parameters = listOf(
                 Parameter("distance", distanceFunctionType),
-                Parameter("color", colorFunctionType)
+                Parameter("color", rgbSampler3dType)
             ),
             output = modelFunctionType
         ),
         implementation = { arguments ->
           val distance = arguments["distance"]!! as DistanceFunction
-          val color = arguments["color"]!! as ColorFunction
+          val color = arguments["color"]!! as RgbColorFunction
           ModelFunction(
               distance = distance,
               color = color

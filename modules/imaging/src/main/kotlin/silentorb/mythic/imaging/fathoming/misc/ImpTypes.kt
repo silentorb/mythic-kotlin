@@ -9,9 +9,6 @@ import java.nio.FloatBuffer
 
 const val fathomPath = "silentorb.mythic.fathom"
 
-val colorFunctionKey = PathKey(fathomPath, "ColorFunction")
-val colorFunctionType = colorFunctionKey.hashCode()
-
 val distanceFunctionKey = PathKey(fathomPath, "DistanceFunction")
 val distanceFunctionType = distanceFunctionKey.hashCode()
 
@@ -21,11 +18,11 @@ val modelFunctionType = modelFunctionKey.hashCode()
 typealias Sampler3d = (Float, Float, Float, FloatBuffer) -> Unit
 
 typealias DistanceFunction = (Vector3) -> Float
-typealias ColorFunction = (Vector3) -> Vector4
+typealias RgbColorFunction = (Vector3) -> Vector3
 
 data class ModelFunction(
     val distance: DistanceFunction,
-    val color: ColorFunction
+    val color: RgbColorFunction
 )
 
 val vector3Key = PathKey(fathomPath, "Vector3")

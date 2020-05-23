@@ -7,6 +7,7 @@ import silentorb.imp.execution.TypeAlias
 import silentorb.mythic.imaging.common.GetSample2d
 import silentorb.mythic.imaging.common.GetSample3d
 import silentorb.mythic.imaging.texturing.*
+import silentorb.mythic.spatial.Vector3
 import thirdparty.noise.OpenSimplexNoise
 
 tailrec fun noiseIteration(octaves: List<Octave>, x: Float, y: Float, algorithm: GetSample2d<Float>, step: Int, output: Float): Float {
@@ -19,13 +20,13 @@ tailrec fun noiseIteration(octaves: List<Octave>, x: Float, y: Float, algorithm:
   }
 }
 
-tailrec fun noiseIteration(octaves: List<Octave>, x: Float, y: Float, z: Float, algorithm: GetSample3d<Float>, step: Int, output: Float): Float {
+tailrec fun noiseIteration(octaves: List<Octave>, location: Vector3, algorithm: GetSample3d<Float>, step: Int, output: Float): Float {
   return if (step >= octaves.size)
     output
   else {
     val (frequency, amplitude) = octaves[step]
-    val nextOutput = output + (algorithm(x * frequency, y * frequency, z * frequency) * 0.5f + 0.5f) * amplitude
-    noiseIteration(octaves, x, y, z, algorithm, step + 1, nextOutput)
+    val nextOutput = output + (algorithm(location * frequency) * 0.5f + 0.5f) * amplitude
+    noiseIteration(octaves, location, algorithm, step + 1, nextOutput)
   }
 }
 
@@ -87,12 +88,12 @@ fun noise2d(arguments: Arguments, algorithm: GetSample2d<Float>): GetSample2d<Fl
 
 fun noise3d(arguments: Arguments, algorithm: FloatSampler3d): FloatSampler3d {
   val (octaves, amplitudeMax) = getNoiseOctaves(arguments)
-  return { x, y, z ->
+  return { location: Vector3 ->
     //    var rawValue = 0f
 //    for ((frequency, amplitude) in octaves) {
 //    rawValue += (algorithm(x * frequency, y * frequency) * 0.5f + 0.5f) * amplitude
 //  }
-    val rawValue = noiseIteration(octaves, x, y, z, algorithm, 0, 0f)
+    val rawValue = noiseIteration(octaves, location, algorithm, 0, 0f)
 //    val rawValue = octaves.fold(0f) { a, (frequency, amplitude) ->
 //      a + (algorithm(x * frequency, y * frequency) * 0.5f + 0.5f) * amplitude
 //    }
@@ -111,9 +112,9 @@ fun nonTilingOpenSimplex2D(seed: Long = 1L): GetSample2d<Float> {
 
 fun nonTilingOpenSimplex3D(seed: Long = 1L): GetSample3d<Float> {
   val generator = OpenSimplexNoise(seed)
-  return { x, y, z ->
+  return { location: Vector3 ->
 //    0.5f
-    generator.eval(x.toDouble(), y.toDouble(), z.toDouble()).toFloat()
+    generator.eval(location.x.toDouble(), location.y.toDouble(), location.z.toDouble()).toFloat()
   }
 }
 

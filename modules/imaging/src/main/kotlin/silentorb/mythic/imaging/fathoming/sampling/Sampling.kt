@@ -3,6 +3,7 @@ package silentorb.mythic.imaging.fathoming.sampling
 import silentorb.mythic.imaging.fathoming.surfacing.GridBounds
 import silentorb.mythic.imaging.fathoming.surfacing.snapToSurfaceIncludingNormal
 import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.spatial.toVector3
 import kotlin.math.abs
 
@@ -29,10 +30,11 @@ fun sampleFunction(config: SamplingConfig, bounds: GridBounds): List<SamplePoint
       null
     else {
       val (location, normal) = snapToSurfaceIncludingNormal(getDistance, startingLocation)
+      val rgb = getColor(location)
       SamplePoint(
           location = location,
           normal = normal,
-          color = getColor(location),
+          color = Vector4(rgb.x, rgb.y, rgb.z, 1f),
           size = pointSize
       )
     }
