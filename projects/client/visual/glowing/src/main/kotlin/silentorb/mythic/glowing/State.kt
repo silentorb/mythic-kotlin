@@ -3,7 +3,6 @@ package silentorb.mythic.glowing
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER
 import org.lwjgl.opengl.GL15.glBindBuffer
-import org.lwjgl.opengl.GL20.glUseProgram
 
 import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.spatial.Vector4i
@@ -11,7 +10,7 @@ import org.lwjgl.opengl.GL13.GL_MULTISAMPLE
 import org.lwjgl.opengl.GL13.glActiveTexture
 import org.lwjgl.opengl.GL14.GL_BLEND_DST_RGB
 import org.lwjgl.opengl.GL14.GL_BLEND_SRC_RGB
-import org.lwjgl.opengl.GL20.GL_VERTEX_PROGRAM_POINT_SIZE
+import org.lwjgl.opengl.GL20.*
 import org.lwjgl.opengl.GL30.*
 import org.lwjgl.opengl.GL31.GL_UNIFORM_BUFFER
 import org.lwjgl.opengl.GL32
@@ -84,6 +83,14 @@ class State {
       if (field != value) {
         field = value
         glPointSize(value)
+      }
+    }
+
+  var pointSprite: Boolean = false
+    set(value) {
+      if (field != value) {
+        field = value
+        setEnabled(GL_POINT_SPRITE, value)
       }
     }
 

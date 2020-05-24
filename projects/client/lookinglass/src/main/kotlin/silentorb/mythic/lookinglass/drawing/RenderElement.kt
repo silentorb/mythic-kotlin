@@ -1,16 +1,41 @@
 package silentorb.mythic.lookinglass.drawing
 
+import org.lwjgl.opengl.GL11
 import silentorb.mythic.breeze.MultiAnimationPart
 import silentorb.mythic.breeze.transformAnimatedSkeleton
+import silentorb.mythic.glowing.PrimitiveType
 import silentorb.mythic.glowing.drawMesh
+import silentorb.mythic.glowing.globalState
 import silentorb.mythic.spatial.*
 import silentorb.mythic.lookinglass.*
+import silentorb.mythic.lookinglass.meshes.Lod
 import silentorb.mythic.lookinglass.meshes.Primitive
 import silentorb.mythic.lookinglass.shading.ObjectShaderConfig
 import silentorb.mythic.lookinglass.shading.ShaderFeatureConfig
 import silentorb.mythic.lookinglass.shading.populateBoneBuffer
 import silentorb.mythic.scenery.Camera
 import silentorb.mythic.scenery.MeshName
+
+fun renderVolume(renderer: SceneRenderer, lod: Lod, location: Vector3, transform: Matrix) {
+  val orientationTransform = getRotationMatrix(transform)
+  val distance = renderer.camera.position.distance(location)
+  val mesh = lod.entries.last { it.key <= distance }.value
+  val effect = renderer.getShader(mesh.vertexSchema, ShaderFeatureConfig(
+      shading = true,
+      pointSize = true
+  ))
+
+  val config = ObjectShaderConfig(
+      nearPlaneHeight = getNearPlaneHeight(renderer.viewport, renderer.camera.angleOrZoom),
+      normalTransform = orientationTransform,
+      transform = transform
+  )
+
+  globalState.vertexProgramPointSizeEnabled = true
+//  globalState.pointSprite = true
+  effect.activate(config)
+  drawMesh(mesh, GL11.GL_POINTS)
+}
 
 fun renderElement(renderer: SceneRenderer, primitive: Primitive, material: Material, transform: Matrix, isAnimated: Boolean) {
   val orientationTransform = getRotationMatrix(transform)
@@ -80,11 +105,15 @@ private fun useMesh(meshes: ModelMeshMap, MeshName: MeshName, action: (ModelMesh
 fun renderMeshElement(renderer: SceneRenderer, element: MeshElement, armature: Armature? = null, transforms: List<Matrix>? = null) {
   val meshes = renderer.meshes
   useMesh(meshes, element.mesh) { mesh ->
-    for (primitive in mesh.primitives) {
-      val transform = getElementTransform(element, primitive, transforms)
-      val materal = element.material ?: primitive.material
-      val isAnimated = armature != null && primitive.isAnimated
-      renderElement(renderer, primitive, materal, transform, isAnimated)
+    if (mesh.particleLod.any()) {
+      renderVolume(renderer, mesh.particleLod, element.location, element.transform)
+    } else {
+      for (primitive in mesh.primitives) {
+        val transform = getElementTransform(element, primitive, transforms)
+        val materal = element.material ?: primitive.material
+        val isAnimated = armature != null && primitive.isAnimated
+        renderElement(renderer, primitive, materal, transform, isAnimated)
+      }
     }
   }
 }

@@ -2,6 +2,7 @@ package silentorb.mythic.imaging.fathoming
 
 import silentorb.imp.core.PathKey
 import silentorb.imp.execution.TypeAlias
+import silentorb.mythic.imaging.texturing.FloatSampler3d
 import silentorb.mythic.imaging.texturing.texturingPath
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
@@ -9,15 +10,12 @@ import java.nio.FloatBuffer
 
 const val fathomPath = "silentorb.mythic.fathom"
 
-val distanceFunctionKey = PathKey(fathomPath, "DistanceFunction")
-val distanceFunctionType = distanceFunctionKey.hashCode()
-
 val modelFunctionKey = PathKey(fathomPath, "ModelFunction")
 val modelFunctionType = modelFunctionKey.hashCode()
 
 typealias Sampler3d = (Float, Float, Float, FloatBuffer) -> Unit
 
-typealias DistanceFunction = (Vector3) -> Float
+typealias DistanceFunction = FloatSampler3d
 typealias RgbColorFunction = (Vector3) -> Vector3
 
 data class ModelFunction(

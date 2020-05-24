@@ -16,7 +16,7 @@ fun sampleFunction(config: SamplingConfig, bounds: GridBounds): List<SamplePoint
   val sampleCount = stepDimensions.x * stepDimensions.y * stepDimensions.z
   val sliceSize = stepDimensions.x * stepDimensions.y
   val start = bounds.start.toVector3()
-  val pointSize = 5f / resolution
+  val pointSize = config.pointSize / resolution
 
   return (0 until sampleCount).mapNotNull { i ->
     val z = i / sliceSize

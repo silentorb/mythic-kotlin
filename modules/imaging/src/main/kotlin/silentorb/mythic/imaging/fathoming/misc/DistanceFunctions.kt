@@ -1,5 +1,6 @@
 package silentorb.mythic.imaging.fathoming
 
+import silentorb.mythic.imaging.texturing.FloatSampler3d
 import silentorb.mythic.spatial.Quaternion
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.unaryMinus
@@ -31,3 +32,8 @@ fun rotate(quaternion: Quaternion, function: DistanceFunction): DistanceFunction
     function(rotated)
   }
 }
+
+fun subtract3dSampler(function: DistanceFunction, sampler: FloatSampler3d): DistanceFunction =
+    { origin ->
+      function(origin) - sampler(origin)
+    }

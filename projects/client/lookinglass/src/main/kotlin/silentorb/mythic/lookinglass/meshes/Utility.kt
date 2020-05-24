@@ -63,9 +63,7 @@ fun createBillboardMesh(vertexSchema: VertexSchema) =
         1f, 1f, 0f, 1f, 1f
     ))
 
-typealias ModelGenerator = () -> Model
-
-//typealias ModelGeneratorMap = Map<MeshType, ModelGenerator>
+typealias Lod = Map<Float, GeneralMesh>
 
 data class Primitive(
     val mesh: GeneralMesh,

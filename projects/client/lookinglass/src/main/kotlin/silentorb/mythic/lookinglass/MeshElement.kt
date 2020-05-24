@@ -20,6 +20,7 @@ data class MeshElement(
     val id: Long,
     val mesh: MeshName,
     val transform: Matrix,
+    val location: Vector3 = Vector3.zero,
     val material: Material? = null
 )
 

@@ -21,11 +21,11 @@ fun fathomFunctions() = listOf(
             parameters = listOf(
                 Parameter("radius", floatType)
             ),
-            output = distanceFunctionType
+            output = floatSampler3dType
         ),
         implementation = { arguments ->
-          val radius = arguments["radius"] as Float
-          sphere(radius)
+            val radius = arguments["radius"] as Float
+            sphere(radius)
         }
     ),
 
@@ -35,11 +35,11 @@ fun fathomFunctions() = listOf(
             parameters = listOf(
                 Parameter("dimensions", vector3Type)
             ),
-            output = distanceFunctionType
+            output = floatSampler3dType
         ),
         implementation = { arguments ->
-          val dimensions = arguments["dimensions"] as Vector3
-          cube(dimensions)
+            val dimensions = arguments["dimensions"] as Vector3
+            cube(dimensions)
         }
     ),
 
@@ -48,14 +48,14 @@ fun fathomFunctions() = listOf(
         signature = Signature(
             parameters = listOf(
                 Parameter("offset", translation3Type),
-                Parameter("source", distanceFunctionType)
+                Parameter("source", floatSampler3dType)
             ),
-            output = distanceFunctionType
+            output = floatSampler3dType
         ),
         implementation = { arguments ->
-          val offset = arguments["offset"] as Vector3
-          val source = arguments["source"] as DistanceFunction
-          translate(offset, source)
+            val offset = arguments["offset"] as Vector3
+            val source = arguments["source"] as DistanceFunction
+            translate(offset, source)
         }
     ),
 
@@ -64,14 +64,14 @@ fun fathomFunctions() = listOf(
         signature = Signature(
             parameters = listOf(
                 Parameter("rotation", quaternionType),
-                Parameter("source", distanceFunctionType)
+                Parameter("source", floatSampler3dType)
             ),
-            output = distanceFunctionType
+            output = floatSampler3dType
         ),
         implementation = { arguments ->
-          val orientation = arguments["rotation"] as Quaternion
-          val source = arguments["source"] as DistanceFunction
-          rotate(orientation, source)
+            val orientation = arguments["rotation"] as Quaternion
+            val source = arguments["source"] as DistanceFunction
+            rotate(orientation, source)
         }
     ),
 
@@ -86,7 +86,7 @@ fun fathomFunctions() = listOf(
             output = vector3Type
         ),
         implementation = { arguments ->
-          Vector3(arguments["x"] as Float, arguments["y"] as Float, arguments["z"] as Float)
+            Vector3(arguments["x"] as Float, arguments["y"] as Float, arguments["z"] as Float)
         }
     ),
 
@@ -101,10 +101,10 @@ fun fathomFunctions() = listOf(
             output = quaternionType
         ),
         implementation = { arguments ->
-          Quaternion()
-              .rotateZ(degreesToRadians(arguments["z"] as Float))
-              .rotateY(degreesToRadians(arguments["y"] as Float))
-              .rotateX(degreesToRadians(arguments["x"] as Float))
+            Quaternion()
+                .rotateZ(degreesToRadians(arguments["z"] as Float))
+                .rotateY(degreesToRadians(arguments["y"] as Float))
+                .rotateX(degreesToRadians(arguments["x"] as Float))
         }
     ),
 
@@ -119,8 +119,8 @@ fun fathomFunctions() = listOf(
             output = floatSampler3dType
         ),
         implementation = { arguments ->
-          val variation = arguments["variation"] as Int
-          noise3d(arguments, nonTilingOpenSimplex3D(variation.toLong()))
+            val variation = arguments["variation"] as Int
+            noise3d(arguments, nonTilingOpenSimplex3D(variation.toLong()))
         }
     ),
 
@@ -135,12 +135,12 @@ fun fathomFunctions() = listOf(
             output = rgbSampler3dType
         ),
         implementation = { arguments ->
-          val sampler = arguments["sampler"]!! as FloatSampler3d
-          val colorize = colorizeValue(arguments)
-          ;
-          { location: Vector3 ->
-            colorize(sampler(location))
-          }
+            val sampler = arguments["sampler"]!! as FloatSampler3d
+            val colorize = colorizeValue(arguments)
+            ;
+            { location: Vector3 ->
+                colorize(sampler(location))
+            }
         }
     ),
 
@@ -148,18 +148,34 @@ fun fathomFunctions() = listOf(
         path = PathKey(fathomPath, "newModel"),
         signature = Signature(
             parameters = listOf(
-                Parameter("distance", distanceFunctionType),
+                Parameter("distance", floatSampler3dType),
                 Parameter("color", rgbSampler3dType)
             ),
             output = modelFunctionType
         ),
         implementation = { arguments ->
-          val distance = arguments["distance"]!! as DistanceFunction
-          val color = arguments["color"]!! as RgbColorFunction
-          ModelFunction(
-              distance = distance,
-              color = color
-          )
+            val distance = arguments["distance"]!! as DistanceFunction
+            val color = arguments["color"]!! as RgbColorFunction
+            ModelFunction(
+                distance = distance,
+                color = color
+            )
+        }
+    ),
+
+    CompleteFunction(
+        path = PathKey(fathomPath, "-"),
+        signature = Signature(
+            parameters = listOf(
+                Parameter("first", floatSampler3dType),
+                Parameter("second", floatSampler3dType)
+            ),
+            output = floatSampler3dType
+        ),
+        implementation = { arguments ->
+            val first = arguments["first"] as DistanceFunction
+            val second = arguments["second"] as DistanceFunction
+            subtract3dSampler(first, second)
         }
     )
 )

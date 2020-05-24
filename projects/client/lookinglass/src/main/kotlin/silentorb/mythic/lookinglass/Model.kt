@@ -1,5 +1,6 @@
 package silentorb.mythic.lookinglass
 
+import silentorb.mythic.lookinglass.meshes.Lod
 import silentorb.mythic.sculpting.ImmutableEdge
 import silentorb.mythic.sculpting.ImmutableFace
 import silentorb.mythic.sculpting.ImmutableMesh
@@ -52,7 +53,8 @@ data class AdvancedModel(
 
 data class ModelMesh(
     val id: MeshName,
-    val primitives: Primitives,
+    val primitives: Primitives = listOf(),
+    val particleLod: Lod = mapOf(),
     val lights: List<Light> = listOf(),
     val bounds: Shape? = null
 )

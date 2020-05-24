@@ -8,7 +8,8 @@ import silentorb.mythic.spatial.Vector4
 data class SamplingConfig(
     val getDistance: DistanceFunction,
     val getColor: RgbColorFunction,
-    val resolution: Int // Length of samples per cell (Each cell having a length of 1f)
+    val resolution: Int, // Length of samples per cell (Each cell having a length of 1f)
+    val pointSize: Float
 )
 
 data class SamplePoint(
