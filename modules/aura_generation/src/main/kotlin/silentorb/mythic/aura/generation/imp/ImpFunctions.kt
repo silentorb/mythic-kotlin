@@ -14,7 +14,7 @@ fun signalGenerators() = mapOf(
     .plus(
         CompleteFunction(
             path = PathKey(auraPath, "random"),
-            signature = Signature(
+            signature = CompleteSignature(
                 parameters = listOf(),
                 output = monoSignalType
             ),
@@ -26,11 +26,11 @@ fun auraFunctions() = signalGenerators() +
     listOf(
         CompleteFunction(
             path = PathKey(auraPath, "period"),
-            signature = Signature(
+            signature = CompleteSignature(
                 parameters = listOf(
-                    Parameter("signal", monoSignalType),
-                    Parameter("start", absoluteTimeType),
-                    Parameter("end", absoluteTimeType)
+                    CompleteParameter("signal", monoSignalType),
+                    CompleteParameter("start", absoluteTimeType),
+                    CompleteParameter("end", absoluteTimeType)
                 ),
                 output = audioOutputType
             ),
@@ -47,10 +47,10 @@ fun auraFunctions() = signalGenerators() +
         ),
         CompleteFunction(
             path = PathKey(auraPath, "+"),
-            signature = Signature(
+            signature = CompleteSignature(
                 parameters = listOf(
-                    Parameter("first", audioOutputType),
-                    Parameter("second", audioOutputType)
+                    CompleteParameter("first", audioOutputType),
+                    CompleteParameter("second", audioOutputType)
                 ),
                 output = audioOutputType
             ),
@@ -76,13 +76,13 @@ fun auraFunctions() = signalGenerators() +
 fun auraAliases() =
     listOf(
         TypeAlias(
-            path = frequencyType,
-            alias = floatType,
+            path = frequencyType.hash,
+            alias = floatType.hash,
             numericConstraint = newNumericConstraint(1f, 33000f)
         ),
         TypeAlias(
-            path = absoluteTimeType,
-            alias = floatType,
+            path = absoluteTimeType.hash,
+            alias = floatType.hash,
             numericConstraint = newNumericConstraint(0f, 1000f)
         )
     )

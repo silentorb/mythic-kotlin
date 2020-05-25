@@ -1,17 +1,15 @@
 package silentorb.mythic.imaging.texturing
 
-import silentorb.imp.core.Parameter
-import silentorb.imp.core.Signature
-import silentorb.imp.core.floatType
+import silentorb.imp.core.*
 import silentorb.imp.execution.CompleteFunction
 import silentorb.mythic.spatial.Vector2
 
 val relativeDimensionsFunction = CompleteFunction(
-    path = relativeDimensionsKey,
-    signature = Signature(
+    path = relativeDimensionsType.key,
+    signature = CompleteSignature(
         parameters = listOf(
-            Parameter("width", floatType),
-            Parameter("height", floatType)
+            CompleteParameter("width", floatType),
+            CompleteParameter("height", floatType)
         ),
         output = relativeDimensionsType
     ),

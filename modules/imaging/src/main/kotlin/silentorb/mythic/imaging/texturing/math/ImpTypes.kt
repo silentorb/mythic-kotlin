@@ -1,23 +1,19 @@
 package silentorb.mythic.imaging.texturing.math
 
-import silentorb.imp.core.Parameter
-import silentorb.imp.core.PathKey
-import silentorb.imp.core.Signature
-import silentorb.imp.core.floatType
+import silentorb.imp.core.*
 import silentorb.imp.execution.CompleteFunction
 import silentorb.mythic.spatial.Vector2
 
 const val mathPath = "silentorb.mythic.math"
 
-val vector2Key = PathKey(mathPath, "Vector2")
-val vector2Type = vector2Key.hashCode()
+val vector2Type = newTypePair(PathKey(mathPath, "Vector2"))
 
 val vector2Function = CompleteFunction(
-    path = vector2Key,
-    signature = Signature(
+    path = vector2Type.key,
+    signature = CompleteSignature(
         parameters = listOf(
-            Parameter("x", floatType),
-            Parameter("y", floatType)
+            CompleteParameter("x", floatType),
+            CompleteParameter("y", floatType)
         ),
         output = vector2Type
     ),

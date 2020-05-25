@@ -63,10 +63,5 @@ fun createTextureBuffer(algorithm: OpaqueTextureAlgorithm, width: Int, height: I
   return buffer
 }
 
-//fun createTexture(algorithm: OpaqueTextureAlgorithm, attributes: TextureAttributes, width: Int, height: Int = width): Texture {
-//  val buffer = createTextureBuffer(algorithm, width, height)
-//  return Texture(width, height, buffer, geometryTextureInitializer)
-//}
-
 fun texturingLibrary() =
-  newLibrary(completeTexturingFunctions(), completeTexturingAliases())
+  newLibrary(completeTexturingFunctions(), typeAliases = completeTexturingAliases())

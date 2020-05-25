@@ -1,8 +1,8 @@
 package silentorb.mythic.imaging.texturing.filters
 
-import silentorb.imp.core.Parameter
+import silentorb.imp.core.CompleteParameter
 import silentorb.imp.core.PathKey
-import silentorb.imp.core.Signature
+import silentorb.imp.core.CompleteSignature
 import silentorb.imp.execution.CompleteFunction
 import silentorb.imp.execution.FunctionImplementation
 import silentorb.mythic.imaging.texturing.AnySampler
@@ -11,21 +11,21 @@ import silentorb.mythic.imaging.texturing.rgbSampler2dType
 import silentorb.mythic.imaging.texturing.texturingPath
 
 private fun commonDistortionParameters() = listOf(
-    Parameter("strength", zeroToOneHundredType),
-    Parameter("scale", oneToOneHundredType),
-    Parameter("detail", zeroToOneHundredType),
-    Parameter("variation", noiseVariationType)
+    CompleteParameter("strength", zeroToOneHundredType),
+    CompleteParameter("scale", oneToOneHundredType),
+    CompleteParameter("detail", zeroToOneHundredType),
+    CompleteParameter("variation", noiseVariationType)
 )
 
-val distortSignatureRgb = Signature(
+val distortSignatureRgb = CompleteSignature(
     parameters = commonDistortionParameters()
-        .plus(Parameter("source", rgbSampler2dType)),
+        .plus(CompleteParameter("source", rgbSampler2dType)),
     output = rgbSampler2dType
 )
 
-val distortSignatureFloat = Signature(
+val distortSignatureFloat = CompleteSignature(
     parameters = commonDistortionParameters()
-        .plus(Parameter("source", floatSampler2dType)),
+        .plus(CompleteParameter("source", floatSampler2dType)),
     output = floatSampler2dType
 )
 

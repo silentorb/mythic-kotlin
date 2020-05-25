@@ -1,8 +1,8 @@
 package silentorb.mythic.imaging.fathoming.functions
 
-import silentorb.imp.core.Parameter
+import silentorb.imp.core.CompleteParameter
 import silentorb.imp.core.PathKey
-import silentorb.imp.core.Signature
+import silentorb.imp.core.CompleteSignature
 import silentorb.imp.core.floatType
 import silentorb.imp.execution.CompleteFunction
 import silentorb.mythic.imaging.fathoming.*
@@ -17,11 +17,11 @@ fun fathomFunctions() = listOf(
 
     CompleteFunction(
         path = PathKey(fathomPath, "sphere"),
-        signature = Signature(
+        signature = CompleteSignature(
             parameters = listOf(
-                Parameter("radius", floatType)
+                CompleteParameter("radius", floatType)
             ),
-            output = floatSampler3dType
+            output = distanceFunctionType
         ),
         implementation = { arguments ->
             val radius = arguments["radius"] as Float
@@ -31,11 +31,11 @@ fun fathomFunctions() = listOf(
 
     CompleteFunction(
         path = PathKey(fathomPath, "cube"),
-        signature = Signature(
+        signature = CompleteSignature(
             parameters = listOf(
-                Parameter("dimensions", vector3Type)
+                CompleteParameter("dimensions", vector3Type)
             ),
-            output = floatSampler3dType
+            output = distanceFunctionType
         ),
         implementation = { arguments ->
             val dimensions = arguments["dimensions"] as Vector3
@@ -45,12 +45,12 @@ fun fathomFunctions() = listOf(
 
     CompleteFunction(
         path = PathKey(fathomPath, "translate"),
-        signature = Signature(
+        signature = CompleteSignature(
             parameters = listOf(
-                Parameter("offset", translation3Type),
-                Parameter("source", floatSampler3dType)
+                CompleteParameter("offset", translation3Type),
+                CompleteParameter("source", distanceFunctionType)
             ),
-            output = floatSampler3dType
+            output = distanceFunctionType
         ),
         implementation = { arguments ->
             val offset = arguments["offset"] as Vector3
@@ -61,12 +61,12 @@ fun fathomFunctions() = listOf(
 
     CompleteFunction(
         path = PathKey(fathomPath, "rotate"),
-        signature = Signature(
+        signature = CompleteSignature(
             parameters = listOf(
-                Parameter("rotation", quaternionType),
-                Parameter("source", floatSampler3dType)
+                CompleteParameter("rotation", quaternionType),
+                CompleteParameter("source", distanceFunctionType)
             ),
-            output = floatSampler3dType
+            output = distanceFunctionType
         ),
         implementation = { arguments ->
             val orientation = arguments["rotation"] as Quaternion
@@ -76,12 +76,12 @@ fun fathomFunctions() = listOf(
     ),
 
     CompleteFunction(
-        path = vector3Key,
-        signature = Signature(
+        path = vector3Type.key,
+        signature = CompleteSignature(
             parameters = listOf(
-                Parameter("x", floatType),
-                Parameter("y", floatType),
-                Parameter("z", floatType)
+                CompleteParameter("x", floatType),
+                CompleteParameter("y", floatType),
+                CompleteParameter("z", floatType)
             ),
             output = vector3Type
         ),
@@ -92,11 +92,11 @@ fun fathomFunctions() = listOf(
 
     CompleteFunction(
         path = PathKey(fathomPath, "rotationFromAxis"),
-        signature = Signature(
+        signature = CompleteSignature(
             parameters = listOf(
-                Parameter("x", floatType),
-                Parameter("y", floatType),
-                Parameter("z", floatType)
+                CompleteParameter("x", floatType),
+                CompleteParameter("y", floatType),
+                CompleteParameter("z", floatType)
             ),
             output = quaternionType
         ),
@@ -110,11 +110,11 @@ fun fathomFunctions() = listOf(
 
     CompleteFunction(
         path = PathKey(fathomPath, "noise"),
-        signature = Signature(
+        signature = CompleteSignature(
             parameters = listOf(
-                Parameter("scale", oneToOneHundredType),
-                Parameter("detail", zeroToOneHundredType),
-                Parameter("variation", noiseVariationType)
+                CompleteParameter("scale", oneToOneHundredType),
+                CompleteParameter("detail", zeroToOneHundredType),
+                CompleteParameter("variation", noiseVariationType)
             ),
             output = floatSampler3dType
         ),
@@ -126,11 +126,11 @@ fun fathomFunctions() = listOf(
 
     CompleteFunction(
         path = PathKey(fathomPath, "colorize"),
-        signature = Signature(
+        signature = CompleteSignature(
             parameters = listOf(
-                Parameter("sampler", floatSampler3dType),
-                Parameter("firstColor", rgbColorType),
-                Parameter("secondColor", rgbColorType)
+                CompleteParameter("sampler", floatSampler3dType),
+                CompleteParameter("firstColor", rgbColorType),
+                CompleteParameter("secondColor", rgbColorType)
             ),
             output = rgbSampler3dType
         ),
@@ -146,10 +146,10 @@ fun fathomFunctions() = listOf(
 
     CompleteFunction(
         path = PathKey(fathomPath, "newModel"),
-        signature = Signature(
+        signature = CompleteSignature(
             parameters = listOf(
-                Parameter("distance", floatSampler3dType),
-                Parameter("color", rgbSampler3dType)
+                CompleteParameter("distance", distanceFunctionType),
+                CompleteParameter("color", rgbSampler3dType)
             ),
             output = modelFunctionType
         ),
@@ -164,18 +164,34 @@ fun fathomFunctions() = listOf(
     ),
 
     CompleteFunction(
-        path = PathKey(fathomPath, "-"),
-        signature = Signature(
+        path = PathKey(fathomPath, "deform"),
+        signature = CompleteSignature(
             parameters = listOf(
-                Parameter("first", floatSampler3dType),
-                Parameter("second", floatSampler3dType)
+                CompleteParameter("object", distanceFunctionType),
+                CompleteParameter("deformer", floatSampler3dType)
+            ),
+            output = distanceFunctionType
+        ),
+        implementation = { arguments ->
+            val first = arguments["object"] as DistanceFunction
+            val deformer = arguments["deformer"] as DistanceFunction
+            deformer3dSampler(first, deformer)
+        }
+    ),
+
+    CompleteFunction(
+        path = PathKey(fathomPath, "*"),
+        signature = CompleteSignature(
+            parameters = listOf(
+                CompleteParameter("sampler", floatSampler3dType),
+                CompleteParameter("constant", floatType)
             ),
             output = floatSampler3dType
         ),
         implementation = { arguments ->
-            val first = arguments["first"] as DistanceFunction
-            val second = arguments["second"] as DistanceFunction
-            subtract3dSampler(first, second)
+            val sampler = arguments["sampler"] as DistanceFunction
+            val constant = arguments["constant"] as Float
+            times3dSampler(sampler, constant)
         }
     )
 )

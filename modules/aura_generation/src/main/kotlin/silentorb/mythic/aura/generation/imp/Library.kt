@@ -6,5 +6,5 @@ import silentorb.imp.execution.newLibrary
 fun auraLibrary(): Library =
     newLibrary(
         functions = auraFunctions(),
-        types = auraAliases()
+        typeAliases = auraAliases()
     )

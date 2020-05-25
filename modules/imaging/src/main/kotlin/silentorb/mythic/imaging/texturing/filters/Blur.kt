@@ -1,8 +1,8 @@
 package silentorb.mythic.imaging.texturing.filters
 
-import silentorb.imp.core.Parameter
+import silentorb.imp.core.CompleteParameter
 import silentorb.imp.core.PathKey
-import silentorb.imp.core.Signature
+import silentorb.imp.core.CompleteSignature
 import silentorb.imp.execution.CompleteFunction
 import silentorb.mythic.imaging.texturing.*
 import silentorb.mythic.spatial.Vector2i
@@ -10,18 +10,18 @@ import silentorb.mythic.spatial.Vector3
 
 
 private fun commonDistortionParameters() = listOf(
-    Parameter("radius", zeroToOneHundredType)
+    CompleteParameter("radius", zeroToOneHundredType)
 )
 
-val blurSignatureRgb = Signature(
+val blurSignatureRgb = CompleteSignature(
     parameters = commonDistortionParameters()
-        .plus(Parameter("source", rgbSampler2dType)),
+        .plus(CompleteParameter("source", rgbSampler2dType)),
     output = rgbSampler2dType
 )
 
-val blurSignatureFloat = Signature(
+val blurSignatureFloat = CompleteSignature(
     parameters = commonDistortionParameters()
-        .plus(Parameter("source", floatSampler2dType)),
+        .plus(CompleteParameter("source", floatSampler2dType)),
     output = floatSampler2dType
 )
 

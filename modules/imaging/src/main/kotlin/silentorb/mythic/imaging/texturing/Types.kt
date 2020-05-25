@@ -1,6 +1,7 @@
 package silentorb.mythic.imaging.texturing
 
 import silentorb.imp.core.PathKey
+import silentorb.imp.core.newTypePair
 import silentorb.mythic.imaging.common.GetSample2d
 import silentorb.mythic.imaging.common.GetSample3d
 import silentorb.mythic.spatial.Vector2i
@@ -18,24 +19,15 @@ typealias RgbaColor = Vector4
 typealias GrayscaleColor = Float
 
 // Type Keys
-val rgbColorKey = PathKey(texturingPath, "RgbColor")
-val rgbColorType = rgbColorKey.hashCode()
-val transparentColorKey = PathKey(texturingPath, "RgbaColor")
+val rgbColorType = newTypePair(PathKey(texturingPath, "RgbColor"))
 
-val rgbBitmapKey = PathKey(texturingPath, "RgbBitmap")
-val rgbBitmapType = rgbBitmapKey.hashCode()
-val transparentColorBitmapKey = PathKey(texturingPath, "RgbaBitmap")
-val grayscaleBitmapKey = PathKey(texturingPath, "GrayscaleBitmap")
-val grayscaleBitmapType = grayscaleBitmapKey.hashCode()
-val absoluteDimensionsKey = PathKey(texturingPath, "Dimensions")
-val absoluteDimensionsType = absoluteDimensionsKey.hashCode()
-val relativeDimensionsKey = PathKey(texturingPath, "RelativeDimensions")
-val relativeDimensionsType = relativeDimensionsKey.hashCode()
+val rgbBitmapType = newTypePair(PathKey(texturingPath, "RgbBitmap"))
+val grayscaleBitmapType = newTypePair(PathKey(texturingPath, "GrayscaleBitmap"))
+val absoluteDimensionsType = newTypePair(PathKey(texturingPath, "Dimensions"))
+val relativeDimensionsType = newTypePair(PathKey(texturingPath, "RelativeDimensions"))
 
-val floatSampler2dKey = PathKey(texturingPath, "FloatSampler")
-val floatSampler2dType = floatSampler2dKey.hashCode()
-val rgbSampler2dKey = PathKey(texturingPath, "RgbSampler")
-val rgbSampler2dType = rgbSampler2dKey.hashCode()
+val floatSampler2dType = newTypePair(PathKey(texturingPath, "FloatSampler"))
+val rgbSampler2dType = newTypePair(PathKey(texturingPath, "RgbSampler"))
 
 typealias FloatSampler2d = GetSample2d<Float>
 typealias FloatSampler3d = GetSample3d<Float>

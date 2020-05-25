@@ -1,9 +1,9 @@
 package silentorb.mythic.imaging.fathoming
 
+import silentorb.mythic.imaging.fathoming.surfacing.snapToSurface
 import silentorb.mythic.imaging.texturing.FloatSampler3d
 import silentorb.mythic.spatial.Quaternion
 import silentorb.mythic.spatial.Vector3
-import silentorb.mythic.spatial.unaryMinus
 import kotlin.math.max
 import kotlin.math.min
 
@@ -33,7 +33,14 @@ fun rotate(quaternion: Quaternion, function: DistanceFunction): DistanceFunction
   }
 }
 
-fun subtract3dSampler(function: DistanceFunction, sampler: FloatSampler3d): DistanceFunction =
+fun deformer3dSampler(first: DistanceFunction, deformer: FloatSampler3d): DistanceFunction =
     { origin ->
-      function(origin) - sampler(origin)
+      val distance = first(origin)
+      val location = snapToSurface(first, origin)
+      distance + deformer(location)
+    }
+
+fun times3dSampler(first: DistanceFunction, constant: Float): DistanceFunction =
+    { origin ->
+      first(origin) * constant
     }

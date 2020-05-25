@@ -1,7 +1,10 @@
 package silentorb.mythic.imaging.fathoming
 
 import silentorb.imp.core.PathKey
+import silentorb.imp.core.TypePair
+import silentorb.imp.core.newTypePair
 import silentorb.imp.execution.TypeAlias
+import silentorb.imp.execution.typePairstoTypeNames
 import silentorb.mythic.imaging.texturing.FloatSampler3d
 import silentorb.mythic.imaging.texturing.texturingPath
 import silentorb.mythic.spatial.Vector3
@@ -10,8 +13,13 @@ import java.nio.FloatBuffer
 
 const val fathomPath = "silentorb.mythic.fathom"
 
-val modelFunctionKey = PathKey(fathomPath, "ModelFunction")
-val modelFunctionType = modelFunctionKey.hashCode()
+val distanceFunctionType = newTypePair(PathKey(fathomPath, "DistanceFunction"))
+val modelFunctionType = newTypePair(PathKey(fathomPath, "ModelFunction"))
+val vector3Type = newTypePair(PathKey(fathomPath, "Vector3"))
+val translation3Type = newTypePair(PathKey(fathomPath, "Translation3"))
+val quaternionType = newTypePair(PathKey(fathomPath, "Quaternion"))
+val floatSampler3dType = newTypePair(PathKey(texturingPath, "FloatSampler3d"))
+val rgbSampler3dType = newTypePair(PathKey(texturingPath, "RgbSampler3d"))
 
 typealias Sampler3d = (Float, Float, Float, FloatBuffer) -> Unit
 
@@ -23,23 +31,23 @@ data class ModelFunction(
     val color: RgbColorFunction
 )
 
-val vector3Key = PathKey(fathomPath, "Vector3")
-val vector3Type = vector3Key.hashCode()
-val translation3Key = PathKey(fathomPath, "Translation3")
-val translation3Type = translation3Key.hashCode()
-val quaternionKey = PathKey(fathomPath, "Quaternion")
-val quaternionType = quaternionKey.hashCode()
-
-val floatSampler3dKey = PathKey(texturingPath, "FloatSampler")
-val floatSampler3dType = floatSampler3dKey.hashCode()
-
-val rgbSampler3dKey = PathKey(texturingPath, "RgbSampler")
-val rgbSampler3dType = rgbSampler3dKey.hashCode()
-
 fun fathomAliases() = listOf(
     TypeAlias(
-        path = translation3Type,
-        alias = vector3Type,
+        path = translation3Type.hash,
+        alias = vector3Type.hash,
         numericConstraint = null
     )
 )
+
+fun fathomTypes() =
+    typePairstoTypeNames(
+        listOf(
+            distanceFunctionType,
+            modelFunctionType,
+            vector3Type,
+            translation3Type,
+            quaternionType,
+            floatSampler3dType,
+            rgbSampler3dType
+        )
+    )

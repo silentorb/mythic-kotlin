@@ -4,4 +4,4 @@ import silentorb.imp.execution.newLibrary
 import silentorb.mythic.imaging.fathoming.functions.fathomFunctions
 
 fun fathomLibrary() =
-    newLibrary(fathomFunctions(), fathomAliases())
+    newLibrary(fathomFunctions(), fathomTypes(), fathomAliases())

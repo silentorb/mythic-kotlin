@@ -23,10 +23,10 @@ fun checkerPattern(iterationsX: Int, iterationsY: Int): GetSample2d<Float> {
 fun checkersFunctions() = listOf(
     CompleteFunction(
         path = PathKey(texturingPath, "checkers"),
-        signature = Signature(
+        signature = CompleteSignature(
             parameters = listOf(
-                Parameter("iterationsX", oneToOneHundredType),
-                Parameter("iterationsY", oneToOneHundredType)
+                CompleteParameter("iterationsX", oneToOneHundredType),
+                CompleteParameter("iterationsY", oneToOneHundredType)
             ),
             output = floatSampler2dType
         ),
@@ -41,7 +41,7 @@ fun checkersFunctions() = listOf(
 fun checkersAliases() = listOf(
     TypeAlias(
         path = CheckersIterationsType,
-        alias = intType,
+        alias = intType.hash,
         numericConstraint = newNumericConstraint(1, 64)
     )
 )

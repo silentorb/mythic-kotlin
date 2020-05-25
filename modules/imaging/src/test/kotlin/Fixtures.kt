@@ -10,7 +10,7 @@ val library = combineLibraries(
       it.copy(
 //          implementation = globalProfiler().wrap(it.path.name, it.implementation)
       )
-    }, completeTexturingAliases())
+    }, typeAliases = completeTexturingAliases())
 )
 
 val context = listOf(library.namespace)

@@ -10,14 +10,13 @@ import silentorb.mythic.spatial.Vector3
 
 const val drawingPath = "silentorb.mythic.generation.drawing"
 
-val shapesKey = PathKey(drawingPath, "Shapes")
-val shapesType = shapesKey.hashCode()
+val shapesType = newTypePair(PathKey(drawingPath, "Shapes"))
 
 val newRectangleFunction = CompleteFunction(
     path = PathKey(drawingPath, "rectangle"),
-    signature = Signature(
+    signature = CompleteSignature(
         parameters = listOf(
-            Parameter("dimensions", relativeDimensionsType)
+            CompleteParameter("dimensions", relativeDimensionsType)
         ),
         output = shapesType
     ),
@@ -29,10 +28,10 @@ val newRectangleFunction = CompleteFunction(
 
 val rgbColorFillShapeFunction = CompleteFunction(
     path = PathKey(drawingPath, "colorFill"),
-    signature = Signature(
+    signature = CompleteSignature(
         parameters = listOf(
-            Parameter("color", rgbColorType),
-            Parameter("shapes", shapesType)
+            CompleteParameter("color", rgbColorType),
+            CompleteParameter("shapes", shapesType)
         ),
         output = shapesType
     ),
@@ -48,10 +47,10 @@ val rgbColorFillShapeFunction = CompleteFunction(
 
 val grayscaleFillShapeFunction = CompleteFunction(
     path = PathKey(drawingPath, "grayscaleFill"),
-    signature = Signature(
+    signature = CompleteSignature(
         parameters = listOf(
-            Parameter("value", floatType),
-            Parameter("shapes", shapesType)
+            CompleteParameter("value", floatType),
+            CompleteParameter("shapes", shapesType)
         ),
         output = shapesType
     ),
@@ -67,11 +66,11 @@ val grayscaleFillShapeFunction = CompleteFunction(
 
 val grayscaleStrokeShapeFunction = CompleteFunction(
     path = PathKey(drawingPath, "grayscaleStroke"),
-    signature = Signature(
+    signature = CompleteSignature(
         parameters = listOf(
-            Parameter("value", floatType),
-            Parameter("width", floatType),
-            Parameter("shapes", shapesType)
+            CompleteParameter("value", floatType),
+            CompleteParameter("width", floatType),
+            CompleteParameter("shapes", shapesType)
         ),
         output = shapesType
     ),
@@ -88,11 +87,11 @@ val grayscaleStrokeShapeFunction = CompleteFunction(
 
 val rgbStrokeShapeFunction = CompleteFunction(
     path = PathKey(drawingPath, "rgbStroke"),
-    signature = Signature(
+    signature = CompleteSignature(
         parameters = listOf(
-            Parameter("color", rgbColorType),
-            Parameter("width", floatType),
-            Parameter("shapes", shapesType)
+            CompleteParameter("color", rgbColorType),
+            CompleteParameter("width", floatType),
+            CompleteParameter("shapes", shapesType)
         ),
         output = shapesType
     ),
@@ -109,10 +108,10 @@ val rgbStrokeShapeFunction = CompleteFunction(
 
 val translateShapeFunction = CompleteFunction(
     path = PathKey(drawingPath, "translate"),
-    signature = Signature(
+    signature = CompleteSignature(
         parameters = listOf(
-            Parameter("offset", vector2Type),
-            Parameter("shapes", shapesType)
+            CompleteParameter("offset", vector2Type),
+            CompleteParameter("shapes", shapesType)
         ),
         output = shapesType
     ),
@@ -134,12 +133,12 @@ val translateShapeFunction = CompleteFunction(
     }
 )
 
-fun rasterizeShapesFunction(bitmapType: TypeHash) = CompleteFunction(
+fun rasterizeShapesFunction(bitmapType: TypePair) = CompleteFunction(
     path = PathKey(drawingPath, "rasterizeShapes"),
-    signature = Signature(
+    signature = CompleteSignature(
         parameters = listOf(
-            Parameter("bitmap", bitmapType),
-            Parameter("shapes", shapesType)
+            CompleteParameter("bitmap", bitmapType),
+            CompleteParameter("shapes", shapesType)
         ),
         output = bitmapType
     ),
