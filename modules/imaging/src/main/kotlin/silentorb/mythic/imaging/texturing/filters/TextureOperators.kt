@@ -99,14 +99,7 @@ val voronoiBoundariesKey = PathKey(texturingPath, "voronoiBoundaries")
 fun completeTexturingFunctions() = listOf(
     CompleteFunction(
         path = rgbColorType.key,
-        signature = CompleteSignature(
-            parameters = listOf(
-                CompleteParameter("red", intType),
-                CompleteParameter("green", intType),
-                CompleteParameter("blue", intType)
-            ),
-            output = rgbColorType
-        ),
+        signature = newRgbSignature,
         implementation = { arguments ->
             Vector3i(arguments["red"] as Int, arguments["green"] as Int, arguments["blue"] as Int)
         }

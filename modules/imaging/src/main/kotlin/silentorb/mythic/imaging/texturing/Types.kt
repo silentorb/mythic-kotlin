@@ -1,7 +1,6 @@
 package silentorb.mythic.imaging.texturing
 
-import silentorb.imp.core.PathKey
-import silentorb.imp.core.newTypePair
+import silentorb.imp.core.*
 import silentorb.mythic.imaging.common.GetSample2d
 import silentorb.mythic.imaging.common.GetSample3d
 import silentorb.mythic.spatial.Vector2i
@@ -20,6 +19,15 @@ typealias GrayscaleColor = Float
 
 // Type Keys
 val rgbColorType = newTypePair(PathKey(texturingPath, "RgbColor"))
+val newRgbSignature = CompleteSignature(
+    parameters = listOf(
+        CompleteParameter("red", intType),
+        CompleteParameter("green", intType),
+        CompleteParameter("blue", intType)
+    ),
+    output = rgbColorType
+)
+val newRgbTypeHash = convertCompleteSignature(newRgbSignature).hashCode()
 
 val rgbBitmapType = newTypePair(PathKey(texturingPath, "RgbBitmap"))
 val grayscaleBitmapType = newTypePair(PathKey(texturingPath, "GrayscaleBitmap"))

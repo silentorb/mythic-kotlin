@@ -49,3 +49,12 @@ fun globalProfiler(): Profiler {
 
   return profiler!!
 }
+
+fun <T>logExecutionTime(label: String, block: () -> T): T {
+  val start = System.currentTimeMillis()
+  val result = block()
+  val end = System.currentTimeMillis()
+  val duration = end - start
+  println("$label: $duration")
+  return result
+}

@@ -11,3 +11,5 @@ fun debugLog(message: String) {}
 fun getDebugRangeValue(): Float = 0f
 
 fun setDebugRangeValue(value: Float) {}
+
+fun <T>logExecutionTime(label: String, block: () -> T): T = block()
