@@ -1,8 +1,8 @@
 package silentorb.mythic.imaging.texturing.filters
 
 import org.lwjgl.BufferUtils
+import silentorb.imp.core.FunctionImplementation
 import silentorb.imp.execution.Arguments
-import silentorb.imp.execution.FunctionImplementation
 import silentorb.mythic.imaging.common.GetSample2d
 import silentorb.mythic.imaging.texturing.Bitmap
 import silentorb.mythic.imaging.texturing.put

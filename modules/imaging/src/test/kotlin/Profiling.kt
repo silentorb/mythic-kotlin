@@ -1,7 +1,7 @@
 import org.junit.jupiter.api.Test
 import silentorb.imp.execution.executeToSingleValue
 import silentorb.imp.parsing.general.handleRoot
-import silentorb.imp.parsing.parser.parseTextBranching
+import silentorb.imp.parsing.parser.parseTextBranchingDeprecated
 import silentorb.imp.testing.errored
 import silentorb.mythic.debugging.globalProfiler
 import silentorb.mythic.debugging.printProfiler
@@ -49,7 +49,7 @@ let output = mask foreground background shapeMask
     """.trimIndent()
     val pid = ManagementFactory.getRuntimeMXBean().getName()
     println("pid: " + pid)
-    handleRoot(errored, parseTextBranching(context)(code)) { result ->
+    handleRoot(errored, parseTextBranchingDeprecated(context)(code)) { result ->
       val graph = result.graph
       var i = 0
       while (++i < 20) {
@@ -87,7 +87,7 @@ let output = mask foreground background (checkers 3 3)
     """.trimIndent()
     val pid = ManagementFactory.getRuntimeMXBean().getName()
     println("pid: " + pid)
-    handleRoot(errored, parseTextBranching(context)(code)) { result ->
+    handleRoot(errored, parseTextBranchingDeprecated(context)(code)) { result ->
       val graph = result.graph
       var i = 0
       val dimensions = Vector2i(512)

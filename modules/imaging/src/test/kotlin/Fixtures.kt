@@ -1,6 +1,6 @@
 import silentorb.imp.execution.combineLibraries
 import silentorb.imp.execution.newLibrary
-import silentorb.imp.library.implementation.standard.standardLibrary
+import silentorb.imp.library.standard.standardLibrary
 import silentorb.mythic.imaging.texturing.filters.completeTexturingAliases
 import silentorb.mythic.imaging.texturing.filters.completeTexturingFunctions
 

@@ -4,7 +4,6 @@ import silentorb.mythic.spatial.Vector3i
 import silentorb.imp.core.*
 import silentorb.imp.execution.Arguments
 import silentorb.imp.execution.CompleteFunction
-import silentorb.imp.execution.FunctionImplementation
 import silentorb.mythic.ent.mappedCache
 import silentorb.mythic.imaging.texturing.*
 import silentorb.mythic.imaging.texturing.drawing.drawingFunctions

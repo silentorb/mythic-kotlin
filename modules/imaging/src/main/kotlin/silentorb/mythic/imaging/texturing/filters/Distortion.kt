@@ -3,8 +3,8 @@ package silentorb.mythic.imaging.texturing.filters
 import silentorb.imp.core.CompleteParameter
 import silentorb.imp.core.PathKey
 import silentorb.imp.core.CompleteSignature
+import silentorb.imp.core.FunctionImplementation
 import silentorb.imp.execution.CompleteFunction
-import silentorb.imp.execution.FunctionImplementation
 import silentorb.mythic.imaging.texturing.AnySampler
 import silentorb.mythic.imaging.texturing.floatSampler2dType
 import silentorb.mythic.imaging.texturing.rgbSampler2dType

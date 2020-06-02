@@ -13,7 +13,6 @@ dependencies {
   implementation(kotlin("stdlib-jdk8"))
   implementation("silentorb.imp:execution")
   implementation("silentorb.imp:libraries_standard")
-  implementation("silentorb.imp:libraries_standard_implementation")
   api("silentorb.mythic:ent")
   api("silentorb.mythic:spatial")
   api("silentorb.mythic:randomly")
