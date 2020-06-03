@@ -55,7 +55,7 @@ let output = mask foreground background shapeMask
       while (++i < 20) {
 //      while (true) {
         globalProfiler().wrapBlock("all") {
-          executeToSingleValue(library.implementation, graph)
+//          executeToSingleValue(library.implementation, graph)
         }
       }
       printProfiler(globalProfiler())
@@ -95,8 +95,8 @@ let output = mask foreground background (checkers 3 3)
       while (++i < 40) {
 //      while (true) {
         globalProfiler().wrapBlock("all") {
-          val value = executeToSingleValue(library.implementation, graph)
-          samplerToBufferedImage(newRgbSampleWriter(value as RgbSampler), image, dimensions, Vector2i(0), dimensions)
+//          val value = executeToSingleValue(library.implementation, graph)
+//          samplerToBufferedImage(newRgbSampleWriter(value as RgbSampler), image, dimensions, Vector2i(0), dimensions)
         }
       }
       printProfiler(globalProfiler())

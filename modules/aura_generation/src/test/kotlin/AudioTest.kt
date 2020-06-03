@@ -17,7 +17,7 @@ let output = period osc1 (Time 0 0) (Time 1 1)
     """.trimIndent()
         handleRoot(errored, parseTextBranchingDeprecated(context)(code)) { result ->
             val graph = result.graph
-            val value = executeToSingleValue(library.implementation, graph)
+//            val value = executeToSingleValue(library.implementation, graph)
         }
     }
 }
