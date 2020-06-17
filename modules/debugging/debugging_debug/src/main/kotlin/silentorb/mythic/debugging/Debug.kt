@@ -3,6 +3,7 @@ package silentorb.mythic.debugging
 import io.github.cdimascio.dotenv.Dotenv
 import io.github.cdimascio.dotenv.dotenv
 import java.io.File
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -27,8 +28,18 @@ fun setDebugRangeValue(value: Float) {
   debugRangeValue = value
 }
 
+tailrec fun findParentDotEnvFile(path: Path = Paths.get(System.getProperty("user.dir"))): String? =
+    when {
+      Files.exists(path.resolve(".env")) -> path.toString()
+      path.parent == null -> null
+      else -> findParentDotEnvFile(path.parent)
+    }
+
+fun getDotEnvDirectory(): String =
+    System.getenv("DOTENV_DIRECTORY") ?: findParentDotEnvFile() ?:""
+
 fun newDotEnv() = dotenv {
-  directory = System.getenv("DOTENV_DIRECTORY") ?: ""
+  directory = getDotEnvDirectory()
   ignoreIfMissing = true
 }
 
@@ -37,7 +48,7 @@ fun reloadDotEnv() {
 }
 
 fun checkDotEnvChanged() {
-  val dotEnvDirectory = System.getenv("DOTENV_DIRECTORY")
+  val dotEnvDirectory = getDotEnvDirectory()
   val modified = File(Paths.get(dotEnvDirectory, ".env").toUri()).lastModified()
   if (modified > lastModified) {
     lastModified = modified

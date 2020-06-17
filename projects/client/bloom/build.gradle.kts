@@ -1,3 +1,7 @@
 plugins { kotlin("jvm") }
 
-requires(project, "spatial", "drawing", "ent")
+dependencies {
+    api("silentorb.mythic:ent")
+}
+
+requires(project, "spatial", "drawing")
