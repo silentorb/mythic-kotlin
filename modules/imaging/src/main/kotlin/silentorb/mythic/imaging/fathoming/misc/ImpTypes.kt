@@ -1,14 +1,13 @@
 package silentorb.mythic.imaging.fathoming
 
 import silentorb.imp.core.PathKey
-import silentorb.imp.core.TypePair
 import silentorb.imp.core.newTypePair
 import silentorb.imp.execution.TypeAlias
 import silentorb.imp.execution.typePairstoTypeNames
 import silentorb.mythic.imaging.texturing.FloatSampler3d
 import silentorb.mythic.imaging.texturing.texturingPath
 import silentorb.mythic.spatial.Vector3
-import silentorb.mythic.spatial.Vector4
+import silentorb.mythic.scenery.Shape
 import java.nio.FloatBuffer
 
 const val fathomPath = "silentorb.mythic.fathom"
@@ -28,7 +27,8 @@ typealias RgbColorFunction = (Vector3) -> Vector3
 
 data class ModelFunction(
     val distance: DistanceFunction,
-    val color: RgbColorFunction
+    val color: RgbColorFunction,
+    val collision: Shape?
 )
 
 fun fathomAliases() = listOf(

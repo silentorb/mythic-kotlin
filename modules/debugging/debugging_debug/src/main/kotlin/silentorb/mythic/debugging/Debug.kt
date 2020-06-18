@@ -36,7 +36,7 @@ tailrec fun findParentDotEnvFile(path: Path = Paths.get(System.getProperty("user
     }
 
 fun getDotEnvDirectory(): String =
-    System.getenv("DOTENV_DIRECTORY") ?: findParentDotEnvFile() ?:""
+    System.getenv("DOTENV_DIRECTORY") ?: findParentDotEnvFile() ?: ""
 
 fun newDotEnv() = dotenv {
   directory = getDotEnvDirectory()

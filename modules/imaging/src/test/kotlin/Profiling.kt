@@ -1,14 +1,10 @@
 import org.junit.jupiter.api.Test
-import silentorb.imp.execution.executeToSingleValue
 import silentorb.imp.parsing.general.handleRoot
 import silentorb.imp.parsing.parser.parseTextBranchingDeprecated
 import silentorb.imp.testing.errored
 import silentorb.mythic.debugging.globalProfiler
 import silentorb.mythic.debugging.printProfiler
-import silentorb.mythic.imaging.texturing.RgbSampler
 import silentorb.mythic.imaging.texturing.newBufferedImage
-import silentorb.mythic.imaging.texturing.newRgbSampleWriter
-import silentorb.mythic.imaging.texturing.samplerToBufferedImage
 import silentorb.mythic.spatial.Vector2i
 import java.lang.management.ManagementFactory
 
@@ -55,7 +51,7 @@ let output = mask foreground background shapeMask
       while (++i < 20) {
 //      while (true) {
         globalProfiler().wrapBlock("all") {
-//          executeToSingleValue(library.implementation, graph)
+//          executeToSingleValue(getLibrary.implementation, graph)
         }
       }
       printProfiler(globalProfiler())
@@ -95,7 +91,7 @@ let output = mask foreground background (checkers 3 3)
       while (++i < 40) {
 //      while (true) {
         globalProfiler().wrapBlock("all") {
-//          val value = executeToSingleValue(library.implementation, graph)
+//          val value = executeToSingleValue(getLibrary.implementation, graph)
 //          samplerToBufferedImage(newRgbSampleWriter(value as RgbSampler), image, dimensions, Vector2i(0), dimensions)
         }
       }
