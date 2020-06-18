@@ -8,7 +8,9 @@ dependencies {
   implementation("org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}")
   implementation(group = "com.fasterxml.jackson.module", name = "jackson-module-afterburner", version = "2.9.9")
   implementation("silentorb.mythic:debugging")
+  api("silentorb.mythic:spatial")
+  api("silentorb.mythic:scenery")
 }
 
-requires(project,"platforming", "spatial", "scenery", "sculpting", "glowing", "typography", "drawing",
+requires(project,"platforming", "sculpting", "glowing", "typography", "drawing",
     "breeze", "configuration")

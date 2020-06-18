@@ -3,7 +3,6 @@ package silentorb.mythic.lookinglass.drawing
 import org.lwjgl.opengl.GL11
 import silentorb.mythic.breeze.MultiAnimationPart
 import silentorb.mythic.breeze.transformAnimatedSkeleton
-import silentorb.mythic.glowing.PrimitiveType
 import silentorb.mythic.glowing.drawMesh
 import silentorb.mythic.glowing.globalState
 import silentorb.mythic.spatial.*

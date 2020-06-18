@@ -1,7 +1,6 @@
 package silentorb.mythic.lookinglass.meshes.loading
 
 import silentorb.mythic.spatial.Vector3
-import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.lookinglass.Armature
 import silentorb.mythic.lookinglass.Material
 import silentorb.mythic.lookinglass.ModelMesh

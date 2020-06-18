@@ -1,10 +1,9 @@
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import silentorb.mythic.imaging.fathoming.cube
-import silentorb.mythic.imaging.fathoming.rotate
-import silentorb.mythic.imaging.fathoming.surfacing.*
-import silentorb.mythic.imaging.fathoming.surfacing.old.findSurfacingStart
-import silentorb.mythic.imaging.fathoming.translate
+import silentorb.mythic.fathom.cube
+import silentorb.mythic.fathom.rotate
+import silentorb.mythic.fathom.surfacing.old.findSurfacingStart
+import silentorb.mythic.fathom.translate
 import silentorb.mythic.spatial.*
 
 class SurfacingTest {
