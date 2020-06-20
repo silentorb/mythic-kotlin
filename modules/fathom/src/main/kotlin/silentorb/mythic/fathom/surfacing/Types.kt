@@ -14,7 +14,9 @@ data class SurfacingConfig(
 data class DecimalBounds(
     val start: Vector3,
     val end: Vector3
-)
+) {
+  val dimensions: Vector3 get() = end - start
+}
 
 data class GridBounds(
     val start: Vector3i,

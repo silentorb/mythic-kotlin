@@ -15,8 +15,8 @@ dependencies {
   implementation("silentorb.imp:libraries_standard")
   api("silentorb.mythic:ent")
   api("silentorb.mythic:spatial")
-  api("silentorb.mythic:randomly")
-  api("silentorb.mythic:debugging")
+  implementation("silentorb.mythic:randomly")
+  implementation("silentorb.mythic:debugging")
   api("org.lwjgl:lwjgl:3.1.5")
   api("org.lwjgl:lwjgl:3.1.5:natives-windows")
 

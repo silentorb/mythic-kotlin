@@ -70,14 +70,6 @@ const val quarterAngle = Pi * 0.5f
 fun Vector2.toVector3m() = Vector3m(x, y, 0f)
 fun Vector2.toVector3() = Vector3(x, y, 0f)
 
-data class BoundingBox(
-    val start: Vector3m,
-    val end: Vector3m
-) {
-  val dimensions: Vector3m
-    get() = end - start
-}
-
 fun isBetween(middle: Float, first: Float, second: Float) =
     if (middle == first || middle == second)
       true

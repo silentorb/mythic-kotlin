@@ -6,9 +6,11 @@ import silentorb.imp.core.CompleteSignature
 import silentorb.imp.core.floatType
 import silentorb.imp.execution.CompleteFunction
 import silentorb.mythic.fathom.*
+import silentorb.mythic.fathom.surfacing.DecimalBounds
 import silentorb.mythic.imaging.texturing.FloatSampler3d
 import silentorb.mythic.imaging.texturing.filters.*
 import silentorb.mythic.imaging.texturing.rgbColorType
+import silentorb.mythic.scenery.Box
 import silentorb.mythic.spatial.Quaternion
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.degreesToRadians
@@ -149,6 +151,28 @@ fun fathomFunctions() = listOf(
         signature = CompleteSignature(
             parameters = listOf(
                 CompleteParameter("distance", distanceFunctionType),
+                CompleteParameter("color", rgbSampler3dType),
+                CompleteParameter("collision", collisionGeneratorType)
+            ),
+            output = modelFunctionType
+        ),
+        implementation = { arguments ->
+            val distance = arguments["distance"]!! as DistanceFunction
+            val color = arguments["color"]!! as RgbColorFunction
+            val collision = arguments["collision"]!! as CollisionGenerator
+            ModelFunction(
+                distance = distance,
+                color = color,
+                collision = collision
+            )
+        }
+    ),
+
+    CompleteFunction(
+        path = PathKey(fathomPath, "newModel"),
+        signature = CompleteSignature(
+            parameters = listOf(
+                CompleteParameter("distance", distanceFunctionType),
                 CompleteParameter("color", rgbSampler3dType)
             ),
             output = modelFunctionType
@@ -158,7 +182,8 @@ fun fathomFunctions() = listOf(
             val color = arguments["color"]!! as RgbColorFunction
             ModelFunction(
                 distance = distance,
-                color = color
+                color = color,
+                collision = null
             )
         }
     ),
@@ -192,6 +217,22 @@ fun fathomFunctions() = listOf(
             val sampler = arguments["sampler"] as DistanceFunction
             val constant = arguments["constant"] as Float
             times3dSampler(sampler, constant)
+        }
+    ),
+
+    CompleteFunction(
+        path = PathKey(fathomPath, "collisionBox"),
+        signature = CompleteSignature(
+            parameters = listOf(),
+            output = collisionGeneratorType
+        ),
+        implementation = { arguments ->
+            val k = 0
+            { bounds: DecimalBounds ->
+                Box(
+                  halfExtents = bounds.dimensions / 2f
+                )
+            }
         }
     )
 )

@@ -4,6 +4,7 @@ import silentorb.imp.core.PathKey
 import silentorb.imp.core.newTypePair
 import silentorb.imp.execution.TypeAlias
 import silentorb.imp.execution.typePairstoTypeNames
+import silentorb.mythic.fathom.surfacing.DecimalBounds
 import silentorb.mythic.imaging.texturing.FloatSampler3d
 import silentorb.mythic.imaging.texturing.texturingPath
 import silentorb.mythic.spatial.Vector3
@@ -19,16 +20,18 @@ val translation3Type = newTypePair(PathKey(fathomPath, "Translation3"))
 val quaternionType = newTypePair(PathKey(fathomPath, "Quaternion"))
 val floatSampler3dType = newTypePair(PathKey(texturingPath, "FloatSampler3d"))
 val rgbSampler3dType = newTypePair(PathKey(texturingPath, "RgbSampler3d"))
+val collisionGeneratorType = newTypePair(PathKey(fathomPath, "CollisionGenerator"))
 
 typealias Sampler3d = (Float, Float, Float, FloatBuffer) -> Unit
 
 typealias DistanceFunction = FloatSampler3d
 typealias RgbColorFunction = (Vector3) -> Vector3
+typealias CollisionGenerator = (DecimalBounds) -> Shape
 
 data class ModelFunction(
     val distance: DistanceFunction,
     val color: RgbColorFunction,
-    val collision: Shape?
+    val collision: CollisionGenerator?
 )
 
 fun fathomAliases() = listOf(
