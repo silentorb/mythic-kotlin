@@ -1,6 +1,5 @@
 package silentorb.mythic.glowing
 
-import org.lwjgl.opengl.GL11.GL_FLOAT
 import org.lwjgl.opengl.GL20.glEnableVertexAttribArray
 import org.lwjgl.opengl.GL20.glVertexAttribPointer
 import org.lwjgl.opengl.GL30
@@ -12,31 +11,33 @@ class VertexArrayObject() {
 
     fun createInterwoven(schema: VertexSchema): VertexArrayObject {
       val result = VertexArrayObject()
+      val stride = schema.floatSize * 4
       var offset = 0L
       var i = 0
       globalState.vertexArrayObject = result.id
 
       for (attribute in schema.attributes) {
-        glVertexAttribPointer(i, attribute.size, GL_FLOAT, false, schema.floatSize * 4, offset)
+        glVertexAttribPointer(i, attribute.count, attribute.elementType, true, stride, offset)
         glEnableVertexAttribArray(i)
         checkError("binding vbo buffer data")
         i++
-        offset += attribute.size * 4
+        offset += attribute.byteSize * 4
       }
       return result
     }
 
     fun createNonInterleaved(schema: VertexSchema): VertexArrayObject {
       val result = VertexArrayObject()
+      val stride = schema.floatSize * 4
       var offset = 0L
       var i = 0
       globalState.vertexArrayObject = result.id
 
       for (attribute in schema.attributes) {
-        glVertexAttribPointer(i, attribute.size, GL_FLOAT, false, schema.floatSize * 4, offset)
+        glVertexAttribPointer(i, attribute.count, attribute.elementType, true, stride, offset)
         glEnableVertexAttribArray(i)
         i++
-        offset += attribute.size * 4
+        offset += attribute.byteSize * 4
       }
       return result
     }

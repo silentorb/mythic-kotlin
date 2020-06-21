@@ -1,6 +1,5 @@
 package silentorb.mythic.lookinglass.texturing
 
-import silentorb.mythic.lookinglass.getResourceUrl
 import silentorb.mythic.lookinglass.scanTextureResources
 import silentorb.mythic.glowing.Texture
 import silentorb.mythic.glowing.TextureAttributes
@@ -8,6 +7,7 @@ import silentorb.mythic.glowing.TextureFormat
 import silentorb.mythic.platforming.ImageLoader
 import silentorb.mythic.platforming.RawImage
 import silentorb.mythic.lookinglass.toCamelCase
+import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.concurrent.thread
 
@@ -37,15 +37,13 @@ fun rawImageToTexture(image: RawImage, attributes: TextureAttributes): Texture {
   return Texture(image.width, image.height, modifiedAttributes, image.buffer)
 }
 
-fun loadTextureFromFile(loadImage: ImageLoader, path: String, attributes: TextureAttributes): Texture {
-  val fullPath = getResourceUrl(path)!!.path.substring(1)
-  val image = loadImage(fullPath)!!
-
-  return rawImageToTexture(image, attributes)
+fun loadTextureFromFile(loadImage: ImageLoader, path: Path, attributes: TextureAttributes): Texture {
+  val image = loadImage(path.toString())
+  return rawImageToTexture(image!!, attributes)
 }
 
-fun deferImageFile(loadImage: ImageLoader, path: String, attributes: TextureAttributes): DeferredTexture {
-  val fullPath = getResourceUrl(path)!!.path.substring(1)
+fun deferImageFile(loadImage: ImageLoader, path: Path, attributes: TextureAttributes): DeferredTexture {
+//  val fullPath = getResourceUrl(path)!!.path.substring(1)
   val shortName = getFileShortName(path)
   val (truncated, newAttributes) = if (shortName.contains('.')) {
     val tokens = shortName.split('.')
@@ -56,14 +54,17 @@ fun deferImageFile(loadImage: ImageLoader, path: String, attributes: TextureAttr
   return DeferredTexture(
       name = truncated,
       attributes = newAttributes,
-      load = { loadImage(fullPath) }
+      load = { loadImage(path.toString()) }
   )
 }
 
 fun getFileShortName(path: String): String =
     toCamelCase(Paths.get(path).fileName.toString().substringBeforeLast("."))
 
-typealias TextureAttributeMapper = (String) -> TextureAttributes
+fun getFileShortName(path: Path): String =
+    toCamelCase(path.fileName.toString().substringBeforeLast("."))
+
+typealias TextureAttributeMapper = (Path) -> TextureAttributes
 
 fun gatherTextures(loadImage: ImageLoader, attributes: TextureAttributeMapper): List<DeferredTexture> =
     scanTextureResources("models")

@@ -21,8 +21,8 @@ data class DrawingVertexSchemas(
 )
 
 fun createDrawingVertexSchemas() = DrawingVertexSchemas(
-    VertexSchema(listOf(VertexAttribute("position", 2))),
-    VertexSchema(listOf(VertexAttribute("vertex", 4)))
+    VertexSchema(listOf(floatVertexAttribute("position", 2))),
+    VertexSchema(listOf(floatVertexAttribute("vertex", 4)))
 )
 
 fun createSquareMesh(vertexSchema: VertexSchema) =

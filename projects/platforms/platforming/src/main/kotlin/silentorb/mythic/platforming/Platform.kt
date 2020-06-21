@@ -3,8 +3,10 @@ package silentorb.mythic.platforming
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector3
+import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.ShortBuffer
+import java.nio.file.Path
 
 data class WindowInfo(val dimensions: Vector2i)
 

@@ -1,14 +1,25 @@
 package silentorb.mythic.glowing
 
+fun byteSizeToPaddedFloatSize(byteSize: Int) =
+    byteSize + (byteSize % 4) / 4
+
 class VertexSchema(inputAttributes: List<VertexAttribute>) {
-  val floatSize = inputAttributes.sumBy { it.size }
+  val floatSize = byteSizeToPaddedFloatSize(inputAttributes.sumBy { it.byteSize })
   val attributes: List<VertexAttributeDetail>
 
   init {
     var offset = 0
     attributes = inputAttributes.mapIndexed { i, input ->
-      val result = VertexAttributeDetail(i, input.name, offset, input.size)
-      offset += input.size
+      val result = VertexAttributeDetail(
+          id = i,
+          name = input.name,
+          offset = offset,
+          count = input.count,
+          byteSize = input.byteSize,
+          floatSize = input.byteSize / 4,
+          elementType = input.elementType
+      )
+      offset += input.byteSize
       result
     }
   }

@@ -5,6 +5,8 @@ plugins {
   kotlin("jvm") version Versions.kotlin apply false
 }
 
+base.archivesBaseName = "mythic"
+
 allprojects {
   group = "silentorb.mythic"
   version = "1.0"

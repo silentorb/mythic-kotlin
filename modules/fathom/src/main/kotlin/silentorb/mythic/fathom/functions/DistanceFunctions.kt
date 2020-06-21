@@ -1,5 +1,6 @@
 package silentorb.mythic.fathom
 
+import silentorb.mythic.fathom.misc.DistanceFunction
 import silentorb.mythic.fathom.surfacing.snapToSurface
 import silentorb.mythic.imaging.texturing.FloatSampler3d
 import silentorb.mythic.spatial.Quaternion

@@ -98,7 +98,7 @@ fun shaderFieldType(size: Int): String =
 
 fun generateInputsHeader(vertexSchema: VertexSchema): String =
     vertexSchema.attributes.mapIndexed { i, it ->
-      "layout(location = ${i}) in ${shaderFieldType(it.size)} ${it.name.toString()};"
+      "layout(location = ${i}) in ${shaderFieldType(it.count)} ${it.name};"
     }.joinToString("\n")
 
 fun generateVertexCode(config: ShaderFeatureConfig): (VertexSchema) -> String = { vertexSchema ->

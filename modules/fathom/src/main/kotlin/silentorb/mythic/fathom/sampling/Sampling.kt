@@ -2,9 +2,9 @@ package silentorb.mythic.fathom.sampling
 
 import silentorb.mythic.fathom.surfacing.GridBounds
 import silentorb.mythic.fathom.surfacing.snapToSurfaceIncludingNormal
+import silentorb.mythic.scenery.SamplePoint
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector3i
-import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.spatial.toVector3
 import kotlin.math.abs
 
@@ -12,7 +12,7 @@ fun samplePoint(config: SamplingConfig, start: Vector3): SamplePoint? {
   val resolution = config.resolution
   val sampleRange = 1.5f / resolution
   val getDistance = config.getDistance
-  val getColor = config.getColor
+  val getShading = config.getShading
   val pointSize = config.pointSize / resolution
 
   val startingDistance = getDistance(start)
@@ -20,11 +20,11 @@ fun samplePoint(config: SamplingConfig, start: Vector3): SamplePoint? {
     null
   else {
     val (location, normal) = snapToSurfaceIncludingNormal(getDistance, start)
-    val rgb = getColor(location)
+    val shading = getShading(location)
     SamplePoint(
         location = location,
         normal = normal,
-        color = Vector4(rgb.x, rgb.y, rgb.z, 1f),
+        shading = shading,
         size = pointSize
     )
   }

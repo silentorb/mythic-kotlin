@@ -1,10 +1,7 @@
-package silentorb.mythic.fathom
+package silentorb.mythic.fathom.misc
 
-import silentorb.mythic.spatial.Vector3i
-import java.nio.FloatBuffer
-
-data class VoxelMap(
-    val depth: Int,
-    val dimensions: Vector3i,
-    val buffer: FloatBuffer
+data class ModelFunction(
+    val form: DistanceFunction,
+    val shading: ShadingFunction,
+    val collision: CollisionFunction?
 )

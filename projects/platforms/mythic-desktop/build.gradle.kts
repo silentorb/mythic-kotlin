@@ -13,4 +13,4 @@ dependencies {
   implementation("org.lwjgl:lwjgl-openal:${Versions.lwjgl}:${Natives.lwjgl}")
 }
 
-requires(project, "platforming", "haft")
+requires(project, "platforming", "haft", "resource-loading")

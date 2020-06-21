@@ -1,4 +1,4 @@
-package silentorb.mythic.fathom
+package silentorb.mythic.fathom.misc
 
 import silentorb.mythic.spatial.Vector3
 

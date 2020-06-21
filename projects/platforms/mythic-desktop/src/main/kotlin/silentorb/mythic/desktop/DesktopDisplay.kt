@@ -1,11 +1,13 @@
 package silentorb.mythic.desktop
 
-import silentorb.mythic.platforming.*
-import silentorb.mythic.spatial.Vector2i
 import org.lwjgl.glfw.GLFW.*
-import org.lwjgl.stb.STBImage.*
+import org.lwjgl.stb.STBImage.stbi_failure_reason
+import org.lwjgl.stb.STBImage.stbi_load_from_memory
 import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil
+import silentorb.mythic.platforming.*
+import silentorb.mythic.resource_loading.ioResourceToByteBuffer
+import silentorb.mythic.spatial.Vector2i
 import java.nio.ByteBuffer
 
 fun createWindow(title: String, config: PlatformDisplayConfig): Long {
@@ -87,7 +89,7 @@ fun getWindowInfo(window: Long): WindowInfo {
   }
 }
 
-val loadImageFromFile: ImageLoader = { path ->
+val loadImageFromFile: ImageLoader = { filePath ->
   var buffer: ByteBuffer? = null
   var width = 0
   var height = 0
@@ -97,8 +99,10 @@ val loadImageFromFile: ImageLoader = { path ->
     val heightBuffer = stack.mallocInt(1)
     val channelBuffer = stack.mallocInt(1)
 
+    val imageBuffer = ioResourceToByteBuffer(filePath)
+
 //    stbi_set_flip_vertically_on_load(true)
-    buffer = stbi_load(path, widthBuffer, heightBuffer, channelBuffer, 0)
+    buffer = stbi_load_from_memory(imageBuffer, widthBuffer, heightBuffer, channelBuffer, 0)
     if (buffer == null) {
       val reason = stbi_failure_reason()
       throw RuntimeException("Failed to load a texture file!"

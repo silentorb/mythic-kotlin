@@ -24,22 +24,19 @@ enum class TextureAntialiasing {
 }
 
 data class DisplayConfig(
-    val width: Int = 800,
-    val height: Int = 600,
+    val dimensions: Vector2i = Vector2i(800, 600),
     val fullscreen: Boolean = false,
     val windowedFullscreen: Boolean = false, // Whether fullscreen uses windowed fullscreen
     val vsync: Boolean = true,
     val multisamples: Int = 0,
     val depthOfField: Boolean = false,
     val textureAntialiasing: TextureAntialiasing = TextureAntialiasing.trilinear
-) {
-  val dimensions: Vector2i get() = Vector2i(width, height)
-}
+)
 
 fun toPlatformDisplayConfig(display: DisplayConfig) =
     PlatformDisplayConfig(
-        width = display.width,
-        height = display.height,
+        width = display.dimensions.x,
+        height = display.dimensions.y,
         fullscreen = display.fullscreen,
         windowedFullscreen = display.windowedFullscreen,
         vsync = display.vsync,

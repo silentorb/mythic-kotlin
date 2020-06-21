@@ -1,7 +1,7 @@
 package silentorb.mythic.fathom.surfacing
 
-import silentorb.mythic.fathom.DistanceFunction
-import silentorb.mythic.fathom.getNormal
+import silentorb.mythic.fathom.misc.DistanceFunction
+import silentorb.mythic.fathom.misc.getNormal
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.getCenter
 import kotlin.math.abs

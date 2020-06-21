@@ -3,6 +3,7 @@ package silentorb.mythic.lookinglass.meshes
 import silentorb.mythic.drawing.DrawingVertexSchemas
 import silentorb.mythic.drawing.createDrawingVertexSchemas
 import silentorb.mythic.glowing.VertexAttribute
+import silentorb.mythic.glowing.floatVertexAttribute
 
 typealias VertexSchema = silentorb.mythic.glowing.VertexSchema
 
@@ -19,37 +20,37 @@ data class VertexSchemas(
 
 fun createVertexSchemas() = VertexSchemas(
     billboard = VertexSchema(listOf(
-        VertexAttribute(AttributeName.position, 3),
-        VertexAttribute(AttributeName.uv, 2)
+        floatVertexAttribute(AttributeName.position, 3),
+        floatVertexAttribute(AttributeName.uv, 2)
     )),
     shaded = VertexSchema(listOf(
-        VertexAttribute(AttributeName.position, 3),
-        VertexAttribute(AttributeName.normal, 3)
+        floatVertexAttribute(AttributeName.position, 3),
+        floatVertexAttribute(AttributeName.normal, 3)
     )),
     shadedPoint = VertexSchema(listOf(
-        VertexAttribute(AttributeName.position, 3),
-        VertexAttribute(AttributeName.normal, 3),
-        VertexAttribute(AttributeName.pointSize, 1),
-        VertexAttribute(AttributeName.color, 4)
+        floatVertexAttribute(AttributeName.position, 3),
+        floatVertexAttribute(AttributeName.normal, 3),
+        floatVertexAttribute(AttributeName.pointSize, 1),
+        floatVertexAttribute(AttributeName.color, 4)
     )),
     textured = VertexSchema(listOf(
-        VertexAttribute(AttributeName.position, 3),
-        VertexAttribute(AttributeName.normal, 3),
-        VertexAttribute(AttributeName.uv, 2)
+        floatVertexAttribute(AttributeName.position, 3),
+        floatVertexAttribute(AttributeName.normal, 3),
+        floatVertexAttribute(AttributeName.uv, 2)
     )),
     animated = VertexSchema(listOf(
-        VertexAttribute(AttributeName.position, 3),
-        VertexAttribute(AttributeName.normal, 3),
-        VertexAttribute(AttributeName.uv, 2),
-        VertexAttribute(AttributeName.joints, 4),
-        VertexAttribute(AttributeName.weights, 4)
+        floatVertexAttribute(AttributeName.position, 3),
+        floatVertexAttribute(AttributeName.normal, 3),
+        floatVertexAttribute(AttributeName.uv, 2),
+        floatVertexAttribute(AttributeName.joints, 4),
+        floatVertexAttribute(AttributeName.weights, 4)
     )),
     flat = VertexSchema(listOf(
-        VertexAttribute(AttributeName.position, 3)
+        floatVertexAttribute(AttributeName.position, 3)
     )),
     imported = VertexSchema(listOf(
-        VertexAttribute(AttributeName.position, 3),
-        VertexAttribute(AttributeName.normal, 3)
+        floatVertexAttribute(AttributeName.position, 3),
+        floatVertexAttribute(AttributeName.normal, 3)
     )),
     drawing = createDrawingVertexSchemas()
 )

@@ -6,11 +6,12 @@ import org.lwjgl.openal.ALC
 import org.lwjgl.openal.ALC10.*
 import org.lwjgl.openal.ALCCapabilities
 import org.lwjgl.openal.ALCapabilities
-import org.lwjgl.stb.STBVorbis.stb_vorbis_decode_filename
+import org.lwjgl.stb.STBVorbis.stb_vorbis_decode_memory
 import org.lwjgl.system.MemoryStack.*
 import org.lwjgl.system.libc.LibCStdlib.free
 import silentorb.mythic.platforming.LoadSoundResult
 import silentorb.mythic.platforming.PlatformAudio
+import silentorb.mythic.resource_loading.ioResourceToByteBuffer
 import silentorb.mythic.spatial.Vector3
 import java.nio.ShortBuffer
 
@@ -30,14 +31,15 @@ fun loadSoundFromBuffer(inputBuffer: ShortBuffer, channels: Int, sampleRate: Int
   )
 }
 
-fun loadSoundFromFile(filename: String): LoadSoundResult {
+fun loadSoundFromFile(filePath: String): LoadSoundResult {
   // Allocate space to store return information from the function
   stackPush()
   val channelsBuffer = stackMallocInt(1)
   stackPush()
   val sampleRateBuffer = stackMallocInt(1)
 
-  val inputBuffer = stb_vorbis_decode_filename(filename, channelsBuffer, sampleRateBuffer)
+  val inputBuffer = ioResourceToByteBuffer(filePath)
+  val audioBuffer = stb_vorbis_decode_memory(inputBuffer, channelsBuffer, sampleRateBuffer)
 
   // Retrieve the extra information that was stored in the buffers by the function
   val channels = channelsBuffer.get()
@@ -47,14 +49,14 @@ fun loadSoundFromFile(filename: String): LoadSoundResult {
   stackPop()
   stackPop()
 
-  assert(inputBuffer != null)
+  assert(audioBuffer != null)
   when (channels) {
     1 -> AL_FORMAT_MONO16
     2 -> AL_FORMAT_STEREO16
-    else -> throw Error("Invalid channel count for audio file $filename: $channels")
+    else -> throw Error("Invalid channel count for audio file $filePath: $channels")
   }
-  val result = loadSoundFromBuffer(inputBuffer, channels, sampleRate)
-  free(inputBuffer)
+  val result = loadSoundFromBuffer(audioBuffer, channels, sampleRate)
+  free(audioBuffer)
   return result
 }
 

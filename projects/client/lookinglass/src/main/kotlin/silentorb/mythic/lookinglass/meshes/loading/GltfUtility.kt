@@ -1,28 +1,27 @@
 package silentorb.mythic.lookinglass.meshes.loading
 
-import silentorb.mythic.lookinglass.getResourceStream
-import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Quaternion
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 import org.lwjgl.BufferUtils
+import silentorb.mythic.resource_loading.getResourceStream
 import java.io.DataInputStream
 import java.nio.ByteBuffer
 
-fun loadGltfByteBuffer(directoryPath: String, info: GltfInfo): ByteBuffer {
-  val inputStream = getResourceStream(directoryPath + "/" + info.buffers[0].uri)
-  val dataStream = DataInputStream(inputStream)
-  val size = info.buffers[0].byteLength
-  val buffer = BufferUtils.createByteBuffer(size)
-  dataStream.use {
-    for (i in 0 until size)
+fun loadGltfByteBuffer(directoryPath: String, info: GltfInfo): ByteBuffer =
+    getResourceStream(directoryPath + "/" + info.buffers[0].uri).use { inputStream ->
+      val dataStream = DataInputStream(inputStream!!)
+      val size = info.buffers[0].byteLength
+      val buffer = BufferUtils.createByteBuffer(size)
+      dataStream.use {
+        for (i in 0 until size)
 //    while (dataStream.available() > 0) {
-      buffer.put(dataStream.readByte())
+          buffer.put(dataStream.readByte())
 //    }
-  }
+      }
 
-  return buffer
-}
+      buffer
+    }
 
 typealias BufferIterator = (ByteBuffer, Int, (Int) -> Unit) -> Unit
 

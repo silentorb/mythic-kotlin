@@ -1,4 +1,4 @@
-package silentorb.mythic.fathom
+package silentorb.mythic.fathom.misc
 
 import silentorb.imp.core.PathKey
 import silentorb.imp.core.newTypePair
@@ -7,6 +7,7 @@ import silentorb.imp.execution.typePairstoTypeNames
 import silentorb.mythic.fathom.surfacing.DecimalBounds
 import silentorb.mythic.imaging.texturing.FloatSampler3d
 import silentorb.mythic.imaging.texturing.texturingPath
+import silentorb.mythic.scenery.Shading
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.scenery.Shape
 import java.nio.FloatBuffer
@@ -26,13 +27,9 @@ typealias Sampler3d = (Float, Float, Float, FloatBuffer) -> Unit
 
 typealias DistanceFunction = FloatSampler3d
 typealias RgbColorFunction = (Vector3) -> Vector3
-typealias CollisionGenerator = (DecimalBounds) -> Shape
+typealias ShadingFunction = (Vector3) -> Shading
 
-data class ModelFunction(
-    val distance: DistanceFunction,
-    val color: RgbColorFunction,
-    val collision: CollisionGenerator?
-)
+typealias CollisionFunction = (DecimalBounds) -> Shape
 
 fun fathomAliases() = listOf(
     TypeAlias(

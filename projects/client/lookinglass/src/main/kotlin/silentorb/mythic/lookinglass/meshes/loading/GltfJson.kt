@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import silentorb.mythic.configuration.getAfterburnerModule
-import silentorb.mythic.lookinglass.getResourceStream
+import silentorb.mythic.resource_loading.getResourceStream
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 import java.io.IOException
@@ -66,9 +66,10 @@ fun getObjectMapper(): ObjectMapper {
 
 inline fun <reified T> loadJsonResource(path: String): T {
   try {
-    val content = getResourceStream(path)
-    val result = getObjectMapper().readValue(content, T::class.java)
-    return result
+    return getResourceStream(path).use { content ->
+      val result = getObjectMapper().readValue(content, T::class.java)
+      result
+    }
   } catch (e: Throwable) {
     throw Error("Could not load JSON resource $path")
   }

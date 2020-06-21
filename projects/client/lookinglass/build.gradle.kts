@@ -13,4 +13,4 @@ dependencies {
 }
 
 requires(project,"platforming", "sculpting", "glowing", "typography", "drawing",
-    "breeze", "configuration")
+    "breeze", "configuration", "resource-loading")

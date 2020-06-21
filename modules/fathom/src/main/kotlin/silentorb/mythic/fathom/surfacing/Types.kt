@@ -1,6 +1,6 @@
 package silentorb.mythic.fathom.surfacing
 
-import silentorb.mythic.fathom.DistanceFunction
+import silentorb.mythic.fathom.misc.DistanceFunction
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector3i
 
