@@ -3,7 +3,6 @@ package silentorb.mythic.bloom
 import silentorb.mythic.bloom.next.*
 import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.typography.IndexedTextStyle
-import silentorb.mythic.bloom.next.*
 
 data class MenuItem(
     val name: String,

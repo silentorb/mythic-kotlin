@@ -22,7 +22,6 @@ fun getResourceUrl(path: String): URL? =
 fun getResourceStream(path: String): InputStream? =
     Loading::class.java.classLoader.getResourceAsStream(sanitizeResourcePath(path))
 
-
 fun bufferStream(input: InputStream): ByteBuffer {
   val array = ByteArray(input.available())
   input.read(array)
