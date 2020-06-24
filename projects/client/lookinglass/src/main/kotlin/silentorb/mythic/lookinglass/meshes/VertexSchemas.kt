@@ -1,7 +1,10 @@
 package silentorb.mythic.lookinglass.meshes
 
+import org.lwjgl.opengl.GL11.GL_BYTE
+import org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE
 import silentorb.mythic.drawing.DrawingVertexSchemas
 import silentorb.mythic.drawing.createDrawingVertexSchemas
+import silentorb.mythic.glowing.VertexAttribute
 import silentorb.mythic.glowing.VertexSchema
 import silentorb.mythic.glowing.floatVertexAttribute
 
@@ -27,10 +30,10 @@ fun createVertexSchemas() = VertexSchemas(
     )),
     shadedPoint = VertexSchema(listOf(
         floatVertexAttribute(AttributeName.position, 3),
-        floatVertexAttribute(AttributeName.normal, 3),
         floatVertexAttribute(AttributeName.pointSize, 1),
-        floatVertexAttribute(AttributeName.color, 4)
-    )),
+        VertexAttribute(AttributeName.color, 4, GL_UNSIGNED_BYTE),
+        VertexAttribute(AttributeName.normal, 3, GL_BYTE)
+        )),
     textured = VertexSchema(listOf(
         floatVertexAttribute(AttributeName.position, 3),
         floatVertexAttribute(AttributeName.normal, 3),

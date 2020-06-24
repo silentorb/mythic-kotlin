@@ -1,7 +1,10 @@
 package silentorb.mythic.glowing
 
 fun paddedFloatBytes(byteSize: Int) =
-    byteSize + (byteSize % 4)
+    if (byteSize % 4 == 0)
+      byteSize
+    else
+      byteSize + 4 - (byteSize % 4)
 
 class VertexSchema(val attributes: List<VertexAttribute>) {
   val byteSize = paddedFloatBytes(attributes.sumBy { it.byteSize })
