@@ -2,10 +2,8 @@ package silentorb.mythic.lookinglass.meshes
 
 import silentorb.mythic.drawing.DrawingVertexSchemas
 import silentorb.mythic.drawing.createDrawingVertexSchemas
-import silentorb.mythic.glowing.VertexAttribute
+import silentorb.mythic.glowing.VertexSchema
 import silentorb.mythic.glowing.floatVertexAttribute
-
-typealias VertexSchema = silentorb.mythic.glowing.VertexSchema
 
 data class VertexSchemas(
     val billboard: VertexSchema,

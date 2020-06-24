@@ -11,7 +11,7 @@ class VertexArrayObject() {
 
     fun createInterwoven(schema: VertexSchema): VertexArrayObject {
       val result = VertexArrayObject()
-      val stride = schema.floatSize * 4
+      val stride = schema.byteSize
       var offset = 0L
       var i = 0
       globalState.vertexArrayObject = result.id
@@ -21,14 +21,14 @@ class VertexArrayObject() {
         glEnableVertexAttribArray(i)
         checkError("binding vbo buffer data")
         i++
-        offset += attribute.byteSize * 4
+        offset += attribute.byteSize
       }
       return result
     }
 
     fun createNonInterleaved(schema: VertexSchema): VertexArrayObject {
       val result = VertexArrayObject()
-      val stride = schema.floatSize * 4
+      val stride = schema.byteSize
       var offset = 0L
       var i = 0
       globalState.vertexArrayObject = result.id
@@ -37,7 +37,7 @@ class VertexArrayObject() {
         glVertexAttribPointer(i, attribute.count, attribute.elementType, true, stride, offset)
         glEnableVertexAttribArray(i)
         i++
-        offset += attribute.byteSize * 4
+        offset += attribute.byteSize
       }
       return result
     }

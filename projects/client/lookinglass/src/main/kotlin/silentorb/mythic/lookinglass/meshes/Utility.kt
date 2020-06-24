@@ -2,6 +2,7 @@ package silentorb.mythic.lookinglass.meshes
 
 import silentorb.mythic.glowing.GeneralMesh
 import silentorb.mythic.glowing.PrimitiveType
+import silentorb.mythic.glowing.VertexSchema
 import silentorb.mythic.glowing.newGeneralMesh
 import silentorb.mythic.sculpting.ImmutableFace
 import silentorb.mythic.sculpting.ImmutableMesh
