@@ -24,13 +24,3 @@ fun floatVertexAttribute(name: String, count: Int) =
         count = count,
         elementType = GL_FLOAT
     )
-
-class VertexAttributeDetail(
-    val id: Int,
-    val name: String,
-    val offset: Int,
-    val count: Int,
-    val byteSize: Int,
-    val floatSize: Int,
-    val elementType: Int
-)

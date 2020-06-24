@@ -31,7 +31,7 @@ fun loadIndices(buffer: ByteBuffer, info: GltfInfo, primitive: Primitive): IntBu
   return indices
 }
 
-typealias VertexConverter = (ByteBuffer, FloatBuffer, VertexAttributeDetail, Int, Int) -> Unit
+typealias VertexConverter = (ByteBuffer, FloatBuffer, VertexAttribute, Int, Int) -> Unit
 
 fun createVertexConverter(info: GltfInfo, transformBuffer: ByteBuffer, boneMap: BoneMap, meshIndex: Int): VertexConverter {
   val meshNode = info.nodes.first { it.mesh == meshIndex }
@@ -51,13 +51,13 @@ fun createVertexConverter(info: GltfInfo, transformBuffer: ByteBuffer, boneMap: 
     var lastWeights: List<Float> = listOf()
     return { buffer, vertices, attribute, componentType, vertexIndex ->
       if (attribute.name == AttributeName.weights) {
-        lastWeights = (0 until attribute.floatSize).map {
+        lastWeights = (0 until attribute.count).map {
           val value = buffer.float
           vertices.put(value)
           value
         }
       } else if (attribute.name == AttributeName.joints) {
-        lastJoints = (0 until attribute.floatSize).map {
+        lastJoints = (0 until attribute.count).map {
           val value = getComponentIntValue(buffer, componentType)
           val jointIndex = jointMap[value]!!
           val converted = boneMap[jointIndex]!!.index
@@ -66,7 +66,7 @@ fun createVertexConverter(info: GltfInfo, transformBuffer: ByteBuffer, boneMap: 
         }
       } else {
         assert(componentType == ComponentType.Float.value)
-        for (x in 0 until attribute.floatSize) {
+        for (x in 0 until attribute.count) {
           val value = buffer.float
           vertices.put(value)
         }
@@ -74,7 +74,7 @@ fun createVertexConverter(info: GltfInfo, transformBuffer: ByteBuffer, boneMap: 
     }
   } else {
     { buffer, vertices, attribute, _, _ ->
-      for (x in 0 until attribute.floatSize) {
+      for (x in 0 until attribute.count) {
         val value = buffer.float
         vertices.put(value)
       }
@@ -113,12 +113,12 @@ fun loadVertices(buffer: ByteBuffer, info: GltfInfo, vertexSchema: VertexSchema,
         val stride = if (bufferView.byteStride != 0)
           bufferView.byteStride
         else
-          attribute.floatSize * getComponentByteSize(attributeAccessor.componentType)
+          attribute.count * getComponentByteSize(attributeAccessor.componentType)
 
         buffer.position(bufferView.byteOffset + attributeAccessor.byteOffset + i * stride)
         converter(buffer, vertices, attribute, attributeAccessor.componentType, i)
       } else {
-        for (x in 0 until attribute.floatSize) {
+        for (x in 0 until attribute.count) {
           vertices.put(0f)
         }
       }
