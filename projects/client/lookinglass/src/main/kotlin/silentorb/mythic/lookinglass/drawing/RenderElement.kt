@@ -15,10 +15,10 @@ import silentorb.mythic.lookinglass.shading.populateBoneBuffer
 import silentorb.mythic.scenery.Camera
 import silentorb.mythic.scenery.MeshName
 
-fun renderVolume(renderer: SceneRenderer, lod: Lod, location: Vector3, transform: Matrix) {
+fun renderVolume(renderer: SceneRenderer, sampledModel: SampledModel, location: Vector3, transform: Matrix) {
   val orientationTransform = getRotationMatrix(transform)
   val distance = renderer.camera.position.distance(location)
-  val mesh = lod.entries.last { it.key <= distance }.value
+  val mesh = sampledModel.mesh
   val effect = renderer.getShader(mesh.vertexSchema, ShaderFeatureConfig(
       shading = true,
       pointSize = true
@@ -104,8 +104,8 @@ private fun useMesh(meshes: ModelMeshMap, MeshName: MeshName, action: (ModelMesh
 fun renderMeshElement(renderer: SceneRenderer, element: MeshElement, armature: Armature? = null, transforms: List<Matrix>? = null) {
   val meshes = renderer.meshes
   useMesh(meshes, element.mesh) { mesh ->
-    if (mesh.particleLod.any()) {
-      renderVolume(renderer, mesh.particleLod, element.location, element.transform)
+    if (mesh.sampledModel != null) {
+      renderVolume(renderer, mesh.sampledModel, element.location, element.transform)
     } else {
       for (primitive in mesh.primitives) {
         val transform = getElementTransform(element, primitive, transforms)

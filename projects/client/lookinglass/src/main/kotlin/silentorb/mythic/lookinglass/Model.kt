@@ -1,5 +1,6 @@
 package silentorb.mythic.lookinglass
 
+import silentorb.mythic.glowing.GeneralMesh
 import silentorb.mythic.lookinglass.meshes.Lod
 import silentorb.mythic.sculpting.ImmutableEdge
 import silentorb.mythic.sculpting.ImmutableFace
@@ -51,10 +52,17 @@ data class AdvancedModel(
     val armature: Armature? = null
 )
 
+typealias SamplePartitioning = List<List<Int>>
+
+data class SampledModel(
+    val mesh: GeneralMesh,
+    val partitioning: SamplePartitioning
+)
+
 data class ModelMesh(
     val id: MeshName,
     val primitives: Primitives = listOf(),
-    val particleLod: Lod = mapOf(),
+    val sampledModel: SampledModel? = null,
     val lights: List<Light> = listOf(),
     val bounds: Shape? = null
 )
