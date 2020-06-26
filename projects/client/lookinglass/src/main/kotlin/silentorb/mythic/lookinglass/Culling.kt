@@ -31,7 +31,7 @@ fun cullElementGroup(meshes: ModelMeshMap, cullingContext: CullingContext): (Ele
 fun getCullingContext(camera: Camera) =
     CullingContext(
         location = camera.position,
-        facingNormal = camera.orientation.transform(Vector3(1f, 0f, 0f)).normalize()
+        facingNormal = camera.lookAt
     )
 
 fun cullElementGroups(meshes: ModelMeshMap, camera: Camera, groups: ElementGroups): ElementGroups {

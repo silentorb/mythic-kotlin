@@ -8,16 +8,16 @@ import silentorb.mythic.spatial.Vector3i
 import silentorb.mythic.spatial.toVector3
 import kotlin.math.abs
 
-val subdivisionTemplate: List<Vector3> = (0 until 1).flatMap { z ->
-  (0 until 1).flatMap { y ->
-    (0 until 1).map { x ->
+val subdivisionTemplate: List<Vector3> = (-1..1 step 2).flatMap { z ->
+  (-1..1 step 2).flatMap { y ->
+    (-1..1 step 2).map { x ->
       Vector3(x.toFloat(), y.toFloat(), z.toFloat()) / 2f
     }
   }
 }
 
-fun samplePoint(config: SamplingConfig, resolution: Float, level: Int, start: Vector3): List<SamplePoint> {
-  val sampleRange = 1.5f / resolution
+fun samplePoint(config: SamplingConfig, scale: Float, level: Int, start: Vector3): List<SamplePoint> {
+  val sampleRange = 1.5f * scale
   val getDistance = config.getDistance
   val getShading = config.getShading
 
@@ -34,13 +34,13 @@ fun samplePoint(config: SamplingConfig, resolution: Float, level: Int, start: Ve
         location = location,
         normal = normal,
         shading = shading,
-        size = config.pointSize / resolution,
+        size = config.pointSize * scale,
         level = level
     )
     if (level < config.levels - 1) {
-      val nextResolution = resolution / 2f
+      val nextResolution = scale / 2f
       val nextLevel = level + 1
-      subdivisionTemplate.flatMap { offset ->
+      listOf(point) + subdivisionTemplate.flatMap { offset ->
         samplePoint(config, nextResolution, nextLevel, start + offset * nextResolution)
       }
     } else {
@@ -72,7 +72,7 @@ fun sampleForm(config: SamplingConfig, startingResolution: Int, bounds: GridBoun
   return (0 until sampleCount).flatMap { index ->
     val offset = indexToVector3i(sliceSize, stepDimensions.x, index).toVector3()
     val startingLocation = start + offset / startingResolution.toFloat()
-    samplePoint(config, startingResolution.toFloat(), 1, startingLocation)
+    samplePoint(config, 1f / startingResolution.toFloat(), 0, startingLocation)
   }
 }
 

@@ -48,20 +48,15 @@ fun createCameraMatrix(dimensions: Vector2i, camera: Camera): Matrix {
   else
     createPerspectiveMatrix(dimensions, camera.angleOrZoom, camera.nearClip, camera.farClip)
 
-  val lookAt = camera.lookAt
-  val view = if (lookAt == null)
-    createViewMatrix(camera.position, camera.orientation)
-  else
-    createViewMatrix(camera.position, lookAt)
-
+  val view = createViewMatrix(camera.position, camera.orientation)
   return projection * view
 }
 
 fun createCameraEffectsData(dimensions: Vector2i, camera: Camera) =
     CameraEffectsData(
         createCameraMatrix(dimensions, camera),
-        if (camera.lookAt != null)
-          camera.lookAt!! - camera.position
-        else
+//        if (camera.lookAt != null)
+//          camera.lookAt!! - camera.position
+//        else
           camera.orientation * Vector3(1f, 0f, 0f)
     )

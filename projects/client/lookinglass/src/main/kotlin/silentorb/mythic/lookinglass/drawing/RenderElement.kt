@@ -1,23 +1,30 @@
 package silentorb.mythic.lookinglass.drawing
 
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL14
 import silentorb.mythic.breeze.MultiAnimationPart
 import silentorb.mythic.breeze.transformAnimatedSkeleton
 import silentorb.mythic.glowing.drawMesh
 import silentorb.mythic.glowing.globalState
 import silentorb.mythic.spatial.*
 import silentorb.mythic.lookinglass.*
-import silentorb.mythic.lookinglass.meshes.Lod
 import silentorb.mythic.lookinglass.meshes.Primitive
-import silentorb.mythic.lookinglass.shading.ObjectShaderConfig
-import silentorb.mythic.lookinglass.shading.ShaderFeatureConfig
-import silentorb.mythic.lookinglass.shading.populateBoneBuffer
+import silentorb.mythic.lookinglass.shading.*
 import silentorb.mythic.scenery.Camera
 import silentorb.mythic.scenery.MeshName
 
 fun renderVolume(renderer: SceneRenderer, sampledModel: SampledModel, location: Vector3, transform: Matrix) {
+  val camera = renderer.camera
   val orientationTransform = getRotationMatrix(transform)
-  val distance = renderer.camera.position.distance(location)
+  val distance = camera.position.distance(location)
+  val lodRanges = listOf(
+      10f,
+      20f,
+      30f,
+      40f,
+      50f
+  )
+  val lodLevel = getLodLevel(lodRanges, sampledModel.levels, distance)
   val mesh = sampledModel.mesh
   val effect = renderer.getShader(mesh.vertexSchema, ShaderFeatureConfig(
       shading = true,
@@ -25,15 +32,54 @@ fun renderVolume(renderer: SceneRenderer, sampledModel: SampledModel, location: 
   ))
 
   val config = ObjectShaderConfig(
-      nearPlaneHeight = getNearPlaneHeight(renderer.viewport, renderer.camera.angleOrZoom),
+      nearPlaneHeight = getNearPlaneHeight(renderer.viewport, camera.angleOrZoom),
       normalTransform = orientationTransform,
       transform = transform
   )
 
   globalState.vertexProgramPointSizeEnabled = true
-//  globalState.pointSprite = true
+
+  val visibleSides = getVisibleSides(camera.lookAt.transform(orientationTransform))
+
+  val realCounts = sampledModel.partitioning
+      .flatten()
+
+  val (offsets) = realCounts
+      .fold(Pair(listOf<Int>(), 0)) { (a, b), c ->
+        val offset = b + c
+        Pair(a + b, offset)
+      }
+
+  val counts = sampledModel.partitioning
+      .mapIndexed { sideIndex, levelCounts ->
+        if (visibleSides.contains(NormalSide.values()[sideIndex]))
+          levelCounts.mapIndexed { level, count ->
+            if (level <= lodLevel)
+              count
+            else
+              0
+          }
+        else
+          levelCounts.map { 0 }
+      }
+      .flatten()
+      .toIntArray()
+
   effect.activate(config)
-  drawMesh(mesh, GL11.GL_POINTS)
+
+//  val memoryCounts = BufferUtils.createIntBuffer(counts.size)
+//  memoryCounts.put(counts)
+//  memoryCounts.rewind()
+//
+//  val memoryOffsets = BufferUtils.createIntBuffer(offsets.size)
+//  memoryOffsets.put(offsets.toIntArray())
+//  memoryOffsets.rewind()
+
+//  drawMesh(mesh, GL11.GL_POINTS)
+  mesh.vertexBuffer.activate()
+//  GL14.nglMultiDrawArrays(GL11.GL_POINTS, memAddress(memoryOffsets), memAddress(memoryCounts), counts.size)
+  GL14.glMultiDrawArrays(GL11.GL_POINTS, offsets.toIntArray(), counts)
+//  GL14.glMultiDrawArrays(GL11.GL_POINTS, intArrayOf(0), intArrayOf(mesh.count!!))
 }
 
 fun renderElement(renderer: SceneRenderer, primitive: Primitive, material: Material, transform: Matrix, isAnimated: Boolean) {

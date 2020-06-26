@@ -1,5 +1,6 @@
 package silentorb.mythic.lookinglass.shading
 
+import silentorb.mythic.lookinglass.LodRanges
 import silentorb.mythic.lookinglass.SamplePartitioning
 import silentorb.mythic.scenery.SamplePoint
 import silentorb.mythic.scenery.Shading
@@ -7,6 +8,7 @@ import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.toList
 import java.nio.ByteBuffer
 import kotlin.math.abs
+import kotlin.math.max
 
 fun normalizedFloatToUnsignedByte(value: Float): Byte =
     (value * 255).toByte()
@@ -77,4 +79,20 @@ fun partitionSamples(levels: Int, samples: List<SamplePoint>): Pair<SamplePartit
       ranges.map { side -> side.map { it.size } },
       ranges.flatMap { it.flatten() }
   )
+}
+
+fun getVisibleSides(facing: Vector3): List<NormalSide> {
+  return listOf(
+      if (facing.x > 0f) NormalSide.x_plus else NormalSide.x_minus,
+      if (facing.y > 0f) NormalSide.y_plus else NormalSide.y_minus,
+      if (facing.z > 0f) NormalSide.z_plus else NormalSide.z_minus
+  )
+}
+
+fun getLodLevel(lodRanges: LodRanges, levels: Int, distance: Float): Int {
+  val index = lodRanges.indexOfFirst { it > distance }
+  return if (index == -1)
+    0
+  else
+    max(0, levels - 1 - index)
 }
