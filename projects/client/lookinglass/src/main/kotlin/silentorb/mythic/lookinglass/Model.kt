@@ -60,7 +60,11 @@ data class SampledModel(
     val partitioning: SamplePartitioning,
     val levels: Int,
     val lodRanges: LodRanges
-)
+) {
+  init {
+    assert(lodRanges.size == levels)
+  }
+}
 
 data class ModelMesh(
     val id: MeshName,

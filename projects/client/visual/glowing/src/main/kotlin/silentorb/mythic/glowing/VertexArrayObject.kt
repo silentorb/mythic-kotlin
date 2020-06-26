@@ -17,7 +17,7 @@ class VertexArrayObject() {
       globalState.vertexArrayObject = result.id
 
       for (attribute in schema.attributes) {
-        glVertexAttribPointer(i, attribute.count, attribute.elementType, true, stride, offset)
+        glVertexAttribPointer(i, attribute.count, attribute.elementType, attribute.normalize, stride, offset)
         glEnableVertexAttribArray(i)
         checkError("binding vbo buffer data")
         i++
@@ -34,7 +34,7 @@ class VertexArrayObject() {
       globalState.vertexArrayObject = result.id
 
       for (attribute in schema.attributes) {
-        glVertexAttribPointer(i, attribute.count, attribute.elementType, true, stride, offset)
+        glVertexAttribPointer(i, attribute.count, attribute.elementType, attribute.normalize, stride, offset)
         glEnableVertexAttribArray(i)
         i++
         offset += attribute.byteSize

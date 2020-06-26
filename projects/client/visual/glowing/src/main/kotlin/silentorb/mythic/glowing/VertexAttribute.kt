@@ -12,14 +12,16 @@ fun elementTypeByteSize(elementType: Int): Int =
 class VertexAttribute(
     val name: String,
     val count: Int,
-    val elementType: Int
+    val elementType: Int,
+    val normalize: Boolean
 ) {
-  val byteSize = paddedFloatBytes(count * elementTypeByteSize(elementType))
+  val byteSize = count * elementTypeByteSize(elementType)
 }
 
 fun floatVertexAttribute(name: String, count: Int) =
     VertexAttribute(
         name = name,
         count = count,
-        elementType = GL_FLOAT
+        elementType = GL_FLOAT,
+        normalize = false // Doesn't matter true or false for GL_FLOAT
     )

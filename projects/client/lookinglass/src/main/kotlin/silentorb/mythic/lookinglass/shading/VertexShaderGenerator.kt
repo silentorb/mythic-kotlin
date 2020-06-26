@@ -38,6 +38,7 @@ private const val shadingOperations = """
 private const val pointSizeHeader = """
 uniform float nearPlaneHeight;
 out vec4 fragmentColor;
+out uint fragmentLevel;
 """
 
 private const val pointSizeOutput = """

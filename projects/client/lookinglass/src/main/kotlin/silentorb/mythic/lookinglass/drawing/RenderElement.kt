@@ -17,29 +17,48 @@ fun renderVolume(renderer: SceneRenderer, sampledModel: SampledModel, location: 
   val camera = renderer.camera
   val orientationTransform = getRotationMatrix(transform)
   val distance = camera.position.distance(location)
+  val levels = sampledModel.levels
   val lodRanges = listOf(
-      10f,
+//      50f,
+//      40f,
+//      30f,
       20f,
-      30f,
-      40f,
-      50f
+      10f
   )
-  val lodLevel = getLodLevel(lodRanges, sampledModel.levels, distance)
+  val lodLevel = getLodLevel(lodRanges, levels, distance)
   val mesh = sampledModel.mesh
   val effect = renderer.getShader(mesh.vertexSchema, ShaderFeatureConfig(
       shading = true,
       pointSize = true
   ))
 
+  val lodTransitionScalar: Float = if (lodLevel < lodRanges.size - 1) {
+    val lower = lodRanges[lodLevel + 1]
+    val upper = lodRanges[lodLevel]
+    val gap = upper - lower
+    val current = distance - lower
+    current / gap
+  } else
+    1f
+
+  val lodOpacityLevels = (0 until levels)
+      .map { level ->
+        if (level == lodLevel + 1)
+          lodTransitionScalar
+        else
+          1f
+      }
+
   val config = ObjectShaderConfig(
       nearPlaneHeight = getNearPlaneHeight(renderer.viewport, camera.angleOrZoom),
       normalTransform = orientationTransform,
-      transform = transform
+      transform = transform,
+      lodOpacityLevels = lodOpacityLevels
   )
 
   globalState.vertexProgramPointSizeEnabled = true
 
-  val visibleSides = getVisibleSides(camera.lookAt.transform(orientationTransform))
+  val visibleSides = getVisibleSides((-camera.lookAt).transform(orientationTransform))
 
   val realCounts = sampledModel.partitioning
       .flatten()
@@ -54,7 +73,7 @@ fun renderVolume(renderer: SceneRenderer, sampledModel: SampledModel, location: 
       .mapIndexed { sideIndex, levelCounts ->
         if (visibleSides.contains(NormalSide.values()[sideIndex]))
           levelCounts.mapIndexed { level, count ->
-            if (level <= lodLevel)
+            if (level <= lodLevel + 1)
               count
             else
               0
@@ -76,6 +95,7 @@ fun renderVolume(renderer: SceneRenderer, sampledModel: SampledModel, location: 
 //  memoryOffsets.rewind()
 
 //  drawMesh(mesh, GL11.GL_POINTS)
+//  globalState.blendFunction = Pair(GL11.GL_DST_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA)
   mesh.vertexBuffer.activate()
 //  GL14.nglMultiDrawArrays(GL11.GL_POINTS, memAddress(memoryOffsets), memAddress(memoryCounts), counts.size)
   GL14.glMultiDrawArrays(GL11.GL_POINTS, offsets.toIntArray(), counts)

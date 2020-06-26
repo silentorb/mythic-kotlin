@@ -59,6 +59,19 @@ class FloatProperty(private val program: ShaderProgram, name: String) {
   }
 }
 
+class FloatArrayProperty(private val program: ShaderProgram, name: String) {
+  private val location = glGetUniformLocation(program.id, name)
+  var cachedValue: List<Float> = listOf()
+
+  fun setValue(value: List<Float>) {
+    if (cachedValue != value) {
+      cachedValue = value
+      program.activate()
+      glUniform1fv(location, value.toFloatArray())
+    }
+  }
+}
+
 class UniformBufferProperty(
     private val program: ShaderProgram,
     private val name: String,

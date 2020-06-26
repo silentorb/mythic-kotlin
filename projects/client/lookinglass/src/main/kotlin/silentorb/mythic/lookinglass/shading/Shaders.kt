@@ -59,7 +59,8 @@ data class ObjectShaderConfig(
     val normalTransform: Matrix? = null,
     val boneBuffer: UniformBuffer? = null,
     val textureScale: Vector2? = null,
-    val nearPlaneHeight: Float? = null // Used for scaling point size
+    val nearPlaneHeight: Float? = null, // Used for scaling point size
+    val lodOpacityLevels: List<Float>? = null
 )
 
 fun generateShaderProgram(vertexSchema: VertexSchema, featureConfig: ShaderFeatureConfig): ShaderProgram {
@@ -78,6 +79,7 @@ class GeneralPerspectiveShader(buffers: UniformBuffers, vertexSchema: VertexSche
   val shading: ShadingFeature? = if (featureConfig.shading) ShadingFeature(program, buffers.section) else null
   val skeleton: SkeletonFeature? = if (featureConfig.skeleton) SkeletonFeature(program, buffers.bone) else null
   val nearPlaneHeight: FloatProperty? = if (featureConfig.pointSize) FloatProperty(program, "nearPlaneHeight") else null
+  val lodOpacityLevels: FloatArrayProperty? = if (featureConfig.pointSize) FloatArrayProperty(program, "lodOpacityLevels") else null
 
   // IntelliJ will flag this use of inline as a warning, but using inline here
   // causes the JVM to optimize away the ObjectShaderConfig allocation and significantly
@@ -103,6 +105,10 @@ class GeneralPerspectiveShader(buffers: UniformBuffers, vertexSchema: VertexSche
 
     if (nearPlaneHeight != null && config.nearPlaneHeight != null) {
       nearPlaneHeight.setValue(config.nearPlaneHeight)
+    }
+
+    if (lodOpacityLevels != null && config.lodOpacityLevels != null) {
+      lodOpacityLevels.setValue(config.lodOpacityLevels)
     }
   }
 }

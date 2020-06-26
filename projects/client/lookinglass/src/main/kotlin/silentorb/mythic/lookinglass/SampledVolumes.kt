@@ -1,7 +1,5 @@
-package silentorb.mythic.lookinglass.shading
+package silentorb.mythic.lookinglass
 
-import silentorb.mythic.lookinglass.LodRanges
-import silentorb.mythic.lookinglass.SamplePartitioning
 import silentorb.mythic.scenery.SamplePoint
 import silentorb.mythic.scenery.Shading
 import silentorb.mythic.spatial.Vector3
@@ -23,7 +21,7 @@ fun bytesToFloat(vararg values: Byte): Float =
     )
         .float
 
-fun serializeShading(shading: Shading): Float =
+fun serializeShadingColor(shading: Shading): Float =
     bytesToFloat(
         normalizedFloatToUnsignedByte(shading.color.x),
         normalizedFloatToUnsignedByte(shading.color.y),
@@ -40,7 +38,21 @@ fun serializeNormal(normal: Vector3): Float =
     )
 
 fun toFloatList(sample: SamplePoint) =
-    toList(sample.location) + listOf(sample.size) + serializeShading(sample.shading) + serializeNormal(sample.normal)
+    listOf<Float>() +
+
+        toList(sample.location) +
+        serializeShadingColor(sample.shading) +
+        sample.size +
+        bytesToFloat(
+            normalizedFloatToSignedByte(sample.normal.x),
+            normalizedFloatToSignedByte(sample.normal.y),
+            normalizedFloatToSignedByte(sample.normal.z),
+            sample.level.toByte()
+        ) +
+//        serializeNormal(sample.normal) +
+//        bytesToFloat(sample.level.toByte(), 0, 0, 0) +
+
+        listOf()
 
 enum class NormalSide {
   x_plus,
@@ -82,17 +94,18 @@ fun partitionSamples(levels: Int, samples: List<SamplePoint>): Pair<SamplePartit
 }
 
 fun getVisibleSides(facing: Vector3): List<NormalSide> {
-  return listOf(
-      if (facing.x > 0f) NormalSide.x_plus else NormalSide.x_minus,
-      if (facing.y > 0f) NormalSide.y_plus else NormalSide.y_minus,
-      if (facing.z > 0f) NormalSide.z_plus else NormalSide.z_minus
-  )
+//  return listOf(
+//      if (facing.x > 0f) NormalSide.x_plus else NormalSide.x_minus,
+//      if (facing.y > 0f) NormalSide.y_plus else NormalSide.y_minus,
+//      if (facing.z > 0f) NormalSide.z_plus else NormalSide.z_minus
+//  )
+  return listOf(NormalSide.y_minus)
 }
 
 fun getLodLevel(lodRanges: LodRanges, levels: Int, distance: Float): Int {
-  val index = lodRanges.indexOfFirst { it > distance }
+  val index = lodRanges.indexOfLast { it > distance }
   return if (index == -1)
     0
   else
-    max(0, levels - 1 - index)
+    max(0, index)
 }
