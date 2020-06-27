@@ -6,6 +6,7 @@ import silentorb.mythic.scenery.Shading
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.toList
 import java.nio.ByteBuffer
+import java.util.ArrayList
 import kotlin.math.abs
 import kotlin.math.max
 
@@ -145,3 +146,13 @@ fun newSampledModel(vertexSchema: VertexSchema, lodRanges: LodRanges, levels: In
       lodRanges = lodRanges
   )
 }
+
+fun serializeVertex(getShading: (Vector3) -> Shading, getNormal: (Vector3) -> Vector3): (ArrayList<Float>, Vector3, Vector3, Vector3) -> Unit =
+    { vertexBuffer, a, b, c ->
+      val shadingA = getShading(a)
+      val shadingB = getShading(b)
+      val shadingC = getShading(c)
+      vertexBuffer.addAll(listOf(a.x, a.y, a.z) + serializeShadingColor(shadingA) + serializeNormal(getNormal(a)))
+      vertexBuffer.addAll(listOf(b.x, b.y, b.z) + serializeShadingColor(shadingB) + serializeNormal(getNormal(b)))
+      vertexBuffer.addAll(listOf(c.x, c.y, c.z) + serializeShadingColor(shadingC) + serializeNormal(getNormal(c)))
+    }

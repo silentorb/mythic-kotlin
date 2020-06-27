@@ -14,5 +14,6 @@ data class Material(
     val glow: Float = 0f,
     val texture: String? = null,
     val shading: Boolean,
+    val coloredVertices: Boolean = false,
     val drawMethod: DrawMethod = DrawMethod.triangleFan
 )
