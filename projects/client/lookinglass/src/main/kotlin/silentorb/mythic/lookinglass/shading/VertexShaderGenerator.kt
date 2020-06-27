@@ -47,6 +47,14 @@ private const val pointSizeOutput = """
   fragmentColor = color * vec4(1.0, 1.0, 1.0, lodOpacityLevels[level]);
 """
 
+private const val coloredHeader = """
+out vec4 fragmentColor;
+"""
+
+private const val coloredOutput = """
+  fragmentColor = color;
+"""
+
 private fun textureOperations(config: ShaderFeatureConfig) =
     if (config.animatedTexture && config.instanced)
       "textureCoordinates = uv * uniformTextureScale + instanceSection.instances[gl_InstanceID].textureOffset;"
@@ -78,6 +86,7 @@ ${if (config.texture) textureHeader else ""}
 ${if (config.animatedTexture) "uniform vec2 uniformTextureScale;" else ""}
 ${if (config.skeleton) weightHeader else ""}
 ${if (config.pointSize) pointSizeHeader else ""}
+${if (config.colored) coloredHeader else ""}
 
 void main() {
   vec4 position4 = vec4(position, 1.0);
@@ -87,6 +96,7 @@ ${instanceOperations(config.instanced)}
   gl_Position = scene.cameraTransform * modelPosition;
 ${if (config.shading) shadingOperations else ""}
 ${if (config.pointSize) pointSizeOutput else ""}
+${if (config.colored) coloredOutput else ""}
 ${textureOperations(config)}
 }
 """

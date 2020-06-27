@@ -34,9 +34,7 @@ private fun textureOperations(config: ShaderFeatureConfig) =
 fun generateFragmentShader(config: ShaderFeatureConfig): String {
   val outColor = listOfNotNull(
       when {
-//        config.pointSize -> "fragmentColor * vec4(1.0, 1.0, 1.0, 0.0)"
-        config.pointSize -> "fragmentColor"
-        config.instanced -> "fragmentColor"
+        config.pointSize || config.instanced || config.colored -> "fragmentColor"
         config.shading -> null
         else -> "uniformColor"
       },

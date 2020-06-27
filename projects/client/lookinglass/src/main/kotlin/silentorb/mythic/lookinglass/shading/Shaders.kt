@@ -47,6 +47,7 @@ data class ShaderFeatureConfig(
     val shading: Boolean = false,
     val skeleton: Boolean = false,
     val texture: Boolean = false,
+    val colored: Boolean = false,
     val instanced: Boolean = false,
     val animatedTexture: Boolean = false // Requires `texture` == true
 )

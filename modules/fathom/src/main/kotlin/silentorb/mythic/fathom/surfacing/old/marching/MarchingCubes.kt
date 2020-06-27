@@ -2,6 +2,7 @@ package silentorb.mythic.fathom.surfacing.old.marching
 
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector3i
+import silentorb.mythic.spatial.getNormal
 import java.nio.FloatBuffer
 import java.util.*
 
@@ -9,7 +10,9 @@ fun lerp(vec1: FloatArray, vec2: FloatArray, alpha: Float): FloatArray {
   return floatArrayOf(vec1[0] + (vec2[0] - vec1[0]) * alpha, vec1[1] + (vec2[1] - vec1[1]) * alpha, vec1[2] + (vec2[2] - vec1[2]) * alpha)
 }
 
-fun marchingCubes(values: FloatBuffer, volumeDimensions: Vector3i, voxelDimensions: Vector3, isoLevel: Float): FloatArray {
+typealias AddTriangle = (ArrayList<Float>, Vector3, Vector3, Vector3) -> Unit
+
+fun marchingCubes(values: FloatBuffer, volumeDimensions: Vector3i, voxelDimensions: Vector3, isoLevel: Float, addTriangle: AddTriangle): FloatArray {
   val vertexBuffer = ArrayList<Float>(64)
   // Actual position along edge weighted according to function values.
   val vertList = Array(12) { FloatArray(3) }
@@ -145,16 +148,12 @@ fun marchingCubes(values: FloatBuffer, volumeDimensions: Vector3i, voxelDimensio
           val a = Vector3(vertList[index3][0] / maxAxisVal - 0.5f, vertList[index3][1] / maxAxisVal - 0.5f, vertList[index3][2] / maxAxisVal - 0.5f)
           val b = Vector3(vertList[index2][0] / maxAxisVal - 0.5f, vertList[index2][1] / maxAxisVal - 0.5f, vertList[index2][2] / maxAxisVal - 0.5f)
           val c = Vector3(vertList[index1][0] / maxAxisVal - 0.5f, vertList[index1][1] / maxAxisVal - 0.5f, vertList[index1][2] / maxAxisVal - 0.5f)
-//          val normal = -getNormal(a, b, c)
-          
-          // Add triangles vertices normalized with the maximal possible value
-//          vertexBuffer.addAll(listOf(a.x, a.y, a.z, normal.x, normal.y, normal.z))
-//          vertexBuffer.addAll(listOf(b.x, b.y, b.z, normal.x, normal.y, normal.z))
-//          vertexBuffer.addAll(listOf(c.x, c.y, c.z, normal.x, normal.y, normal.z))
 
-          vertexBuffer.addAll(listOf(a.x, a.y, a.z))
-          vertexBuffer.addAll(listOf(b.x, b.y, b.z))
-          vertexBuffer.addAll(listOf(c.x, c.y, c.z))
+          addTriangle(vertexBuffer, a, b, c)
+
+//          vertexBuffer.addAll(listOf(a.x, a.y, a.z))
+//          vertexBuffer.addAll(listOf(b.x, b.y, b.z))
+//          vertexBuffer.addAll(listOf(c.x, c.y, c.z))
           i += 3
         }
       }

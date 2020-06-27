@@ -81,12 +81,12 @@ fun indexToVector3i(sliceSize: Int, xSize: Int, index: Int): Vector3i {
   return Vector3i(x, y, z)
 }
 
-fun sampleForm(config: SamplingConfig, bounds: GridBounds): List<SamplePoint> {
+fun sampleCells(config: SamplingConfig, bounds: GridBounds): CellSampler {
   val boundsDimensions = bounds.end - bounds.start
 
   // Sometimes intermediate sdf changes can cause massive spikes in bounding size
   if (boundsDimensions.x > 100 || boundsDimensions.y > 100 || boundsDimensions.z > 100)
-    return listOf()
+    return CellSampler(0) { listOf() }
 
   val stepDimensions = boundsDimensions * config.resolution
   val sampleCount = stepDimensions.x * stepDimensions.y * stepDimensions.z
@@ -100,36 +100,19 @@ fun sampleForm(config: SamplingConfig, bounds: GridBounds): List<SamplePoint> {
       }
       .map { Vector2(it).length() }
 
-  return (0 until sampleCount).flatMap { index ->
+  return CellSampler(sampleCount) { index ->
     val offset = indexToVector3i(sliceSize, stepDimensions.x, index).toVector3()
     val startingLocation = start + offset / initialScale
     samplePoint(config, levelRanges, 1f / initialScale, 0, startingLocation)
   }
 }
 
+fun sampleForm(config: SamplingConfig, bounds: GridBounds): List<SamplePoint> {
+  val (sampleCount, sampler) = sampleCells(config, bounds)
+  return (0 until sampleCount).flatMap(sampler)
+}
+
 data class CellSampler(
     val cellCount: Int,
     val sampler: (Int) -> List<SamplePoint>
 )
-
-//fun sampleCells(config: SamplingConfig, bounds: GridBounds, cellDivisions: Int = 1): CellSampler {
-//  val unitDimensions = bounds.end - bounds.start
-//  val subDimensions = unitDimensions * cellDivisions
-//  val cellCount = subDimensions.x * subDimensions.y * subDimensions.z
-//  val cellsSliceSize = subDimensions.x * subDimensions.y
-//  val cellsSizeX = subDimensions.x
-//
-//  val cellLength = config.resolution
-//  val cellSliceSize = cellLength * cellLength
-//  val cellSampleCount = cellLength * cellLength * cellLength
-//  val resolution = config.resolution.toFloat()
-//  val start = bounds.start.toVector3()
-//
-//  return CellSampler(cellCount) { step ->
-//    val cellStart = start + indexToVector3i(cellsSliceSize, cellsSizeX, step).toVector3()
-//    (0 until cellSampleCount).mapNotNull { index ->
-//      val offset = indexToVector3i(cellSliceSize, cellLength, index).toVector3()
-//      samplePoint(config, cellStart + offset / resolution)
-//    }
-//  }
-//}
