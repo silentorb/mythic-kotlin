@@ -44,14 +44,11 @@ fun toFloatList(sample: SamplePoint) =
         serializeShadingColor(sample.shading) +
         sample.size +
         bytesToFloat(
+            sample.level.toByte(),
             normalizedFloatToSignedByte(sample.normal.x),
             normalizedFloatToSignedByte(sample.normal.y),
-            normalizedFloatToSignedByte(sample.normal.z),
-            sample.level.toByte()
+            normalizedFloatToSignedByte(sample.normal.z)
         ) +
-//        serializeNormal(sample.normal) +
-//        bytesToFloat(sample.level.toByte(), 0, 0, 0) +
-
         listOf()
 
 enum class NormalSide {
@@ -94,12 +91,11 @@ fun partitionSamples(levels: Int, samples: List<SamplePoint>): Pair<SamplePartit
 }
 
 fun getVisibleSides(facing: Vector3): List<NormalSide> {
-//  return listOf(
-//      if (facing.x > 0f) NormalSide.x_plus else NormalSide.x_minus,
-//      if (facing.y > 0f) NormalSide.y_plus else NormalSide.y_minus,
-//      if (facing.z > 0f) NormalSide.z_plus else NormalSide.z_minus
-//  )
-  return listOf(NormalSide.y_minus)
+  return listOf(
+      if (facing.x > 0f) NormalSide.x_plus else NormalSide.x_minus,
+      if (facing.y > 0f) NormalSide.y_plus else NormalSide.y_minus,
+      if (facing.z > 0f) NormalSide.z_plus else NormalSide.z_minus
+  )
 }
 
 fun getLodLevel(lodRanges: LodRanges, levels: Int, distance: Float): Int {

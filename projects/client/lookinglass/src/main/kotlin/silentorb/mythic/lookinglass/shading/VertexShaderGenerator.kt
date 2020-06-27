@@ -1,7 +1,8 @@
 package silentorb.mythic.lookinglass.shading
 
+import org.lwjgl.opengl.GL11.*
+import silentorb.mythic.glowing.VertexAttribute
 import silentorb.mythic.glowing.VertexSchema
-
 
 private const val weightHeader = """
 layout (std140) uniform BoneTransforms {
@@ -36,14 +37,14 @@ private const val shadingOperations = """
 """
 
 private const val pointSizeHeader = """
+uniform float lodOpacityLevels[$maxLodLevels];
 uniform float nearPlaneHeight;
 out vec4 fragmentColor;
-out uint fragmentLevel;
 """
 
 private const val pointSizeOutput = """
   gl_PointSize = (nearPlaneHeight * pointSize) / gl_Position.w;
-  fragmentColor = color;
+  fragmentColor = color * vec4(1.0, 1.0, 1.0, lodOpacityLevels[level]);
 """
 
 private fun textureOperations(config: ShaderFeatureConfig) =
@@ -91,15 +92,23 @@ ${textureOperations(config)}
 """
 }
 
-fun shaderFieldType(size: Int): String =
-    when(size) {
-      1 -> "float"
-      else -> "vec$size"
+fun shaderFieldType(attribute: VertexAttribute): String =
+    if (attribute.elementType == GL_FLOAT || attribute.normalize)
+      when (attribute.count) {
+        1 -> "float"
+        else -> "vec${attribute.count}"
+      }
+    else {
+      when (attribute.elementType) {
+        GL_BYTE -> "int"
+        GL_UNSIGNED_BYTE -> "uint"
+        else -> throw Error("Not implemented")
+      }
     }
 
 fun generateInputsHeader(vertexSchema: VertexSchema): String =
     vertexSchema.attributes.mapIndexed { i, it ->
-      "layout(location = ${i}) in ${shaderFieldType(it.count)} ${it.name};"
+      "layout(location = ${i}) in ${shaderFieldType(it)} ${it.name};"
     }.joinToString("\n")
 
 fun generateVertexCode(config: ShaderFeatureConfig): (VertexSchema) -> String = { vertexSchema ->

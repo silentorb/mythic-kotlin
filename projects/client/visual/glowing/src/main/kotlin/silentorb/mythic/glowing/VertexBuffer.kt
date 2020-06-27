@@ -37,10 +37,7 @@ class VertexBuffer(private val vbo: Int, private val vao: VertexArrayObject) {
 fun newVertexBuffer(vertexSchema: VertexSchema, interleaved: Boolean = true): VertexBuffer {
   val vbo = glGenBuffers()
   globalState.vertexBufferObject = vbo
-  val vao = if (interleaved)
-    VertexArrayObject.createInterwoven(vertexSchema)
-  else
-    VertexArrayObject.createNonInterleaved(vertexSchema)
+  val vao = VertexArrayObject.create(vertexSchema)
 
   checkError("binding vbo buffer data")
   return VertexBuffer(vbo, vao)

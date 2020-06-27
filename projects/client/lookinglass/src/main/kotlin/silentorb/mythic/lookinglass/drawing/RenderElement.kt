@@ -19,11 +19,12 @@ fun renderVolume(renderer: SceneRenderer, sampledModel: SampledModel, location: 
   val distance = camera.position.distance(location)
   val levels = sampledModel.levels
   val lodRanges = listOf(
-//      50f,
-//      40f,
+//      60f,
 //      30f,
+//      10f
       20f,
-      10f
+      10f,
+      5f
   )
   val lodLevel = getLodLevel(lodRanges, levels, distance)
   val mesh = sampledModel.mesh
@@ -35,9 +36,13 @@ fun renderVolume(renderer: SceneRenderer, sampledModel: SampledModel, location: 
   val lodTransitionScalar: Float = if (lodLevel < lodRanges.size - 1) {
     val lower = lodRanges[lodLevel + 1]
     val upper = lodRanges[lodLevel]
-    val gap = upper - lower
-    val current = distance - lower
-    current / gap
+    if (distance > upper)
+      0f
+    else {
+      val gap = upper - lower
+      val current = distance - lower
+      1f - current / gap
+    }
   } else
     1f
 
@@ -58,7 +63,8 @@ fun renderVolume(renderer: SceneRenderer, sampledModel: SampledModel, location: 
 
   globalState.vertexProgramPointSizeEnabled = true
 
-  val visibleSides = getVisibleSides((-camera.lookAt).transform(orientationTransform))
+//  val visibleSides = getVisibleSides((-camera.lookAt).transform(orientationTransform.invert()))
+  val visibleSides = getVisibleSides((camera.position - location).transform(orientationTransform.invert()))
 
   val realCounts = sampledModel.partitioning
       .flatten()

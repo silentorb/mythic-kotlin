@@ -5,11 +5,6 @@ import silentorb.mythic.lookinglass.loadTextResource
 val lightingHeader = loadTextResource("shaders/lighting.glsl")
 const val maxLodLevels: Int = 10
 
-private const val lodHeader = """
-uniform float lodOpacityLevels[$maxLodLevels];
-in flat uint fragmentLevel;
-"""
-
 const val lightingApplication1 = "vec3 lightResult = processLights(uniformColor, fragmentNormal, scene.cameraDirection, fragmentPosition.xyz, glow);"
 const val lightingApplication2 = "vec4(lightResult, uniformColor.w)"
 
@@ -22,7 +17,6 @@ uniform mat4 normalTransform;
 uniform float glow;
 uniform mat4 modelTransform;
 out vec4 output_color;""",
-      if (config.pointSize) lodHeader else null,
       if (config.texture)
         """uniform sampler2D text;
 in vec2 textureCoordinates;"""
@@ -41,7 +35,7 @@ fun generateFragmentShader(config: ShaderFeatureConfig): String {
   val outColor = listOfNotNull(
       when {
 //        config.pointSize -> "fragmentColor * vec4(1.0, 1.0, 1.0, 0.0)"
-        config.pointSize -> "fragmentColor * vec4(1.0, 1.0, 1.0, lodOpacityLevels[fragmentLevel])"
+        config.pointSize -> "fragmentColor"
         config.instanced -> "fragmentColor"
         config.shading -> null
         else -> "uniformColor"

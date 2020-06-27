@@ -32,8 +32,8 @@ fun createVertexSchemas() = VertexSchemas(
         floatVertexAttribute(AttributeName.position, 3),
         VertexAttribute(AttributeName.color, 4, GL_UNSIGNED_BYTE, true),
         floatVertexAttribute(AttributeName.pointSize, 1),
-        VertexAttribute(AttributeName.normal, 3, GL_BYTE, true),
-        VertexAttribute(AttributeName.level, 1, GL_BYTE, false)
+        VertexAttribute(AttributeName.level, 1, GL_UNSIGNED_BYTE, false),
+        VertexAttribute(AttributeName.normal, 3, GL_BYTE, true)
     )),
     textured = VertexSchema(listOf(
         floatVertexAttribute(AttributeName.position, 3),
