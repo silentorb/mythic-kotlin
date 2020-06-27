@@ -58,6 +58,7 @@ typealias LodRanges = List<Float>
 data class SampledModel(
     val mesh: GeneralMesh,
     val partitioning: SamplePartitioning,
+    val baseSize: Int,
     val offsets: List<Int>,
     val levels: Int,
     val lodRanges: LodRanges

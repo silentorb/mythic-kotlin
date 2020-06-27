@@ -28,6 +28,11 @@ fun prepareRenderVolume(renderer: SceneRenderer, sampledModel: SampledModel, loc
 //      25f,
 //      10f
 //  )
+//  val lodRanges = listOf(
+//      15f,
+//      10f,
+//      5f
+//  ).takeLast(sampledModel.levels)
   val lodLevel = getLodLevel(lodRanges, levels, distance)
 
   val lodTransitionScalar: Float = if (lodLevel < lodRanges.size - 1) {
@@ -48,7 +53,7 @@ fun prepareRenderVolume(renderer: SceneRenderer, sampledModel: SampledModel, loc
         if (level == lodLevel + 1)
           lodTransitionScalar * 0.5f
         else if (level > 1f)
-          0.5f
+          0.2f
         else
           1f
       }
@@ -62,34 +67,40 @@ fun prepareRenderVolume(renderer: SceneRenderer, sampledModel: SampledModel, loc
 
   val visibleSides = getVisibleSides((camera.position - location).transform(orientationTransform.invert()))
 
-  val opaqueCounts = sampledModel.partitioning
-      .mapIndexed { sideIndex, levelCounts ->
-        if (visibleSides.contains(NormalSide.values()[sideIndex]))
-          levelCounts.mapIndexed { level, count ->
-            if (level <= lodLevel)
-              count
-            else
-              0
-          }
-        else
-          levelCounts.map { 0 }
-      }
-      .flatten()
+  val opaqueCounts = (
+      listOf(sampledModel.baseSize) +
+          sampledModel.partitioning
+              .mapIndexed { sideIndex, levelCounts ->
+                if (visibleSides.contains(NormalSide.values()[sideIndex]))
+                  levelCounts.mapIndexed { level, count ->
+                    if (level <= lodLevel)
+                      count
+                    else
+                      0
+                  }
+                else
+                  levelCounts.map { 0 }
+              }
+              .flatten()
+      )
       .toIntArray()
 
-  val transparentCounts = sampledModel.partitioning
-      .mapIndexed { sideIndex, levelCounts ->
-        if (visibleSides.contains(NormalSide.values()[sideIndex]))
-          levelCounts.mapIndexed { level, count ->
-            if (level == lodLevel + 1 && lodTransitionScalar != 0f)
-              count
-            else
-              0
-          }
-        else
-          levelCounts.map { 0 }
-      }
-      .flatten()
+  val transparentCounts = (
+      listOf(0) +
+          sampledModel.partitioning
+              .mapIndexed { sideIndex, levelCounts ->
+                if (visibleSides.contains(NormalSide.values()[sideIndex]))
+                  levelCounts.mapIndexed { level, count ->
+                    if (level == lodLevel + 1 && lodTransitionScalar != 0f)
+                      count
+                    else
+                      0
+                  }
+                else
+                  levelCounts.map { 0 }
+              }
+              .flatten()
+      )
       .toIntArray()
 
   return BatchedVolume(

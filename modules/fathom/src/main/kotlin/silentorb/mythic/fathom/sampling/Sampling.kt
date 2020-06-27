@@ -1,8 +1,10 @@
 package silentorb.mythic.fathom.sampling
 
+import silentorb.mythic.fathom.misc.getNormal
 import silentorb.mythic.fathom.surfacing.GridBounds
 import silentorb.mythic.fathom.surfacing.snapToSurfaceIncludingNormal
 import silentorb.mythic.scenery.SamplePoint
+import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector3i
 import silentorb.mythic.spatial.toVector3
@@ -16,35 +18,57 @@ val subdivisionTemplate: List<Vector3> = (-1..1 step 2).flatMap { z ->
   }
 }
 
-fun samplePoint(config: SamplingConfig, scale: Float, level: Int, start: Vector3): List<SamplePoint> {
-  val sampleRange = 1.5f * scale
+fun samplePoint(config: SamplingConfig, levelRanges: List<Float>, cellLength: Float, level: Int, start: Vector3): List<SamplePoint> {
+  val sampleRange = levelRanges[level]
   val getDistance = config.getDistance
   val getShading = config.getShading
-
   val startingDistance = getDistance(start)
-  return if (abs(startingDistance) > sampleRange)
-    listOf()
-  else {
-    val (snappedLocation, normal) = snapToSurfaceIncludingNormal(getDistance, start)
-    val normalOffsetStep = config.levelOffsetRange / config.levels.toFloat()
-    val scalarNormalOffset = -config.levelOffsetRange / 2f + level * normalOffsetStep
-    val location = snappedLocation + normal * scalarNormalOffset
-    val shading = getShading(location)
-    val point = SamplePoint(
-        location = location,
-        normal = normal,
-        shading = shading,
-        size = config.pointSize * scale,
-        level = level
-    )
+  val absDistance = abs(startingDistance)
+
+  return if (absDistance > sampleRange) {
+    if (level == 0 && startingDistance < -sampleRange) {
+      val location = start
+      val normal = getNormal(getDistance, start)
+      val shading = getShading(location)
+      listOf(
+          SamplePoint(
+              location = location,
+              normal = normal,
+              shading = shading,
+              size = config.pointSizeScale * cellLength * 2f,
+              level = level
+          )
+      )
+    } else
+      listOf()
+  } else {
+    val newPointList = if (absDistance > sampleRange / 2f)
+      listOf()
+    else {
+      val (location, normal) = snapToSurfaceIncludingNormal(getDistance, start)
+      if (location.distance(start) > cellLength / 2f)
+        listOf()
+      else {
+        val shading = getShading(location)
+        listOf(
+            SamplePoint(
+                location = location,
+                normal = normal,
+                shading = shading,
+                size = config.pointSizeScale * cellLength,
+                level = level
+            )
+        )
+      }
+    }
     if (level < config.levels - 1) {
-      val nextResolution = scale / 2f
+      val nextResolution = cellLength / 2f
       val nextLevel = level + 1
-      listOf(point) + subdivisionTemplate.flatMap { offset ->
-        samplePoint(config, nextResolution, nextLevel, start + offset * nextResolution)
+      newPointList + subdivisionTemplate.flatMap { offset ->
+        samplePoint(config, levelRanges, nextResolution, nextLevel, start + offset * nextResolution)
       }
     } else {
-      listOf(point)
+      newPointList
     }
   }
 }
@@ -70,10 +94,16 @@ fun sampleForm(config: SamplingConfig, bounds: GridBounds): List<SamplePoint> {
   val start = bounds.start.toVector3()
   val initialScale = config.resolution.toFloat()
 
+  val levelRanges = (0 until config.levels - 1)
+      .fold(listOf(1f / initialScale)) { a, b ->
+        a + a.last() / 2f
+      }
+      .map { Vector2(it).length() }
+
   return (0 until sampleCount).flatMap { index ->
     val offset = indexToVector3i(sliceSize, stepDimensions.x, index).toVector3()
     val startingLocation = start + offset / initialScale
-    samplePoint(config, 1f / initialScale, 0, startingLocation)
+    samplePoint(config, levelRanges, 1f / initialScale, 0, startingLocation)
   }
 }
 

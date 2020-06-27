@@ -72,11 +72,13 @@ fun getNormalSide(normal: Vector3): NormalSide {
   }
 }
 
-fun partitionSamples(levels: Int, samples: List<SamplePoint>): Pair<SamplePartitioning, List<SamplePoint>> {
-  val groups = samples
+fun partitionSamples(levels: Int, samples: List<SamplePoint>): Triple<List<SamplePoint>, SamplePartitioning, List<SamplePoint>> {
+  val (base, details) = samples.partition { it.level == 0 }
+  val groups = details
       .groupBy { getNormalSide(it.normal) }
 
-  val ranges = NormalSide.values()
+
+  val detailRanges = NormalSide.values()
       .map { side ->
         val sideSamples = groups.getOrElse(side) { listOf() }
         (0 until levels)
@@ -85,9 +87,10 @@ fun partitionSamples(levels: Int, samples: List<SamplePoint>): Pair<SamplePartit
             }
       }
 
-  return Pair(
-      ranges.map { side -> side.map { it.size } },
-      ranges.flatMap { it.flatten() }
+  return Triple(
+      base,
+      detailRanges.map { side -> side.map { it.size } },
+      base + detailRanges.flatMap { it.flatten() }
   )
 }
 
@@ -107,21 +110,21 @@ fun getLodLevel(lodRanges: LodRanges, levels: Int, distance: Float): Int {
     max(0, index)
 }
 
-fun getVolumeOffsets(partitioning: SamplePartitioning): List<Int> {
+fun getVolumeOffsets(baseSize: Int, partitioning: SamplePartitioning): List<Int> {
   val realCounts = partitioning
       .flatten()
 
   val (offsets) = realCounts
-      .fold(Pair(listOf<Int>(), 0)) { (a, b), c ->
+      .fold(Pair(listOf<Int>(), baseSize)) { (a, b), c ->
         val offset = b + c
         Pair(a + b, offset)
       }
 
-  return offsets
+  return listOf(0) + offsets
 }
 
 fun newSampledModel(vertexSchema: VertexSchema, lodRanges: LodRanges, levels: Int, initialPoints: List<SamplePoint>): SampledModel {
-  val (partitioning, points) = partitionSamples(levels, initialPoints)
+  val (base, partitioning, points) = partitionSamples(levels, initialPoints)
   val vertices = points
       .flatMap(::toFloatList)
       .toFloatArray()
@@ -136,7 +139,8 @@ fun newSampledModel(vertexSchema: VertexSchema, lodRanges: LodRanges, levels: In
   return SampledModel(
       mesh = mesh,
       partitioning = partitioning,
-      offsets = getVolumeOffsets(partitioning),
+      baseSize = base.size,
+      offsets = getVolumeOffsets(base.size, partitioning),
       levels = levels,
       lodRanges = lodRanges
   )
