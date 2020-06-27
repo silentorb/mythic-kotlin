@@ -1,112 +1,18 @@
 package silentorb.mythic.lookinglass.drawing
 
-import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL14
 import silentorb.mythic.breeze.MultiAnimationPart
 import silentorb.mythic.breeze.transformAnimatedSkeleton
 import silentorb.mythic.glowing.drawMesh
-import silentorb.mythic.glowing.globalState
-import silentorb.mythic.spatial.*
 import silentorb.mythic.lookinglass.*
 import silentorb.mythic.lookinglass.meshes.Primitive
-import silentorb.mythic.lookinglass.shading.*
+import silentorb.mythic.lookinglass.shading.ObjectShaderConfig
+import silentorb.mythic.lookinglass.shading.ShaderFeatureConfig
+import silentorb.mythic.lookinglass.shading.populateBoneBuffer
 import silentorb.mythic.scenery.Camera
 import silentorb.mythic.scenery.MeshName
-
-fun renderVolume(renderer: SceneRenderer, sampledModel: SampledModel, location: Vector3, transform: Matrix) {
-  val camera = renderer.camera
-  val orientationTransform = getRotationMatrix(transform)
-  val distance = camera.position.distance(location)
-  val levels = sampledModel.levels
-  val lodRanges = listOf(
-//      60f,
-//      30f,
-//      10f
-      20f,
-      10f,
-      5f
-  )
-  val lodLevel = getLodLevel(lodRanges, levels, distance)
-  val mesh = sampledModel.mesh
-  val effect = renderer.getShader(mesh.vertexSchema, ShaderFeatureConfig(
-      shading = true,
-      pointSize = true
-  ))
-
-  val lodTransitionScalar: Float = if (lodLevel < lodRanges.size - 1) {
-    val lower = lodRanges[lodLevel + 1]
-    val upper = lodRanges[lodLevel]
-    if (distance > upper)
-      0f
-    else {
-      val gap = upper - lower
-      val current = distance - lower
-      1f - current / gap
-    }
-  } else
-    1f
-
-  val lodOpacityLevels = (0 until levels)
-      .map { level ->
-        if (level == lodLevel + 1)
-          lodTransitionScalar
-        else
-          1f
-      }
-
-  val config = ObjectShaderConfig(
-      nearPlaneHeight = getNearPlaneHeight(renderer.viewport, camera.angleOrZoom),
-      normalTransform = orientationTransform,
-      transform = transform,
-      lodOpacityLevels = lodOpacityLevels
-  )
-
-  globalState.vertexProgramPointSizeEnabled = true
-
-//  val visibleSides = getVisibleSides((-camera.lookAt).transform(orientationTransform.invert()))
-  val visibleSides = getVisibleSides((camera.position - location).transform(orientationTransform.invert()))
-
-  val realCounts = sampledModel.partitioning
-      .flatten()
-
-  val (offsets) = realCounts
-      .fold(Pair(listOf<Int>(), 0)) { (a, b), c ->
-        val offset = b + c
-        Pair(a + b, offset)
-      }
-
-  val counts = sampledModel.partitioning
-      .mapIndexed { sideIndex, levelCounts ->
-        if (visibleSides.contains(NormalSide.values()[sideIndex]))
-          levelCounts.mapIndexed { level, count ->
-            if (level <= lodLevel + 1)
-              count
-            else
-              0
-          }
-        else
-          levelCounts.map { 0 }
-      }
-      .flatten()
-      .toIntArray()
-
-  effect.activate(config)
-
-//  val memoryCounts = BufferUtils.createIntBuffer(counts.size)
-//  memoryCounts.put(counts)
-//  memoryCounts.rewind()
-//
-//  val memoryOffsets = BufferUtils.createIntBuffer(offsets.size)
-//  memoryOffsets.put(offsets.toIntArray())
-//  memoryOffsets.rewind()
-
-//  drawMesh(mesh, GL11.GL_POINTS)
-//  globalState.blendFunction = Pair(GL11.GL_DST_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA)
-  mesh.vertexBuffer.activate()
-//  GL14.nglMultiDrawArrays(GL11.GL_POINTS, memAddress(memoryOffsets), memAddress(memoryCounts), counts.size)
-  GL14.glMultiDrawArrays(GL11.GL_POINTS, offsets.toIntArray(), counts)
-//  GL14.glMultiDrawArrays(GL11.GL_POINTS, intArrayOf(0), intArrayOf(mesh.count!!))
-}
+import silentorb.mythic.spatial.Matrix
+import silentorb.mythic.spatial.Pi
+import silentorb.mythic.spatial.getRotationMatrix
 
 fun renderElement(renderer: SceneRenderer, primitive: Primitive, material: Material, transform: Matrix, isAnimated: Boolean) {
   val orientationTransform = getRotationMatrix(transform)
@@ -176,9 +82,7 @@ private fun useMesh(meshes: ModelMeshMap, MeshName: MeshName, action: (ModelMesh
 fun renderMeshElement(renderer: SceneRenderer, element: MeshElement, armature: Armature? = null, transforms: List<Matrix>? = null) {
   val meshes = renderer.meshes
   useMesh(meshes, element.mesh) { mesh ->
-    if (mesh.sampledModel != null) {
-      renderVolume(renderer, mesh.sampledModel, element.location, element.transform)
-    } else {
+    if (mesh.sampledModel == null) {
       for (primitive in mesh.primitives) {
         val transform = getElementTransform(element, primitive, transforms)
         val materal = element.material ?: primitive.material

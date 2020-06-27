@@ -57,22 +57,23 @@ fun indexToVector3i(sliceSize: Int, xSize: Int, index: Int): Vector3i {
   return Vector3i(x, y, z)
 }
 
-fun sampleForm(config: SamplingConfig, startingResolution: Int, bounds: GridBounds): List<SamplePoint> {
+fun sampleForm(config: SamplingConfig, bounds: GridBounds): List<SamplePoint> {
   val boundsDimensions = bounds.end - bounds.start
 
   // Sometimes intermediate sdf changes can cause massive spikes in bounding size
   if (boundsDimensions.x > 100 || boundsDimensions.y > 100 || boundsDimensions.z > 100)
     return listOf()
 
-  val stepDimensions = boundsDimensions * startingResolution
+  val stepDimensions = boundsDimensions * config.resolution
   val sampleCount = stepDimensions.x * stepDimensions.y * stepDimensions.z
   val sliceSize = stepDimensions.x * stepDimensions.y
   val start = bounds.start.toVector3()
+  val initialScale = config.resolution.toFloat()
 
   return (0 until sampleCount).flatMap { index ->
     val offset = indexToVector3i(sliceSize, stepDimensions.x, index).toVector3()
-    val startingLocation = start + offset / startingResolution.toFloat()
-    samplePoint(config, 1f / startingResolution.toFloat(), 0, startingLocation)
+    val startingLocation = start + offset / initialScale
+    samplePoint(config, 1f / initialScale, 0, startingLocation)
   }
 }
 

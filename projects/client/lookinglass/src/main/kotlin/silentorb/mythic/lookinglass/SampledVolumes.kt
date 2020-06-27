@@ -1,5 +1,6 @@
 package silentorb.mythic.lookinglass
 
+import silentorb.mythic.glowing.*
 import silentorb.mythic.scenery.SamplePoint
 import silentorb.mythic.scenery.Shading
 import silentorb.mythic.spatial.Vector3
@@ -104,4 +105,39 @@ fun getLodLevel(lodRanges: LodRanges, levels: Int, distance: Float): Int {
     0
   else
     max(0, index)
+}
+
+fun getVolumeOffsets(partitioning: SamplePartitioning): List<Int> {
+  val realCounts = partitioning
+      .flatten()
+
+  val (offsets) = realCounts
+      .fold(Pair(listOf<Int>(), 0)) { (a, b), c ->
+        val offset = b + c
+        Pair(a + b, offset)
+      }
+
+  return offsets
+}
+
+fun newSampledModel(vertexSchema: VertexSchema, lodRanges: LodRanges, levels: Int, initialPoints: List<SamplePoint>): SampledModel {
+  val (partitioning, points) = partitionSamples(levels, initialPoints)
+  val vertices = points
+      .flatMap(::toFloatList)
+      .toFloatArray()
+
+  val mesh = GeneralMesh(
+      vertexSchema = vertexSchema,
+      primitiveType = PrimitiveType.points,
+      vertexBuffer = newVertexBuffer(vertexSchema).load(createFloatBuffer(vertices)),
+      count = vertices.size / vertexSchema.floatSize
+  )
+
+  return SampledModel(
+      mesh = mesh,
+      partitioning = partitioning,
+      offsets = getVolumeOffsets(partitioning),
+      levels = levels,
+      lodRanges = lodRanges
+  )
 }

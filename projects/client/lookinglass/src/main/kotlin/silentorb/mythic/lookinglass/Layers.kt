@@ -3,6 +3,7 @@ package silentorb.mythic.lookinglass
 import silentorb.mythic.glowing.clearDepth
 import silentorb.mythic.glowing.globalState
 import silentorb.mythic.lookinglass.drawing.renderElementGroup
+import silentorb.mythic.lookinglass.drawing.renderVolumes
 import silentorb.mythic.scenery.Camera
 
 data class SceneLayer(
@@ -22,6 +23,8 @@ fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer)
   for (group in layer.elements) {
     renderElementGroup(renderer, camera, group)
   }
+
+  renderVolumes(renderer, layer.elements)
   globalState.depthEnabled = previousDepthEnabled
 }
 
