@@ -9,9 +9,12 @@ fun lerp(vec1: Vector3, vec2: Vector3, alpha: Float): Vector3 =
 
 typealias AddTriangle = (ArrayList<Float>, Vector3, Vector3, Vector3) -> Unit
 
-fun marchingCubes(values: FloatArray, start: Vector3, volumeDimensions: Vector3i, voxelDimensions: Vector3, isoLevel: Float, addTriangle: AddTriangle): FloatArray {
+fun marchingCubes(values: Map<Vector3i, Float>, start: Vector3, volumeDimensions: Vector3i, voxelDimensions: Vector3, isoLevel: Float, addTriangle: AddTriangle): FloatArray {
   val vertexBuffer = ArrayList<Float>(64)
   val vertList = Array(12) { Vector3.zero }
+
+  fun getValue(x: Int, y: Int, z: Int) =
+      values.getOrDefault(Vector3i(x, y, z), 0f)
 
   // Volume iteration
   for (z in 0 until volumeDimensions.z - 1) {
@@ -32,26 +35,26 @@ fun marchingCubes(values: FloatArray, start: Vector3, volumeDimensions: Vector3i
         //              | /                 | /
         //              |/__________________|/
         //             p                     px
-        val p = x + volumeDimensions.x * y + volumeDimensions.x * volumeDimensions.y * z
-        val px = p + 1
-        val py = p + volumeDimensions.x
-        val pxy = py + 1
-        val pz = p + volumeDimensions.x * volumeDimensions.y
-        val pxz = px + volumeDimensions.x * volumeDimensions.y
-        val pyz = py + volumeDimensions.x * volumeDimensions.y
-        val pxyz = pxy + volumeDimensions.x * volumeDimensions.y
+//        val p = x + volumeDimensions.x * y + volumeDimensions.x * volumeDimensions.y * z
+//        val px = p + 1
+//        val py = p + volumeDimensions.x
+//        val pxy = py + 1
+//        val pz = p + volumeDimensions.x * volumeDimensions.y
+//        val pxz = px + volumeDimensions.x * volumeDimensions.y
+//        val pyz = py + volumeDimensions.x * volumeDimensions.y
+//        val pxyz = pxy + volumeDimensions.x * volumeDimensions.y
 
         val position = Vector3(x.toFloat(), y.toFloat(), z.toFloat()) * voxelDimensions.x
 
         // Voxel intensities
-        val value0 = values[p]
-        val value1 = values[px]
-        val value2 = values[py]
-        val value3 = values[pxy]
-        val value4 = values[pz]
-        val value5 = values[pxz]
-        val value6 = values[pyz]
-        val value7 = values[pxyz]
+        val value0 = getValue(x, y, z)
+        val value1 = getValue(x + 1, y, z)
+        val value2 = getValue(x, y + 1, z)
+        val value3 = getValue(x + 1, y + 1, z)
+        val value4 = getValue(x, y, z + 1)
+        val value5 = getValue(x + 1, y, z + 1)
+        val value6 = getValue(x, y + 1, z + 1)
+        val value7 = getValue(x, y, z) + 1
 
         // Voxel is active if its intensity is above isolevel
         var cubeindex = 0
