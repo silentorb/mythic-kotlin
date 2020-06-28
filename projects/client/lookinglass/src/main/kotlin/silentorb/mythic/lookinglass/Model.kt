@@ -77,3 +77,10 @@ data class ModelMesh(
 )
 
 typealias ModelMeshMap = Map<MeshName, ModelMesh>
+
+typealias IndexedPolygons = List<List<Int>>
+
+data class IndexedGeometry(
+    val vertices: FloatArray,
+    val triangles: IndexedPolygons
+)
