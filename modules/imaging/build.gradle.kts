@@ -17,6 +17,7 @@ dependencies {
   api("silentorb.mythic:spatial")
   implementation("silentorb.mythic:randomly")
   implementation("silentorb.mythic:debugging")
+  implementation("silentorb.mythic:mythic-shape-meshes")
   api("org.lwjgl:lwjgl:3.1.5")
   api("org.lwjgl:lwjgl:3.1.5:natives-windows")
 

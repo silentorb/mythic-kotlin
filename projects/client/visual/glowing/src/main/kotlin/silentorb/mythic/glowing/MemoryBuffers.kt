@@ -19,3 +19,12 @@ fun createIntBuffer(value: Int): IntBuffer {
   buffer.flip()
   return buffer
 }
+
+fun createIntBuffer(values: List<Int>): IntBuffer {
+  val buffer = BufferUtils.createIntBuffer(values.size)
+  for (value in values) {
+    buffer.put(value)
+  }
+  buffer.flip()
+  return buffer
+}

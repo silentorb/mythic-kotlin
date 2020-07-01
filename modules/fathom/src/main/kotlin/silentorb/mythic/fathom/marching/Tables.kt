@@ -1,4 +1,4 @@
-package silentorb.mythic.fathom.surfacing.old.marching
+package silentorb.mythic.fathom.marching
 
 object TablesMC {
   val MC_EDGE_TABLE = intArrayOf(

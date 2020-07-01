@@ -1,4 +1,4 @@
-package silentorb.mythic.fathom.surfacing.old.marching
+package silentorb.mythic.fathom.marching
 
 import silentorb.mythic.fathom.misc.DistanceFunction
 import silentorb.mythic.fathom.misc.ShadingFunction

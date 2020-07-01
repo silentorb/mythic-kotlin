@@ -21,6 +21,7 @@ dependencies {
   api("org.lwjgl:lwjgl:3.1.5:natives-windows")
   api("silentorb.mythic:imaging")
   api("silentorb.mythic:scenery")
+  api("silentorb.mythic:mythic-shape-meshes")
 
   testImplementation("org.junit.jupiter:junit-jupiter:5.6.1")
   testImplementation("silentorb.imp:testing")

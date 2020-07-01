@@ -21,15 +21,13 @@ val translation3Type = newTypePair(PathKey(fathomPath, "Translation3"))
 val quaternionType = newTypePair(PathKey(fathomPath, "Quaternion"))
 val floatSampler3dType = newTypePair(PathKey(texturingPath, "FloatSampler3d"))
 val rgbSampler3dType = newTypePair(PathKey(texturingPath, "RgbSampler3d"))
-val collisionGeneratorType = newTypePair(PathKey(fathomPath, "CollisionGenerator"))
+val shapeType = newTypePair(PathKey(fathomPath, "Shape"))
 
 typealias Sampler3d = (Float, Float, Float, FloatBuffer) -> Unit
 
 typealias DistanceFunction = FloatSampler3d
 typealias RgbColorFunction = (Vector3) -> Vector3
 typealias ShadingFunction = (Vector3) -> Shading
-
-typealias CollisionFunction = (DecimalBounds) -> Shape
 
 fun fathomAliases() = listOf(
     TypeAlias(

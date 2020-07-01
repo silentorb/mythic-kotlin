@@ -1,8 +1,7 @@
-package silentorb.mythic.fathom.surfacing.old.marching
+package silentorb.mythic.fathom.marching
 
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector3i
-import java.util.*
 
 fun lerp(vec1: Vector3, vec2: Vector3, alpha: Float): Vector3 =
     vec1 + (vec2 - vec1) * alpha
