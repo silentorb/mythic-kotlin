@@ -1,6 +1,4 @@
 import org.junit.jupiter.api.Test
-import silentorb.imp.parsing.general.handleRoot
-import silentorb.imp.parsing.parser.parseTextBranchingDeprecated
 import silentorb.imp.testing.errored
 import silentorb.mythic.debugging.globalProfiler
 import silentorb.mythic.debugging.printProfiler
@@ -45,17 +43,17 @@ let output = mask foreground background shapeMask
     """.trimIndent()
     val pid = ManagementFactory.getRuntimeMXBean().getName()
     println("pid: " + pid)
-    handleRoot(errored, parseTextBranchingDeprecated(context)(code)) { result ->
-      val graph = result.graph
-      var i = 0
-      while (++i < 20) {
-//      while (true) {
-        globalProfiler().wrapBlock("all") {
-//          executeToSingleValue(getLibrary.implementation, graph)
-        }
-      }
-      printProfiler(globalProfiler())
-    }
+//    handleRoot(errored, parseTextBranchingDeprecated(context)(code)) { result ->
+//      val graph = result.graph
+//      var i = 0
+//      while (++i < 20) {
+////      while (true) {
+//        globalProfiler().wrapBlock("all") {
+////          executeToSingleValue(getLibrary.implementation, graph)
+//        }
+//      }
+//      printProfiler(globalProfiler())
+//    }
   }
 
 
@@ -83,19 +81,19 @@ let output = mask foreground background (checkers 3 3)
     """.trimIndent()
     val pid = ManagementFactory.getRuntimeMXBean().getName()
     println("pid: " + pid)
-    handleRoot(errored, parseTextBranchingDeprecated(context)(code)) { result ->
-      val graph = result.graph
-      var i = 0
-      val dimensions = Vector2i(512)
-      val image = newBufferedImage(dimensions, 3)
-      while (++i < 40) {
-//      while (true) {
-        globalProfiler().wrapBlock("all") {
-//          val value = executeToSingleValue(getLibrary.implementation, graph)
-//          samplerToBufferedImage(newRgbSampleWriter(value as RgbSampler), image, dimensions, Vector2i(0), dimensions)
-        }
-      }
-      printProfiler(globalProfiler())
-    }
+//    handleRoot(errored, parseTextBranchingDeprecated(context)(code)) { result ->
+//      val graph = result.graph
+//      var i = 0
+//      val dimensions = Vector2i(512)
+//      val image = newBufferedImage(dimensions, 3)
+//      while (++i < 40) {
+////      while (true) {
+//        globalProfiler().wrapBlock("all") {
+////          val value = executeToSingleValue(getLibrary.implementation, graph)
+////          samplerToBufferedImage(newRgbSampleWriter(value as RgbSampler), image, dimensions, Vector2i(0), dimensions)
+//        }
+//      }
+//      printProfiler(globalProfiler())
+//    }
   }
 }
