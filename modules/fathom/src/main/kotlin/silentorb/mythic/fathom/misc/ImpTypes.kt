@@ -4,21 +4,19 @@ import silentorb.imp.core.PathKey
 import silentorb.imp.core.newTypePair
 import silentorb.imp.execution.TypeAlias
 import silentorb.imp.execution.typePairstoTypeNames
-import silentorb.mythic.fathom.surfacing.DecimalBounds
+import silentorb.mythic.fathom.spatial.quaternionType
+import silentorb.mythic.fathom.spatial.translation3Type
+import silentorb.mythic.fathom.spatial.vector3Type
 import silentorb.mythic.imaging.texturing.FloatSampler3d
 import silentorb.mythic.imaging.texturing.texturingPath
 import silentorb.mythic.scenery.Shading
 import silentorb.mythic.spatial.Vector3
-import silentorb.mythic.scenery.Shape
 import java.nio.FloatBuffer
 
 const val fathomPath = "silentorb.mythic.fathom"
 
 val distanceFunctionType = newTypePair(PathKey(fathomPath, "DistanceFunction"))
 val modelFunctionType = newTypePair(PathKey(fathomPath, "ModelFunction"))
-val vector3Type = newTypePair(PathKey(fathomPath, "Vector3"))
-val translation3Type = newTypePair(PathKey(fathomPath, "Translation3"))
-val quaternionType = newTypePair(PathKey(fathomPath, "Quaternion"))
 val floatSampler3dType = newTypePair(PathKey(texturingPath, "FloatSampler3d"))
 val rgbSampler3dType = newTypePair(PathKey(texturingPath, "RgbSampler3d"))
 val shapeType = newTypePair(PathKey(fathomPath, "Shape"))

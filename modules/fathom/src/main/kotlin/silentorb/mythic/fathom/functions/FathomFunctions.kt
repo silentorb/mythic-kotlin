@@ -7,12 +7,18 @@ import silentorb.imp.core.floatType
 import silentorb.imp.execution.CompleteFunction
 import silentorb.mythic.fathom.*
 import silentorb.mythic.fathom.misc.*
+import silentorb.mythic.fathom.spatial.matrix4Type
+import silentorb.mythic.fathom.spatial.quaternionType
+import silentorb.mythic.fathom.spatial.translation3Type
+import silentorb.mythic.fathom.spatial.vector3Type
 import silentorb.mythic.fathom.surfacing.getSceneDecimalBounds
 import silentorb.mythic.imaging.texturing.FloatSampler3d
 import silentorb.mythic.imaging.texturing.filters.*
 import silentorb.mythic.imaging.texturing.rgbColorType
 import silentorb.mythic.scenery.Box
 import silentorb.mythic.scenery.Shape
+import silentorb.mythic.scenery.ShapeTransform
+import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Quaternion
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.degreesToRadians
@@ -253,6 +259,25 @@ fun fathomFunctions() = listOf(
           val dimensions = arguments["dimensions"] as Vector3
           Box(
               halfExtents = dimensions / 2f
+          )
+        }
+    ),
+
+    CompleteFunction(
+        path = PathKey(fathomPath, "transform"),
+        signature = CompleteSignature(
+            parameters = listOf(
+                CompleteParameter("transform", matrix4Type),
+                CompleteParameter("shape", shapeType)
+            ),
+            output = distanceFunctionType
+        ),
+        implementation = { arguments ->
+          val transform = arguments["transform"] as Matrix
+          val shape = arguments["shape"] as Shape
+          ShapeTransform(
+              transform = transform,
+              shape = shape
           )
         }
     )

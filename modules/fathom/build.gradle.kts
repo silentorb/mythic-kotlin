@@ -25,6 +25,7 @@ dependencies {
 
   testImplementation("org.junit.jupiter:junit-jupiter:5.6.1")
   testImplementation("silentorb.imp:testing")
+  testImplementation("silentorb.imp:campaign")
 }
 
 tasks {
