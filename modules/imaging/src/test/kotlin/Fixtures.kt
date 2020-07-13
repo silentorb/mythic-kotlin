@@ -1,10 +1,9 @@
-import silentorb.imp.execution.combineLibraries
 import silentorb.imp.execution.newLibrary
 import silentorb.imp.library.standard.standardLibrary
 import silentorb.mythic.imaging.texturing.filters.completeTexturingAliases
 import silentorb.mythic.imaging.texturing.filters.completeTexturingFunctions
 
-val library = combineLibraries(
+val library = listOf(
     standardLibrary(),
     newLibrary(completeTexturingFunctions().map {
       it.copy(
@@ -12,5 +11,3 @@ val library = combineLibraries(
       )
     }, typeAliases = completeTexturingAliases())
 )
-
-val context = listOf(library.namespace)

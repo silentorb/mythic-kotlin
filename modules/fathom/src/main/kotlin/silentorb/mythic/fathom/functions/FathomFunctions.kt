@@ -286,25 +286,17 @@ fun fathomFunctions() = listOf(
     CompleteFunction(
         path = PathKey(fathomPath, "+"),
         signature = CompleteSignature(
+            isVariadic = true,
             parameters = listOf(
-                CompleteParameter("first", shapeType),
-                CompleteParameter("second", shapeType)
+                CompleteParameter("values", shapeType)
             ),
             output = shapeType
         ),
         implementation = { arguments ->
-            val first = arguments["first"] as Shape
-            val second = arguments["second"] as Shape
-
-            fun flatten(shape: Shape) =
-                if (shape is CompositeShape)
-                    shape.shapes
-                else
-                    listOf(shape)
-            
-            CompositeShape(
-                shapes = flatten(first) + flatten(second)
-            )
+          val values = arguments["values"] as List<Shape>
+          CompositeShape(
+              shapes = values
+          )
         }
     )
 )
