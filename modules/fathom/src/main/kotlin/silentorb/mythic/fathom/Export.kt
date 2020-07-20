@@ -8,7 +8,7 @@ import silentorb.mythic.fathom.spatial.spatialFunctions
 
 fun fathomLibrary() =
     newLibrary(
-        functions = fathomFunctions() + spatialFunctions(),
+        functions = fathomFunctions() +distanceFunctions() + spatialFunctions(),
         typeNames = fathomTypes(),
         typeAliases = fathomAliases()
     )

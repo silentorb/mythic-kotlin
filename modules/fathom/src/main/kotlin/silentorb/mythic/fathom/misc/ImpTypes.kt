@@ -3,7 +3,7 @@ package silentorb.mythic.fathom.misc
 import silentorb.imp.core.PathKey
 import silentorb.imp.core.newTypePair
 import silentorb.imp.execution.TypeAlias
-import silentorb.imp.execution.typePairstoTypeNames
+import silentorb.imp.execution.typePairsToTypeNames
 import silentorb.mythic.fathom.spatial.quaternionType
 import silentorb.mythic.fathom.spatial.translation3Type
 import silentorb.mythic.fathom.spatial.vector3Type
@@ -36,7 +36,7 @@ fun fathomAliases() = listOf(
 )
 
 fun fathomTypes() =
-    typePairstoTypeNames(
+    typePairsToTypeNames(
         listOf(
             distanceFunctionType,
             modelFunctionType,
