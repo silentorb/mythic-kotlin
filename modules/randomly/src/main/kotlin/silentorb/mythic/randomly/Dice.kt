@@ -6,7 +6,11 @@ import java.util.*
 class Dice(val seed: Long? = null) {
   private val random = Random(seed ?: System.currentTimeMillis())
 
-  fun getInt(min: Int, max: Int) = min + random.nextInt(1 + max - min)
+  fun getInt(min: Int, max: Int) =
+      if (min == max)
+        min
+      else
+        min + random.nextInt(1 + max - min)
 
   fun getInt(max: Int) = getInt(0, max)
 
@@ -50,6 +54,9 @@ class Dice(val seed: Long? = null) {
 
   fun <T> take(list: Set<T>, count: Int): Set<T> {
     assert(count <= list.size)
+    if (count == 0)
+      return setOf()
+
     val result = mutableSetOf<T>()
     val options = list.toMutableList()
     for (i in 1..count) {
