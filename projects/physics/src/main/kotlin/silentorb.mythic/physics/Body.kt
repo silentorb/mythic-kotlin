@@ -1,6 +1,5 @@
 package silentorb.mythic.physics
 
-import silentorb.mythic.ent.Id
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Quaternion
 import silentorb.mythic.spatial.Vector3
@@ -20,8 +19,7 @@ data class Body(
     override val position: Vector3,
     val velocity: Vector3 = Vector3.zero,
     val orientation: Quaternion = Quaternion(),
-    val scale: Vector3 = Vector3.unit,
-    val nearestNode: Id = voidNodeId
+    val scale: Vector3 = Vector3.unit
 ) : SimpleBody
 
 data class DynamicBody(
