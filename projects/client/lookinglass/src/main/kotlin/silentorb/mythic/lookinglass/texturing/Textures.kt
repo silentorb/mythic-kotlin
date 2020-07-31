@@ -4,9 +4,11 @@ import silentorb.mythic.lookinglass.scanTextureResources
 import silentorb.mythic.glowing.Texture
 import silentorb.mythic.glowing.TextureAttributes
 import silentorb.mythic.glowing.TextureFormat
+import silentorb.mythic.lookinglass.LoadingState
 import silentorb.mythic.platforming.ImageLoader
 import silentorb.mythic.platforming.RawImage
 import silentorb.mythic.lookinglass.toCamelCase
+import silentorb.mythic.lookinglass.updateAsyncLoading
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.concurrent.thread
@@ -92,31 +94,6 @@ fun texturesToGpu(list: List<LoadedTextureData>): Map<String, Texture> {
   }.associate { it }
 }
 
-data class AsyncTextureLoader(
-    var remainingTextures: List<DeferredTexture>,
-    var batchSize: Int = 8,
-    var loadedTextureBuffer: List<LoadedTextureData>? = null,
-    var isLoading: Boolean = false
-)
+typealias TextureLoadingState = LoadingState<DeferredTexture, LoadedTextureData>
 
-fun updateAsyncTextureLoading(loader: AsyncTextureLoader, destination: DynamicTextureLibrary) {
-  if (loader.isLoading)
-    return
-
-  loader.isLoading = true
-  val loadedTextures = loader.loadedTextureBuffer
-  if (loadedTextures != null) {
-    destination += texturesToGpu(loadedTextures)
-    loader.loadedTextureBuffer = null
-  }
-  if (loader.remainingTextures.none())
-    return
-
-  val next = loader.remainingTextures.take(loader.batchSize)
-  loader.remainingTextures = loader.remainingTextures.drop(loader.batchSize)
-
-  thread(start = true) {
-    loader.loadedTextureBuffer = loadDeferredTextures(next)
-    loader.isLoading = false
-  }
-}
+val updateAsyncTextureLoading = updateAsyncLoading(::loadDeferredTextures, ::texturesToGpu)

@@ -11,6 +11,7 @@ import silentorb.mythic.lookinglass.shading.*
 import silentorb.mythic.lookinglass.texturing.DynamicTextureLibrary
 import silentorb.mythic.platforming.PlatformDisplayConfig
 import silentorb.mythic.scenery.ArmatureName
+import silentorb.mythic.scenery.MeshName
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.typography.FontSet
@@ -76,7 +77,7 @@ data class Renderer(
     val glow: Glow,
     val config: DisplayConfig,
     val multisampler: Multisampler?,
-    val meshes: ModelMeshMap,
+    val meshes: MutableMap<MeshName, ModelMesh>,
     val armatures: Map<ArmatureName, Armature>,
     val vertexSchemas: VertexSchemas,
     val fonts: List<FontSet>,
