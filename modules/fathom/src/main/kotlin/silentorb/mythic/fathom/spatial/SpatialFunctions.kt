@@ -40,7 +40,7 @@ fun spatialFunctions(): List<CompleteFunction> = listOf(
         path = PathKey(spatialPath, "rotate"),
         signature = CompleteSignature(
             parameters = listOf(
-                CompleteParameter("rotation", translation3Type),
+                CompleteParameter("rotation", quaternionType),
                 CompleteParameter("matrix", matrix4Type)
             ),
             output = matrix4Type

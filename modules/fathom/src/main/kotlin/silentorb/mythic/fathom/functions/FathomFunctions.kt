@@ -15,14 +15,12 @@ import silentorb.mythic.fathom.surfacing.getSceneDecimalBounds
 import silentorb.mythic.imaging.texturing.FloatSampler3d
 import silentorb.mythic.imaging.texturing.filters.*
 import silentorb.mythic.imaging.texturing.rgbColorType
-import silentorb.mythic.scenery.Box
-import silentorb.mythic.scenery.CompositeShape
-import silentorb.mythic.scenery.Shape
-import silentorb.mythic.scenery.ShapeTransform
+import silentorb.mythic.scenery.*
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Quaternion
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.degreesToRadians
+import kotlin.math.max
 
 fun fathomFunctions() = listOf(
 
@@ -260,6 +258,34 @@ fun fathomFunctions() = listOf(
           val dimensions = arguments["dimensions"] as Vector3
           Box(
               halfExtents = dimensions / 2f
+          )
+        }
+    ),
+
+    CompleteFunction(
+        path = PathKey(fathomPath, "triangularPrism"),
+        signature = CompleteSignature(
+            parameters = listOf(
+                CompleteParameter("dimensions", vector3Type)
+            ),
+            output = shapeType
+        ),
+        implementation = { arguments ->
+          val dimensions = arguments["dimensions"] as Vector3
+          val half = dimensions / 2f
+          val up = listOf(
+              Vector3(-half.x, -half.y, half.z),
+              Vector3(half.x, -half.y, half.z),
+              Vector3(half.x, half.y, half.z)
+          )
+          val down = up.map { it.copy(z = -half.z) }
+          MeshShape(
+              triangles = listOf(
+                  up[0], up[1], up[2],
+                  down[0], down[1], down[2]
+              ),
+              radius = max(dimensions.x, dimensions.y) / 2f,
+              height = dimensions.z
           )
         }
     ),
