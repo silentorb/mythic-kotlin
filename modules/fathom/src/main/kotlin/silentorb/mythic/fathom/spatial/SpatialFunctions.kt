@@ -48,7 +48,7 @@ fun spatialFunctions(): List<CompleteFunction> = listOf(
         implementation = { arguments ->
           val rotation = arguments["rotation"] as Quaternion
           val matrix = arguments["matrix"] as Matrix
-          matrix.rotate(rotation)
+          matrix.rotateAffine(rotation)
         }
     ),
 
