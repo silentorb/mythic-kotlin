@@ -12,10 +12,8 @@ import silentorb.mythic.fathom.spatial.quaternionType
 import silentorb.mythic.fathom.spatial.translation3Type
 import silentorb.mythic.fathom.spatial.vector3Type
 import silentorb.mythic.fathom.surfacing.getSceneDecimalBounds
-import silentorb.mythic.imaging.texturing.DistanceSampler
-import silentorb.mythic.imaging.texturing.anonymousSampler
+import silentorb.mythic.imaging.texturing.*
 import silentorb.mythic.imaging.texturing.filters.*
-import silentorb.mythic.imaging.texturing.rgbColorType
 import silentorb.mythic.scenery.*
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Quaternion
@@ -66,6 +64,22 @@ fun fathomFunctions() = listOf(
           val radius = arguments["radius"] as Float
           val height = arguments["height"] as Float
           capsule(radius, height)
+        }
+    ),
+
+    CompleteFunction(
+        path = PathKey(fathomPath, "cylinder"),
+        signature = CompleteSignature(
+            parameters = listOf(
+                CompleteParameter("radius", floatType),
+                CompleteParameter("height", floatType)
+            ),
+            output = distanceFunctionType
+        ),
+        implementation = { arguments ->
+          val radius = arguments["radius"] as Float
+          val height = arguments["height"] as Float
+          cylinder(radius, height)
         }
     ),
 
@@ -182,6 +196,32 @@ fun fathomFunctions() = listOf(
           val result: ShadingFunction = { origin ->
             newShading(
                 color = colorize(sampler(origin).second)
+            )
+          }
+          result
+        }
+    ),
+
+    CompleteFunction(
+        path = PathKey(fathomPath, "newShading"),
+        signature = CompleteSignature(
+            parameters = listOf(
+                CompleteParameter("color", rgbColorType),
+                CompleteParameter("opacity", floatType),
+                CompleteParameter("glow", floatType)
+            ),
+            output = shadingSamplerType
+        ),
+        implementation = { arguments ->
+          val color = rgbIntToFloat(arguments["color"]!! as RgbColor)
+          val opacity = arguments["opacity"]!! as Float
+          val glow = arguments["glow"]!! as Float
+          val result: ShadingFunction = { origin ->
+            Shading(
+                color = color,
+                opacity = opacity,
+                glow = glow,
+                specular = 0.8f
             )
           }
           result
