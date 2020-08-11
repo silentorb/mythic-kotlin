@@ -38,7 +38,10 @@ val floatSampler2dType = newTypePair(PathKey(texturingPath, "FloatSampler"))
 val rgbSampler2dType = newTypePair(PathKey(texturingPath, "RgbSampler"))
 
 typealias FloatSampler2d = GetSample2d<Float>
-typealias FloatSampler3d = GetSample3d<Float>
+typealias DistanceSample = Pair<Any, Float>
+typealias DistanceSampler = (Vector3) -> DistanceSample
+
+const val anonymousSampler = 0
 
 typealias RgbSampler = GetSample2d<Vector3>
 typealias AnySampler = GetSample2d<Any>

@@ -3,6 +3,7 @@ package silentorb.mythic.fathom.sampling
 import silentorb.mythic.fathom.misc.getNormal
 import silentorb.mythic.fathom.surfacing.GridBounds
 import silentorb.mythic.fathom.surfacing.snapToSurfaceIncludingNormal
+import silentorb.mythic.imaging.texturing.anonymousSampler
 import silentorb.mythic.scenery.SamplePoint
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
@@ -22,7 +23,7 @@ fun samplePoint(config: SamplingConfig, levelRanges: List<Float>, cellLength: Fl
   val sampleRange = levelRanges[level]
   val getDistance = config.getDistance
   val getShading = config.getShading
-  val startingDistance = getDistance(start)
+  val (_, startingDistance) = getDistance(start)
   val absDistance = abs(startingDistance)
 
   return if (absDistance > sampleRange) {
@@ -45,7 +46,7 @@ fun samplePoint(config: SamplingConfig, levelRanges: List<Float>, cellLength: Fl
     val newPointList = if (absDistance > sampleRange / 2f)
       listOf()
     else {
-      val (location, normal) = snapToSurfaceIncludingNormal(getDistance, start)
+      val (id, location, normal) = snapToSurfaceIncludingNormal(getDistance, start)
       if (location.distance(start) > cellLength / 2f)
         listOf()
       else {

@@ -27,14 +27,14 @@ fun snapToSurface(position: Vector3, normal: Vector3, distance: Float): Vector3 
 
 fun snapToSurface(getDistance: DistanceFunction, position: Vector3): Vector3 {
   val normal = getNormal(getDistance, position)
-  val distance = getDistance(position)
+  val (_, distance) = getDistance(position)
   return snapToSurface(position, normal, distance)
 }
 
-fun snapToSurfaceIncludingNormal(getDistance: DistanceFunction, position: Vector3): Pair<Vector3, Vector3> {
+fun snapToSurfaceIncludingNormal(getDistance: DistanceFunction, position: Vector3): Triple<Any, Vector3, Vector3> {
   val normal = getNormal(getDistance, position)
-  val distance = getDistance(position)
-  return Pair(snapToSurface(position, normal, distance), normal)
+  val (id, distance) = getDistance(position)
+  return Triple(id, snapToSurface(position, normal, distance), normal)
 }
 
 tailrec fun snapToSurface(getDistance: DistanceFunction, tolerance: Float, normal: Vector3, position: Vector3, distance: Float, step: Int): Vector3 {
@@ -42,7 +42,7 @@ tailrec fun snapToSurface(getDistance: DistanceFunction, tolerance: Float, norma
     position
   else {
     val newPosition = position - normal * distance
-    val newDistance = getDistance(newPosition)
+    val (_, newDistance) = getDistance(newPosition)
 //    println("$step $newDistance     $newPosition")
     snapToSurface(getDistance, tolerance, normal, newPosition, newDistance, step + 1)
   }
@@ -67,7 +67,7 @@ fun sampleCellGrid(config: SurfacingConfig, center: Vector3, start: Vector3, dim
         z.toFloat() * subStep
     )
 
-    val distance = getDistance(subCenter)
+    val (_, distance) = getDistance(subCenter)
     if (abs(distance) > subCellRange)
       null
     else {
@@ -117,7 +117,7 @@ fun getActiveCells(getCellStart: (Int) -> Vector3, config: SurfacingConfig, cell
   for (i in 0 until cellCount) {
     val center = getCellStart(i) + halfCell
     // Skip cells that have no geometry
-    val rangeSample = config.getDistance(center)
+    val (_, rangeSample) = config.getDistance(center)
     cells[i] = abs(rangeSample) <= maxCellRange
   }
   return cells

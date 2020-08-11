@@ -20,12 +20,13 @@ tailrec fun noiseIteration(octaves: List<Octave>, x: Float, y: Float, algorithm:
   }
 }
 
-tailrec fun noiseIteration(octaves: List<Octave>, location: Vector3, algorithm: GetSample3d<Float>, step: Int, output: Float): Float {
+tailrec fun noiseIteration(octaves: List<Octave>, location: Vector3, algorithm: DistanceSampler, step: Int, output: Float): Float {
   return if (step >= octaves.size)
     output
   else {
     val (frequency, amplitude) = octaves[step]
-    val nextOutput = output + (algorithm(location * frequency) * 0.5f + 0.5f) * amplitude
+    val (_, sample) = algorithm(location * frequency)
+    val nextOutput = output + (sample * 0.5f + 0.5f) * amplitude
     noiseIteration(octaves, location, algorithm, step + 1, nextOutput)
   }
 }
@@ -86,7 +87,7 @@ fun noise2d(arguments: Arguments, algorithm: GetSample2d<Float>): GetSample2d<Fl
   }
 }
 
-fun noise3d(arguments: Arguments, algorithm: FloatSampler3d): FloatSampler3d {
+fun noise3d(arguments: Arguments, algorithm: DistanceSampler, id: Any): DistanceSampler {
   val (octaves, amplitudeMax) = getNoiseOctaves(arguments)
   return { location: Vector3 ->
     //    var rawValue = 0f
@@ -97,7 +98,7 @@ fun noise3d(arguments: Arguments, algorithm: FloatSampler3d): FloatSampler3d {
 //    val rawValue = octaves.fold(0f) { a, (frequency, amplitude) ->
 //      a + (algorithm(x * frequency, y * frequency) * 0.5f + 0.5f) * amplitude
 //    }
-    rawValue / amplitudeMax
+    id to rawValue / amplitudeMax
 //    minMax(rawValue, 0f, 1f)
   }
 }
@@ -110,11 +111,11 @@ fun nonTilingOpenSimplex2D(seed: Long = 1L): GetSample2d<Float> {
   }
 }
 
-fun nonTilingOpenSimplex3D(seed: Long = 1L): GetSample3d<Float> {
+fun nonTilingOpenSimplex3D(seed: Long = 1L): DistanceSampler {
   val generator = OpenSimplexNoise(seed)
   return { location: Vector3 ->
 //    0.5f
-    generator.eval(location.x.toDouble(), location.y.toDouble(), location.z.toDouble()).toFloat()
+    anonymousSampler to generator.eval(location.x.toDouble(), location.y.toDouble(), location.z.toDouble()).toFloat()
   }
 }
 

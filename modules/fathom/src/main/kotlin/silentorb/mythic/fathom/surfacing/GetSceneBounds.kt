@@ -17,7 +17,7 @@ fun getSceneDecimalBounds(getDistance: DistanceFunction): DecimalBounds {
         listToVector3(baseVectors
             .map { vector ->
               val origin = vector * facing * originDistance
-              val distance = getDistance(origin)
+              val distance = getDistance(origin).second
               (originDistance - distance) * facing
             }
         )

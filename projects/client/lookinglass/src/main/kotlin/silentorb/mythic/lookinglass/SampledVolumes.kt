@@ -147,5 +147,22 @@ fun newSampledModel(vertexSchema: VertexSchema, lodRanges: LodRanges, levels: In
   )
 }
 
-fun serializeVertex(point: SamplePoint): List<Float> =
-    toList(point.location) + serializeShadingColor(point.shading) + serializeNormal(point.normal)
+fun serializeVertex(point: SamplePoint): List<Float> {
+  val shading = point.shading
+  val normal = point.normal
+  val color = shading.color
+
+  return toList(point.location) +
+      bytesToFloat(
+          normalizedFloatToUnsignedByte(color.x),
+          normalizedFloatToUnsignedByte(color.y),
+          normalizedFloatToUnsignedByte(color.z),
+          normalizedFloatToUnsignedByte(shading.opacity)
+      ) +
+      bytesToFloat(
+          normalizedFloatToSignedByte(normal.x),
+          normalizedFloatToSignedByte(normal.y),
+          normalizedFloatToSignedByte(normal.z),
+          normalizedFloatToUnsignedByte(shading.glow)
+      )
+}

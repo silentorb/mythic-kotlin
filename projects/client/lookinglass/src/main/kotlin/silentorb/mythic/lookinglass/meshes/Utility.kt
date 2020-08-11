@@ -20,6 +20,8 @@ object AttributeName {
   const val weights = "weights"
   const val pointSize = "pointSize"
   const val level = "level"
+  const val glow = "glow"
+  const val specular = "specular"
 }
 
 fun animatedVertexSerializer(weightMap: WeightMap): ImmutableVertexSerializer {

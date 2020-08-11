@@ -7,7 +7,7 @@ private const val normalStep = 0.001f
 // , hook: SdfHook
 fun getNormal(getDistance: DistanceFunction, position: Vector3): Vector3 {
   fun accumulateDimension(offset: Vector3) =
-      getDistance(position + offset) - getDistance(position - offset)
+      getDistance(position + offset).second - getDistance(position - offset).second
 
 //  (1..6).forEach { hook() }
 

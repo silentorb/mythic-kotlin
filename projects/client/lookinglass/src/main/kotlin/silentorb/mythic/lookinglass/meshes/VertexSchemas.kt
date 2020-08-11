@@ -32,7 +32,8 @@ fun createVertexSchemas() = VertexSchemas(
     shadedColor = VertexSchema(listOf(
         floatVertexAttribute(AttributeName.position, 3),
         VertexAttribute(AttributeName.color, 4, GL_UNSIGNED_BYTE, true),
-        VertexAttribute(AttributeName.normal, 3, GL_BYTE, true)
+        VertexAttribute(AttributeName.normal, 3, GL_BYTE, true),
+        VertexAttribute(AttributeName.glow, 1, GL_UNSIGNED_BYTE, true)
     )),
     shadedPoint = VertexSchema(listOf(
         floatVertexAttribute(AttributeName.position, 3),

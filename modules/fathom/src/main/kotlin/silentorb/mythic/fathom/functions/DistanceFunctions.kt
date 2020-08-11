@@ -7,28 +7,34 @@ import silentorb.imp.execution.CompleteFunction
 import silentorb.mythic.fathom.misc.DistanceFunction
 import silentorb.mythic.fathom.misc.distanceFunctionType
 import silentorb.mythic.fathom.misc.fathomPath
-import silentorb.mythic.fathom.misc.shapeType
 import silentorb.mythic.fathom.surfacing.snapToSurface
-import silentorb.mythic.imaging.texturing.FloatSampler3d
-import silentorb.mythic.scenery.CompositeShape
-import silentorb.mythic.scenery.Shape
+import silentorb.mythic.imaging.texturing.DistanceSample
+import silentorb.mythic.imaging.texturing.DistanceSampler
+import silentorb.mythic.imaging.texturing.anonymousSampler
 import silentorb.mythic.spatial.Quaternion
 import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.minMax
 import kotlin.math.max
 import kotlin.math.min
 
 fun sphere(radius: Float): DistanceFunction =
     { origin ->
-      origin.distance(Vector3.zero) - radius
+      anonymousSampler to origin.distance(Vector3.zero) - radius
     }
 
 fun cube(bounds: Vector3): DistanceFunction {
   val halfBounds = bounds / 2f
   return { origin ->
     val q = origin.absolute() - halfBounds
-    q.max(0f).length() + min(max(q.x, max(q.y, q.z)), 0f)
+    anonymousSampler to q.max(0f).length() + min(max(q.x, max(q.y, q.z)), 0f)
   }
 }
+
+fun capsule(radius: Float, height: Float): DistanceFunction =
+    { origin ->
+      val z = origin.z - minMax(origin.z, 0f, height)
+      anonymousSampler to origin.copy(z = z).length() - radius
+    }
 
 fun translate(offset: Vector3, function: DistanceFunction): DistanceFunction =
     { origin ->
@@ -43,17 +49,49 @@ fun rotate(quaternion: Quaternion, function: DistanceFunction): DistanceFunction
   }
 }
 
-fun deformer3dSampler(first: DistanceFunction, deformer: FloatSampler3d): DistanceFunction =
+fun deformer3dSampler(first: DistanceFunction, deformer: DistanceSampler): DistanceFunction =
     { origin ->
-      val distance = first(origin)
+      val (id, distance) = first(origin)
       val location = snapToSurface(first, origin)
-      distance + deformer(location)
+      id to distance + deformer(location).second
     }
 
 fun times3dSampler(first: DistanceFunction, constant: Float): DistanceFunction =
     { origin ->
-      first(origin) * constant
+      val (id, sample) = first(origin)
+      id to sample * constant
     }
+
+fun min(vararg values: DistanceSample): DistanceSample =
+    values
+        .reduce { a, b ->
+          if (a.second <= b.second)
+            a
+          else
+            b
+        }
+
+fun min(values: List<DistanceSample>): DistanceSample =
+    min(*values.toTypedArray())
+
+fun max(vararg values: DistanceSample): DistanceSample =
+    values
+        .reduce { a, b ->
+          if (a.second >= b.second)
+            a
+          else
+            b
+        }
+
+fun max(values: List<DistanceSample>): DistanceSample =
+    max(*values.toTypedArray())
+
+fun mergeDistanceFunctions(values: List<DistanceFunction>): DistanceFunction {
+  val result: DistanceFunction = { location ->
+    min(values.map { it(location) })
+  }
+  return result
+}
 
 fun distanceFunctions() = listOf(
     CompleteFunction(
@@ -67,12 +105,7 @@ fun distanceFunctions() = listOf(
         ),
         implementation = { arguments ->
           val values = arguments["values"] as List<DistanceFunction>
-          val result: DistanceFunction = { location ->
-            values
-                .map { it(location) }
-                .reduce(::min)
-          }
-          result
+          mergeDistanceFunctions(values)
         }
     ),
 
@@ -91,7 +124,7 @@ fun distanceFunctions() = listOf(
           val result: DistanceFunction = { location ->
             val a = first(location)
             val b = second(location)
-            max(a, -b)
+            max(a, b.copy(second = -b.second))
           }
           result
         }
@@ -111,7 +144,7 @@ fun distanceFunctions() = listOf(
           val result: DistanceFunction = { location ->
             values
                 .map { it(location) }
-                .reduce(::max)
+                .reduce { a, b -> max(a, b) }
           }
           result
         }

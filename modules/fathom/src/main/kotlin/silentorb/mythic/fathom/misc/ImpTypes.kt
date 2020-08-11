@@ -7,7 +7,7 @@ import silentorb.imp.execution.typePairsToTypeNames
 import silentorb.mythic.fathom.spatial.quaternionType
 import silentorb.mythic.fathom.spatial.translation3Type
 import silentorb.mythic.fathom.spatial.vector3Type
-import silentorb.mythic.imaging.texturing.FloatSampler3d
+import silentorb.mythic.imaging.texturing.DistanceSampler
 import silentorb.mythic.imaging.texturing.texturingPath
 import silentorb.mythic.scenery.Shading
 import silentorb.mythic.spatial.Vector3
@@ -18,12 +18,12 @@ const val fathomPath = "silentorb.mythic.fathom"
 val distanceFunctionType = newTypePair(PathKey(fathomPath, "DistanceFunction"))
 val modelFunctionType = newTypePair(PathKey(fathomPath, "ModelFunction"))
 val floatSampler3dType = newTypePair(PathKey(texturingPath, "FloatSampler3d"))
-val rgbSampler3dType = newTypePair(PathKey(texturingPath, "RgbSampler3d"))
+val shadingSamplerType = newTypePair(PathKey(fathomPath, "ShadingSampler"))
 val shapeType = newTypePair(PathKey(fathomPath, "Shape"))
 
 typealias Sampler3d = (Float, Float, Float, FloatBuffer) -> Unit
 
-typealias DistanceFunction = FloatSampler3d
+typealias DistanceFunction = DistanceSampler
 typealias RgbColorFunction = (Vector3) -> Vector3
 typealias ShadingFunction = (Vector3) -> Shading
 
@@ -44,6 +44,6 @@ fun fathomTypes() =
             translation3Type,
             quaternionType,
             floatSampler3dType,
-            rgbSampler3dType
+            shadingSamplerType
         )
     )

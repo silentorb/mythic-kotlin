@@ -55,7 +55,7 @@ tailrec fun getVertexCorners(getDistance: DistanceFunction, position: Vector3, e
       else
         options
             .sortedBy { (_, center) ->
-              getDistance(center)
+              getDistance(center).second
             }
             .take(2)
 

@@ -15,7 +15,7 @@ fun voxelize(sampler: DistanceFunction, bounds: GridBounds, depth: Int, voxelsPe
     for (y in 0 until dimensions.y) {
       for (x in 0 until dimensions.x) {
         val location = Vector3(x.toFloat(), y.toFloat(), z.toFloat()) * scale + start
-        val distance = sampler(location)
+        val (_, distance) = sampler(location)
         val value = if (distance <= scale)
           1f - distance / scale
         else

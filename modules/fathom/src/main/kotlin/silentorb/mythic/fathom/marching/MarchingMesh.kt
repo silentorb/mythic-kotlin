@@ -4,6 +4,7 @@ import silentorb.mythic.fathom.misc.DistanceFunction
 import silentorb.mythic.fathom.misc.ShadingFunction
 import silentorb.mythic.fathom.misc.getNormal
 import silentorb.mythic.fathom.surfacing.getSceneGridBounds
+import silentorb.mythic.imaging.texturing.anonymousSampler
 import silentorb.mythic.scenery.SamplePoint
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.toVector3
