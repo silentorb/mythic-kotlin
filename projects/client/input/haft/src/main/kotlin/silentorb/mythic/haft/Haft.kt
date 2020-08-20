@@ -2,9 +2,7 @@ package silentorb.mythic.haft
 
 import silentorb.mythic.debugging.debugLog
 import silentorb.mythic.debugging.getDebugBoolean
-import silentorb.mythic.debugging.getDebugString
 import silentorb.mythic.platforming.InputEvent
-import silentorb.mythic.spatial.Vector2
 
 fun matches(event: InputEvent): (InputEvent) -> Boolean = { other ->
   event.device == other.device && event.index == other.index

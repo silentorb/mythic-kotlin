@@ -2061,14 +2061,14 @@ class Matrix4f {
      * @see Matrix4f#getUnnormalizedRotation(Quaternion)
      */
   fun getUnnormalizedRotation(dest: Quaternion): Quaternion {
-    return dest.setFromUnnormalized(this)
+    return dest.fromUnnormalized(this)
   }
 
   /* (non-Javadoc)
      * @see Matrix4f#getNormalizedRotation(Quaternion)
      */
   fun getNormalizedRotation(dest: Quaternion): Quaternion {
-    return dest.setFromNormalized(this)
+    return dest.fromNormalized(this)
   }
 
   /**

@@ -75,3 +75,9 @@ fun getDebugFloat(name: String): Float? =
 fun debugLog(message: String) {
   println("($privateLoopNumber) $message")
 }
+
+fun conditionalDebugLog(booleanSetting: String): (() -> String) -> Unit = { message ->
+  if (getDebugBoolean(booleanSetting)) {
+    println(message())
+  }
+}

@@ -385,7 +385,7 @@ data class Quaternion(
     return this
   }
 
-  private fun setFromUnnormalized(m00: Float, m01: Float, m02: Float, m10: Float, m11: Float, m12: Float, m20: Float, m21: Float, m22: Float) {
+  private fun fromUnnormalized(m00: Float, m01: Float, m02: Float, m10: Float, m11: Float, m12: Float, m20: Float, m21: Float, m22: Float) {
     var nm00 = m00
     var nm01 = m01
     var nm02 = m02
@@ -407,10 +407,10 @@ data class Quaternion(
     nm20 *= lenZ
     nm21 *= lenZ
     nm22 *= lenZ
-    setFromNormalized(nm00, nm01, nm02, nm10, nm11, nm12, nm20, nm21, nm22)
+    fromNormalized(nm00, nm01, nm02, nm10, nm11, nm12, nm20, nm21, nm22)
   }
 
-  private fun setFromNormalized(m00: Float, m01: Float, m02: Float, m10: Float, m11: Float, m12: Float, m20: Float, m21: Float, m22: Float) {
+  private fun fromNormalized(m00: Float, m01: Float, m02: Float, m10: Float, m11: Float, m12: Float, m20: Float, m21: Float, m22: Float) {
     var t: Float
     val tr = m00 + m11 + m22
     if (tr >= 0.0f) {
@@ -446,7 +446,7 @@ data class Quaternion(
     }
   }
 
-  private fun setFromUnnormalized(m00: Double, m01: Double, m02: Double, m10: Double, m11: Double, m12: Double, m20: Double, m21: Double, m22: Double) {
+  private fun fromUnnormalized(m00: Double, m01: Double, m02: Double, m10: Double, m11: Double, m12: Double, m20: Double, m21: Double, m22: Double) {
     var nm00 = m00
     var nm01 = m01
     var nm02 = m02
@@ -468,10 +468,10 @@ data class Quaternion(
     nm20 *= lenZ
     nm21 *= lenZ
     nm22 *= lenZ
-    setFromNormalized(nm00, nm01, nm02, nm10, nm11, nm12, nm20, nm21, nm22)
+    fromNormalized(nm00, nm01, nm02, nm10, nm11, nm12, nm20, nm21, nm22)
   }
 
-  private fun setFromNormalized(m00: Double, m01: Double, m02: Double, m10: Double, m11: Double, m12: Double, m20: Double, m21: Double, m22: Double) {
+  private fun fromNormalized(m00: Double, m01: Double, m02: Double, m10: Double, m11: Double, m12: Double, m20: Double, m21: Double, m22: Double) {
     var t: Double
     val tr = m00 + m11 + m22
     if (tr >= 0.0) {
@@ -517,8 +517,8 @@ data class Quaternion(
    * the matrix whose rotational component is used to set this quaternion
    * @return this
    */
-  fun setFromUnnormalized(mat: Matrix4f): Quaternion {
-    setFromUnnormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
+  fun fromUnnormalized(mat: Matrix4f): Quaternion {
+    fromUnnormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
     return this
   }
 
@@ -532,8 +532,8 @@ data class Quaternion(
    * the matrix whose rotational component is used to set this quaternion
    * @return this
    */
-  fun setFromUnnormalized(mat: Matrix4x3fc): Quaternion {
-    setFromUnnormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
+  fun fromUnnormalized(mat: Matrix4x3fc): Quaternion {
+    fromUnnormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
     return this
   }
 
@@ -547,8 +547,8 @@ data class Quaternion(
    * the matrix whose rotational component is used to set this quaternion
    * @return this
    */
-  fun setFromUnnormalized(mat: Matrix4x3dc): Quaternion {
-    setFromUnnormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
+  fun fromUnnormalized(mat: Matrix4x3dc): Quaternion {
+    fromUnnormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
     return this
   }
 
@@ -562,8 +562,8 @@ data class Quaternion(
    * the matrix whose rotational component is used to set this quaternion
    * @return this
    */
-  fun setFromNormalized(mat: Matrix4f): Quaternion {
-    setFromNormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
+  fun fromNormalized(mat: Matrix4f): Quaternion {
+    fromNormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
     return this
   }
 
@@ -577,8 +577,8 @@ data class Quaternion(
    * the matrix whose rotational component is used to set this quaternion
    * @return this
    */
-  fun setFromNormalized(mat: Matrix4x3fc): Quaternion {
-    setFromNormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
+  fun fromNormalized(mat: Matrix4x3fc): Quaternion {
+    fromNormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
     return this
   }
 
@@ -592,8 +592,8 @@ data class Quaternion(
    * the matrix whose rotational component is used to set this quaternion
    * @return this
    */
-  fun setFromNormalized(mat: Matrix4x3dc): Quaternion {
-    setFromNormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
+  fun fromNormalized(mat: Matrix4x3dc): Quaternion {
+    fromNormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
     return this
   }
 
@@ -607,8 +607,8 @@ data class Quaternion(
    * the matrix whose rotational component is used to set this quaternion
    * @return this
    */
-  fun setFromUnnormalized(mat: Matrix4dc): Quaternion {
-    setFromUnnormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
+  fun fromUnnormalized(mat: Matrix4dc): Quaternion {
+    fromUnnormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
     return this
   }
 
@@ -622,8 +622,8 @@ data class Quaternion(
    * the matrix whose rotational component is used to set this quaternion
    * @return this
    */
-  fun setFromNormalized(mat: Matrix4dc): Quaternion {
-    setFromNormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
+  fun fromNormalized(mat: Matrix4dc): Quaternion {
+    fromNormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
     return this
   }
 
@@ -637,8 +637,8 @@ data class Quaternion(
    * the matrix whose rotational component is used to set this quaternion
    * @return this
    */
-  fun setFromUnnormalized(mat: Matrix3fc): Quaternion {
-    setFromUnnormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
+  fun fromUnnormalized(mat: Matrix3fc): Quaternion {
+    fromUnnormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
     return this
   }
 
@@ -652,8 +652,8 @@ data class Quaternion(
    * the matrix whose rotational component is used to set this quaternion
    * @return this
    */
-  fun setFromNormalized(mat: Matrix3fc): Quaternion {
-    setFromNormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
+  fun fromNormalized(mat: Matrix3fc): Quaternion {
+    fromNormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
     return this
   }
 
@@ -667,8 +667,8 @@ data class Quaternion(
    * the matrix whose rotational component is used to set this quaternion
    * @return this
    */
-  fun setFromUnnormalized(mat: Matrix3dc): Quaternion {
-    setFromUnnormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
+  fun fromUnnormalized(mat: Matrix3dc): Quaternion {
+    fromUnnormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
     return this
   }
 
@@ -679,8 +679,8 @@ data class Quaternion(
    * the matrix whose rotational component is used to set this quaternion
    * @return this
    */
-  fun setFromNormalized(mat: Matrix3dc): Quaternion {
-    setFromNormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
+  fun fromNormalized(mat: Matrix3dc): Quaternion {
+    fromNormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
     return this
   }
 
