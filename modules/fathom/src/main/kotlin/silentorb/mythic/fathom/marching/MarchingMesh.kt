@@ -33,9 +33,9 @@ fun aggregateTriangleVertices(voxelsPerUnit: Int, offset: Vector3, getDistance: 
 
 fun marchingMesh(voxelsPerUnit: Int, getDistance: DistanceFunction, getShading: ShadingFunction, bounds: GridBounds): Pair<List<SamplePoint>, List<List<Int>>> {
   val voxels = voxelize(getDistance, bounds, 1, voxelsPerUnit)
-  val dimensions = (bounds.end - bounds.start) * voxelsPerUnit
-  val start = bounds.start.toVector3()
+  val dimensions = (bounds.end - bounds.start) * voxelsPerUnit + 1
   val triangles = marchingCubes(voxels, dimensions, 0.5f)
+  val start = bounds.start.toVector3()
   val vertexMap = aggregateTriangleVertices(voxelsPerUnit, start, getDistance, getShading, triangles)
   val vertexIndices = vertexMap.keys
       .mapIndexed { index, pair -> pair to index }

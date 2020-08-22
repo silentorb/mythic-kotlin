@@ -7,7 +7,7 @@ import silentorb.mythic.spatial.toVector3
 
 fun voxelize(sampler: DistanceFunction, bounds: GridBounds, depth: Int, voxelsPerUnit: Int): FloatArray {
   val scale = 1f / voxelsPerUnit.toFloat()
-  val dimensions = (bounds.end - bounds.start) * voxelsPerUnit
+  val dimensions = (bounds.end - bounds.start) * voxelsPerUnit + 1
   val buffer = FloatArray(dimensions.x * dimensions.y * dimensions.z * depth)
   var i = 0
   val start = bounds.start.toVector3()

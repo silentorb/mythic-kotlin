@@ -28,6 +28,14 @@ fun setDebugRangeValue(value: Float) {
   debugRangeValue = value
 }
 
+private var debugString = ""
+
+fun getDebugString(): String = debugString
+
+fun setDebugString(value: String) {
+  debugString = value
+}
+
 tailrec fun findParentDotEnvFile(path: Path = Paths.get(System.getProperty("user.dir"))): String? =
     when {
       Files.exists(path.resolve(".env")) -> path.toString()
