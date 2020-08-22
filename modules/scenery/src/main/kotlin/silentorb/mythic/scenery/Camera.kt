@@ -17,4 +17,5 @@ data class Camera(
     val farClip: Float = 1000f
 ) {
   val lookAt: Vector3 = orientation.transform(Vector3(1f, 0f, 0f)).normalize()
+  val location: Vector3 get() = position
 }

@@ -14,7 +14,10 @@ data class SceneLayer(
 
 typealias SceneLayers = List<SceneLayer>
 
-fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer) {
+// Temporary callback mechanism while experimenting with a hybrid rendering system
+typealias OnRenderScene = (SceneRenderer, Camera, SceneLayer) -> Unit
+
+fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer, callback: OnRenderScene? = null) {
   val previousDepthEnabled = globalState.depthEnabled
   globalState.depthEnabled = layer.useDepth
   if (layer.resetDepth)
@@ -24,12 +27,16 @@ fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer)
     renderElementGroup(renderer, camera, group)
   }
 
+  if (callback != null) {
+    callback(renderer, camera, layer)
+  }
+
   renderVolumes(renderer, layer.elements)
   globalState.depthEnabled = previousDepthEnabled
 }
 
-fun renderSceneLayers(renderer: SceneRenderer, camera: Camera, layers: SceneLayers) {
+fun renderSceneLayers(renderer: SceneRenderer, camera: Camera, layers: SceneLayers, callback: OnRenderScene? = null) {
   for (layer in layers) {
-    renderSceneLayer(renderer, camera, layer)
+    renderSceneLayer(renderer, camera, layer, callback)
   }
 }

@@ -5,16 +5,14 @@ import silentorb.imp.core.CompleteSignature
 import silentorb.imp.core.PathKey
 import silentorb.imp.execution.CompleteFunction
 import silentorb.mythic.fathom.misc.DistanceFunction
+import silentorb.mythic.fathom.misc.ModelFunction
 import silentorb.mythic.fathom.misc.distanceFunctionType
 import silentorb.mythic.fathom.misc.fathomPath
 import silentorb.mythic.fathom.surfacing.snapToSurface
 import silentorb.mythic.imaging.texturing.DistanceSample
 import silentorb.mythic.imaging.texturing.DistanceSampler
 import silentorb.mythic.imaging.texturing.anonymousSampler
-import silentorb.mythic.spatial.Quaternion
-import silentorb.mythic.spatial.Vector2
-import silentorb.mythic.spatial.Vector3
-import silentorb.mythic.spatial.minMax
+import silentorb.mythic.spatial.*
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -92,6 +90,13 @@ fun rotate(quaternion: Quaternion, function: DistanceFunction): DistanceFunction
   }
 }
 
+fun transform(matrix: Matrix, function: DistanceFunction): DistanceFunction {
+  val inverse = matrix.invert()
+  return { origin ->
+    function(origin.transform(inverse))
+  }
+}
+
 fun deformer3dSampler(first: DistanceFunction, deformer: DistanceSampler): DistanceFunction =
     { origin ->
       val (id, distance) = first(origin)
@@ -130,11 +135,20 @@ fun max(values: List<DistanceSample>): DistanceSample =
     max(*values.toTypedArray())
 
 fun mergeDistanceFunctions(values: List<DistanceFunction>): DistanceFunction {
+  assert(values.any())
   val result: DistanceFunction = { location ->
     min(values.map { it(location) })
   }
   return result
 }
+
+fun mergeDistanceFunctionsTrackingIds(models: List<ModelFunction>): DistanceFunction =
+    mergeDistanceFunctions(models.map {
+      val result: DistanceFunction = { origin ->
+        it.hashCode() to it.form(origin).second
+      }
+      result
+    })
 
 fun distanceFunctions() = listOf(
     CompleteFunction(

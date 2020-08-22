@@ -3,6 +3,7 @@ package silentorb.mythic.fathom.marching
 import silentorb.mythic.fathom.misc.DistanceFunction
 import silentorb.mythic.fathom.misc.ShadingFunction
 import silentorb.mythic.fathom.misc.getNormal
+import silentorb.mythic.fathom.surfacing.GridBounds
 import silentorb.mythic.fathom.surfacing.getSceneGridBounds
 import silentorb.mythic.imaging.texturing.anonymousSampler
 import silentorb.mythic.scenery.SamplePoint
@@ -30,9 +31,7 @@ fun aggregateTriangleVertices(voxelsPerUnit: Int, offset: Vector3, getDistance: 
       }
 }
 
-fun marchingMesh(voxelsPerUnit: Int, getDistance: DistanceFunction, getShading: ShadingFunction): Pair<List<SamplePoint>, List<List<Int>>> {
-  val bounds = getSceneGridBounds(getDistance, 1f)
-      .pad(1)
+fun marchingMesh(voxelsPerUnit: Int, getDistance: DistanceFunction, getShading: ShadingFunction, bounds: GridBounds): Pair<List<SamplePoint>, List<List<Int>>> {
   val voxels = voxelize(getDistance, bounds, 1, voxelsPerUnit)
   val dimensions = (bounds.end - bounds.start) * voxelsPerUnit
   val start = bounds.start.toVector3()
@@ -47,4 +46,11 @@ fun marchingMesh(voxelsPerUnit: Int, getDistance: DistanceFunction, getShading: 
       }
 
   return vertexMap.values.toList() to indexedTriangles
+}
+
+fun marchingMesh(voxelsPerUnit: Int, getDistance: DistanceFunction, getShading: ShadingFunction): Pair<List<SamplePoint>, List<List<Int>>> {
+  val bounds = getSceneGridBounds(getDistance, 1f)
+      .pad(1)
+
+  return marchingMesh(voxelsPerUnit, getDistance, getShading, bounds)
 }

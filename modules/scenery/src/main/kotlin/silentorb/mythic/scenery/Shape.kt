@@ -64,3 +64,11 @@ data class MeshShape(
     override val x: Float = radius * 2f,
     override val y: Float = radius * 2f
 ) : Shape
+
+fun mergeShapes(shapes: List<Shape>): Shape? =
+    if (shapes.size > 1)
+      CompositeShape(
+          shapes = shapes
+      )
+    else
+      shapes.firstOrNull()
