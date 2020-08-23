@@ -9,7 +9,8 @@ import silentorb.mythic.scenery.Camera
 data class SceneLayer(
     val elements: ElementGroups,
     val useDepth: Boolean,
-    val resetDepth: Boolean = false
+    val resetDepth: Boolean = false,
+    val attributes: Set<String> = setOf()
 )
 
 typealias SceneLayers = List<SceneLayer>

@@ -10,6 +10,7 @@ data class TimeState(
 
 data class TimestepState(
     val time: TimeState,
+    val increment: Long,
     val rawDelta: Double,
     val accumulator: Double,
     val delta: Double
@@ -29,6 +30,7 @@ fun newTimestepState(): TimestepState =
         time = newTimeState(),
         rawDelta = 0.0,
         accumulator = 0.0,
+        increment = 0L,
         delta = 0.0
     )
 
@@ -38,16 +40,15 @@ fun updateTimeState(state: TimeState): TimeState =
         latest = System.nanoTime()
     )
 
-fun getDelta(state: TimeState): Double {
-  val gap = state.latest - state.previous
-  return gap.toDouble() / 1_000_000_000
-}
+fun nanosecondsToDelta(value: Long): Double =
+    value.toDouble() / 1_000_000_000
 
 fun clipDelta(max: Double): (Double) -> Double = { value -> Math.min(value, max) }
 
 fun updateTimestep(timestepState: TimestepState, step: Double): Pair<TimestepState, Int> {
   val timeState = updateTimeState(timestepState.time)
-  val rawDelta = getDelta(timeState)
+  val increment = timeState.latest - timeState.previous
+  val rawDelta = nanosecondsToDelta(increment)
   val delta = clipDelta(ceiling)(rawDelta)
 
   val accumulator = timestepState.accumulator + delta
@@ -63,6 +64,7 @@ fun updateTimestep(timestepState: TimestepState, step: Double): Pair<TimestepSta
       TimestepState(
           time = timeState,
           rawDelta = rawDelta,
+          increment = increment,
           accumulator = finalAccumulator,
           delta = delta
       ),

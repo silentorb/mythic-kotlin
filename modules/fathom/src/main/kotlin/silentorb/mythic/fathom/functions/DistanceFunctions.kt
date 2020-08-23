@@ -97,11 +97,14 @@ fun transform(matrix: Matrix, function: DistanceFunction): DistanceFunction {
   }
 }
 
-fun deformer3dSampler(first: DistanceFunction, deformer: DistanceSampler): DistanceFunction =
+fun deformer3dSampler(first: DistanceFunction, deformer: DistanceSampler, amplitude: Float): DistanceFunction =
     { origin ->
       val (id, distance) = first(origin)
       val location = snapToSurface(first, origin)
-      id to distance + deformer(location).second
+      if (distance > amplitude * 2f)
+        id to distance
+      else
+        id to distance + deformer(location).second * amplitude
     }
 
 fun times3dSampler(first: DistanceFunction, constant: Float): DistanceFunction =

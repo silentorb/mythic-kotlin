@@ -290,14 +290,16 @@ fun fathomFunctions() = listOf(
         signature = CompleteSignature(
             parameters = listOf(
                 CompleteParameter("object", distanceFunctionType),
-                CompleteParameter("deformer", floatSampler3dType)
-            ),
+                CompleteParameter("deformer", floatSampler3dType),
+                CompleteParameter("amplitude", floatType)
+                ),
             output = distanceFunctionType
         ),
         implementation = { arguments ->
           val first = arguments["object"] as DistanceFunction
           val deformer = arguments["deformer"] as DistanceFunction
-          deformer3dSampler(first, deformer)
+          val amplitude = arguments["amplitude"] as Float
+          deformer3dSampler(first, deformer, amplitude)
         }
     ),
 
