@@ -774,6 +774,12 @@ data class Matrix(
 
   operator fun times(m: Matrix) = mul(m)
   operator fun times(v: Vector4) = transform(v)
+
+  fun getScale(): Vector3 {
+    val value: Vector3m = Vector3m()
+    toMutableMatrix(this).getScale(value)
+    return Vector3(value)
+  }
 }
 
 fun writeMatrixToBuffer(buffer: ByteBuffer, matrix: Matrix) {
