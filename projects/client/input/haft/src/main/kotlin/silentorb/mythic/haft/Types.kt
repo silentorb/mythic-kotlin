@@ -26,15 +26,15 @@ data class Binding(
 data class HaftCommand(
     val type: Any,
     val target: Long = 0,
-    val value: Float = 0f,
+    val value: Any? = 0f,
     val device: Int
 )
 
-fun simpleCommand(type: Any, device: Int, target: Long = 0): HaftCommand =
+fun simpleCommand(type: Any, device: Int, target: Long = 0, value: Any? = 1f): HaftCommand =
     HaftCommand(
         type = type,
         target = target,
-        value = 1f,
+        value = value,
         device = device
     )
 
