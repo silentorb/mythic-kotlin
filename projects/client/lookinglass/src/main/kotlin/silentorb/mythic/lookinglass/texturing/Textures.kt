@@ -68,11 +68,6 @@ fun getFileShortName(path: Path): String =
 
 typealias TextureAttributeMapper = (Path) -> TextureAttributes
 
-fun gatherTextures(loadImage: ImageLoader, attributes: TextureAttributeMapper): List<DeferredTexture> =
-    scanTextureResources("models")
-        .plus(scanTextureResources("textures"))
-        .map { deferImageFile(loadImage, it, attributes(it)) }
-
 fun loadDeferredTextures(list: List<DeferredTexture>): List<LoadedTextureData> {
   return list.mapNotNull { deferred ->
     val image = deferred.load()

@@ -40,3 +40,7 @@ fun forwardDimensions(
       dimensions = dimensions
   )
 }
+
+val stretchBoth: ForwardLayout = { container ->
+  Bounds(dimensions = container)
+}
