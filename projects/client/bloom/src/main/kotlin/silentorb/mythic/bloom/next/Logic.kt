@@ -11,6 +11,14 @@ data class LogicArgs(
     val bag: StateBag
 )
 
+inline fun <reified T> getBagEntry(bag: StateBag, key: String, initialValue: () -> T): T {
+  val existing = bag[key]
+  return if (existing != null && existing is T)
+    existing
+  else
+    initialValue()
+}
+
 fun Flower.plusOnClick(vararg events: AnyEvent): Flower = { seed ->
   val box = this(seed)
   box.copy(
@@ -41,6 +49,8 @@ fun combineModules(modules: List<LogicModule>): LogicModule = { args ->
 
 fun combineModules(vararg modules: LogicModule): LogicModule =
     combineModules(modules.toList())
+
+val emptyLogic: LogicModule = { mapOf() }
 
 fun gatherEventBoxes(box: Box): List<Box> {
   val children = box.boxes.flatMap(::flattenAllBoxes)

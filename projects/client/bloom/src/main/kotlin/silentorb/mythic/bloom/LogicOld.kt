@@ -56,7 +56,7 @@ fun updateStateBag(rootBox: Box, state: HistoricalBloomState): StateBag {
   return result
 }
 
-fun updateBloomState(modules: List<LogicModule>, box: Box, previousState: BloomState,
+fun updateBloomState(logic: LogicModule, box: Box, previousState: BloomState,
                      currentInput: InputState): Pair<BloomState, List<AnyEvent>> {
   val inputState = HistoricalInputState(
       previous = previousState.input,
@@ -76,7 +76,7 @@ fun updateBloomState(modules: List<LogicModule>, box: Box, previousState: BloomS
       bag = previousState.bag
   )
 
-  val secondBag = combineModules(modules)(args)
+  val secondBag = logic(args)
 
   return Pair(BloomState(
       input = currentInput,
