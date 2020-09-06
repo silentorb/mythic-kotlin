@@ -18,7 +18,8 @@ data class Box(
     val depiction: Depiction? = null,
     val clipBounds: Boolean = false,
     val logic: LogicModuleOld? = null,
-    val onClick: List<AnyEvent> = listOf()
+    val onClick: List<AnyEvent> = listOf(),
+    val data: Map<String, Any> = mapOf()
 )
 
 data class Seed(
@@ -47,7 +48,9 @@ fun div(name: String = "",
         forward: ForwardLayout = forwardPass,
         reverse: ReverseLayout = reversePass,
         depiction: Depiction? = null,
-        logic: LogicModuleOld? = null): FlowerWrapper = { flower ->
+        logic: LogicModuleOld? = null,
+        data: Map<String, Any> = mapOf()
+): FlowerWrapper = { flower ->
   { seed ->
     if (name == "dialog") {
       val k = 0
@@ -64,10 +67,17 @@ fun div(name: String = "",
         bounds = finalBounds,
         boxes = listOf(childBox),
         depiction = depiction,
-        logic = logic
+        logic = logic,
+        data = data
     )
   }
 }
+
+fun flattenBoxData(boxes: List<Box>): Map<String, Any> =
+    boxes
+        .fold(mapOf()) { a, b ->
+          a + flattenBoxData(b.boxes) + b.data
+        }
 
 fun div(name: String = "",
         layout: DualLayout,
