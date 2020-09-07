@@ -1,9 +1,6 @@
-package silentorb.mythic.bloom.next
+package silentorb.mythic.bloom
 
-import silentorb.mythic.bloom.*
 import silentorb.mythic.ent.pipe
-import silentorb.mythic.bloom.BloomKey
-import silentorb.mythic.bloom.SelectionLogic
 
 typealias SelectionState = Set<BloomKey>
 typealias IdSelector = (Any) -> BloomKey

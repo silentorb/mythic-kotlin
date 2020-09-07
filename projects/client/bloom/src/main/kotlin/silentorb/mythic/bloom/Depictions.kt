@@ -1,7 +1,5 @@
 package silentorb.mythic.bloom
 
-import silentorb.mythic.bloom.next.Box
-import silentorb.mythic.bloom.next.Flower
 import silentorb.mythic.drawing.Canvas
 import silentorb.mythic.drawing.globalFonts
 import silentorb.mythic.glowing.cropStack
@@ -22,11 +20,11 @@ fun label(style: IndexedTextStyle, content: String): Flower = { seed ->
   val config = TextConfiguration(content, Vector2(), resolveTextStyle(globalFonts(), style))
   val dimensions = calculateTextDimensions(config)
   Box(
+      name = if (content.length < 32) content else content.substring(0, 32),
       bounds = Bounds(
           dimensions = dimensions.toVector2i()
       ),
-      depiction = textDepiction(style, content),
-      name = if (content.length < 32) content else content.substring(0, 32)
+      depiction = textDepiction(style, content)
   )
 }
 

@@ -1,6 +1,5 @@
 package silentorb.mythic.bloom
 
-import silentorb.mythic.bloom.next.*
 import silentorb.mythic.spatial.*
 import silentorb.mythic.spatial.Vector2i
 
@@ -96,10 +95,10 @@ fun scrollingInteraction(key: String, contentBounds: Bounds): LogicModuleOld = {
 fun scrollBox(key: String, contentBounds: Bounds): Flower = { seed ->
   val bounds = Bounds(dimensions = seed.dimensions)
   Box(
+      name = "scroll box",
       bounds = bounds,
-      depiction = scrollbar(scrollingState(seed.bag[key]).offset, contentBounds.dimensions.y),
-      logic = scrollingInteraction(key, contentBounds),
-      name = "scroll box"
+      depiction = scrollbar(scrollingState(seed.bag[key]).offset, contentBounds.dimensions.y)
+//      logic = scrollingInteraction(key, contentBounds)
   )
 }
 
@@ -150,12 +149,12 @@ fun scrolling(key: String): (Flower) -> Flower = { child ->
         result.copy(
             boxes = listOf(
                 Box(
+                    name = "clipped box",
                     bounds = result.bounds.copy(
                         dimensions = clippedDimensions
                     ),
                     boxes = pruneClippedBoxes(clippedDimensions, Vector2i(), listOf(box)),
-                    clipBounds = true,
-                    name = "clipped box"
+                    clipBounds = true
                 )
             )
 //              result.boxes.plus(box)

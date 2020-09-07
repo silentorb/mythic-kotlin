@@ -1,6 +1,5 @@
-package silentorb.mythic.bloom.next
+package silentorb.mythic.bloom
 
-import silentorb.mythic.bloom.*
 import silentorb.mythic.spatial.Vector2i
 
 val forwardPass: ForwardLayout = { Bounds(dimensions = it) }

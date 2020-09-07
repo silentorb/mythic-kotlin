@@ -1,9 +1,5 @@
 package silentorb.mythic.bloom
 
-import silentorb.mythic.bloom.next.Box
-import silentorb.mythic.bloom.next.Flower
-import silentorb.mythic.bloom.next.Seed
-
 fun maxBounds(a: Bounds, b: Bounds): Bounds {
   val x1 = Math.min(a.position.x, b.position.x)
   val y1 = Math.min(a.position.y, b.position.y)
@@ -14,17 +10,17 @@ fun maxBounds(a: Bounds, b: Bounds): Bounds {
 
 fun depict(depiction: StateDepiction): Flower = { seed ->
   Box(
+      name = "depiction",
       bounds = Bounds(dimensions = seed.dimensions),
-      depiction = depiction(seed),
-      name = "depiction"
+      depiction = depiction(seed)
   )
 }
 
 fun depict(name: String, depiction: StateDepiction): Flower = { seed ->
   Box(
+      name = name,
       bounds = Bounds(dimensions = seed.dimensions),
-      depiction = depiction(seed),
-      name = name
+      depiction = depiction(seed)
   )
 }
 

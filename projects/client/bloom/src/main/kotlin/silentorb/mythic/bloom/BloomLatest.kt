@@ -1,12 +1,9 @@
-package silentorb.mythic.bloom.next
+package silentorb.mythic.bloom
 
-import silentorb.mythic.bloom.*
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.minus
 
 private val emptyBoxList: List<Box> = listOf()
-
-val emptyBounds = Bounds(0, 0, 0, 0)
 
 typealias AnyEvent = Any
 
@@ -16,10 +13,7 @@ data class Box(
     val boxes: List<Box> = emptyBoxList,
     val depiction: Depiction? = null,
     val clipBounds: Boolean = false,
-    val logic: LogicModuleOld? = null,
-    val onClick: List<AnyEvent> = listOf(),
-    val attributes: Map<String, Any?> = mapOf(),
-    val outBag: Map<String, Any> = mapOf()
+    val attributes: Map<String, Any?> = mapOf()
 )
 
 data class Seed(
@@ -57,9 +51,7 @@ fun div(name: String = "",
         forward: ForwardLayout = forwardPass,
         reverse: ReverseLayout = reversePass,
         depiction: Depiction? = null,
-        logic: LogicModuleOld? = null,
-        attributes: Map<String, Any?> = mapOf(),
-        data: Map<String, Any> = mapOf()
+        attributes: Map<String, Any?> = mapOf()
 ): FlowerWrapper = { flower ->
   { seed ->
     if (name == "dialog") {
@@ -77,31 +69,21 @@ fun div(name: String = "",
         bounds = finalBounds,
         boxes = listOf(childBox),
         depiction = depiction,
-        logic = logic,
-        attributes = attributes,
-        outBag = data
+        attributes = attributes
     )
   }
 }
 
-fun flattenBoxData(boxes: List<Box>): Map<String, Any> =
-    boxes
-        .fold(mapOf()) { a, b ->
-          a + flattenBoxData(b.boxes) + b.outBag
-        }
-
 fun div(name: String = "",
         layout: DualLayout,
-        depiction: Depiction? = null,
-        logic: LogicModuleOld? = null): FlowerWrapper = { flower ->
+        depiction: Depiction? = null): FlowerWrapper = { flower ->
   { seed ->
     val (childBox, bounds) = layout(seed, flower)
     Box(
         name = name,
         bounds = bounds,
         boxes = listOf(childBox),
-        depiction = depiction,
-        logic = logic
+        depiction = depiction
     )
   }
 }

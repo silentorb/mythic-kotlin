@@ -1,6 +1,5 @@
 package silentorb.mythic.bloom
 
-import silentorb.mythic.bloom.next.Box
 import silentorb.mythic.drawing.Canvas
 import silentorb.mythic.glowing.cropStack
 import silentorb.mythic.glowing.debugMarkPass
@@ -10,7 +9,6 @@ import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.spatial.toVector2
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector4i
-import silentorb.mythic.spatial.plus
 import org.lwjgl.opengl.GL11
 
 data class Bounds(
@@ -117,13 +115,13 @@ fun drawFill(bounds: Bounds, canvas: Canvas, color: Vector4) {
   canvas.drawSquare(bounds.position.toVector2(), bounds.dimensions.toVector2(), canvas.solid(color))
 }
 
-fun toAbsoluteBounds(parentOffset: Vector2i, box: Box): Box {
+fun toAbsoluteBoundsRecursive(parentOffset: Vector2i, box: Box): Box {
   val localOffset = parentOffset + box.bounds.position
   return box.copy(
       bounds = box.bounds.copy(
           position = localOffset
       ),
-      boxes = box.boxes.map { toAbsoluteBounds(localOffset, it) }
+      boxes = box.boxes.map { toAbsoluteBoundsRecursive(localOffset, it) }
   )
 }
 

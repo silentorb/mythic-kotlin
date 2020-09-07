@@ -1,8 +1,5 @@
 package silentorb.mythic.bloom
 
-import silentorb.mythic.bloom.next.Flower
-import silentorb.mythic.bloom.next.Seed
-
 typealias GenericIdSelector<T> = (T) -> BloomKey
 
 data class SelectionStateOld(

@@ -1,11 +1,7 @@
 package silentorb.mythic.bloom
 
-import silentorb.mythic.bloom.next.Box
-import silentorb.mythic.bloom.next.Flower
-import silentorb.mythic.bloom.next.Seed
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.minus
-import silentorb.mythic.spatial.plus
 
 typealias FixedChildArranger = (Vector2i) -> List<Bounds>
 typealias ParentFlower = (List<Flower>) -> Flower
@@ -19,8 +15,8 @@ fun applyBounds(bag: StateBag, children: List<Flower>, bounds: List<Bounds>): Li
 fun applyBounds(arranger: FixedChildArranger): (List<Flower>) -> Flower = { flowers ->
   { seed ->
     Box(
-        boxes = applyBounds(seed.bag, flowers, arranger(seed.dimensions)),
-        bounds = emptyBounds
+        bounds = emptyBounds,
+        boxes = applyBounds(seed.bag, flowers, arranger(seed.dimensions))
     )
   }
 }
@@ -56,10 +52,10 @@ fun list(plane: Plane, spacing: Int = 0, drawReversed: Boolean = false, name: St
     }
     Box(
         name = name,
-        boxes = if (drawReversed) boxes.reversed() else boxes,
         bounds = Bounds(
             dimensions = plane(Vector2i(lastOffset, otherLength))
-        )
+        ),
+        boxes = if (drawReversed) boxes.reversed() else boxes
     )
   }
 }
@@ -101,10 +97,10 @@ fun flexList(plane: Plane, spacing: Int = 0, name: String = "flexList"): (List<F
     }
     Box(
         name = name,
-        boxes = boxes,
         bounds = Bounds(
             dimensions = resolvedDimensions
-        )
+        ),
+        boxes = boxes
     )
   }
 }

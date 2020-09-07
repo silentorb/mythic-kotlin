@@ -1,9 +1,6 @@
-package silentorb.mythic.bloom.next
+package silentorb.mythic.bloom
 
 import silentorb.mythic.spatial.Vector2i
-import silentorb.mythic.bloom.ReversePlanePositioner
-import silentorb.mythic.bloom.horizontalPlaneMap
-import silentorb.mythic.bloom.verticalPlaneMap
 
 val reversePass: ReverseLayout = { _, bounds, _ -> bounds }
 
