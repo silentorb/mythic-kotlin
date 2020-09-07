@@ -1,5 +1,6 @@
 package silentorb.mythic.bloom
 
+import silentorb.mythic.bloom.next.isInBounds
 import silentorb.mythic.spatial.Vector2i
 
 enum class ButtonState {
@@ -39,37 +40,15 @@ fun isClick() = isClick(0)
 fun isClickInside(bounds: Bounds, inputState: HistoricalInputState) =
     isClick()(inputState) && isInBounds(inputState.current.mousePosition, bounds)
 
-fun onClick(logicModule: LogicModuleOld): LogicModuleOld = { bundle ->
-  val visibleBounds = bundle.visibleBounds
-  if (visibleBounds != null && isClickInside(visibleBounds, bundle.state.input))
-    logicModule(bundle)
-  else
-    null
-}
-
 fun onClickPersisted(key: String, logicModule: LogicModuleOld): LogicModuleOld = { bundle ->
   val visibleBounds = bundle.visibleBounds
   if (visibleBounds != null && isClickInside(visibleBounds, bundle.state.input))
     logicModule(bundle)
   else {
-    val flowerState = bundle.state.bag[key]
+    val flowerState = bundle.state.resourceBag[key]
     if (flowerState != null)
       mapOf(key to flowerState)
     else
       null
   }
-}
-
-fun onClick(key: String): LogicModuleOld = onClick { bundle ->
-  if (bundle.visibleBounds != null)
-    mapOf(key to bundle)
-  else
-    null
-}
-
-fun onClick(key: String, value: Any): LogicModuleOld = onClick { bundle ->
-  if (bundle.visibleBounds != null)
-    mapOf(key to value)
-  else
-    null
 }

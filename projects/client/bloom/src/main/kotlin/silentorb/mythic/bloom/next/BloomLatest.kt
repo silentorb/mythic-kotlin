@@ -3,7 +3,6 @@ package silentorb.mythic.bloom.next
 import silentorb.mythic.bloom.*
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.minus
-import silentorb.mythic.spatial.plus
 
 private val emptyBoxList: List<Box> = listOf()
 
@@ -19,7 +18,8 @@ data class Box(
     val clipBounds: Boolean = false,
     val logic: LogicModuleOld? = null,
     val onClick: List<AnyEvent> = listOf(),
-    val data: Map<String, Any> = mapOf()
+    val attributes: Map<String, Any?> = mapOf(),
+    val outBag: Map<String, Any> = mapOf()
 )
 
 data class Seed(
@@ -42,6 +42,15 @@ val emptyBox = Box(
     )
 )
 
+fun withAttributes(attributes: Map<String, Any?>): FlowerWrapper = { flower ->
+  { seed ->
+    val box = flower(seed)
+    box.copy(
+        attributes = box.attributes + attributes
+    )
+  }
+}
+
 val emptyFlower: Flower = { emptyBox }
 
 fun div(name: String = "",
@@ -49,6 +58,7 @@ fun div(name: String = "",
         reverse: ReverseLayout = reversePass,
         depiction: Depiction? = null,
         logic: LogicModuleOld? = null,
+        attributes: Map<String, Any?> = mapOf(),
         data: Map<String, Any> = mapOf()
 ): FlowerWrapper = { flower ->
   { seed ->
@@ -68,7 +78,8 @@ fun div(name: String = "",
         boxes = listOf(childBox),
         depiction = depiction,
         logic = logic,
-        data = data
+        attributes = attributes,
+        outBag = data
     )
   }
 }
@@ -76,7 +87,7 @@ fun div(name: String = "",
 fun flattenBoxData(boxes: List<Box>): Map<String, Any> =
     boxes
         .fold(mapOf()) { a, b ->
-          a + flattenBoxData(b.boxes) + b.data
+          a + flattenBoxData(b.boxes) + b.outBag
         }
 
 fun div(name: String = "",
@@ -118,18 +129,6 @@ fun dependentBoundsTransform(transform: (Vector2i, Bounds, Bounds) -> Vector2i):
 }
 
 fun fixed(value: Int): PlanePositioner = { plane -> { value } }
-
-infix fun Flower.plusLogic(logic: LogicModuleOld): Flower = { seed ->
-  val box = this(seed)
-  val newLogic = if (box.logic == null)
-    logic
-  else
-    box.logic combineLogic logic
-
-  box.copy(
-      logic = newLogic
-  )
-}
 
 fun ForwardLayout.plus2(other: ForwardLayout): ForwardLayout = { container ->
   val a = this(container)

@@ -4,12 +4,12 @@ import silentorb.mythic.bloom.next.*
 import silentorb.mythic.spatial.Vector2i
 
 data class BloomState(
-    val bag: StateBag,
+    val resourceBag: StateBag,
     val input: InputState
 )
 
 data class HistoricalBloomState(
-    val bag: StateBag,
+    val resourceBag: StateBag,
     val input: HistoricalInputState
 )
 
@@ -64,7 +64,7 @@ fun updateBloomState(logic: LogicModule, box: Box, previousState: BloomState,
   )
   val historicalState = HistoricalBloomState(
       input = inputState,
-      bag = previousState.bag
+      resourceBag = previousState.resourceBag
   )
 
   val newBag = updateStateBag(box, historicalState)
@@ -73,63 +73,13 @@ fun updateBloomState(logic: LogicModule, box: Box, previousState: BloomState,
   val args = LogicArgs(
       inputState = inputState,
       events = events,
-      bag = previousState.bag
+      bag = previousState.resourceBag
   )
 
   val secondBag = logic(args)
 
   return Pair(BloomState(
       input = currentInput,
-      bag = newBag.plus(secondBag)
+      resourceBag = newBag.plus(secondBag)
   ), events)
-}
-
-fun persist(key: String): LogicModuleOld = { bundle ->
-  val flowerState = bundle.state.bag[key]
-  if (flowerState != null)
-    mapOf(key to flowerState)
-  else
-    null
-}
-
-fun persist(key: String, logicModule: LogicModuleOld): LogicModuleOld = { bundle ->
-  val visibleBounds = bundle.visibleBounds
-  if (visibleBounds != null)
-    logicModule(bundle)
-  else {
-    val flowerState = bundle.state.bag[key]
-    if (flowerState != null)
-      mapOf(key to flowerState)
-    else
-      null
-  }
-}
-
-fun isInBounds(position: Vector2i, bounds: Bounds): Boolean =
-    position.x >= bounds.position.x &&
-        position.x < bounds.position.x + bounds.dimensions.x &&
-        position.y >= bounds.position.y &&
-        position.y < bounds.position.y + bounds.dimensions.y
-
-fun logic(logicModule: LogicModuleOld): Flower = { seed ->
-  Box(
-      bounds = Bounds(dimensions = seed.dimensions),
-      logic = logicModule
-  )
-}
-
-infix fun LogicModuleOld.combineLogic(b: LogicModuleOld): LogicModuleOld = { bundle ->
-  val first = this(bundle)
-  val second = b(bundle)
-  if (first != null) {
-    if (second != null) {
-      first.plus(second)
-    } else {
-      first
-    }
-  } else if (second != null) {
-    second
-  } else {
-    null
-  }
 }

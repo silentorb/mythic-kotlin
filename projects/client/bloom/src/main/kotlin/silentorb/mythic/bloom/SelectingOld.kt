@@ -35,7 +35,7 @@ val optionalSingleSelection: SelectionLogic = { selection, item ->
 fun <T> selectable(key: String, selectionLogic: SelectionLogic, idSelector: GenericIdSelector<T>): (T) -> LogicModuleOld =
     { seed ->
       { (bloomState) ->
-        val state = selectionStateOld(bloomState.bag[key])
+        val state = selectionStateOld(bloomState.resourceBag[key])
         val id = idSelector(seed)
         val selection = selectionLogic(state, id)
         if (selection.none())
@@ -51,7 +51,7 @@ fun <T> selectable(key: String, selectionLogic: SelectionLogic, idSelector: Gene
     }
 
 private fun childSelected2(key: String): LogicModuleTransform = logicWrapper { bundle, result ->
-  if (bundle.state.bag[key] != null)
+  if (bundle.state.resourceBag[key] != null)
     null
   else
     result

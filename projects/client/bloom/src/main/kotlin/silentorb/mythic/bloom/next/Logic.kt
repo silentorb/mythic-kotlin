@@ -19,24 +19,11 @@ inline fun <reified T> getBagEntry(bag: StateBag, key: String, initialValue: () 
     initialValue()
 }
 
-fun Flower.plusOnClick(vararg events: AnyEvent): Flower = { seed ->
-  val box = this(seed)
-  box.copy(
-      onClick = box.onClick.plus(events)
-  )
-}
-
 fun getClicked(inputState: HistoricalInputState, boxes: List<Box>) =
     boxes.filter { box ->
       val visibleBounds = visibleBounds(box)
       visibleBounds != null && isClickInside(visibleBounds, inputState)
     }
-
-fun getClickedLazy(inputState: HistoricalInputState, boxes: Sequence<Box>): List<Box> =
-    if (isClick()(inputState))
-      getClicked(inputState, boxes.toList())
-    else
-      listOf()
 
 fun flattenAllBoxes(box: Box): List<Box> =
     listOf(box).plus(box.boxes.flatMap(::flattenAllBoxes))
@@ -60,22 +47,34 @@ fun gatherEventBoxes(box: Box): List<Box> {
     children
 }
 
+fun isInBounds(position: Vector2i, bounds: Bounds): Boolean =
+    position.x >= bounds.position.x &&
+        position.x < bounds.position.x + bounds.dimensions.x &&
+        position.y >= bounds.position.y &&
+        position.y < bounds.position.y + bounds.dimensions.y
+
+fun isInBounds(position: Vector2i, box: Box): Boolean {
+  val visibleBounds = visibleBounds(box)
+  return visibleBounds != null && isInBounds(position, visibleBounds)
+}
+
+fun hasAttributes(box: Box): Boolean =
+    box.attributes.any()
+
+fun getHoverBoxes(mousePosition: Vector2i, boxes: List<Box>): List<Box> =
+    boxes.filter { box ->
+      box.attributes.any() && isInBounds(mousePosition, box)
+    }
+
 fun gatherBoxEvents(inputState: HistoricalInputState, box: Box): List<AnyEvent> {
   val boxes = gatherEventBoxes(box)
   val activatedBoxes = getClicked(inputState, boxes)
   return activatedBoxes.flatMap { it.onClick }
 }
 
-fun <T> logicModule(initialState: Any, key: String, transform: (LogicArgs) -> (T) -> T): LogicModule =
-    { args ->
-      val state = args.bag[key] ?: initialState
-      val result = transform(args)(state as T) as Any
-      mapOf(key to result)
-    }
-
 fun newBloomState() =
     BloomState(
-        bag = mapOf(),
+        resourceBag = mapOf(),
         input = InputState(
             mousePosition = Vector2i(),
             mouseButtons = listOf(ButtonState.up),

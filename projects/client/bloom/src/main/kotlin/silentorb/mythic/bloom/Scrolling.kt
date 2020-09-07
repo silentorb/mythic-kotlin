@@ -3,7 +3,6 @@ package silentorb.mythic.bloom
 import silentorb.mythic.bloom.next.*
 import silentorb.mythic.spatial.*
 import silentorb.mythic.spatial.Vector2i
-import silentorb.mythic.spatial.plus
 
 private const val scrollbarWidth = 15
 
@@ -63,7 +62,7 @@ fun scrollingInteraction(key: String, contentBounds: Bounds): LogicModuleOld = {
   if (contentBounds.dimensions.y <= bounds.dimensions.y) {
     null
   } else {
-    val state = scrollingState(bloomState.bag[key])
+    val state = scrollingState(bloomState.resourceBag[key])
     val input = bloomState.input
     val currentButton = input.current.mouseButtons[0]
     val previousButton = input.previous.mouseButtons[0]
