@@ -33,24 +33,6 @@ fun <Key, Value> mappedCache(source: (Key) -> Value): (Key) -> Value {
 }
 
 // Only stores one value at a time.  Using a different input value overwrites the previously stored output value.
-// Is not thread safe
-fun <Input, Output> singleValueCache(source: (Input) -> Output): (Input) -> Output {
-  var lastInput: Int? = null
-  var lastOutput: Output? = null
-  return { input ->
-    val hashCode = input.hashCode()
-    if (hashCode == lastInput)
-      lastOutput!!
-    else {
-      lastInput = hashCode
-      val newOutput = source(input)
-      lastOutput = newOutput
-      newOutput
-    }
-  }
-}
-
-// Only stores one value at a time.  Using a different input value overwrites the previously stored output value.
 // Is not thread safe!
 fun <Artifact, Output> singleValueCache(): (Artifact, () -> Output) -> Output {
   var lastInput: Int? = null
@@ -65,5 +47,14 @@ fun <Artifact, Output> singleValueCache(): (Artifact, () -> Output) -> Output {
       lastOutput = newOutput
       newOutput
     }
+  }
+}
+
+// Only stores one value at a time.  Using a different input value overwrites the previously stored output value.
+// Is not thread safe
+fun <Input, Output> singleValueCache(source: (Input) -> Output): (Input) -> Output {
+  val cache = singleValueCache<Input, Output>()
+  return { input ->
+    cache(input) { source(input) }
   }
 }
