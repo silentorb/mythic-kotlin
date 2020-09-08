@@ -40,6 +40,18 @@ fun forwardDimensions(
   )
 }
 
+fun forwardDimensions(dimensions: Vector2i): ForwardLayout = { container ->
+  Bounds(
+      dimensions = dimensions
+  )
+}
+
+fun forwardDimensions(width: Int, height: Int): ForwardLayout = { container ->
+  Bounds(
+      dimensions = Vector2i(width, height)
+  )
+}
+
 val stretchBoth: ForwardLayout = { container ->
   Bounds(dimensions = container)
 }

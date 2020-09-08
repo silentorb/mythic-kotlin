@@ -16,6 +16,8 @@ data class Box(
     val attributes: Map<String, Any?> = mapOf()
 )
 
+typealias Boxes = Collection<Box>
+
 data class Seed(
     val bag: StateBag = mapOf(),
     val dimensions: Vector2i,

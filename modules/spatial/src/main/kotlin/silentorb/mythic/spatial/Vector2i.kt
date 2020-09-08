@@ -446,4 +446,5 @@ class Vector2i {
   operator fun minus(other: Int): Vector2i = Vector2i(x + other, y + other)
 
   operator fun times(other: Int): Vector2i = Vector2i(x * other, y * other)
+  operator fun plus(other: Int): Vector2i = Vector2i(x + other, y + other)
 }

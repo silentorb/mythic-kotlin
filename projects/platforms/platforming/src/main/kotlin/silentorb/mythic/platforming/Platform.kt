@@ -27,11 +27,15 @@ interface PlatformInput {
   fun getEvents(): List<InputEvent>
 }
 
+enum class WindowMode {
+  fullscreen,
+  windowed,
+  windowedFullscreen
+}
+
 data class PlatformDisplayConfig(
-    val width: Int,
-    val height: Int,
-    val fullscreen: Boolean,
-    val windowedFullscreen: Boolean, // Whether fullscreen uses windowed fullscreen
+    val dimensions: Vector2i,
+    val windowMode: WindowMode = WindowMode.windowed,
     val vsync: Boolean,
     val multisamples: Int
 )

@@ -60,6 +60,12 @@ fun list(plane: Plane, spacing: Int = 0, drawReversed: Boolean = false, name: St
   }
 }
 
+fun horizontalList(spacing: Int = 0, drawReversed: Boolean = false, name: String = "list"): (List<Flower>) -> Flower =
+    list(horizontalPlane, spacing, drawReversed, name)
+
+fun verticalList(spacing: Int = 0, drawReversed: Boolean = false, name: String = "list"): (List<Flower>) -> Flower =
+    list(verticalPlane, spacing, drawReversed, name)
+
 enum class FlexType {
   stretch,
   fixed,

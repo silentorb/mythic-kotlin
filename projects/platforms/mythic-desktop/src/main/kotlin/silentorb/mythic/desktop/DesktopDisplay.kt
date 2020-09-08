@@ -19,7 +19,7 @@ fun createWindow(title: String, config: PlatformDisplayConfig): Long {
   glfwWindowHint(GLFW_SAMPLES, config.multisamples)
 //  val pid = ProcessHandle.current().getPid()
 
-  val window = glfwCreateWindow(config.width, config.height, title, MemoryUtil.NULL, MemoryUtil.NULL)
+  val window = glfwCreateWindow(config.dimensions.x, config.dimensions.y, title, MemoryUtil.NULL, MemoryUtil.NULL)
   if (window == MemoryUtil.NULL)
     throw RuntimeException("Failed to create the GLFW window")
 
@@ -55,7 +55,7 @@ fun centerWindow(window: Long) {
   }
 }
 
-fun initializeFullscreen(window: Long) {
+fun initializeWindowedFullscreen(window: Long) {
   val monitor = glfwGetPrimaryMonitor()
   val videoMode = glfwGetVideoMode(monitor)
   glfwSetWindowMonitor(window, monitor, 0, 0, videoMode.width(), videoMode.height(), videoMode.refreshRate())
@@ -63,12 +63,16 @@ fun initializeFullscreen(window: Long) {
   glfwFocusWindow(window) // For some reason the window loses focus when switching to fullscreen mode?
 }
 
+fun initializeWindowed(window: Long, dimensions: Vector2i) {
+  glfwSetWindowSize(window, dimensions.x, dimensions.y)
+  centerWindow(window)
+}
+
 fun initializeWindow(window: Long, config: PlatformDisplayConfig) {
-  if (config.fullscreen) {
-    initializeFullscreen(window)
-  } else {
-    glfwSetWindowSize(window, config.width, config.height)
-    centerWindow(window)
+  when (config.windowMode) {
+    WindowMode.fullscreen -> initializeWindowedFullscreen(window) // Currently only supporting windowed fullscreen
+    WindowMode.windowedFullscreen -> initializeWindowedFullscreen(window)
+    else -> initializeWindowed(window, config.dimensions)
   }
 
   glfwMakeContextCurrent(window)

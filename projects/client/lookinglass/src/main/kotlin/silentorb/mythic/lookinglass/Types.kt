@@ -10,6 +10,7 @@ import silentorb.mythic.lookinglass.meshes.createVertexSchemas
 import silentorb.mythic.lookinglass.shading.*
 import silentorb.mythic.lookinglass.texturing.DynamicTextureLibrary
 import silentorb.mythic.platforming.PlatformDisplayConfig
+import silentorb.mythic.platforming.WindowMode
 import silentorb.mythic.scenery.ArmatureName
 import silentorb.mythic.scenery.MeshName
 import silentorb.mythic.spatial.Matrix
@@ -27,7 +28,7 @@ enum class TextureAntialiasing {
 data class DisplayConfig(
     val dimensions: Vector2i = Vector2i(800, 600),
     val fullscreen: Boolean = false,
-    val windowedFullscreen: Boolean = false, // Whether fullscreen uses windowed fullscreen
+    val windowMode: WindowMode = WindowMode.windowed,
     val vsync: Boolean = true,
     val multisamples: Int = 0,
     val depthOfField: Boolean = false,
@@ -36,10 +37,8 @@ data class DisplayConfig(
 
 fun toPlatformDisplayConfig(display: DisplayConfig) =
     PlatformDisplayConfig(
-        width = display.dimensions.x,
-        height = display.dimensions.y,
-        fullscreen = display.fullscreen,
-        windowedFullscreen = display.windowedFullscreen,
+        dimensions = display.dimensions,
+        windowMode = display.windowMode,
         vsync = display.vsync,
         multisamples = display.multisamples
     )

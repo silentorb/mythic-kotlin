@@ -1,5 +1,6 @@
 package silentorb.mythic.bloom
 
+import silentorb.mythic.ent.firstNotNull
 import silentorb.mythic.spatial.Vector2i
 
 typealias LogicModule = (LogicArgs) -> StateBag
@@ -75,6 +76,17 @@ fun isInBounds(position: Vector2i, box: Box): Boolean {
 
 fun hasAttributes(box: Box): Boolean =
     box.attributes.any()
+
+inline fun <reified T> getAttributeValue(box: Box, key: String): T? {
+  val value = box.attributes[key]
+  return if (value != null)
+    value as? T
+  else
+    null
+}
+
+inline fun <reified T> getAttributeValue(boxes: Boxes, key: String): T? =
+    boxes.firstNotNull { getAttributeValue(it, key) }
 
 fun getHoverBoxes(mousePosition: Vector2i, boxes: List<Box>): List<Box> =
     boxes.filter { box ->
