@@ -27,6 +27,7 @@ data class Seed(
 typealias Flower = (Seed) -> Box
 
 typealias FlowerWrapper = (Flower) -> Flower
+typealias IndexedFlowerWrapper = (Int, Flower) -> Flower
 
 typealias ForwardLayout = (Vector2i) -> Bounds
 
@@ -129,7 +130,7 @@ val shrinkWrap: ReversePlanePositioner = { plane ->
   }
 }
 
-fun margin(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): FlowerWrapper = div(
+fun forwardMargin(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): FlowerWrapper = div(
     layout = { seed, flower ->
       val sizeOffset = Vector2i(left + right, top + bottom)
       val childSeed = seed.copy(
@@ -148,6 +149,19 @@ fun margin(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, rig
     },
     name = "margin"
 )
+
+fun reverseMargin(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): FlowerWrapper = { flower ->
+  { seed ->
+    val sizeOffset = Vector2i(left + right, top + bottom)
+    val box = flower(seed)
+    box.copy(
+        bounds = box.bounds.copy(
+            dimensions = box.bounds.dimensions + sizeOffset,
+            position = box.bounds.position + Vector2i(left, top)
+        )
+    )
+  }
+}
 
 fun padding2(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): FlowerWrapper = div(
     forward = fixedOffset(left, top),
