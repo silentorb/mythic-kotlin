@@ -139,7 +139,7 @@ fun renderBox(canvas: Canvas, box: Box, debug: Boolean = false) {
     }
   }
 
-  if (box.clipBounds) {
+  if (getAttributeBoolean(box, clipBoundsKey)) {
     val viewport = canvas.flipViewport(box.bounds.toVector4i())
     cropStack(viewport) {
       renderChildren()

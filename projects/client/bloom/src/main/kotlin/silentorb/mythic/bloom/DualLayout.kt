@@ -4,14 +4,12 @@ import silentorb.mythic.spatial.Vector2i
 
 typealias DualLayout = (Seed, Flower) -> Pair<Box, Bounds>
 
-fun layoutDimensions(width: PlanePositioner? = null, height: PlanePositioner? = null): DualLayout = { seed, flower ->
+fun layoutDimensions(width: PlanePositioner? = null, height: PlanePositioner? = null): DualLayout = { dimensions, flower ->
   val childDimensions = Vector2i(
-      if (width != null) width(horizontalPlaneMap)(seed.dimensions) else seed.dimensions.x,
-      if (height != null) height(verticalPlaneMap)(seed.dimensions) else seed.dimensions.y
+      if (width != null) width(horizontalPlaneMap)(dimensions) else dimensions.x,
+      if (height != null) height(verticalPlaneMap)(dimensions) else dimensions.y
   )
-  val childSeed = seed.copy(
-      dimensions = childDimensions
-  )
+  val childSeed = childDimensions
   val childBox = flower(childSeed)
   val finalBounds = Bounds(
       dimensions = Vector2i(

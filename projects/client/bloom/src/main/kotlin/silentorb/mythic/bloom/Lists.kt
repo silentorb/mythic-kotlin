@@ -30,8 +30,8 @@ fun getListBreadth(plane: Plane, boxes: Boxes): Int =
     boxes.maxOfOrNull { plane(it.bounds.dimensions).y } ?: 0
 
 fun list(plane: Plane, spacing: Int = 0, name: String = "list"): FlowerContainer = { children ->
-  { seed ->
-    val initialBoxes = children.map { it(seed) }
+  { dimensions ->
+    val initialBoxes = children.map { it(dimensions) }
     val boxes = arrangeListItems(plane, spacing, initialBoxes)
     val length = getListLength(plane, boxes)
     val breadth = getListBreadth(plane, boxes)
@@ -67,18 +67,18 @@ val flexStretch: (Flower) -> FlexItem = { flower ->
 }
 
 fun flexList(plane: Plane, spacing: Int = 0, name: String = "flexList"): (List<FlexItem>) -> Flower = { items ->
-  { seed ->
+  { dimensions ->
 //    val totalSpacing = (items.size - 1) * spacing
     val firstPass = items.map { item ->
       if (item.type == FlexType.fixed) {
-        item.flower(seed)
+        item.flower(dimensions)
       } else
         null
     }
     val lengths = firstPass.map { if (it != null) plane(it.bounds.end).x else null }
     val otherLength = firstPass.filterNotNull().map { plane(it.bounds.end).y }.maxOrNull()
     assert(otherLength != null)
-    val resolvedDimensions = plane(Vector2i(0, otherLength!!)) + plane(Vector2i(plane(seed.dimensions).x, 0))
+    val resolvedDimensions = plane(Vector2i(0, otherLength!!)) + plane(Vector2i(plane(dimensions).x, 0))
     val boundsList = fixedLengthArranger(plane, spacing, lengths)(resolvedDimensions)
     val boxes = firstPass.zip(boundsList.zip(items)) { box, (bounds, item) ->
       if (box != null) {
@@ -86,7 +86,7 @@ fun flexList(plane: Plane, spacing: Int = 0, name: String = "flexList"): (List<F
             bounds = bounds
         )
       } else {
-        val newBox = item.flower(seed.copy(dimensions = bounds.dimensions))
+        val newBox = item.flower(bounds.dimensions)
         newBox.copy(
             bounds = bounds
         )
@@ -98,24 +98,6 @@ fun flexList(plane: Plane, spacing: Int = 0, name: String = "flexList"): (List<F
             dimensions = resolvedDimensions
         ),
         boxes = boxes
-    )
-  }
-}
-
-fun fixedList(plane: Plane, spacing: Int, lengths: List<Int?>): FlowerContainer = { flowers ->
-  { seed ->
-    val boundsList = fixedLengthArranger(plane, spacing, lengths)(seed.dimensions)
-    Box(
-        name = "fixedList",
-        bounds = Bounds(dimensions = seed.dimensions),
-        boxes = flowers.zip(boundsList) { flower, bounds ->
-          val box = flower(seed.copy(dimensions = bounds.dimensions))
-          box.copy(
-              bounds = box.bounds.copy(
-                  position = bounds.position + box.bounds.position
-              )
-          )
-        }
     )
   }
 }

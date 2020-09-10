@@ -21,17 +21,17 @@ fun scrollbar(offset: Int, contentLength: Int): Depiction = { b, c ->
   }
 }
 
-//fun clipBox(clipBounds: Bounds): (FlatBox) -> FlatBox = { box ->
-//  val depiction = if (box.depiction != null)
-//    clipBox(clipBounds, box.depiction)
-//  else
-//    null
-//
-//  box.copy(
-//      depiction = depiction,
-//      clipBounds = clipBounds
-//  )
-//}
+fun clipBox(clipBounds: Bounds): (FlatBox) -> FlatBox = { box ->
+  val depiction = if (box.depiction != null)
+    clipBox(clipBounds, box.depiction)
+  else
+    null
+
+  box.copy(
+      depiction = depiction,
+      clipBounds = clipBounds
+  )
+}
 
 data class ScrollingState(
     val dragOrigin: Vector2i?,
@@ -47,9 +47,9 @@ val scrollingState = existingOrNewState {
   )
 }
 
-//fun extractOffset(key: String, input: (Vector2i) -> Flower): Flower = { seed ->
-//  val state = scrollingState(seed.bag[key])
-//  input(Vector2i(0, -state.withOffset))(seed)
+//fun extractOffset(key: String, input: (Vector2i) -> Flower): Flower = { dimensions ->
+//  val state = scrollingState(dimensions.bag[key])
+//  input(Vector2i(0, -state.withOffset))(dimensions)
 //}
 
 fun extractOffset(key: String, bag: StateBag): Vector2i {
@@ -92,13 +92,12 @@ fun scrollingInteraction(key: String, contentBounds: Bounds): LogicModuleOld = {
   }
 }
 
-fun scrollBox(key: String, contentBounds: Bounds): Flower = { seed ->
-  val bounds = Bounds(dimensions = seed.dimensions)
+fun scrollBox(key: String, contentBounds: Bounds): Flower = { dimensions ->
+  val bounds = Bounds(dimensions = dimensions)
   Box(
       name = "scroll box",
       bounds = bounds,
-      depiction = scrollbar(scrollingState(seed.bag[key]).offset, contentBounds.dimensions.y)
-//      logic = scrollingInteraction(key, contentBounds)
+//      depiction = scrollbar(scrollingState(dimensions.bag[key]).offset, contentBounds.dimensions.y)
   )
 }
 
@@ -130,39 +129,38 @@ private fun reverseFixedOffset(left: Int = 0, top: Int = 0): FlowerWrapper = div
 )
 
 fun scrolling(key: String): (Flower) -> Flower = { child ->
-  { seed ->
+  { dimensions ->
     val clippedDimensions = Vector2i(
-        seed.dimensions.x - scrollbarWidth - 5,
-        seed.dimensions.y
+        dimensions.x - scrollbarWidth - 5,
+        dimensions.y
     )
-    val innerSeed = seed.copy(
-        dimensions = clippedDimensions
-    )
-    val offset = extractOffset(key, seed.bag)
-    val box = reverseFixedOffset(top = offset.y)(child)(innerSeed)
-    if (box.boxes.any()) {
-      val contentBounds = accumulatedBounds(box.boxes)
-      if (contentBounds.dimensions.y <= clippedDimensions.y) {
-        box
-      } else {
-        val result = scrollBox(key, contentBounds)(seed)
-        result.copy(
-            boxes = listOf(
-                Box(
-                    name = "clipped box",
-                    bounds = result.bounds.copy(
-                        dimensions = clippedDimensions
-                    ),
-                    boxes = pruneClippedBoxes(clippedDimensions, Vector2i(), listOf(box)),
-                    clipBounds = true
-                )
-            )
-//              result.boxes.plus(box)
-        )
-      }
-
-    } else {
-      emptyBox
-    }
+    val innerSeed = clippedDimensions
+    throw Error("No longer supported.  Needs updating to not use Seed.bag")
+//    val offset = extractOffset(key, dimensions.bag)
+//    val box = reverseFixedOffset(top = offset.y)(child)(innerSeed)
+//    if (box.boxes.any()) {
+//      val contentBounds = accumulatedBounds(box.boxes)
+//      if (contentBounds.dimensions.y <= clippedDimensions.y) {
+//        box
+//      } else {
+//        val result = scrollBox(key, contentBounds)(dimensions)
+//        result.copy(
+//            boxes = listOf(
+//                Box(
+//                    name = "clipped box",
+//                    bounds = result.bounds.copy(
+//                        dimensions = clippedDimensions
+//                    ),
+//                    boxes = pruneClippedBoxes(clippedDimensions, Vector2i(), listOf(box)),
+//                    clipBounds = true
+//                )
+//            )
+////              result.boxes.plus(box)
+//        )
+//      }
+//
+//    } else {
+//      emptyBox
+//    }
   }
 }

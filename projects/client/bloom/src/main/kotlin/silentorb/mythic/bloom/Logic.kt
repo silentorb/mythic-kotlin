@@ -88,6 +88,9 @@ inline fun <reified T> getAttributeValue(box: Box, key: String): T? {
 inline fun <reified T> getAttributeValue(boxes: Boxes, key: String): T? =
     boxes.firstNotNull { getAttributeValue(it, key) }
 
+fun getAttributeBoolean(box: Box, key: String): Boolean =
+    getAttributeValue<Boolean>(box, key) ?: false
+
 fun getHoverBoxes(mousePosition: Vector2i, boxes: List<Box>): List<Box> =
     boxes.filter { box ->
       box.attributes.any() && isInBounds(mousePosition, box)

@@ -1,37 +1,8 @@
 package silentorb.mythic.bloom
 
 import silentorb.mythic.spatial.Vector2i
-import silentorb.mythic.spatial.minus
-
-private val emptyBoxList: List<Box> = listOf()
 
 typealias AnyEvent = Any
-
-data class Box(
-    val name: String = "",
-    val bounds: Bounds,
-    val boxes: List<Box> = emptyBoxList,
-    val depiction: Depiction? = null,
-    val clipBounds: Boolean = false,
-    val attributes: Map<String, Any?> = mapOf()
-)
-
-typealias Boxes = Collection<Box>
-
-data class Seed(
-    val bag: StateBag = mapOf(),
-    val dimensions: Vector2i,
-    val clipBounds: Bounds? = null
-)
-
-typealias Flower = (Seed) -> Box
-
-typealias FlowerWrapper = (Flower) -> Flower
-typealias IndexedFlowerWrapper = (Int, Flower) -> Flower
-
-typealias ForwardLayout = (Vector2i) -> Bounds
-
-typealias ReverseLayout = (Vector2i, Bounds, Bounds) -> Bounds
 
 val emptyBox = Box(
     bounds = Bounds(
@@ -40,8 +11,8 @@ val emptyBox = Box(
 )
 
 fun withAttributes(attributes: Map<String, Any?>): FlowerWrapper = { flower ->
-  { seed ->
-    val box = flower(seed)
+  { dimensions ->
+    val box = flower(dimensions)
     box.copy(
         attributes = box.attributes + attributes
     )
@@ -56,16 +27,13 @@ fun div(name: String = "",
         depiction: Depiction? = null,
         attributes: Map<String, Any?> = mapOf()
 ): FlowerWrapper = { flower ->
-  { seed ->
+  { dimensions ->
     if (name == "dialog") {
       val k = 0
     }
-    val bounds = forward(seed.dimensions)
-    val childSeed = seed.copy(
-        dimensions = bounds.dimensions
-    )
-    val childBox = flower(childSeed)
-    val finalBounds = reverse(seed.dimensions, bounds, childBox.bounds)
+    val bounds = forward(dimensions)
+    val childBox = flower(bounds.dimensions)
+    val finalBounds = reverse(dimensions, bounds, childBox.bounds)
 
     Box(
         name = name,
@@ -80,8 +48,8 @@ fun div(name: String = "",
 fun div(name: String = "",
         layout: DualLayout,
         depiction: Depiction? = null): FlowerWrapper = { flower ->
-  { seed ->
-    val (childBox, bounds) = layout(seed, flower)
+  { dimensions ->
+    val (childBox, bounds) = layout(dimensions, flower)
     Box(
         name = name,
         bounds = bounds,
@@ -91,17 +59,17 @@ fun div(name: String = "",
   }
 }
 
-fun compose(flowers: List<Flower>): Flower = { seed ->
+fun compose(flowers: List<Flower>): Flower = { dimensions ->
   Box(
-      bounds = Bounds(dimensions = seed.dimensions),
-      boxes = flowers.map { it(seed) }
+      bounds = Bounds(dimensions = dimensions),
+      boxes = flowers.map { it(dimensions) }
   )
 }
 
-fun compose(vararg flowers: Flower): Flower = { seed ->
+fun compose(vararg flowers: Flower): Flower = { dimensions ->
   Box(
-      bounds = Bounds(dimensions = seed.dimensions),
-      boxes = flowers.map { it(seed) }
+      bounds = Bounds(dimensions = dimensions),
+      boxes = flowers.map { it(dimensions) }
   )
 }
 
@@ -131,11 +99,9 @@ val shrinkWrap: ReversePlanePositioner = { plane ->
 }
 
 fun forwardMargin(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): FlowerWrapper = div(
-    layout = { seed, flower ->
+    layout = { dimensions, flower ->
       val sizeOffset = Vector2i(left + right, top + bottom)
-      val childSeed = seed.copy(
-          dimensions = seed.dimensions - sizeOffset
-      )
+      val childSeed = dimensions - sizeOffset
       val childBox = flower(childSeed)
       val finalBounds = Bounds(
           dimensions = childBox.bounds.dimensions + sizeOffset
@@ -151,9 +117,9 @@ fun forwardMargin(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = a
 )
 
 fun reverseMargin(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): FlowerWrapper = { flower ->
-  { seed ->
+  { dimensions ->
     val sizeOffset = Vector2i(left + right, top + bottom)
-    val box = flower(seed)
+    val box = flower(dimensions)
     box.copy(
         bounds = box.bounds.copy(
             dimensions = box.bounds.dimensions + sizeOffset,
@@ -173,14 +139,12 @@ fun padding2(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, r
 )
 
 fun padding(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): FlowerWrapper = { flower ->
-  { seed ->
+  { dimensions ->
     val paddingWidth = left + right
     val paddingHeight = top + bottom
     val paddingDimensions = Vector2i(paddingWidth, paddingHeight)
-    val childDimensions = seed.dimensions - paddingDimensions
-    val childSeed = seed.copy(
-        dimensions = childDimensions
-    )
+    val childDimensions = dimensions - paddingDimensions
+    val childSeed = childDimensions
     val box = flower(childSeed)
     val offsetBox = box.copy(
         bounds = box.bounds.copy(
@@ -203,8 +167,8 @@ fun accumulatedBounds(boxes: List<Box>): Bounds {
 }
 
 fun depictBehind2(depiction: Depiction): (Flower) -> Flower = { flower ->
-  { seed ->
-    val box = flower(seed)
+  { dimensions ->
+    val box = flower(dimensions)
     val boxDepiction = box.depiction
     box.copy(
         depiction = { b, c ->
@@ -220,8 +184,8 @@ infix fun Flower.depictBehind(depiction: Depiction): Flower =
     depictBehind2(depiction)(this)
 
 fun breakReverse(child: Flower): Flower {
-  return { seed ->
-    val box = child(seed)
+  return { dimensions ->
+    val box = child(dimensions)
     Box(
         name = "breakReverse",
         bounds = Bounds(dimensions = Vector2i()),

@@ -8,19 +8,19 @@ fun maxBounds(a: Bounds, b: Bounds): Bounds {
   return Bounds(x1, y1, x2 - x1, y2 - y1)
 }
 
-fun depict(depiction: StateDepiction): Flower = { seed ->
+fun depict(depiction: StateDepiction): Flower = { dimensions ->
   Box(
       name = "depiction",
-      bounds = Bounds(dimensions = seed.dimensions),
-      depiction = depiction(seed)
+      bounds = Bounds(dimensions = dimensions),
+      depiction = depiction(dimensions)
   )
 }
 
-fun depict(name: String, depiction: StateDepiction): Flower = { seed ->
+fun depict(name: String, depiction: StateDepiction): Flower = { dimensions ->
   Box(
       name = name,
-      bounds = Bounds(dimensions = seed.dimensions),
-      depiction = depiction(seed)
+      bounds = Bounds(dimensions = dimensions),
+      depiction = depiction(dimensions)
   )
 }
 
