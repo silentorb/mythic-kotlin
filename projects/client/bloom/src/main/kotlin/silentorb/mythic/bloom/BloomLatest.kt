@@ -19,6 +19,12 @@ fun withAttributes(attributes: Map<String, Any?>): FlowerWrapper = { flower ->
   }
 }
 
+fun withAttributes(attributes: Map<String, Any?>, box: Box): Box {
+  return box.copy(
+      attributes = box.attributes + attributes
+  )
+}
+
 val emptyFlower: Flower = { emptyBox }
 
 fun div(name: String = "",
@@ -116,17 +122,14 @@ fun forwardMargin(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = a
     name = "margin"
 )
 
-fun reverseMargin(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): FlowerWrapper = { flower ->
-  { dimensions ->
-    val sizeOffset = Vector2i(left + right, top + bottom)
-    val box = flower(dimensions)
-    box.copy(
-        bounds = box.bounds.copy(
-            dimensions = box.bounds.dimensions + sizeOffset,
-            position = box.bounds.position + Vector2i(left, top)
-        )
-    )
-  }
+fun reverseMargin(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): WildFlower = { box ->
+  val sizeOffset = Vector2i(left + right, top + bottom)
+  box.copy(
+      bounds = box.bounds.copy(
+          dimensions = box.bounds.dimensions + sizeOffset,
+          position = box.bounds.position + Vector2i(left, top)
+      )
+  )
 }
 
 fun padding2(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): FlowerWrapper = div(

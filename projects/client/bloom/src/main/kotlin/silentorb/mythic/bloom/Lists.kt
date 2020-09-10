@@ -5,6 +5,15 @@ import silentorb.mythic.spatial.Vector2i
 typealias FixedChildArranger = (Vector2i) -> List<Bounds>
 typealias FlowerContainer = (List<Flower>) -> Flower
 typealias FlowerContainerWrapper = (FlowerContainer) -> FlowerContainer
+typealias BoxFlowerContainer = (List<Box>) -> Flower
+typealias BoxContainer = (List<Box>) -> Box
+typealias BoxContainerWrapper = (BoxContainer) -> BoxContainer
+
+fun boxToFlower(box: Box): Flower = { box }
+
+fun flowerToBox(flower: Flower): Box = flower(Vector2i.zero)
+
+fun flowersToBoxes(flowers: List<Flower>): List<Box> = flowers.map(::flowerToBox)
 
 tailrec fun arrangeListItems(plane: Plane, spacing: Int, boxes: List<Box>, length: Int = 0, accumulator: List<Box> = listOf()): List<Box> =
     if (boxes.none())
@@ -29,27 +38,24 @@ fun getListLength(plane: Plane, boxes: Boxes): Int =
 fun getListBreadth(plane: Plane, boxes: Boxes): Int =
     boxes.maxOfOrNull { plane(it.bounds.dimensions).y } ?: 0
 
-fun list(plane: Plane, spacing: Int = 0, name: String = "list"): FlowerContainer = { children ->
-  { dimensions ->
-    val initialBoxes = children.map { it(dimensions) }
-    val boxes = arrangeListItems(plane, spacing, initialBoxes)
-    val length = getListLength(plane, boxes)
-    val breadth = getListBreadth(plane, boxes)
+fun list(plane: Plane, spacing: Int = 0, name: String = "list"): BoxContainer = { children ->
+  val boxes = arrangeListItems(plane, spacing, children)
+  val length = getListLength(plane, boxes)
+  val breadth = getListBreadth(plane, boxes)
 
-    Box(
-        name = name,
-        bounds = Bounds(
-            dimensions = plane(Vector2i(length, breadth))
-        ),
-        boxes = boxes
-    )
-  }
+  Box(
+      name = name,
+      bounds = Bounds(
+          dimensions = plane(Vector2i(length, breadth))
+      ),
+      boxes = boxes
+  )
 }
 
-fun horizontalList(spacing: Int = 0, name: String = "horizontalList"): (List<Flower>) -> Flower =
+fun horizontalList(spacing: Int = 0, name: String = "horizontalList"): (List<Box>) -> Box =
     list(horizontalPlane, spacing, name)
 
-fun verticalList(spacing: Int = 0, name: String = "verticalList"): (List<Flower>) -> Flower =
+fun verticalList(spacing: Int = 0, name: String = "verticalList"): (List<Box>) -> Box =
     list(verticalPlane, spacing, name)
 
 enum class FlexType {

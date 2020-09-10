@@ -16,10 +16,10 @@ fun textDepiction(style: IndexedTextStyle, content: String): Depiction = { b, c 
   c.drawText(position, style, content)
 }
 
-fun label(style: IndexedTextStyle, content: String): Flower = { dimensions ->
+fun label(style: IndexedTextStyle, content: String): Box {
   val config = TextConfiguration(content, Vector2(), resolveTextStyle(globalFonts(), style))
   val dimensions = calculateTextDimensions(config)
-  Box(
+  return Box(
       name = if (content.length < 32) content else content.substring(0, 32),
       bounds = Bounds(
           dimensions = dimensions.toVector2i()

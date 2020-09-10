@@ -17,11 +17,8 @@ data class Box(
 typealias Boxes = Collection<Box>
 
 typealias Seed = Vector2i
-//data class Seed(
-//    val dimensions: Vector2i
-//)
-
 typealias Flower = (Seed) -> Box
+typealias WildFlower = (Box) -> Box
 
 typealias FlowerWrapper = (Flower) -> Flower
 typealias IndexedFlowerWrapper = (Int, Flower) -> Flower
