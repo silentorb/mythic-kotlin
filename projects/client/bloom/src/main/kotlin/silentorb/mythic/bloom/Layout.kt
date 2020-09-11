@@ -2,6 +2,7 @@ package silentorb.mythic.bloom
 
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.plus
+import kotlin.math.max
 
 typealias BloomKey = String
 
@@ -57,13 +58,50 @@ typealias ReversePositioner = (Vector2i, Bounds, Bounds) -> Int
 
 typealias ReversePlanePositioner = (PlaneMap) -> ReversePositioner
 
+fun center(child: Int, parent: Int): Int =
+    max(0, (parent - child) / 2)
+
 val centered: ReversePlanePositioner = { plane ->
   { parent, _, child ->
-    (plane.x(parent) - plane.x(child.dimensions)) / 2
+    center(plane.x(child.dimensions), plane.x(parent))
   }
 }
 
-//val horizontalCentered: Length =
+fun centered(box: SimpleBox): SimpleFlower = { dimensions ->
+  val offset = Vector2i(
+      center(box.dimensions.x, dimensions.x),
+      center(box.dimensions.y, dimensions.y)
+  )
+  SimpleBox(
+      dimensions = dimensions,
+      boxes = listOf(OffsetBox(box, offset))
+  )
+}
+
+inline fun <reified T : PlaneMap> lengthToFlower(crossinline flower: SimpleLengthFlower<T>): Flower = { dimensions ->
+  val plane = getPlane<T>()
+  toBox(flower(plane(dimensions).x))
+}
+
+inline fun <reified T : PlaneMap> centeredAxis(box: SimpleBox): SimpleLengthFlower<T> = { length ->
+  val plane = getPlane<T>()
+  val relativeBoxDimensions = plane(box.dimensions)
+  val offset = plane(
+      Vector2i(
+          center(relativeBoxDimensions.x, length),
+          relativeBoxDimensions.y
+      )
+  )
+
+  // Currently doesn't support negative numbers
+  assert(offset.x >= 0)
+  assert(offset.y >= 0)
+
+  SimpleBox(
+      dimensions = box.dimensions + offset,
+      boxes = listOf(OffsetBox(box, offset))
+  )
+}
 
 val justifiedEnd: ReversePlanePositioner = { plane ->
   { parent, _, child ->
