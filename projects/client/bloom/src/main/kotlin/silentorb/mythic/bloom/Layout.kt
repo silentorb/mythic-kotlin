@@ -3,16 +3,14 @@ package silentorb.mythic.bloom
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.plus
 
-typealias BloomId = Long
 typealias BloomKey = String
 
-data class FlatBox(
-    val bounds: Bounds,
-    val depiction: Depiction? = null,
-    val clipBounds: Bounds? = null,
-    val handler: Any? = null,
-    val logic: LogicModuleOld? = null
-)
+fun boxToFlower(box: Box): Flower = { box }
+fun boxToFlower(box: SimpleBox): Flower = { toBox(box) }
+
+fun flowerToBox(flower: Flower): Box = flower(Vector2i.zero)
+
+fun flowersToBoxes(flowers: List<Flower>): List<Box> = flowers.map(::flowerToBox)
 
 fun resolveLengths(boundLength: Int, lengths: List<Int?>): List<Int> {
   val exacts = lengths.filterNotNull()
@@ -64,6 +62,8 @@ val centered: ReversePlanePositioner = { plane ->
     (plane.x(parent) - plane.x(child.dimensions)) / 2
   }
 }
+
+//val horizontalCentered: Length =
 
 val justifiedEnd: ReversePlanePositioner = { plane ->
   { parent, _, child ->

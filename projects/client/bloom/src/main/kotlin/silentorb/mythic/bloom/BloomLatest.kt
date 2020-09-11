@@ -79,6 +79,13 @@ fun compose(vararg flowers: Flower): Flower = { dimensions ->
   )
 }
 
+fun compose(vararg boxes: Box): Flower = { dimensions ->
+  Box(
+      bounds = mergeBounds(boxes.map { it.bounds }),
+      boxes = boxes.toList()
+  )
+}
+
 infix fun Flower.plusFlower(second: Flower): Flower =
     compose(this, second)
 
@@ -130,6 +137,21 @@ fun reverseMargin(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = a
           position = box.bounds.position + Vector2i(left, top)
       )
   )
+}
+
+inline fun <reified T : PlaneMap> axisMargin(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all, crossinline child: LengthFlower<T>): LengthFlower<T> {
+  return { length ->
+    val plane = getPlane<T>()
+    val sizeOffset = Vector2i(left + right, top + bottom)
+    val relativeSizeOffset = plane(sizeOffset)
+    val box = child(length - relativeSizeOffset.x)
+    box.copy(
+        bounds = box.bounds.copy(
+            dimensions = box.bounds.dimensions + sizeOffset,
+            position = box.bounds.position + Vector2i(left, top)
+        )
+    )
+  }
 }
 
 fun padding2(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): FlowerWrapper = div(

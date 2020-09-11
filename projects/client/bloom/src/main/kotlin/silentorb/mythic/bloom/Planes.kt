@@ -40,3 +40,9 @@ fun normalizeBounds(plane: Plane): (Bounds) -> Bounds = { bounds ->
 
 val horizontalPlane: Plane = { it }
 val verticalPlane: Plane = { Vector2i(it.y, it.x) }
+
+inline fun <reified T : PlaneMap> getPlane(): Plane =
+    if (T::class.java.isAssignableFrom(HorizontalPlane::class.java))
+      horizontalPlane
+    else
+      verticalPlane

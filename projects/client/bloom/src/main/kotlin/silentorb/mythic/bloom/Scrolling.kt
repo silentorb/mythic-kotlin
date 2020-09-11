@@ -21,17 +21,17 @@ fun scrollbar(offset: Int, contentLength: Int): Depiction = { b, c ->
   }
 }
 
-fun clipBox(clipBounds: Bounds): (FlatBox) -> FlatBox = { box ->
-  val depiction = if (box.depiction != null)
-    clipBox(clipBounds, box.depiction)
-  else
-    null
-
-  box.copy(
-      depiction = depiction,
-      clipBounds = clipBounds
-  )
-}
+//fun clipBox(clipBounds: Bounds): (FlatBox) -> FlatBox = { box ->
+//  val depiction = if (box.depiction != null)
+//    clipBox(clipBounds, box.depiction)
+//  else
+//    null
+//
+//  box.copy(
+//      depiction = depiction,
+//      clipBounds = clipBounds
+//  )
+//}
 
 data class ScrollingState(
     val dragOrigin: Vector2i?,

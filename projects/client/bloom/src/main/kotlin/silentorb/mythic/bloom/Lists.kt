@@ -9,12 +9,6 @@ typealias BoxFlowerContainer = (List<Box>) -> Flower
 typealias BoxContainer = (List<Box>) -> Box
 typealias BoxContainerWrapper = (BoxContainer) -> BoxContainer
 
-fun boxToFlower(box: Box): Flower = { box }
-
-fun flowerToBox(flower: Flower): Box = flower(Vector2i.zero)
-
-fun flowersToBoxes(flowers: List<Flower>): List<Box> = flowers.map(::flowerToBox)
-
 tailrec fun arrangeListItems(plane: Plane, spacing: Int, boxes: List<Box>, length: Int = 0, accumulator: List<Box> = listOf()): List<Box> =
     if (boxes.none())
       accumulator
@@ -52,6 +46,23 @@ fun list(plane: Plane, spacing: Int = 0, name: String = "list"): BoxContainer = 
   )
 }
 
+inline fun <reified T : PlaneMap> list(spacing: Int = 0, name: String = "list", children: List<LengthFlower<T>>): LengthFlower<T> {
+  return { length ->
+    val plane = getPlane<T>()
+    val boxes = arrangeListItems(plane, spacing, children.map { it(length) })
+//    val length = getListLength(plane, boxes)
+    val breadth = getListBreadth(plane, boxes)
+
+    Box(
+        name = name,
+        bounds = Bounds(
+            dimensions = plane(Vector2i(length, breadth))
+        ),
+        boxes = boxes
+    )
+  }
+}
+
 fun horizontalList(spacing: Int = 0, name: String = "horizontalList"): (List<Box>) -> Box =
     list(horizontalPlane, spacing, name)
 
@@ -63,47 +74,104 @@ enum class FlexType {
   fixed,
 }
 
-data class FlexItem(
-    val flower: Flower,
-    val type: FlexType = FlexType.fixed
-)
+interface FlexItem
 
-val flexStretch: (Flower) -> FlexItem = { flower ->
-  FlexItem(flower, FlexType.stretch)
-}
+data class BoxFlexItem(
+    val box: Box
+) : FlexItem
+
+data class FlowerFlexItem(
+    val flower: Flower
+) : FlexItem
+
+fun flex(box: Box): FlexItem =
+    BoxFlexItem(box)
+
+fun flex(flower: Flower): FlexItem =
+    FlowerFlexItem(flower)
 
 fun flexList(plane: Plane, spacing: Int = 0, name: String = "flexList"): (List<FlexItem>) -> Flower = { items ->
   { dimensions ->
-//    val totalSpacing = (items.size - 1) * spacing
-    val firstPass = items.map { item ->
-      if (item.type == FlexType.fixed) {
-        item.flower(dimensions)
-      } else
-        null
-    }
-    val lengths = firstPass.map { if (it != null) plane(it.bounds.end).x else null }
-    val otherLength = firstPass.filterNotNull().map { plane(it.bounds.end).y }.maxOrNull()
-    assert(otherLength != null)
-    val resolvedDimensions = plane(Vector2i(0, otherLength!!)) + plane(Vector2i(plane(dimensions).x, 0))
-    val boundsList = fixedLengthArranger(plane, spacing, lengths)(resolvedDimensions)
-    val boxes = firstPass.zip(boundsList.zip(items)) { box, (bounds, item) ->
-      if (box != null) {
-        box.copy(
-            bounds = bounds
-        )
-      } else {
-        val newBox = item.flower(bounds.dimensions)
-        newBox.copy(
-            bounds = bounds
-        )
+    val relativeBounds = plane(dimensions)
+    val totalLength = relativeBounds.x
+    val breadth = relativeBounds.y
+    val inputBoxes = items.mapNotNull { (it as? BoxFlexItem)?.box }
+    val fixedLength = inputBoxes.sumBy { plane(it.bounds.dimensions).x }
+//    val fixedBreadth = inputBoxes.sumBy { plane(it.bounds.dimensions).y }
+    val totalSpacing = spacing * (items.size - 1)
+    val reserved = fixedLength + totalSpacing
+    val remaining = totalLength - reserved
+    val stretchCount = items.size - inputBoxes.size
+    val stretchRation = remaining / stretchCount
+    val stretchItemBounds = plane(Vector2i(stretchRation, breadth))
+
+    val boxes = items.map { item ->
+      when (item) {
+        is BoxFlexItem -> item.box
+        is FlowerFlexItem -> item.flower(stretchItemBounds)
+        else -> throw Error()
       }
     }
+    val arrangedBoxes = arrangeListItems(plane, spacing, boxes)
     Box(
         name = name,
         bounds = Bounds(
-            dimensions = resolvedDimensions
+            dimensions = dimensions
         ),
-        boxes = boxes
+        boxes = arrangedBoxes
     )
+  }
+}
+
+interface LengthFlexItem<T> {
+  fun getBox(length: Int): Box
+  fun getBoxOrNull(): Box?
+}
+
+data class LengthBoxFlexItem<T>(
+    val box: Box
+) : LengthFlexItem<T> {
+  override fun getBox(length: Int): Box = box
+  override fun getBoxOrNull(): Box? = box
+}
+
+data class LengthFlowerFlexItem<T>(
+    val flower: LengthFlower<T>
+) : LengthFlexItem<T> {
+  override fun getBox(length: Int): Box = flower(length)
+  override fun getBoxOrNull(): Box? = null
+}
+
+fun <T> flex2(box: Box): LengthFlexItem<T> =
+    LengthBoxFlexItem(box)
+
+fun <T> flex2(flower: LengthFlower<T>): LengthFlexItem<T> =
+    LengthFlowerFlexItem(flower)
+
+inline fun <reified T : PlaneMap> flexList(spacing: Int = 0, name: String = "flexList", children: List<LengthFlexItem<T>>): LengthFlower<T> {
+  return { length ->
+    val plane = getPlane<T>()
+    val inputBoxes = children.mapNotNull { it.getBoxOrNull() }
+    if (inputBoxes.size == children.size)
+      list(plane, spacing, name)(inputBoxes)
+    else {
+      val totalLength = length
+      val fixedLength = inputBoxes.sumBy { plane(it.bounds.dimensions).x }
+      val breadth = inputBoxes.sumBy { plane(it.bounds.dimensions).y }
+      val totalSpacing = spacing * (children.size - 1)
+      val reserved = fixedLength + totalSpacing
+      val remaining = totalLength - reserved
+      val stretchCount = children.size - inputBoxes.size
+      val stretchRation = remaining / stretchCount
+      val boxes = children.map { it.getBox(stretchRation) }
+      val arrangedBoxes = arrangeListItems(plane, spacing, boxes)
+      Box(
+          name = name,
+          bounds = Bounds(
+              dimensions = plane(Vector2i(length, breadth))
+          ),
+          boxes = arrangedBoxes
+      )
+    }
   }
 }
