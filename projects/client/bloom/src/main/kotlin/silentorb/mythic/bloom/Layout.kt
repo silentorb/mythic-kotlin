@@ -1,13 +1,11 @@
 package silentorb.mythic.bloom
 
 import silentorb.mythic.spatial.Vector2i
-import silentorb.mythic.spatial.plus
 import kotlin.math.max
 
 typealias BloomKey = String
 
 fun boxToFlower(box: Box): Flower = { box }
-fun boxToFlower(box: SimpleBox): Flower = { toBox(box) }
 
 fun flowerToBox(flower: Flower): Box = flower(Vector2i.zero)
 
@@ -67,40 +65,42 @@ val centered: ReversePlanePositioner = { plane ->
   }
 }
 
-fun centered(box: SimpleBox): SimpleFlower = { dimensions ->
+fun centered(box: Box): SimpleFlower = { dimensions ->
   val offset = Vector2i(
       center(box.dimensions.x, dimensions.x),
       center(box.dimensions.y, dimensions.y)
   )
-  SimpleBox(
+  Box(
       dimensions = dimensions,
       boxes = listOf(OffsetBox(box, offset))
   )
 }
 
-inline fun <reified T : PlaneMap> lengthToFlower(crossinline flower: SimpleLengthFlower<T>): Flower = { dimensions ->
-  val plane = getPlane<T>()
-  toBox(flower(plane(dimensions).x))
+fun lengthToFlower(plane: Plane): (SimpleLengthFlower) -> Flower = { flower ->
+  { dimensions ->
+    flower(plane(dimensions).x)
+  }
 }
 
-inline fun <reified T : PlaneMap> centeredAxis(box: SimpleBox): SimpleLengthFlower<T> = { length ->
-  val plane = getPlane<T>()
-  val relativeBoxDimensions = plane(box.dimensions)
-  val offset = plane(
-      Vector2i(
-          center(relativeBoxDimensions.x, length),
-          relativeBoxDimensions.y
-      )
-  )
+fun centeredAxis(plane: Plane): (Box) -> SimpleLengthFlower = { box ->
+  { length ->
+    val relativeBoxDimensions = plane(box.dimensions)
+    val offset = plane(
+        Vector2i(
+            center(relativeBoxDimensions.x, length),
+            relativeBoxDimensions.y
+        )
+    )
 
-  // Currently doesn't support negative numbers
-  assert(offset.x >= 0)
-  assert(offset.y >= 0)
+    // Currently doesn't support negative numbers
+    assert(offset.x >= 0)
+    assert(offset.y >= 0)
 
-  SimpleBox(
-      dimensions = box.dimensions + offset,
-      boxes = listOf(OffsetBox(box, offset))
-  )
+    Box(
+        dimensions = box.dimensions + offset,
+        boxes = listOf(OffsetBox(box, offset))
+    )
+  }
 }
 
 val justifiedEnd: ReversePlanePositioner = { plane ->

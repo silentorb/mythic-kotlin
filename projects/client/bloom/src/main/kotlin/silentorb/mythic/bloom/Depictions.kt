@@ -21,15 +21,13 @@ fun label(style: IndexedTextStyle, content: String): Box {
   val dimensions = calculateTextDimensions(config)
   return Box(
       name = if (content.length < 32) content else content.substring(0, 32),
-      bounds = Bounds(
-          dimensions = dimensions.toVector2i()
-      ),
+      dimensions = dimensions.toVector2i(),
       depiction = textDepiction(style, content)
   )
 }
 
 fun clipBox(bounds: Bounds, depiction: Depiction): Depiction = { b, c ->
-  val viewport = c.flipViewport(bounds.toVector4i())
+  val viewport = c.flipViewport(toVector4i(bounds))
   cropStack(viewport) {
     depiction(b, c)
   }

@@ -38,7 +38,7 @@ fun logicWrapper(wrapper: (LogicBundle, StateBagMods) -> StateBagMods): LogicMod
   }
 }
 
-fun visibleBounds(box: Box): Bounds? =
+fun visibleBounds(box: OffsetBox): Bounds? =
     box.bounds
 
 inline fun <reified T> getBagEntry(bag: StateBag, key: String, initialValue: () -> T): T {
@@ -49,7 +49,7 @@ inline fun <reified T> getBagEntry(bag: StateBag, key: String, initialValue: () 
     initialValue()
 }
 
-fun flattenAllBoxes(box: Box): List<Box> =
+fun flattenAllBoxes(box: OffsetBox): List<OffsetBox> =
     listOf(box).plus(box.boxes.flatMap(::flattenAllBoxes))
 
 fun combineModules(modules: List<LogicModule>): LogicModule = { args ->
@@ -69,15 +69,15 @@ fun isInBounds(position: Vector2i, bounds: Bounds): Boolean =
         position.y >= bounds.position.y &&
         position.y < bounds.position.y + bounds.dimensions.y
 
-fun isInBounds(position: Vector2i, box: Box): Boolean {
+fun isInBounds(position: Vector2i, box: OffsetBox): Boolean {
   val visibleBounds = visibleBounds(box)
   return visibleBounds != null && isInBounds(position, visibleBounds)
 }
 
-fun hasAttributes(box: Box): Boolean =
+fun hasAttributes(box: AttributeHolder): Boolean =
     box.attributes.any()
 
-inline fun <reified T> getAttributeValue(box: Box, key: String): T? {
+inline fun <reified T> getAttributeValue(box: AttributeHolder, key: String): T? {
   val value = box.attributes[key]
   return if (value != null)
     value as? T
@@ -85,13 +85,13 @@ inline fun <reified T> getAttributeValue(box: Box, key: String): T? {
     null
 }
 
-inline fun <reified T> getAttributeValue(boxes: Boxes, key: String): T? =
+inline fun <reified T> getAttributeValue(boxes: Collection<AttributeHolder>, key: String): T? =
     boxes.firstNotNull { getAttributeValue(it, key) }
 
 fun getAttributeBoolean(box: Box, key: String): Boolean =
     getAttributeValue<Boolean>(box, key) ?: false
 
-fun getHoverBoxes(mousePosition: Vector2i, boxes: List<Box>): List<Box> =
+fun getHoverBoxes(mousePosition: Vector2i, boxes: List<OffsetBox>): List<OffsetBox> =
     boxes.filter { box ->
       box.attributes.any() && isInBounds(mousePosition, box)
     }

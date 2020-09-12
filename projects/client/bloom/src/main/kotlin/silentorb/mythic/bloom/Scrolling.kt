@@ -5,21 +5,21 @@ import silentorb.mythic.spatial.Vector2i
 
 private const val scrollbarWidth = 15
 
-fun scrollbar(offset: Int, contentLength: Int): Depiction = { b, c ->
-  if (contentLength > b.dimensions.y) {
-    val width = scrollbarWidth
-    val bounds = Bounds(
-        x = b.end.x - width - 2,
-        y = b.top + offset * b.dimensions.y / contentLength,
-        width = width,
-        height = b.dimensions.y * b.dimensions.y / contentLength
-    )
-
-    val viewport = bounds.toVector4i().toVector4()
-
-    c.drawSquare(viewport.xy(), viewport.zw, c.solid(Vector4(0.6f, 0.6f, 0.6f, 1f)))
-  }
-}
+//fun scrollbar(offset: Int, contentLength: Int): Depiction = { b, c ->
+//  if (contentLength > b.dimensions.y) {
+//    val width = scrollbarWidth
+//    val bounds = Bounds(
+//        x = b.end.x - width - 2,
+//        y = b.top + offset * b.dimensions.y / contentLength,
+//        width = width,
+//        height = b.dimensions.y * b.dimensions.y / contentLength
+//    )
+//
+//    val viewport = bounds.toVector4i().toVector4()
+//
+//    c.drawSquare(viewport.xy(), viewport.zw, c.solid(Vector4(0.6f, 0.6f, 0.6f, 1f)))
+//  }
+//}
 
 //fun clipBox(clipBounds: Bounds): (FlatBox) -> FlatBox = { box ->
 //  val depiction = if (box.depiction != null)
@@ -92,41 +92,41 @@ fun scrollingInteraction(key: String, contentBounds: Bounds): LogicModuleOld = {
   }
 }
 
-fun scrollBox(key: String, contentBounds: Bounds): Flower = { dimensions ->
-  val bounds = Bounds(dimensions = dimensions)
-  Box(
-      name = "scroll box",
-      bounds = bounds,
-//      depiction = scrollbar(scrollingState(dimensions.bag[key]).offset, contentBounds.dimensions.y)
-  )
-}
+//fun scrollBox(key: String, contentBounds: Bounds): Flower = { dimensions ->
+//  val bounds = Bounds(dimensions = dimensions)
+//  Box(
+//      name = "scroll box",
+//      bounds = bounds,
+////      depiction = scrollbar(scrollingState(dimensions.bag[key]).offset, contentBounds.dimensions.y)
+//  )
+//}
 
-private fun pruneClippedBoxes(dimensions: Vector2i, offset: Vector2i, boxes: List<Box>): List<Box> {
-  return boxes.filter { box ->
-    val result = offset.y + box.bounds.top <= dimensions.y && offset.y + box.bounds.bottom >= 0
-    if (boxes.size > 16) {
-      val k = 0
-    }
-    if (!result) {
-      val k = 0
-    }
-    result
-  }
-      .map { box ->
-        box.copy(
-            boxes = pruneClippedBoxes(box.bounds.dimensions, offset + box.bounds.position, box.boxes)
-        )
-      }
-}
+//private fun pruneClippedBoxes(dimensions: Vector2i, offset: Vector2i, boxes: List<Box>): List<Box> {
+//  return boxes.filter { box ->
+//    val result = offset.y + box.bounds.top <= dimensions.y && offset.y + box.bounds.bottom >= 0
+//    if (boxes.size > 16) {
+//      val k = 0
+//    }
+//    if (!result) {
+//      val k = 0
+//    }
+//    result
+//  }
+//      .map { box ->
+//        box.copy(
+//            boxes = pruneClippedBoxes(box.bounds.dimensions, offset + box.bounds.position, box.boxes)
+//        )
+//      }
+//}
 
-private fun reverseFixedOffset(left: Int = 0, top: Int = 0): FlowerWrapper = div(
-    reverse = { _, bounds, child ->
-      bounds.copy(
-          position = Vector2i(left, top),
-          dimensions = child.dimensions
-      )
-    }
-)
+//private fun reverseFixedOffset(left: Int = 0, top: Int = 0): FlowerWrapper = div(
+//    reverse = { _, bounds, child ->
+//      bounds.copy(
+//          position = Vector2i(left, top),
+//          dimensions = child.dimensions
+//      )
+//    }
+//)
 
 fun scrolling(key: String): (Flower) -> Flower = { child ->
   { dimensions ->

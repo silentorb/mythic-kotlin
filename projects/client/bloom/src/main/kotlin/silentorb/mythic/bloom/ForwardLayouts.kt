@@ -2,56 +2,56 @@ package silentorb.mythic.bloom
 
 import silentorb.mythic.spatial.Vector2i
 
-val forwardPass: ForwardLayout = { Bounds(dimensions = it) }
+//val forwardPass: ForwardLayout = { Bounds(dimensions = it) }
 
-fun fixedOffset(offset: Vector2i): ForwardLayout = { container ->
-  val newDimensions = clippedDimensions(container, offset, container)
-  Bounds(
-      position = offset,
-      dimensions = newDimensions
-  )
-}
+//fun fixedOffset(offset: Vector2i): ForwardLayout = { container ->
+//  val newDimensions = clippedDimensions(container, offset, container)
+//  Bounds(
+//      position = offset,
+//      dimensions = newDimensions
+//  )
+//}
 
-fun fixedOffset(left: Int = 0, top: Int = 0): ForwardLayout = fixedOffset(Vector2i(left, top))
+//fun fixedOffset(left: Int = 0, top: Int = 0): ForwardLayout = fixedOffset(Vector2i(left, top))
 
-fun forwardOffset(left: PlanePositioner? = null,
-                  top: PlanePositioner? = null): ForwardLayout = { container ->
-  val position = Vector2i(
-      if (left != null) left(horizontalPlaneMap)(container) else 0,
-      if (top != null) top(verticalPlaneMap)(container) else 0
-  )
+//fun forwardOffset(left: PlanePositioner? = null,
+//                  top: PlanePositioner? = null): ForwardLayout = { container ->
+//  val position = Vector2i(
+//      if (left != null) left(horizontalPlaneMap)(container) else 0,
+//      if (top != null) top(verticalPlaneMap)(container) else 0
+//  )
+//
+//  Bounds(
+//      position = position,
+//      dimensions = container
+//  )
+//}
 
-  Bounds(
-      position = position,
-      dimensions = container
-  )
-}
+//fun forwardDimensions(
+//    width: PlanePositioner? = null,
+//    height: PlanePositioner? = null): ForwardLayout = { container ->
+//  val dimensions = Vector2i(
+//      x = if (width != null) width(horizontalPlaneMap)(container) else container.x,
+//      y = if (height != null) height(verticalPlaneMap)(container) else container.y
+//  )
+//
+//  Bounds(
+//      dimensions = dimensions
+//  )
+//}
 
-fun forwardDimensions(
-    width: PlanePositioner? = null,
-    height: PlanePositioner? = null): ForwardLayout = { container ->
-  val dimensions = Vector2i(
-      x = if (width != null) width(horizontalPlaneMap)(container) else container.x,
-      y = if (height != null) height(verticalPlaneMap)(container) else container.y
-  )
+//fun forwardDimensions(dimensions: Vector2i): ForwardLayout = { container ->
+//  Bounds(
+//      dimensions = dimensions
+//  )
+//}
 
-  Bounds(
-      dimensions = dimensions
-  )
-}
-
-fun forwardDimensions(dimensions: Vector2i): ForwardLayout = { container ->
-  Bounds(
-      dimensions = dimensions
-  )
-}
-
-fun forwardDimensions(width: Int, height: Int): ForwardLayout = { container ->
-  Bounds(
-      dimensions = Vector2i(width, height)
-  )
-}
-
-val stretchBoth: ForwardLayout = { container ->
-  Bounds(dimensions = container)
-}
+//fun forwardDimensions(width: Int, height: Int): ForwardLayout = { container ->
+//  Bounds(
+//      dimensions = Vector2i(width, height)
+//  )
+//}
+//
+//val stretchBoth: ForwardLayout = { container ->
+//  Bounds(dimensions = container)
+//}
