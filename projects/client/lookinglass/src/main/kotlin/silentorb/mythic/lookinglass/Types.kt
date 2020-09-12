@@ -25,7 +25,7 @@ enum class TextureAntialiasing {
   trilinear
 }
 
-data class DisplayConfig(
+data class DisplayOptions(
     val dimensions: Vector2i = Vector2i(800, 600),
     val fullscreen: Boolean = false,
     val windowMode: WindowMode = WindowMode.windowed,
@@ -35,7 +35,7 @@ data class DisplayConfig(
     val textureAntialiasing: TextureAntialiasing = TextureAntialiasing.trilinear
 )
 
-fun toPlatformDisplayConfig(display: DisplayConfig) =
+fun toPlatformDisplayConfig(display: DisplayOptions) =
     PlatformDisplayConfig(
         dimensions = display.dimensions,
         windowMode = display.windowMode,
@@ -74,7 +74,7 @@ data class FloatTextureBuffer(
 
 data class Renderer(
     val glow: Glow,
-    val config: DisplayConfig,
+    val options: DisplayOptions,
     val multisampler: Multisampler?,
     val meshes: MutableMap<MeshName, ModelMesh>,
     val armatures: Map<ArmatureName, Armature>,
@@ -112,10 +112,10 @@ data class Renderer(
 //  }
 //}
 
-fun emptyRenderer(config: DisplayConfig): Renderer =
+fun emptyRenderer(options: DisplayOptions): Renderer =
     Renderer(
         glow = Glow(),
-        config = config,
+        options = options,
         meshes = mutableMapOf(),
         armatures = mapOf(),
         vertexSchemas = createVertexSchemas(),

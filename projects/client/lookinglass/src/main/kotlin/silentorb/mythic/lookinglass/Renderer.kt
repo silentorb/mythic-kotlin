@@ -92,11 +92,11 @@ fun updateTextureBuffer(dimensions: Vector2i, buffer: FloatTextureBuffer, attrib
   buffer.texture!!.update(buffer.buffer!!)
 }
 
-fun textureAttributesFromConfig(config: DisplayConfig) =
+fun textureAttributesFromConfig(options: DisplayOptions) =
     TextureAttributes(
         repeating = true,
-        mipmap = config.textureAntialiasing == TextureAntialiasing.trilinear,
-        smooth = config.textureAntialiasing != TextureAntialiasing.none,
+        mipmap = options.textureAntialiasing == TextureAntialiasing.trilinear,
+        smooth = options.textureAntialiasing != TextureAntialiasing.none,
         storageUnit = TextureStorageUnit.unsigned_byte
     )
 

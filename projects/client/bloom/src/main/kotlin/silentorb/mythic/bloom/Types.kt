@@ -18,7 +18,13 @@ data class Box(
     val boxes: List<OffsetBox> = listOf(),
     val depiction: Depiction? = null,
     override val attributes: Map<String, Any?> = mapOf()
-) : DimensionBox, AttributeHolder
+) : DimensionBox, AttributeHolder {
+
+  fun addAttributes(vararg attributes: Pair<String, Any?>): Box =
+      this.copy(
+          attributes = this.attributes + attributes
+      )
+}
 
 data class OffsetBox(
     val child: Box,

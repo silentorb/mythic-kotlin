@@ -4,7 +4,6 @@ import silentorb.mythic.drawing.getStaticCanvasDependencies
 import silentorb.mythic.glowing.DrawMethod
 import silentorb.mythic.glowing.activateTextures
 import silentorb.mythic.glowing.globalState
-import silentorb.mythic.lookinglass.drawing.armatureTransforms
 import silentorb.mythic.lookinglass.shading.Shaders
 import silentorb.mythic.spatial.*
 
@@ -31,8 +30,8 @@ fun drawSkeleton(renderer: SceneRenderer, armature: Armature, transforms: List<M
 //  globalState.depthEnabled = true
 //}
 
-fun getDisplayConfigFilters(config: DisplayConfig): List<ScreenFilter> =
-    if (config.depthOfField)
+fun getDisplayConfigFilters(options: DisplayOptions): List<ScreenFilter> =
+    if (options.depthOfField)
       listOf<ScreenFilter>(
           { shaders, scale -> shaders.depthOfField.activate(scale) }
       )
@@ -77,7 +76,7 @@ fun applyFilters(renderer: SceneRenderer, filters: List<ScreenFilter>) {
 fun applyFrameBufferTexture(renderer: SceneRenderer, filter: ScreenFilter) {
   val canvasDependencies = getStaticCanvasDependencies()
   val offscreenBuffer = renderer.renderer.offscreenBuffers.first()
-  val config = renderer.renderer.config
+  val config = renderer.renderer.options
   val scale = Vector2(config.dimensions.x.toFloat(), config.dimensions.y.toFloat()) / renderer.viewport.zw.toVector2()
   filter(renderer.renderer.shaders, scale)
   activateTextures(listOf(offscreenBuffer.colorTexture, offscreenBuffer.depthTexture!!))

@@ -5,28 +5,6 @@ import kotlin.math.max
 
 typealias BloomKey = String
 
-fun boxToFlower(box: Box): Flower = { box }
-
-fun flowerToBox(flower: Flower): Box = flower(Vector2i.zero)
-
-fun flowersToBoxes(flowers: List<Flower>): List<Box> = flowers.map(::flowerToBox)
-
-fun resolveLengths(boundLength: Int, lengths: List<Int?>): List<Int> {
-  val exacts = lengths.filterNotNull()
-  val total = exacts.sum()
-
-  if (exacts.size == lengths.size) {
-    if (total != boundLength)
-      throw Error("Could not stretch or shrink to fit bounds")
-
-    return exacts
-  } else {
-    val stretchCount = lengths.size - exacts.size
-    val stretchLength = (boundLength - total) / stretchCount
-    return lengths.map { if (it != null) it else stretchLength }
-  }
-}
-
 fun clippedDimensions(parent: Vector2i, childPosition: Vector2i, childDimensions: Vector2i): Vector2i {
   return if (childPosition.x + childDimensions.x > parent.x ||
       childPosition.y + childDimensions.y > parent.y)
@@ -62,11 +40,35 @@ val centered: Aligner = { parent, child ->
   max(0, (parent - child) / 2)
 }
 
-//val centered: ReversePlanePositioner = { plane ->
-//  { parent, child ->
-//    center(plane.x(child), plane.x(parent))
-//  }
-//}
+fun axisMargin(plane: Plane, all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): (LengthFlower) -> LengthFlower = { child ->
+  { length ->
+    val sizeOffset = Vector2i(left + right, top + bottom)
+    val relativeSizeOffset = plane(sizeOffset)
+    val box = child(length - relativeSizeOffset.x)
+    Box(
+        dimensions = box.dimensions + sizeOffset,
+        boxes = listOf(
+            OffsetBox(
+                child = box,
+                offset = Vector2i(left, top)
+            )
+        )
+    )
+  }
+}
+
+fun boxMargin(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): (Box) -> Box = { box ->
+  val sizeOffset = Vector2i(left + right, top + bottom)
+  Box(
+      dimensions = box.dimensions + sizeOffset,
+      boxes = listOf(
+          OffsetBox(
+              child = box,
+              offset = Vector2i(left, top)
+          )
+      )
+  )
+}
 
 fun centered(box: Box): Flower = { dimensions ->
   val offset = Vector2i(
