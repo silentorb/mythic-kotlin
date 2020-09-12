@@ -2,6 +2,24 @@ package silentorb.mythic.bloom
 
 import silentorb.mythic.spatial.Vector2i
 
+fun reverseOffset(left: ReversePlanePositioner,
+                  top: ReversePlanePositioner = left): (Box) -> Flower = { box ->
+  { dimensions ->
+    Box(
+        dimensions = dimensions,
+        boxes = listOf(
+            OffsetBox(
+                offset = Vector2i(
+                    left(horizontalPlaneMap)(dimensions, box.dimensions),
+                    top(verticalPlaneMap)(dimensions, box.dimensions)
+                ),
+                child = box
+            )
+        )
+    )
+  }
+}
+
 //val reversePass: ReverseLayout = { _, bounds, _ -> bounds }
 
 //operator fun ReverseLayout.plus(other: ReverseLayout): ReverseLayout = { parent, bounds, child ->

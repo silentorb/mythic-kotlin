@@ -136,7 +136,7 @@ fun fixed(value: Int): PlanePositioner = { plane -> { value } }
 //  )
 //}
 
-fun axisMargin(plane: Plane, all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): (SimpleLengthFlower) -> SimpleLengthFlower = { child ->
+fun axisMargin(plane: Plane, all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): (LengthFlower) -> LengthFlower = { child ->
   { length ->
     val sizeOffset = Vector2i(left + right, top + bottom)
     val relativeSizeOffset = plane(sizeOffset)
@@ -151,6 +151,19 @@ fun axisMargin(plane: Plane, all: Int = 0, left: Int = all, top: Int = all, bott
         )
     )
   }
+}
+
+fun boxMargin(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): (Box) -> Box = { box ->
+  val sizeOffset = Vector2i(left + right, top + bottom)
+  Box(
+      dimensions = box.dimensions + sizeOffset,
+      boxes = listOf(
+          OffsetBox(
+              child = box,
+              offset = Vector2i(left, top)
+          )
+      )
+  )
 }
 
 //fun padding2(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): FlowerWrapper = div(

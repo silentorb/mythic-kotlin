@@ -52,23 +52,26 @@ typealias Positioner = (Vector2i) -> Int
 
 typealias PlanePositioner = (PlaneMap) -> Positioner
 
-typealias ReversePositioner = (Vector2i, Bounds, Bounds) -> Int
+typealias ReversePositioner = (Vector2i, Vector2i) -> Int
+
+typealias Aligner = (Int, Int) -> Int
 
 typealias ReversePlanePositioner = (PlaneMap) -> ReversePositioner
 
-fun center(child: Int, parent: Int): Int =
-    max(0, (parent - child) / 2)
-
-val centered: ReversePlanePositioner = { plane ->
-  { parent, _, child ->
-    center(plane.x(child.dimensions), plane.x(parent))
-  }
+val centered: Aligner = { parent, child ->
+  max(0, (parent - child) / 2)
 }
 
-fun centered(box: Box): SimpleFlower = { dimensions ->
+//val centered: ReversePlanePositioner = { plane ->
+//  { parent, child ->
+//    center(plane.x(child), plane.x(parent))
+//  }
+//}
+
+fun centered(box: Box): Flower = { dimensions ->
   val offset = Vector2i(
-      center(box.dimensions.x, dimensions.x),
-      center(box.dimensions.y, dimensions.y)
+      centered(dimensions.x, box.dimensions.x),
+      centered(dimensions.y, box.dimensions.y)
   )
   Box(
       dimensions = dimensions,
@@ -76,18 +79,18 @@ fun centered(box: Box): SimpleFlower = { dimensions ->
   )
 }
 
-fun lengthToFlower(plane: Plane): (SimpleLengthFlower) -> Flower = { flower ->
+fun lengthToFlower(plane: Plane): (LengthFlower) -> Flower = { flower ->
   { dimensions ->
     flower(plane(dimensions).x)
   }
 }
 
-fun centeredAxis(plane: Plane): (Box) -> SimpleLengthFlower = { box ->
+fun centeredAxis(plane: Plane): (Box) -> LengthFlower = { box ->
   { length ->
     val relativeBoxDimensions = plane(box.dimensions)
     val offset = plane(
         Vector2i(
-            center(relativeBoxDimensions.x, length),
+            centered(length, relativeBoxDimensions.x),
             relativeBoxDimensions.y
         )
     )
@@ -104,13 +107,19 @@ fun centeredAxis(plane: Plane): (Box) -> SimpleLengthFlower = { box ->
 }
 
 val justifiedEnd: ReversePlanePositioner = { plane ->
-  { parent, _, child ->
-    plane.x(parent) - plane.x(child.dimensions)
+  { parent, child ->
+    plane.x(parent) - plane.x(child)
+  }
+}
+
+val justifiedStart: ReversePlanePositioner = { plane ->
+  { _, _ ->
+    0
   }
 }
 
 fun fixedReverse(value: Int): ReversePlanePositioner = { plane ->
-  { _, _, _ ->
+  { _, _ ->
     value
   }
 }

@@ -14,7 +14,12 @@ import silentorb.mythic.spatial.toVector2
 data class Bounds(
     val position: Vector2i,
     val dimensions: Vector2i
-)
+) {
+  val left: Int get() = position.x
+  val top: Int get() = position.y
+  val right: Int get() = position.x + dimensions.x
+  val bottom: Int get() = position.y + dimensions.y
+}
 
 //data class Bounds(
 //    val position: Vector2i = Vector2i(),
