@@ -34,7 +34,8 @@ enum class WindowMode {
 }
 
 data class PlatformDisplayConfig(
-    val dimensions: Vector2i,
+    val fullscreenDimensions: Vector2i,
+    val windowedDimensions: Vector2i,
     val windowMode: WindowMode = WindowMode.windowed,
     val vsync: Boolean,
     val multisamples: Int
@@ -54,6 +55,9 @@ interface PlatformDisplay {
   fun swapBuffers()
   fun getInfo(): WindowInfo
   fun hasFocus(): Boolean
+  fun setOptions(previous: PlatformDisplayConfig, options: PlatformDisplayConfig)
+  fun shutdown()
+
   val loadImage: ImageLoader
 }
 

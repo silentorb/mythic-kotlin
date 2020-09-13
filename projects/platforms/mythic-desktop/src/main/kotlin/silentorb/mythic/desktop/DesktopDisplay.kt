@@ -19,7 +19,7 @@ fun createWindow(title: String, config: PlatformDisplayConfig): Long {
   glfwWindowHint(GLFW_SAMPLES, config.multisamples)
 //  val pid = ProcessHandle.current().getPid()
 
-  val window = glfwCreateWindow(config.dimensions.x, config.dimensions.y, title, MemoryUtil.NULL, MemoryUtil.NULL)
+  val window = glfwCreateWindow(config.windowedDimensions.x, config.windowedDimensions.y, title, MemoryUtil.NULL, MemoryUtil.NULL)
   if (window == MemoryUtil.NULL)
     throw RuntimeException("Failed to create the GLFW window")
 
@@ -55,24 +55,32 @@ fun centerWindow(window: Long) {
   }
 }
 
-fun initializeWindowedFullscreen(window: Long) {
+fun initializeFullscreen(window: Long, resolution: Vector2i? = null) {
   val monitor = glfwGetPrimaryMonitor()
   val videoMode = glfwGetVideoMode(monitor)
-  glfwSetWindowMonitor(window, monitor, 0, 0, videoMode.width(), videoMode.height(), videoMode.refreshRate())
+  glfwSetWindowMonitor(
+      window, monitor, 0, 0,
+      resolution?.x ?: videoMode.width(),
+      resolution?.y ?: videoMode.height(),
+      videoMode.refreshRate()
+  )
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
   glfwFocusWindow(window) // For some reason the window loses focus when switching to fullscreen mode?
 }
 
 fun initializeWindowed(window: Long, dimensions: Vector2i) {
+  val monitor = glfwGetPrimaryMonitor()
+  val videoMode = glfwGetVideoMode(monitor)
+  glfwSetWindowMonitor(window, 0, 0, 0, dimensions.x, dimensions.y, videoMode.refreshRate())
   glfwSetWindowSize(window, dimensions.x, dimensions.y)
   centerWindow(window)
 }
 
 fun initializeWindow(window: Long, config: PlatformDisplayConfig) {
   when (config.windowMode) {
-    WindowMode.fullscreen -> initializeWindowedFullscreen(window) // Currently only supporting windowed fullscreen
-    WindowMode.windowedFullscreen -> initializeWindowedFullscreen(window)
-    else -> initializeWindowed(window, config.dimensions)
+    WindowMode.fullscreen -> initializeFullscreen(window, config.fullscreenDimensions)
+    WindowMode.windowedFullscreen -> initializeFullscreen(window)
+    else -> initializeWindowed(window, config.windowedDimensions)
   }
 
   glfwMakeContextCurrent(window)
@@ -129,6 +137,12 @@ val loadImageFromFile: ImageLoader = { filePath ->
     null
 }
 
+fun setDisplayOptions(window: Long, previous: PlatformDisplayConfig, options: PlatformDisplayConfig) {
+  if (previous.windowMode != options.windowMode) {
+    initializeWindow(window, options)
+  }
+}
+
 class DesktopDisplay(val window: Long) : PlatformDisplay {
   override fun initialize(config: PlatformDisplayConfig) = initializeWindow(window, config)
 
@@ -137,6 +151,16 @@ class DesktopDisplay(val window: Long) : PlatformDisplay {
   override fun swapBuffers() = glfwSwapBuffers(window)
 
   override fun hasFocus() = glfwGetWindowAttrib(window, GLFW_FOCUSED) == 1
+
+  override fun setOptions(previous: PlatformDisplayConfig, options: PlatformDisplayConfig) {
+    setDisplayOptions(window, previous, options)
+  }
+
+  override fun shutdown() {
+    // The window will eventually get destroyed automatically when the application closes
+    // but at least in some cases manually destroying the window is significantly faster
+    glfwDestroyWindow(window)
+  }
 
   override val loadImage: ImageLoader
     get() = loadImageFromFile
