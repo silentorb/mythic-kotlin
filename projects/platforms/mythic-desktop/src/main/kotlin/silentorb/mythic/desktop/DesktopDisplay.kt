@@ -64,7 +64,6 @@ fun initializeFullscreen(window: Long, resolution: Vector2i? = null) {
       resolution?.y ?: videoMode.height(),
       videoMode.refreshRate()
   )
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
   glfwFocusWindow(window) // For some reason the window loses focus when switching to fullscreen mode?
 }
 
