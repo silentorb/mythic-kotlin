@@ -3,10 +3,8 @@ package silentorb.mythic.platforming
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector3
-import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.ShortBuffer
-import java.nio.file.Path
 
 data class WindowInfo(val dimensions: Vector2i)
 
@@ -28,8 +26,8 @@ interface PlatformInput {
 }
 
 enum class WindowMode {
-  fullscreen,
   windowed,
+  fullscreen,
   windowedFullscreen
 }
 
@@ -50,12 +48,17 @@ data class RawImage(
 
 typealias ImageLoader = (String) -> RawImage?
 
+data class DisplayMode(
+    val resolution: Vector2i
+)
+
 interface PlatformDisplay {
   fun initialize(config: PlatformDisplayConfig)
   fun swapBuffers()
   fun getInfo(): WindowInfo
   fun hasFocus(): Boolean
   fun setOptions(previous: PlatformDisplayConfig, options: PlatformDisplayConfig)
+  fun getDisplayModes(): List<DisplayMode>
   fun shutdown()
 
   val loadImage: ImageLoader

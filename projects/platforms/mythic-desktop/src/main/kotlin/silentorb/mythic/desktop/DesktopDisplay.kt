@@ -137,8 +137,22 @@ val loadImageFromFile: ImageLoader = { filePath ->
 }
 
 fun setDisplayOptions(window: Long, previous: PlatformDisplayConfig, options: PlatformDisplayConfig) {
-  if (previous.windowMode != options.windowMode) {
+  if (
+      previous.windowMode != options.windowMode ||
+      (options.windowMode == WindowMode.windowed && previous.windowedDimensions != options.windowedDimensions) ||
+      (options.windowMode == WindowMode.fullscreen && previous.fullscreenDimensions != options.fullscreenDimensions)
+  ) {
     initializeWindow(window, options)
+  }
+}
+
+fun getDesktopDisplayModes(): List<DisplayMode> {
+  val monitor = glfwGetPrimaryMonitor()
+  val modes = glfwGetVideoModes(monitor)
+  return modes.map {
+    DisplayMode(
+        resolution = Vector2i(it.width(), it.height())
+    )
   }
 }
 
@@ -154,6 +168,8 @@ class DesktopDisplay(val window: Long) : PlatformDisplay {
   override fun setOptions(previous: PlatformDisplayConfig, options: PlatformDisplayConfig) {
     setDisplayOptions(window, previous, options)
   }
+
+  override fun getDisplayModes(): List<DisplayMode> = getDesktopDisplayModes()
 
   override fun shutdown() {
     // The window will eventually get destroyed automatically when the application closes

@@ -77,7 +77,7 @@ fun applyFrameBufferTexture(renderer: SceneRenderer, filter: ScreenFilter) {
   val canvasDependencies = getStaticCanvasDependencies()
   val offscreenBuffer = renderer.renderer.offscreenBuffers.first()
   val config = renderer.renderer.options
-  val scale = Vector2(config.windowedDimensions.x.toFloat(), config.windowedDimensions.y.toFloat()) / renderer.viewport.zw.toVector2()
+  val scale = Vector2(config.windowedResolution.x.toFloat(), config.windowedResolution.y.toFloat()) / renderer.viewport.zw.toVector2()
   filter(renderer.renderer.shaders, scale)
   activateTextures(listOf(offscreenBuffer.colorTexture, offscreenBuffer.depthTexture!!))
   canvasDependencies.meshes.image.draw(DrawMethod.triangleFan)
