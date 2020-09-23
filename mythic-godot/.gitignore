@@ -1,0 +1,5 @@
+.idea
+
+# Files placed in src by Godot
+*.obj
+__pycache__

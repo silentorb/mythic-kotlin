@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+
+import os
+from platform_methods import run_in_subprocess
+import glob
+
+Import("env")
+
+print("Hello World!!!")
+print(Dir('#').abspath)
+
+windows_module_path = Dir("#").abspath.replace("\\", "/")
+common_win = glob.glob(windows_module_path + "/platform/windows/*.cpp")
+print(common_win)
+res_file = windows_module_path + "/godot_res.rc"
+res_target = "godot_res" + env["OBJSUFFIX"]
+res_obj = env.RES(res_target, res_file)
+
+def add_shared_library(env, name, sources, **args):
+    library = env.SharedLibrary(name, sources, **args)
+    env.NoCache(library)
+    return library
+
+prog = env.add_shared_library("#bin/godot", common_win + res_obj, PROGSUFFIX=env["PROGSUFFIX"])
