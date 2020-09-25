@@ -40,6 +40,10 @@ val centered: Aligner = { parent, child ->
   max(0, (parent - child) / 2)
 }
 
+fun percentage(value: Float): Aligner = { parent, _ ->
+  (parent.toFloat() * value).toInt()
+}
+
 fun axisMargin(plane: Plane, all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): (LengthFlower) -> LengthFlower = { child ->
   { length ->
     val sizeOffset = Vector2i(left + right, top + bottom)
@@ -54,6 +58,13 @@ fun axisMargin(plane: Plane, all: Int = 0, left: Int = all, top: Int = all, bott
             )
         )
     )
+  }
+}
+
+fun lengthToFlower(plane: Plane): (LengthFlower) -> Flower = { lengthFlower ->
+  { dimensions ->
+    val length = plane(dimensions).x
+    lengthFlower(length)
   }
 }
 
@@ -81,32 +92,72 @@ fun centered(box: Box): Flower = { dimensions ->
   )
 }
 
-fun lengthToFlower(plane: Plane): (LengthFlower) -> Flower = { flower ->
-  { dimensions ->
-    flower(plane(dimensions).x)
+fun align(aligner: Aligner): (Plane) -> (Box) -> LengthFlower = { plane ->
+  { box ->
+    { length ->
+      val relativeBoxDimensions = plane(box.dimensions)
+      val offset = plane(
+          Vector2i(
+              aligner(length, relativeBoxDimensions.x),
+              relativeBoxDimensions.y
+          )
+      )
+
+      // Currently doesn't support negative numbers
+      assert(offset.x >= 0)
+      assert(offset.y >= 0)
+
+      Box(
+          dimensions = box.dimensions + offset,
+          boxes = listOf(OffsetBox(box, offset))
+      )
+    }
   }
 }
 
-fun centeredAxis(plane: Plane): (Box) -> LengthFlower = { box ->
-  { length ->
-    val relativeBoxDimensions = plane(box.dimensions)
-    val offset = plane(
-        Vector2i(
-            centered(length, relativeBoxDimensions.x),
-            relativeBoxDimensions.y
+
+fun align(horizontal: Aligner, vertical: Aligner): (Box) -> Flower =
+    { box ->
+      { dimensions ->
+        val offset = Vector2i(
+            horizontal(dimensions.x, box.dimensions.x),
+            vertical(dimensions.y, box.dimensions.y)
         )
-    )
 
-    // Currently doesn't support negative numbers
-    assert(offset.x >= 0)
-    assert(offset.y >= 0)
+        // Currently doesn't support negative numbers
+        assert(offset.x >= 0)
+        assert(offset.y >= 0)
 
-    Box(
-        dimensions = box.dimensions + offset,
-        boxes = listOf(OffsetBox(box, offset))
-    )
-  }
-}
+        Box(
+            dimensions = box.dimensions + offset,
+            boxes = listOf(OffsetBox(box, offset))
+        )
+      }
+    }
+
+val centeredAxis = align(centered)
+//fun centeredAxis(plane: Plane): (Box) -> LengthFlower = { box ->
+//  { length ->
+//    val relativeBoxDimensions = plane(box.dimensions)
+//    val offset = plane(
+//        Vector2i(
+//            centered(length, relativeBoxDimensions.x),
+//            relativeBoxDimensions.y
+//        )
+//    )
+//
+//    // Currently doesn't support negative numbers
+//    assert(offset.x >= 0)
+//    assert(offset.y >= 0)
+//
+//    Box(
+//        dimensions = box.dimensions + offset,
+//        boxes = listOf(OffsetBox(box, offset))
+//    )
+//  }
+//}
+
+fun percentageAxis(plane: Plane, value: Float) = align(percentage(value))(plane)
 
 val justifiedEnd: ReversePlanePositioner = { plane ->
   { parent, child ->
@@ -123,11 +174,5 @@ val justifiedStart: ReversePlanePositioner = { plane ->
 fun fixedReverse(value: Int): ReversePlanePositioner = { plane ->
   { _, _ ->
     value
-  }
-}
-
-fun percentage(value: Float): PlanePositioner = { plane ->
-  { parent ->
-    (plane.x(parent).toFloat() * value).toInt()
   }
 }

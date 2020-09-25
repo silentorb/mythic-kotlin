@@ -21,31 +21,6 @@ data class Bounds(
   val bottom: Int get() = position.y + dimensions.y
 }
 
-//data class Bounds(
-//    val position: Vector2i = Vector2i(),
-//    val dimensions: Vector2i
-//) {
-//  constructor(x: Int, y: Int, width: Int, height: Int) :
-//      this(Vector2i(x, y), Vector2i(width, height))
-//
-//  constructor(values: Vector4i) :
-//      this(Vector2i(values.x, values.y), Vector2i(values.z, values.w))
-//
-//  val left: Int get() = position.x
-//  val top: Int get() = position.y
-//  val right: Int get() = position.x + dimensions.x
-//  val bottom: Int get() = position.y + dimensions.y
-//
-//  val end: Vector2i get() = position + dimensions
-//
-//  fun toVector4i() = Vector4i(position.x, position.y, dimensions.x, dimensions.y)
-//
-//  companion object {
-//    fun fromEnds(left: Int, top: Int, right: Int, bottom: Int) =
-//        Bounds(left, top, right - left, bottom - top)
-//  }
-//}
-
 fun toVector4i(bounds: Bounds) = Vector4i(bounds.position.x, bounds.position.y, bounds.dimensions.x, bounds.dimensions.y)
 
 fun mergeDimensions(boxes: List<Box>): Vector2i =
@@ -54,58 +29,11 @@ fun mergeDimensions(boxes: List<Box>): Vector2i =
         boxes.maxOfOrNull { it.dimensions.y } ?: 0,
     )
 
-//fun mergeBounds(list: List<Bounds>): Bounds {
-//  if (list.none())
-//    return Bounds(0, 0, 0, 0)
-//
-//  val left = list.minBy { it.left }!!.left
-//  val right = list.maxBy { it.right }!!.right
-//  val top = list.minBy { it.top }!!.top
-//  val bottom = list.maxBy { it.bottom }!!.bottom
-//  return Bounds(
-//      x = left,
-//      y = top,
-//      width = right - left,
-//      height = bottom - top
-//  )
-//}
-
-//val emptyBounds = Bounds(0, 0, 0, 0)
-
 typealias Depiction = (Bounds, Canvas) -> Unit
 typealias StateBag = Map<String, Any>
 typealias StateBagMods = StateBag?
 
 fun crop(bounds: Bounds, canvas: Canvas, action: () -> Unit) = canvas.crop(toVector4i(bounds), action)
-
-//fun listBounds(plane: Plane, padding: Int, dimensions: Vector2i, lengths: List<Int>): List<Bounds> {
-//  var progress = 0
-//  val otherLength = plane(dimensions).y
-//
-//  return lengths.mapIndexed { i, length ->
-//    val b = Bounds(
-//        plane(Vector2i(progress, 0)),
-//        plane(Vector2i(length, otherLength))
-//    )
-//    progress += length
-//    if (i != lengths.size - 1)
-//      progress += padding
-//
-//    b
-//  }
-//}
-
-typealias LengthArrangement = (dimensions: Vector2i, lengths: List<Int>) -> List<Bounds>
-
-//fun lengthArranger(plane: Plane, padding: Int): LengthArrangement = { dimensions, lengths: List<Int> ->
-//  listBounds(plane, padding, dimensions, lengths)
-//}
-
-//fun fixedLengthArranger(plane: Plane, spacing: Int, lengths: List<Int?>): FixedChildArranger = { dimensions ->
-//  val totalPadding = spacing * (lengths.size - 1)
-//  val boundLength = plane(dimensions).x - totalPadding
-//  lengthArranger(plane, spacing)(dimensions, resolveLengths(boundLength, lengths))
-//}
 
 fun centeredPosition(boundsLength: Int, length: Int): Int =
     (boundsLength - length) / 2
@@ -180,18 +108,3 @@ fun renderLayout(box: Box, canvas: Canvas, debug: Boolean = false) {
     renderBox(canvas, box, Vector2i.zero)
   }
 }
-
-fun centeredPosition(bounds: Bounds, contentDimensions: Vector2i): Vector2i {
-  val dimensions = bounds.dimensions
-  return bounds.position + Vector2i(
-      centeredPosition(horizontalPlane, dimensions, contentDimensions.x),
-      centeredPosition(verticalPlane, dimensions, contentDimensions.y)
-  )
-}
-
-//fun centeredBounds(bounds: Bounds, contentDimensions: Vector2i): Bounds {
-//  return Bounds(
-//      centeredPosition(bounds, contentDimensions) + bounds.position,
-//      contentDimensions
-//  )
-//}

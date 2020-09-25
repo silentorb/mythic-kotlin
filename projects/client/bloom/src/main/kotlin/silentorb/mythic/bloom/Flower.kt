@@ -16,19 +16,8 @@ fun depict(depiction: StateDepiction): Flower = { dimensions ->
   )
 }
 
-fun depict(name: String, depiction: StateDepiction): Flower = { dimensions ->
-  Box(
-      name = name,
-      dimensions = dimensions,
-      depiction = depiction(dimensions)
-  )
-}
-
 fun depict(depiction: Depiction): Flower =
     depict { s: Seed -> depiction }
-
-fun depict(name: String, depiction: Depiction): Flower =
-    depict(name) { s: Seed -> depiction }
 
 typealias StateDepiction = (Seed) -> Depiction
 
@@ -38,14 +27,3 @@ inline fun <reified T> existingOrNewState(crossinline initializer: () -> T): (An
   else
     initializer()
 }
-
-typealias BagGetter<T> = (StateBag) -> T
-
-inline fun <reified T> existingOrNewState(key: String, crossinline initializer: () -> T): BagGetter<T> = { bag ->
-  val value = bag[key]
-  if (value is T)
-    value
-  else
-    initializer()
-}
-

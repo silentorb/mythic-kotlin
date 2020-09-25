@@ -2,7 +2,6 @@ package silentorb.mythic.bloom
 
 import silentorb.mythic.spatial.Vector2i
 
-typealias FlowerContainer = (List<Flower>) -> Flower
 typealias SimpleBoxContainer = (List<Box>) -> Box
 
 tailrec fun arrangeListItems(plane: Plane, spacing: Int, boxes: List<Box>, length: Int = 0, accumulator: List<OffsetBox> = listOf()): List<OffsetBox> =

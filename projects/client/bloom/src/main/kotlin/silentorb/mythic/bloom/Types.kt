@@ -38,11 +38,7 @@ data class OffsetBox(
   val bounds: Bounds get() = Bounds(position = offset, dimensions = dimensions)
 }
 
-
 typealias Seed = Vector2i
 typealias Flower = (Seed) -> Box
 typealias WildFlower = (Box) -> Box
 typealias LengthFlower = (Int) -> Box
-
-typealias FlowerWrapper = (Flower) -> Flower
-typealias IndexedFlowerWrapper = (Int, Flower) -> Flower
