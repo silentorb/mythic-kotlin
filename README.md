@@ -22,3 +22,10 @@ This project isn't being published with the expectation that people can grab it 
 Initially this version of Mythic was created in a monorepo alongside one of the innumerable iterations of a Marloth game.  Now it's in the middle of being extracted into it's own repo.  Most of the general modules were already separate from the game and in their own mythic folder.  Some of the general modules were slightly more tied the to game but could easily be disconnected and moved here.
 
 Much of Mythic as it is doesn't make sense and is incomplete without the Marloth codebase as at least a template.  The plan is to eventually release the Marloth code as open source similar to Id Software's release model.
+
+## Dependencies
+
+### FreeType
+
+* Font functionality depends on [java-freetype](https://github.com/silentorb/java-freetype)
+* When debugging you can use something like `-Djava.library.path="/path-to/java-freetype/cmake-build-debug/bin"`

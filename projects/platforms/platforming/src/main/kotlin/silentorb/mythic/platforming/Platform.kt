@@ -21,7 +21,7 @@ const val generalGamepadDeviceIndex = 2
 interface PlatformInput {
   fun update()
   fun getMousePosition(): Vector2
-  fun isMouseVisible(value: Boolean)
+  fun setMouseVisibility(value: Boolean)
   fun getEvents(): List<InputEvent>
 }
 

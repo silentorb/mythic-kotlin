@@ -1,5 +1,7 @@
 import java.nio.file.Files
 
+// TODO: Make Imp and Mythic paths configurable
+
 includeBuild("../imp")
 
 Files.list(file("modules").toPath())
