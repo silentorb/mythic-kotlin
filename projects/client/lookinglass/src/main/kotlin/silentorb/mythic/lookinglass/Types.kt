@@ -82,7 +82,8 @@ data class Renderer(
     val armatures: Map<ArmatureName, Armature>,
     val vertexSchemas: VertexSchemas,
     val fonts: List<FontSet>,
-    val offscreenBuffers: List<OffscreenBuffer>
+    val offscreenBuffers: List<OffscreenBuffer>,
+    val textures: DynamicTextureLibrary = mutableMapOf()
 ) {
   val renderColor: ByteTextureBuffer = ByteTextureBuffer()
   val renderDepth: FloatTextureBuffer = FloatTextureBuffer()
@@ -96,7 +97,6 @@ data class Renderer(
   val shaderCache: ShaderCache = mutableMapOf()
   val getShader = getCachedShader(uniformBuffers, shaderCache)
   val drawing = createDrawingEffects()
-  val textures: DynamicTextureLibrary = mutableMapOf()
   val dynamicMesh = MutableSimpleMesh(vertexSchemas.flat)
 }
 
