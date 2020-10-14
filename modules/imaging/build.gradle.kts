@@ -18,8 +18,8 @@ dependencies {
   implementation("silentorb.mythic:randomly")
   implementation("silentorb.mythic:debugging")
   implementation("silentorb.mythic:mythic-shape-meshes")
-  api("org.lwjgl:lwjgl:3.1.5")
-  api("org.lwjgl:lwjgl:3.1.5:natives-windows")
+  api("org.lwjgl:lwjgl:3.2.3")
+  api("org.lwjgl:lwjgl:3.2.3:natives-windows")
 
   testImplementation("org.junit.jupiter:junit-jupiter:5.6.1")
   testImplementation("silentorb.imp:testing")

@@ -14,8 +14,8 @@ dependencies {
   api("silentorb.mythic:randomly")
   implementation("silentorb.imp:execution")
   implementation("silentorb.imp:libraries_standard")
-  implementation("org.lwjgl:lwjgl:3.1.5")
-  implementation("org.lwjgl:lwjgl:3.1.5:natives-windows")
+  implementation("org.lwjgl:lwjgl:3.2.3")
+  implementation("org.lwjgl:lwjgl:3.2.3:natives-windows")
 
   testImplementation("org.junit.jupiter:junit-jupiter:5.6.1")
   testImplementation("silentorb.imp:testing")

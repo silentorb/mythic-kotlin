@@ -3,7 +3,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 object Versions {
   const val gdx = "1.9.9"
   const val kotlin = "1.4.0"
-  const val lwjgl = "3.1.5"
+  const val lwjgl = "3.2.3"
 }
 
 object Natives {

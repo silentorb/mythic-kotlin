@@ -5,6 +5,8 @@ import imgui.ImGui
 import imgui.flag.ImGuiConfigFlags
 import imgui.gl3.ImGuiImplGl3
 import imgui.glfw.ImGuiImplGlfw
+import org.lwjgl.glfw.GLFW.glfwGetCurrentContext
+import org.lwjgl.glfw.GLFW.glfwMakeContextCurrent
 
 private var imguiInitialized: Boolean = false
 private var imGuiGlfw: ImGuiImplGlfw? = null
@@ -17,7 +19,7 @@ fun initializeImGui(fonts: List<Typeface>, window: Long) {
   io.iniFilename = null
   io.addConfigFlags(ImGuiConfigFlags.NavEnableKeyboard)
   io.addConfigFlags(ImGuiConfigFlags.DockingEnable)
-  io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable)
+//  io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable)
   io.configViewportsNoTaskBarIcon = true
   val fontAtlas = io.fonts
   val fontConfig = ImFontConfig()
@@ -31,6 +33,7 @@ fun initializeImGui(fonts: List<Typeface>, window: Long) {
 
   imGuiGlfw = ImGuiImplGlfw()
   imGuiGlfw!!.init(window, true)
+  imGuiGl3 = ImGuiImplGl3()
   imGuiGl3!!.init()
 }
 
@@ -63,4 +66,9 @@ fun updateEditorGui() {
 
   ImGui.render()
   imGuiGl3!!.renderDrawData(ImGui.getDrawData())
+
+//  val window = glfwGetCurrentContext()
+//  ImGui.updatePlatformWindows()
+//  ImGui.renderPlatformWindowsDefault()
+//  glfwMakeContextCurrent(window)
 }

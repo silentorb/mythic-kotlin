@@ -19,6 +19,6 @@ tasks {
 }
 
 dependencies {
-  api("org.lwjgl:lwjgl:3.1.5")
-  api("org.lwjgl:lwjgl:3.1.5:natives-windows")
+  api("org.lwjgl:lwjgl:3.2.3")
+  api("org.lwjgl:lwjgl:3.2.3:natives-windows")
 }

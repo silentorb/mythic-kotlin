@@ -45,7 +45,7 @@ fun centerWindow(window: Long) {
 
     glfwGetWindowSize(window, width, height)
 
-    val videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor())
+    val videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor())!!
 
     glfwSetWindowPos(
         window,
@@ -57,7 +57,7 @@ fun centerWindow(window: Long) {
 
 fun initializeFullscreen(window: Long, resolution: Vector2i? = null) {
   val monitor = glfwGetPrimaryMonitor()
-  val videoMode = glfwGetVideoMode(monitor)
+  val videoMode = glfwGetVideoMode(monitor)!!
   glfwSetWindowMonitor(
       window, monitor, 0, 0,
       resolution?.x ?: videoMode.width(),
@@ -69,7 +69,7 @@ fun initializeFullscreen(window: Long, resolution: Vector2i? = null) {
 
 fun initializeWindowed(window: Long, dimensions: Vector2i) {
   val monitor = glfwGetPrimaryMonitor()
-  val videoMode = glfwGetVideoMode(monitor)
+  val videoMode = glfwGetVideoMode(monitor)!!
   glfwSetWindowMonitor(window, 0, 0, 0, dimensions.x, dimensions.y, videoMode.refreshRate())
   glfwSetWindowSize(window, dimensions.x, dimensions.y)
   centerWindow(window)
@@ -148,7 +148,7 @@ fun setDisplayOptions(window: Long, previous: PlatformDisplayConfig, options: Pl
 
 fun getDesktopDisplayModes(): List<DisplayMode> {
   val monitor = glfwGetPrimaryMonitor()
-  val modes = glfwGetVideoModes(monitor)
+  val modes = glfwGetVideoModes(monitor)!!
   return modes.map {
     DisplayMode(
         resolution = Vector2i(it.width(), it.height())

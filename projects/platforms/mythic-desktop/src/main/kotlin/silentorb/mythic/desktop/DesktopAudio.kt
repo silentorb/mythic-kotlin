@@ -55,7 +55,7 @@ fun loadSoundFromFile(filePath: String): LoadSoundResult {
     2 -> AL_FORMAT_STEREO16
     else -> throw Error("Invalid channel count for audio file $filePath: $channels")
   }
-  val result = loadSoundFromBuffer(audioBuffer, channels, sampleRate)
+  val result = loadSoundFromBuffer(audioBuffer!!, channels, sampleRate)
   free(audioBuffer)
   return result
 }
@@ -76,7 +76,7 @@ class DesktopAudio : PlatformAudio {
   val isActive: Boolean get() = device != 0L
 
   override fun start(latency: Int) {
-    val defaultDeviceName: String = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER)
+    val defaultDeviceName: String = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER)!!
     device = alcOpenDevice(defaultDeviceName)
 
     val attributes = intArrayOf(0)
