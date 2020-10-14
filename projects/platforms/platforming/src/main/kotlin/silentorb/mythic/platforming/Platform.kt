@@ -6,7 +6,7 @@ import silentorb.mythic.spatial.Vector3
 import java.nio.ByteBuffer
 import java.nio.ShortBuffer
 
-data class WindowInfo(val dimensions: Vector2i)
+data class WindowInfo(val dimensions: Vector2i, val id: Long)
 
 data class InputEvent(
     val device: Int,

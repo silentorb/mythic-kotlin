@@ -96,7 +96,7 @@ fun getWindowInfo(window: Long): WindowInfo {
     val height = stack.mallocInt(1)
     glfwGetWindowSize(window, width, height)
 
-    return WindowInfo(Vector2i(width.get(), height.get()))
+    return WindowInfo(Vector2i(width.get(), height.get()), window)
   }
 }
 

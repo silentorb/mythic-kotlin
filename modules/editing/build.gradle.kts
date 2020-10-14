@@ -1,0 +1,28 @@
+plugins {
+  kotlin("jvm") version "1.4.0"
+}
+
+group = "silentorb.mythic"
+
+repositories {
+  jcenter()
+  mavenCentral()
+}
+
+dependencies {
+  implementation("io.imgui.java:imgui-java-binding:1.78-1.3.0")
+  implementation("io.imgui.java:imgui-java-lwjgl3:1.78-1.3.0")
+  runtimeOnly("io.imgui.java:imgui-java-natives-windows:1.78-1.3.0")
+  api("silentorb.mythic:spatial")
+  implementation("silentorb.mythic:resource-loading")
+  api("silentorb.mythic:spatial_serialization")
+}
+
+tasks {
+  compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+  }
+  compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+  }
+}

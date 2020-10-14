@@ -3,9 +3,6 @@ package silentorb.mythic.lookinglass
 import silentorb.mythic.resource_loading.getResourceStream
 import silentorb.mythic.resource_loading.getResourceUrl
 import silentorb.mythic.resource_loading.getUrlPath
-import java.io.InputStream
-import java.net.URI
-import java.net.URL
 import java.nio.file.*
 import java.util.*
 
