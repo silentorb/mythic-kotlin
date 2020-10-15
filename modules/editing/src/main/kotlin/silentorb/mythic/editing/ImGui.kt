@@ -51,10 +51,6 @@ fun ensureImGuiIsInitialized(fonts: List<Typeface>, window: Long) {
   }
 }
 
-fun drawEditor() {
-
-}
-
 fun updateEditorGui() {
   if (!imguiInitialized)
     return
