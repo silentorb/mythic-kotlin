@@ -2,6 +2,7 @@ package silentorb.mythic.editing
 
 import silentorb.mythic.spatial.Quaternion
 import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.Vector4i
 
 data class Node(
     val type: String,
@@ -19,4 +20,8 @@ data class Typeface(
     val name: String,
     val path: String,
     val size: Float
+)
+
+data class EditorResult(
+    val viewport: Vector4i?
 )

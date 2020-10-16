@@ -196,5 +196,8 @@ class Canvas(
   fun crop(value: Vector4i, action: () -> Unit) = cropStack(value, action)
 
   fun flipViewport(value: Vector4i): Vector4i =
-      Vector4i(value.x, viewportDimensions.y.toInt() - value.y - value.w, value.z, value.w)
+      flipViewport(viewportDimensions.y.toInt(), value)
 }
+
+fun flipViewport(viewportHeight: Int, value: Vector4i): Vector4i =
+    Vector4i(value.x, viewportHeight - value.y - value.w, value.z, value.w)

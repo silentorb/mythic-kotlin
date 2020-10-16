@@ -19,8 +19,11 @@ fun initializeImGui(fonts: List<Typeface>, window: Long) {
   io.iniFilename = null
   io.addConfigFlags(ImGuiConfigFlags.NavEnableKeyboard)
   io.addConfigFlags(ImGuiConfigFlags.DockingEnable)
-//  io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable)
+  io.configDockingTransparentPayload = true
+  io.configViewportsNoAutoMerge = true
   io.configViewportsNoTaskBarIcon = true
+  io.iniFilename = "editor.ini"
+
   val fontAtlas = io.fonts
   val fontConfig = ImFontConfig()
   fontConfig.glyphRanges = fontAtlas.glyphRangesCyrillic
@@ -51,20 +54,17 @@ fun ensureImGuiIsInitialized(fonts: List<Typeface>, window: Long) {
   }
 }
 
-fun updateEditorGui() {
+fun defineEditorGui(): EditorResult? {
   if (!imguiInitialized)
-    return
+    return null
 
   imGuiGlfw!!.newFrame()
   ImGui.newFrame()
 
-  drawEditor()
+  return drawEditor()
+}
 
+fun renderEditorGui() {
   ImGui.render()
   imGuiGl3!!.renderDrawData(ImGui.getDrawData())
-
-//  val window = glfwGetCurrentContext()
-//  ImGui.updatePlatformWindows()
-//  ImGui.renderPlatformWindowsDefault()
-//  glfwMakeContextCurrent(window)
 }
