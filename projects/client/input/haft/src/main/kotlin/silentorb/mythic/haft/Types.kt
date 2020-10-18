@@ -30,31 +30,11 @@ data class HaftCommand(
     val device: Int
 )
 
-fun simpleCommand(type: Any, device: Int, target: Long = 0, value: Any? = 1f): HaftCommand =
-    HaftCommand(
-        type = type,
-        target = target,
-        value = value,
-        device = device
-    )
-
-data class Gamepad(val id: Int, val name: String)
-
 typealias HaftCommands = List<HaftCommand>
-
-typealias CommandHandler = (HaftCommand) -> Unit
-
-//typealias InputTriggerState = Map<Binding, TriggerState?>
 
 typealias Bindings = List<Binding>
 
-typealias ScalarInputSource = (trigger: Int) -> Float
-
-typealias MultiDeviceScalarInputSource = (device: Int, trigger: Int) -> Float
-
 typealias InputProfiles = List<Bindings>
-
-val disconnectedScalarInputSource: ScalarInputSource = { 0f }
 
 fun newInputDeviceState() =
     InputDeviceState(

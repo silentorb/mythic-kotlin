@@ -5,12 +5,11 @@ import imgui.ImGui
 import imgui.flag.ImGuiConfigFlags
 import imgui.gl3.ImGuiImplGl3
 import imgui.glfw.ImGuiImplGlfw
-import org.lwjgl.glfw.GLFW.glfwGetCurrentContext
-import org.lwjgl.glfw.GLFW.glfwMakeContextCurrent
 
 private var imguiInitialized: Boolean = false
 private var imGuiGlfw: ImGuiImplGlfw? = null
 private var imGuiGl3: ImGuiImplGl3? = null
+private var renderReady: Boolean = false
 
 fun initializeImGui(fonts: List<Typeface>, window: Long) {
   imguiInitialized = true
@@ -54,17 +53,37 @@ fun ensureImGuiIsInitialized(fonts: List<Typeface>, window: Long) {
   }
 }
 
-fun defineEditorGui(): EditorResult? {
+fun defineEditorGui(state: Editor): Editor {
   if (!imguiInitialized)
-    return null
+    return state.copy(
+        viewport = null
+    )
 
+  if (renderReady)
+    return state
+
+  renderReady = true
   imGuiGlfw!!.newFrame()
   ImGui.newFrame()
 
-  return drawEditor()
+  return drawEditor(state)
+}
+
+fun prepareEditorGui(fonts: List<Typeface>, window: Long,  state: Editor?): Editor? {
+  return if (state?.isActive == true) {
+    ensureImGuiIsInitialized(fonts, window)
+    defineEditorGui(state)
+  } else
+    state
 }
 
 fun renderEditorGui() {
-  ImGui.render()
+  if (!imguiInitialized)
+    return
+
+  if (renderReady) {
+    ImGui.render()
+    renderReady = false
+  }
   imGuiGl3!!.renderDrawData(ImGui.getDrawData())
 }

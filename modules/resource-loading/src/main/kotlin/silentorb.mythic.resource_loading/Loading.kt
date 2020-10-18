@@ -7,6 +7,7 @@ import java.net.URL
 import java.nio.ByteBuffer
 import java.nio.channels.Channels
 import java.nio.file.*
+import kotlin.streams.toList
 
 class Loading
 
@@ -102,3 +103,10 @@ fun ioResourceToByteBuffer(resource: String, bufferSize: Int = 8 * 1024): ByteBu
   return buffer
 }
 
+fun listFiles(path: Path): List<Path> =
+    Files.list(path)
+        .use { paths ->
+          paths
+              .toList()
+              .filterIsInstance<Path>()
+        }

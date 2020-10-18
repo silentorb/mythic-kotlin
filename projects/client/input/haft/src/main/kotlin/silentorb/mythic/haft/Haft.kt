@@ -35,30 +35,5 @@ fun mapEventsToCommands(deviceStates: List<InputDeviceState>, getBinding: Bindin
       }
 }
 
-fun getBindingSimple(bindings: List<Binding>, strokes: Set<Any>): BindingSource = { event ->
-  val binding = bindings.firstOrNull {
-    val values = DeviceIndex.values()
-    it.device == values[Math.min(2, event.device)] && it.trigger == event.index
-  }
-  if (binding != null)
-    Triple(binding, 0, strokes.contains(binding.command))
-  else
-    null
-}
-
-fun applyCommands(commands: HaftCommands, actions: Map<Any, (HaftCommand) -> Unit>) {
-  commands.filter { actions.containsKey(it.type) }
-      .forEach { actions[it.type]!!(it) }
-}
-
 fun createBindings(device: DeviceIndex, bindings: Map<Int, Any>) =
     bindings.map { Binding(device, it.key, it.value) }
-
-fun isActive(commands: List<HaftCommand>, commandType: Any): Boolean =
-    commands.any { it.type == commandType }
-
-fun isActive(commands: List<HaftCommand>): (Any) -> Boolean =
-    { commandType -> isActive(commands, commandType) }
-
-fun getCommand(commands: List<HaftCommand>, commandType: Any) =
-    commands.first { it.type == commandType }
