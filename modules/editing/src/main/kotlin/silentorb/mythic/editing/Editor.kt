@@ -30,10 +30,9 @@ fun renderTree(graph: Graph, id: String, node: Node) {
   val isOpen = ImGui.treeNodeEx("Tree-$id", flags, id)
   if (ImGui.isItemClicked()) {
     if (selected) {
-      println("Removed $id")
       nodeSelection.remove(id)
     } else {
-      println("Added $id")
+      nodeSelection.clear()
       nodeSelection.add(id)
     }
   }
@@ -56,7 +55,9 @@ fun panelBackground() {
   )
 }
 
-fun drawEditor(state:  Editor): Editor {
+fun drawEditor(editor: Editor): Editor {
+  val graph = editor.graphLibrary[editor.graph]
+
   if (ImGui.beginMainMenuBar()) {
     if (ImGui.beginMenu("Edit")) {
       ImGui.menuItem("Foo", "F")
@@ -72,19 +73,12 @@ fun drawEditor(state:  Editor): Editor {
   ImGui.begin("Tree", ImGuiWindowFlags.MenuBar)
   panelBackground()
 
-  val graph = mapOf(
-      "Node 1" to Node(
-          type = "foo",
-      ),
-      "Node 2" to Node(
-          type = "foo",
-          parent = "Node 1"
-      )
-  )
-  val rootNodes = graph.filter { it.value.parent == null }
-  assert(rootNodes.size == 1)
-  val (rootId, rootRecord) = rootNodes.entries.first()
-  renderTree(graph, rootId, rootRecord)
+  if (graph != null) {
+    val rootNodes = graph.filter { it.value.parent == null }
+    assert(rootNodes.size == 1)
+    val (rootId, rootRecord) = rootNodes.entries.first()
+    renderTree(graph, rootId, rootRecord)
+  }
   ImGui.end()
 
   ImGui.begin("Viewport", ImGuiWindowFlags.MenuBar or ImGuiWindowFlags.NoBackground)
@@ -94,7 +88,7 @@ fun drawEditor(state:  Editor): Editor {
   )
   ImGui.end()
 
-  return state.copy(
+  return editor.copy(
       viewport = viewport
   )
 }

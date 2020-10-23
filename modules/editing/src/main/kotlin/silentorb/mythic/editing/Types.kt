@@ -28,7 +28,8 @@ data class Typeface(
 
 data class Editor(
     val isActive: Boolean = false,
-    val graph: Graph = mapOf(),
+    val graphLibrary: GraphLibrary = mapOf(),
+    val graph: String? = null,
     val selection: Set<String> = setOf(),
     val viewport: Vector4i? = null
 )
