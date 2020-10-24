@@ -71,6 +71,9 @@ fun getDebugString(name: String): String? {
   return dotEnv!![name]
 }
 
+fun getConfigString(name: String): String? =
+    getDebugString(name)
+
 fun getDebugInt(name: String): Int? =
     getDebugString(name)?.toIntOrNull()
 
