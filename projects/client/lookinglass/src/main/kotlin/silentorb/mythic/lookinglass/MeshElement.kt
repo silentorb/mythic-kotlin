@@ -17,9 +17,9 @@ data class ElementAnimation(
 )
 
 data class MeshElement(
-    val id: Long,
+    val id: Long = 1L,
     val mesh: MeshName,
-    val transform: Matrix,
+    val transform: Matrix = Matrix.identity,
     val location: Vector3 = Vector3.zero,
     val material: Material? = null
 )

@@ -27,12 +27,12 @@ fun loadFromResources(fileName: String): ByteArray? {
   }
 }
 
-
 fun loadGraph(path: String): Graph =
-    loadJsonResource<GraphFile>(path).nodes
+    loadJsonResource<GraphFile>(path).graph
+        .map { Entry(it[0].toString(), it[1].toString(), it[2]) }
 
 fun saveGraph(path: String, graph: Graph) =
-    saveJsonResource(path, GraphFile(nodes = graph))
+    saveJsonResource(path, GraphFile(graph = graph.map { listOf(it.source, it.property, it.target) }))
 
 fun loadGraphLibrary(directoryPath: String): GraphLibrary {
   val rootPath = getUrlPath(directoryPath)
@@ -41,7 +41,7 @@ fun loadGraphLibrary(directoryPath: String): GraphLibrary {
   val library = files.associate { filePath ->
     val name = filePath.fileName.toString().dropLast(".json".length)
     val relativePath = resourcesPath.relativize(filePath)
-    val graph = loadGraph(relativePath.toString())
+    val graph = loadGraph(relativePath.toString().replace("\\", "/"))
     name to graph
   }
   return library

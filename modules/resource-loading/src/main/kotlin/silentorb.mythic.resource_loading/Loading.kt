@@ -7,6 +7,7 @@ import java.net.URL
 import java.nio.ByteBuffer
 import java.nio.channels.Channels
 import java.nio.file.*
+import java.util.*
 import kotlin.streams.toList
 
 class Loading
@@ -22,6 +23,13 @@ fun getResourceUrl(path: String): URL? =
 
 fun getResourceStream(path: String): InputStream? =
     Loading::class.java.classLoader.getResourceAsStream(sanitizeResourcePath(path))
+
+fun loadTextResource(name: String): String =
+    getResourceStream(name).use { inputStream ->
+      val s = Scanner(inputStream!!).useDelimiter("\\A")
+      val result = if (s.hasNext()) s.next() else ""
+      result
+    }
 
 fun bufferStream(input: InputStream): ByteBuffer {
   val array = ByteArray(input.available())

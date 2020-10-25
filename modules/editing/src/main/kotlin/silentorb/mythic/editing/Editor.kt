@@ -8,9 +8,9 @@ import silentorb.mythic.spatial.Vector4i
 
 private val nodeSelection: MutableSet<String> = mutableSetOf()
 
-fun renderTree(graph: Graph, id: String, node: Node) {
+fun renderTree(tree: SceneTree, id: String) {
   val selected = nodeSelection.contains(id)
-  val children = graph.filter { it.value.parent == id }
+  val children = tree.filter { it.value == id }
 
   val selectionFlags = if (selected)
     ImGuiTreeNodeFlags.Selected
@@ -38,7 +38,7 @@ fun renderTree(graph: Graph, id: String, node: Node) {
   }
   if (isOpen) {
     for (child in children) {
-      renderTree(graph, child.key, child.value)
+      renderTree(tree, child.key)
     }
     ImGui.treePop()
   }
@@ -56,7 +56,7 @@ fun panelBackground() {
 }
 
 fun drawEditor(editor: Editor): Editor {
-  val graph = editor.graphLibrary[editor.graph]
+  val graph = getActiveEditorGraph(editor)
 
   if (ImGui.beginMainMenuBar()) {
     if (ImGui.beginMenu("Edit")) {
@@ -74,10 +74,13 @@ fun drawEditor(editor: Editor): Editor {
   panelBackground()
 
   if (graph != null) {
-    val rootNodes = graph.filter { it.value.parent == null }
+    val tree = getSceneTree(graph)
+    val rootNodes = getTripleKeys(graph)
+        .plus(tree.values)
+        .minus(tree.keys)
     assert(rootNodes.size == 1)
-    val (rootId, rootRecord) = rootNodes.entries.first()
-    renderTree(graph, rootId, rootRecord)
+    val rootId = rootNodes.first()
+    renderTree(tree, rootId)
   }
   ImGui.end()
 

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import silentorb.mythic.configuration.getAfterburnerModule
 import silentorb.mythic.configuration.getJsonObjectMapper
 import silentorb.mythic.resource_loading.getResourceStream
+import silentorb.mythic.resource_loading.loadTextResource
 import silentorb.mythic.spatial.Quaternion
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector3i

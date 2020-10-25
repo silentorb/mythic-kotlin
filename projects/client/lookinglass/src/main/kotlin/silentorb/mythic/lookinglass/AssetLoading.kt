@@ -1,17 +1,8 @@
 package silentorb.mythic.lookinglass
 
-import silentorb.mythic.resource_loading.getResourceStream
 import silentorb.mythic.resource_loading.getResourceUrl
 import silentorb.mythic.resource_loading.getUrlPath
 import java.nio.file.*
-import java.util.*
-
-fun loadTextResource(name: String): String =
-    getResourceStream(name).use { inputStream ->
-      val s = Scanner(inputStream!!).useDelimiter("\\A")
-      val result = if (s.hasNext()) s.next() else ""
-      result
-    }
 
 fun scanResources(rootPath: String, extensions: List<String>): List<Path> {
   val modelRootUrl = getResourceUrl(rootPath)

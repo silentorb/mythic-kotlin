@@ -1,6 +1,6 @@
 package silentorb.mythic.lookinglass.shading
 
-import silentorb.mythic.lookinglass.loadTextResource
+import silentorb.mythic.resource_loading.loadTextResource
 
 val lightingHeader = loadTextResource("shaders/lighting.glsl")
 const val maxLodLevels: Int = 10
