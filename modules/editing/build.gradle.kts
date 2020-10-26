@@ -23,6 +23,7 @@ dependencies {
   api("silentorb.mythic:spatial")
   implementation("silentorb.mythic:resource-loading")
   api("silentorb.mythic:spatial_serialization")
+  implementation("silentorb.mythic:character-movement")
 }
 
 tasks {
