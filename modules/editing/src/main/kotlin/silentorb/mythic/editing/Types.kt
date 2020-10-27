@@ -35,6 +35,7 @@ data class Editor(
     val graphLibrary: GraphLibrary = mapOf(),
     val graph: String? = null,
     val selection: NodeSelection = setOf(),
-    val viewport: Vector4i? = null,
+    val viewportBoundsMap: Map<Id, Vector4i> = mapOf(),
+    val cameras: Map<Id, CameraRig> = mapOf(),
     val propertyDefinitions: PropertyDefinitions
 )

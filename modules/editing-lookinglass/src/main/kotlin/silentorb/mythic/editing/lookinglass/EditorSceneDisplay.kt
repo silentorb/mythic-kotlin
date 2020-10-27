@@ -3,7 +3,9 @@ package marloth.integration.editing
 import silentorb.mythic.editing.*
 import silentorb.mythic.lookinglass.*
 import silentorb.mythic.lookinglass.Scene
+import silentorb.mythic.scenery.Camera
 import silentorb.mythic.scenery.LightingConfig
+import silentorb.mythic.scenery.ProjectionType
 
 data class SerialElementData(
     val tree: SceneTree,
@@ -47,10 +49,18 @@ fun nodeToElement(data: SerialElementData, node: Id): ElementGroup? {
   }
 }
 
-fun sceneFromEditorGraph(meshes: ModelMeshMap, editor: Editor, lightingConfig: LightingConfig): GameScene {
-  val camera = newFlyThroughCamera { defaultFlyThroughState() }
+fun cameraRigToCamera(rig: CameraRig): Camera =
+    Camera(
+        projectionType = ProjectionType.perspective,
+        position = rig.location,
+        orientation = rig.orientation,
+        angleOrZoom = 45f,
+    )
+
+fun sceneFromEditorGraph(meshes: ModelMeshMap, editor: Editor, lightingConfig: LightingConfig, viewport: Id): GameScene {
   val graph = getActiveEditorGraph(editor) ?: listOf()
   val data = newSerialElementData(graph)
+  val camera = cameraRigToCamera(editor.cameras[viewport] ?: CameraRig())
 
   val layers = listOf(
       SceneLayer(

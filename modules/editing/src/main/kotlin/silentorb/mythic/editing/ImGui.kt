@@ -56,7 +56,7 @@ fun ensureImGuiIsInitialized(fonts: List<Typeface>, window: Long) {
 fun defineEditorGui(state: Editor): Editor {
   if (!imguiInitialized)
     return state.copy(
-        viewport = null
+        viewportBoundsMap = mapOf()
     )
 
   if (renderReady)

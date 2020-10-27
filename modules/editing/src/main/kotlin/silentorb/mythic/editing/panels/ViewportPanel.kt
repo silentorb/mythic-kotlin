@@ -4,6 +4,8 @@ import imgui.ImGui
 import imgui.flag.ImGuiWindowFlags
 import silentorb.mythic.spatial.Vector4i
 
+const val defaultViewportId = "viewport"
+
 fun drawViewportPanel(): Vector4i {
   ImGui.begin("Viewport", ImGuiWindowFlags.MenuBar or ImGuiWindowFlags.NoBackground)
   val viewport = Vector4i(

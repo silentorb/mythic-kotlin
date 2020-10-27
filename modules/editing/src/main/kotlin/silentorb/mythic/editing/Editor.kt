@@ -1,6 +1,7 @@
 package silentorb.mythic.editing
 
 import imgui.ImGui
+import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.editing.panels.drawPropertiesPanel
 import silentorb.mythic.editing.panels.drawViewportPanel
 import silentorb.mythic.editing.panels.renderTree
@@ -25,7 +26,7 @@ fun drawEditor(editor: Editor): Editor {
   drawPropertiesPanel()
 
   return editor.copy(
-      viewport = viewport,
+      viewportBoundsMap = mapOf(defaultViewportId to viewport),
       selection = nextSelection
   )
 }
