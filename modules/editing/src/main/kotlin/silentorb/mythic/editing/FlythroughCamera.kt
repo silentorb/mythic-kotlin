@@ -1,13 +1,7 @@
 package silentorb.mythic.editing
 
-import silentorb.mythic.cameraman.characterMovementVector
-import silentorb.mythic.cameraman.defaultLookMomentumAxis
-import silentorb.mythic.cameraman.updateFirstPersonFacingRotation
-import silentorb.mythic.cameraman.updateLookVelocityFirstPerson
-import silentorb.mythic.haft.GAMEPAD_AXIS_TRIGGER_LEFT
-import silentorb.mythic.haft.GAMEPAD_AXIS_TRIGGER_RIGHT
-import silentorb.mythic.happenings.CharacterCommand
-import silentorb.mythic.platforming.InputEvent
+import silentorb.mythic.cameraman.*
+import silentorb.mythic.happenings.Command
 import silentorb.mythic.spatial.Quaternion
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
@@ -25,34 +19,7 @@ data class CameraRig(
       .rotateY(-rotation.y)
 }
 
-//fun getFlyThroughCameraState(initialize: () -> FlyThroughCameraState = ::defaultFlyThroughState): FlyThroughCameraState {
-//  if (flyThroughCameraState == null) {
-//    flyThroughCameraState = initialize()
-//  }
-//
-//  return flyThroughCameraState!!
-//}
-
-//fun newFlyThroughCamera(location: Vector3, orientation: Quaternion): Camera =
-//    Camera(
-//        ProjectionType.perspective,
-//        location,
-//        orientation,
-//        defaultAngle
-//    )
-
-//fun newFlyThroughCamera(initialize: () -> FlyThroughCameraState): Camera {
-//  val state = getFlyThroughCameraState(initialize)
-//  return newFlyThroughCamera(state.location, state.facingOrientation)
-//}
-
-fun flyThroughOrientation(camera: CameraRig, commands: List<CharacterCommand>): Vector2 {
-  val firstPersonLookVelocity = updateLookVelocityFirstPerson(commands, defaultLookMomentumAxis(), camera.lookVelocity)
-  return updateFirstPersonFacingRotation(camera.rotation, null, firstPersonLookVelocity * 20f, simulationDelta)
-}
-
-fun updateFlyThroughCamera(commands: List<CharacterCommand>, events: List<InputEvent>, camera: CameraRig): CameraRig {
-//  val commands = mapGameCommands(clientState.players, clientState.commands)
+fun updateFlyThroughCamera(commands: List<Command>, camera: CameraRig): CameraRig {
   val lookVelocity = updateLookVelocityFirstPerson(commands, defaultLookMomentumAxis(), camera.lookVelocity)
   val rotation = updateFirstPersonFacingRotation(camera.rotation, null, lookVelocity * 20f, simulationDelta)
   val movementVector = characterMovementVector(commands, camera.orientation)
@@ -61,11 +28,10 @@ fun updateFlyThroughCamera(commands: List<CharacterCommand>, events: List<InputE
   else
     Vector3.zero
 
-//  val deviceEvents = clientState.input.deviceStates.flatMap { it.events }
   val zSpeed = 15f
-  val zOffset = if (events.any { it.index == GAMEPAD_AXIS_TRIGGER_LEFT }) {
+  val zOffset = if (commands.any { it.type == CameramanCommands.moveUp }) {
     Vector3(0f, 0f, -zSpeed * simulationDelta)
-  } else if (events.any { it.index == GAMEPAD_AXIS_TRIGGER_RIGHT }) {
+  } else if (commands.any { it.type == CameramanCommands.moveDown }) {
     Vector3(0f, 0f, zSpeed* simulationDelta)
   } else
     Vector3.zero

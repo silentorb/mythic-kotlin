@@ -1,5 +1,5 @@
 package silentorb.mythic.happenings
 
-interface GameEvent
+typealias GameEvent = Any
 
 typealias Events = List<GameEvent>

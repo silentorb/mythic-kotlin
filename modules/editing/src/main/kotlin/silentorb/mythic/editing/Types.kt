@@ -31,7 +31,6 @@ typealias PropertyDefinitions = Map<Id, PropertyDefinition>
 typealias NodeSelection = Set<Id>
 
 data class Editor(
-    val isActive: Boolean = false,
     val graphLibrary: GraphLibrary = mapOf(),
     val graph: String? = null,
     val selection: NodeSelection = setOf(),

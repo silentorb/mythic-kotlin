@@ -2,13 +2,15 @@ package silentorb.mythic.haft
 
 import silentorb.mythic.debugging.debugLog
 import silentorb.mythic.debugging.getDebugBoolean
+import silentorb.mythic.happenings.Command
+import silentorb.mythic.happenings.Commands
 import silentorb.mythic.platforming.InputEvent
 
 fun matches(event: InputEvent): (InputEvent) -> Boolean = { other ->
   event.device == other.device && event.index == other.index
 }
 
-fun mapEventsToCommands(deviceStates: List<InputDeviceState>, getBinding: BindingSource): HaftCommands {
+fun mapEventsToCommandsOld(deviceStates: List<InputDeviceState>, getBinding: BindingSource): Commands {
   if (DEBUG_INPUT_COUNTS) {
     val counts = deviceStates.map { it.events.size }
     if (counts.any { it > 0 })
@@ -22,7 +24,7 @@ fun mapEventsToCommands(deviceStates: List<InputDeviceState>, getBinding: Bindin
           if (!isStroke || deviceStates.dropLast(1).last().events.none(matches(event))) {
             if (getDebugBoolean("DEBUG_INPUT"))
               debugLog("Haft Command: isStroke $isStroke ${binding.command} $target ${event.value}")
-            HaftCommand(
+            Command(
                 type = binding.command,
                 target = target,
                 value = event.value,
@@ -35,5 +37,36 @@ fun mapEventsToCommands(deviceStates: List<InputDeviceState>, getBinding: Bindin
       }
 }
 
-fun createBindings(device: DeviceIndex, bindings: Map<Int, Any>) =
+fun mapInputToCommands(strokes: Set<Any>, bindings: Bindings, deviceStates: List<InputDeviceState>): Commands {
+  if (DEBUG_INPUT_COUNTS) {
+    val counts = deviceStates.map { it.events.size }
+    if (counts.any { it > 0 })
+      debugLog("Event counts: ${counts.joinToString(" ")}")
+  }
+  val previousEvents = deviceStates.dropLast(1).last().events
+
+  return deviceStates.last().events
+      .mapNotNull { event ->
+        val binding = bindings.firstOrNull { it.device == event.device && it.trigger == event.index }
+        if (binding != null) {
+          val isStroke = strokes.contains(binding.command)
+          val target = binding.target
+          if (!isStroke || previousEvents.none(matches(event))) {
+            if (getDebugBoolean("DEBUG_INPUT")) {
+              debugLog("Haft Command: isStroke $isStroke ${binding.command} $target ${event.value}")
+            }
+            Command(
+                type = binding.command,
+                target = target,
+                value = event.value,
+                device = event.device
+            )
+          } else
+            null
+        } else
+          null
+      }
+}
+
+fun createBindings(device: Int, bindings: Map<Int, Any>) =
     bindings.map { Binding(device, it.key, it.value) }

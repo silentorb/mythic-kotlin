@@ -69,8 +69,8 @@ fun defineEditorGui(state: Editor): Editor {
   return drawEditor(state)
 }
 
-fun prepareEditorGui(fonts: List<Typeface>, window: Long,  state: Editor?): Editor? {
-  return if (state?.isActive == true) {
+fun prepareEditorGui(fonts: List<Typeface>, window: Long, isActive: Boolean,  state: Editor?): Editor? {
+  return if (isActive && state != null) {
     ensureImGuiIsInitialized(fonts, window)
     defineEditorGui(state)
   } else

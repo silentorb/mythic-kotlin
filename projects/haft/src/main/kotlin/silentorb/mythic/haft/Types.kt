@@ -6,10 +6,10 @@ import silentorb.mythic.spatial.Vector2
 
 val DEBUG_INPUT_COUNTS = getDebugString("DEBUG_INPUT_COUNTS") != null
 
-enum class DeviceIndex {
-  keyboard,
-  mouse,
-  gamepad
+object DeviceIndexes {
+  const val keyboard = 0
+  const val mouse = 1
+  const val gamepad = 2
 }
 
 data class InputDeviceState(
@@ -18,19 +18,11 @@ data class InputDeviceState(
 )
 
 data class Binding(
-    val device: DeviceIndex,
+    val device: Int,
     val trigger: Int,
-    val command: Any
+    val command: Any,
+    val target: Long = 0L
 )
-
-data class HaftCommand(
-    val type: Any,
-    val target: Long = 0,
-    val value: Any? = 0f,
-    val device: Int
-)
-
-typealias HaftCommands = List<HaftCommand>
 
 typealias Bindings = List<Binding>
 

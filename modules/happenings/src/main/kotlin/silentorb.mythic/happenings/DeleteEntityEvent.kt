@@ -4,4 +4,4 @@ import silentorb.mythic.ent.Id
 
 data class DeleteEntityEvent(
     val id: Id
-) : GameEvent
+)

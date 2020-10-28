@@ -2,7 +2,7 @@ package silentorb.mythic.haft
 
 import silentorb.mythic.platforming.PlatformInput
 
-typealias DeviceTypeMap = Map<Int, DeviceIndex>
+typealias DeviceTypeMap = Map<Int, Int>
 
 fun updateInputDeviceState(input: PlatformInput): InputDeviceState {
   input.update()

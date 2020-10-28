@@ -91,7 +91,7 @@ fun releaseBulletState(bulletState: BulletState) {
 data class LinearImpulse(
     val body: Id,
     val offset: Vector3
-) : GameEvent
+)
 
 data class PhysicsDeck(
     val bodies: Table<Body>,
