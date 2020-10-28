@@ -60,7 +60,7 @@ fun cameraRigToCamera(rig: CameraRig): Camera =
 fun sceneFromEditorGraph(meshes: ModelMeshMap, editor: Editor, lightingConfig: LightingConfig, viewport: Id): GameScene {
   val graph = getActiveEditorGraph(editor) ?: listOf()
   val data = newSerialElementData(graph)
-  val camera = cameraRigToCamera(editor.cameras[viewport] ?: CameraRig())
+  val camera = cameraRigToCamera(editor.state.cameras[viewport] ?: CameraRig())
 
   val layers = listOf(
       SceneLayer(

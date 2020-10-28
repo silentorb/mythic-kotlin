@@ -21,7 +21,7 @@ data class CameraRig(
 
 fun updateFlyThroughCamera(commands: List<Command>, camera: CameraRig): CameraRig {
   val lookVelocity = updateLookVelocityFirstPerson(commands, defaultLookMomentumAxis(), camera.lookVelocity)
-  val rotation = updateFirstPersonFacingRotation(camera.rotation, null, lookVelocity * 20f, simulationDelta)
+  val rotation = updateFirstPersonFacingRotation(camera.rotation, null, lookVelocity, simulationDelta)
   val movementVector = characterMovementVector(commands, camera.orientation)
   val movementOffset = if (movementVector != null)
     movementVector * 12f * simulationDelta

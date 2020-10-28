@@ -11,14 +11,19 @@ object Properties {
 
 val getSceneTree: (Graph) -> SceneTree = groupProperty(Properties.parent)
 
+object Widgets {
+  const val meshSelect = "meshSelect"
+  const val textureSelect = "textureSelect"
+}
+
 fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
     Properties.mesh to PropertyDefinition(
         displayName = "Mesh",
-        widget = "meshSelect",
+        widget = Widgets.meshSelect,
     ),
-    Properties.mesh to PropertyDefinition(
+    Properties.texture to PropertyDefinition(
         displayName = "Texture",
-        widget = "textureSelect",
+        widget = Widgets.textureSelect,
         dependencies = setOf(Properties.mesh)
     ),
 )

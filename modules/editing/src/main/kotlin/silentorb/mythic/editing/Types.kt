@@ -30,11 +30,24 @@ typealias PropertyDefinitions = Map<Id, PropertyDefinition>
 
 typealias NodeSelection = Set<Id>
 
-data class Editor(
-    val graphLibrary: GraphLibrary = mapOf(),
+data class Option(
+    val label: String,
+    val value: String,
+)
+
+typealias Options = List<Option>
+
+data class EditorState(
     val graph: String? = null,
-    val selection: NodeSelection = setOf(),
-    val viewportBoundsMap: Map<Id, Vector4i> = mapOf(),
     val cameras: Map<Id, CameraRig> = mapOf(),
-    val propertyDefinitions: PropertyDefinitions
+    val viewportBoundsMap: Map<Id, Vector4i> = mapOf(),
+    val selection: NodeSelection = setOf(),
+    val graphLibrary: GraphLibrary = mapOf(),
+)
+
+data class Editor(
+    val state: EditorState = EditorState(),
+    val propertyDefinitions: PropertyDefinitions,
+    val textures: Options = listOf(),
+    val meshes: Options = listOf(),
 )

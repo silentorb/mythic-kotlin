@@ -53,7 +53,8 @@ fun ensureImGuiIsInitialized(fonts: List<Typeface>, window: Long) {
   }
 }
 
-fun defineEditorGui(state: Editor): Editor {
+fun defineEditorGui(editor: Editor): EditorState {
+  val state = editor.state
   if (!imguiInitialized)
     return state.copy(
         viewportBoundsMap = mapOf()
@@ -66,15 +67,15 @@ fun defineEditorGui(state: Editor): Editor {
   imGuiGlfw!!.newFrame()
   ImGui.newFrame()
 
-  return drawEditor(state)
+  return drawEditor(editor)
 }
 
-fun prepareEditorGui(fonts: List<Typeface>, window: Long, isActive: Boolean,  state: Editor?): Editor? {
-  return if (isActive && state != null) {
+fun prepareEditorGui(fonts: List<Typeface>, window: Long, isActive: Boolean, editor: Editor?): EditorState? {
+  return if (isActive && editor != null) {
     ensureImGuiIsInitialized(fonts, window)
-    defineEditorGui(state)
+    defineEditorGui(editor)
   } else
-    state
+    editor?.state
 }
 
 fun renderEditorGui() {

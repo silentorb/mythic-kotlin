@@ -25,7 +25,7 @@ fun renderTree(tree: SceneTree, id: String, selection: NodeSelection): NodeSelec
       (1 shl 11)
 
   val isOpen = ImGui.treeNodeEx("Tree-$id", flags, id)
-  val nextSelection = if (ImGui.isItemClicked()) {
+  var nextSelection = if (ImGui.isItemClicked()) {
     if (selected) {
       selection - id
     } else {
@@ -37,7 +37,7 @@ fun renderTree(tree: SceneTree, id: String, selection: NodeSelection): NodeSelec
 
   if (isOpen) {
     for (child in children) {
-      renderTree(tree, child.key, nextSelection)
+      nextSelection = renderTree(tree, child.key, nextSelection)
     }
     ImGui.treePop()
   }
@@ -56,9 +56,9 @@ fun renderTree(editor: Editor, graph: Graph?): NodeSelection {
         .minus(tree.keys)
     assert(rootNodes.size == 1)
     val rootId = rootNodes.first()
-    renderTree(tree, rootId, editor.selection)
+    renderTree(tree, rootId, editor.state.selection)
   } else
-    editor.selection
+    editor.state.selection
 
   ImGui.end()
 

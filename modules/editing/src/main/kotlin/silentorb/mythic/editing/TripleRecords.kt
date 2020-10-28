@@ -27,3 +27,6 @@ inline fun <reified T> groupProperty(relationship: Id, graph: Graph): Map<Id, T>
 inline fun <reified T> groupProperty(relationship: Id): (Graph) -> Map<Id, T> = { graph ->
   groupProperty(relationship, graph)
 }
+
+fun getProperties(graph: Graph, key: String): List<Entry> =
+    graph.filter { it.source == key }
