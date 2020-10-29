@@ -1,24 +1,26 @@
 package silentorb.mythic.editing
 
 import imgui.ImGui
+import silentorb.mythic.editing.components.drawMainMenuBar
+import silentorb.mythic.editing.components.drawMenuItems
 import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.editing.panels.drawPropertiesPanel
 import silentorb.mythic.editing.panels.drawViewportPanel
 import silentorb.mythic.editing.panels.renderTree
+import silentorb.mythic.happenings.Commands
 
-fun drawEditor(editor: Editor): Editor {
+fun drawEditor(editor: Editor): Pair<Editor, Commands> {
   val graphId = getActiveEditorGraphId(editor)
   val graph = editor.graphLibrary[graphId]
   val state = editor.state
 
-  if (ImGui.beginMainMenuBar()) {
-    if (ImGui.beginMenu("Edit")) {
-      ImGui.menuItem("Foo", "F")
-      ImGui.menuItem("Kung Foo", "K")
-      ImGui.endMenu()
-    }
-    ImGui.endMainMenuBar()
-  }
+  val menuCommands = drawMainMenuBar(listOf(
+      MenuItem("Edit", items = listOf(
+          MenuItem("Add Node", "Ctrl+A", EditorCommands.addNode),
+          MenuItem("Assign Mesh", "Shift+M", EditorCommands.assignMesh),
+          MenuItem("Assign Texture", "Shift+T", EditorCommands.assignTexture),
+      ))
+  ))
 
   ImGui.setNextWindowBgAlpha(0f)
   ImGui.dockSpaceOverViewport()
@@ -37,5 +39,5 @@ fun drawEditor(editor: Editor): Editor {
           selection = nextSelection,
       ),
       graphLibrary = nextGraphLibrary,
-  )
+  ) to menuCommands
 }

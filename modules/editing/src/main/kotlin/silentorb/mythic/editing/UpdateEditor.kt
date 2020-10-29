@@ -1,14 +1,23 @@
 package silentorb.mythic.editing
 
 import silentorb.mythic.haft.InputDeviceState
+import silentorb.mythic.happenings.Commands
 
-fun updateEditor(deviceStates: List<InputDeviceState>, previous: Editor): EditorState {
-  val commands = mapCommands(defaultEditorBindings(), deviceStates)
-  val cameras = previous.state.cameras
+fun updateEditorFromCommands(commands: Commands, editor: Editor): Editor {
+  val cameras = editor.state.cameras
       .mapValues { (_, camera) ->
         updateFlyThroughCamera(commands, camera)
       }
-  return previous.state.copy(
-      cameras = cameras
+  return editor.copy(
+      state = editor.state.copy(
+          cameras = cameras
+      )
   )
+}
+
+fun updateEditor(deviceStates: List<InputDeviceState>, editor: Editor): Editor {
+  val externalCommands = mapCommands(defaultEditorBindings(), deviceStates)
+  val (nextEditor, guiCommands) = defineEditorGui(editor)
+  val commands = externalCommands + guiCommands
+  return updateEditorFromCommands(commands, nextEditor)
 }

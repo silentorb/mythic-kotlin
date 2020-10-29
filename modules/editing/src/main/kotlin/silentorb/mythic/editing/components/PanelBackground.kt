@@ -1,4 +1,4 @@
-package silentorb.mythic.editing
+package silentorb.mythic.editing.components
 
 import imgui.ImColor
 import imgui.ImGui

@@ -51,3 +51,10 @@ data class Editor(
     val meshes: Options = listOf(),
     val graphLibrary: GraphLibrary = mapOf(),
 )
+
+data class MenuItem(
+    val label: String,
+    val shortcut: String? = null,
+    val command: Any? = null,
+    val items: List<MenuItem>? = null
+)

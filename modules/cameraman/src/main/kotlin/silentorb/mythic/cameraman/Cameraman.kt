@@ -22,7 +22,9 @@ val playerMoveMap = mapOf(
     CameramanCommands.moveLeft to Vector3(0f, 1f, 0f),
     CameramanCommands.moveRight to Vector3(0f, -1f, 0f),
     CameramanCommands.moveForward to Vector3(1f, 0f, 0f),
-    CameramanCommands.moveBackwards to Vector3(-1f, 0f, 0f)
+    CameramanCommands.moveBackwards to Vector3(-1f, 0f, 0f),
+    CameramanCommands.moveUp to Vector3(0f, 0f, 1f),
+    CameramanCommands.moveDown to Vector3(0f, 0f, -1f),
 )
 
 val lookMap = mapOf(

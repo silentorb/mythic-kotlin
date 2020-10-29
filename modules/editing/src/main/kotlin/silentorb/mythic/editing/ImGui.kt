@@ -5,6 +5,7 @@ import imgui.ImGui
 import imgui.flag.ImGuiConfigFlags
 import imgui.gl3.ImGuiImplGl3
 import imgui.glfw.ImGuiImplGlfw
+import silentorb.mythic.happenings.Commands
 
 private var imguiInitialized: Boolean = false
 private var imGuiGlfw: ImGuiImplGlfw? = null
@@ -22,6 +23,7 @@ fun initializeImGui(fonts: List<Typeface>, window: Long) {
   io.configViewportsNoAutoMerge = true
   io.configViewportsNoTaskBarIcon = true
   io.iniFilename = "editor.ini"
+
 
   val fontAtlas = io.fonts
   val fontConfig = ImFontConfig()
@@ -53,31 +55,23 @@ fun ensureImGuiIsInitialized(fonts: List<Typeface>, window: Long) {
   }
 }
 
-fun defineEditorGui(editor: Editor): Editor {
+fun defineEditorGui(editor: Editor): Pair<Editor, Commands> {
   val state = editor.state
   if (!imguiInitialized)
     return editor.copy(
         state.copy(
             viewportBoundsMap = mapOf()
         )
-    )
+    ) to listOf()
 
   if (renderReady)
-    return editor
+    return editor to listOf()
 
   renderReady = true
   imGuiGlfw!!.newFrame()
   ImGui.newFrame()
 
   return drawEditor(editor)
-}
-
-fun prepareEditorGui(fonts: List<Typeface>, window: Long, isActive: Boolean, editor: Editor?): Editor? {
-  return if (isActive && editor != null) {
-    ensureImGuiIsInitialized(fonts, window)
-    defineEditorGui(editor)
-  } else
-    editor
 }
 
 fun renderEditorGui() {

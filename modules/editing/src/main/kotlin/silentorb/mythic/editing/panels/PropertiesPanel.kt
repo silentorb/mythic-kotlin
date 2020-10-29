@@ -3,6 +3,7 @@ package silentorb.mythic.editing.panels
 import imgui.ImGui
 import imgui.flag.ImGuiWindowFlags
 import silentorb.mythic.editing.*
+import silentorb.mythic.editing.components.panelBackground
 
 fun dropDownWidget(options: List<Option>, entry: Entry): String {
   val value = entry.target as String

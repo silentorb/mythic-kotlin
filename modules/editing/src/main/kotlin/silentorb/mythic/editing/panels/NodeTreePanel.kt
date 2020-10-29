@@ -4,6 +4,7 @@ import imgui.ImGui
 import imgui.flag.ImGuiTreeNodeFlags
 import imgui.flag.ImGuiWindowFlags
 import silentorb.mythic.editing.*
+import silentorb.mythic.editing.components.panelBackground
 
 fun renderTree(tree: SceneTree, id: String, selection: NodeSelection): NodeSelection {
   val selected = selection.contains(id)
@@ -22,6 +23,7 @@ fun renderTree(tree: SceneTree, id: String, selection: NodeSelection): NodeSelec
   val flags = selectionFlags or leafFlags or
       ImGuiTreeNodeFlags.OpenOnArrow or
       ImGuiTreeNodeFlags.OpenOnDoubleClick or
+      ImGuiTreeNodeFlags.DefaultOpen or
       (1 shl 11)
 
   val isOpen = ImGui.treeNodeEx("Tree-$id", flags, id)
@@ -46,7 +48,7 @@ fun renderTree(tree: SceneTree, id: String, selection: NodeSelection): NodeSelec
 }
 
 fun renderTree(editor: Editor, graph: Graph?): NodeSelection {
-  ImGui.begin("Tree", ImGuiWindowFlags.MenuBar)
+  ImGui.begin("Node Tree", ImGuiWindowFlags.MenuBar)
   panelBackground()
 
   val nextSelection = if (graph != null) {
