@@ -1,6 +1,7 @@
 package silentorb.mythic.configuration
 
 import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule
@@ -10,7 +11,6 @@ import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Paths
 
-private var globalYamlMapper: YAMLMapper? = null
 private var afterburnerModule: AfterburnerModule? = null
 
 fun getAfterburnerModule(): AfterburnerModule {
@@ -21,18 +21,13 @@ fun getAfterburnerModule(): AfterburnerModule {
   return afterburnerModule!!
 }
 
-fun getYamlObjectMapper(): YAMLMapper {
-  if (globalYamlMapper == null) {
-    val mapper = YAMLMapper()
-    mapper.configure(YAMLGenerator.Feature.WRITE_DOC_START_MARKER, false)
-    mapper.configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true)
-    mapper.registerModule(KotlinModule())
-    mapper.registerModule(getAfterburnerModule())
-    globalYamlMapper = mapper
-    return mapper
-  }
-
-  return globalYamlMapper!!
+val getYamlObjectMapper = getObjectMapper {
+  val mapper = YAMLMapper()
+  mapper.configure(YAMLGenerator.Feature.WRITE_DOC_START_MARKER, false)
+  mapper.configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true)
+  mapper.registerModule(KotlinModule())
+  mapper.registerModule(getAfterburnerModule())
+  mapper
 }
 
 inline fun <reified T> loadYamlFile(path: String): T? {
@@ -46,7 +41,7 @@ inline fun <reified T> loadYamlFile(path: String): T? {
   return null
 }
 
-fun getResourceStream(name: String): InputStream {
+fun getResourceStream(name: String): InputStream? {
   val classloader = Thread.currentThread().contextClassLoader
   return classloader.getResourceAsStream(name)
 }
@@ -61,30 +56,12 @@ inline fun <reified T> loadYamlResource(path: String, typeref: TypeReference<T>)
   return getYamlObjectMapper().readValue(content, typeref)
 }
 
-fun <T> saveYamlFile(mapper: YAMLMapper, path: String, config: T) {
+fun <T> saveYamlFile(mapper: ObjectMapper, path: String, data: T) {
   Files.newBufferedWriter(Paths.get(path)).use {
-    mapper.writeValue(it, config)
+    mapper.writeValue(it, data)
   }
 }
 
 fun <T> saveYamlFile(path: String, config: T) {
   saveYamlFile(getYamlObjectMapper(), path, config)
-}
-
-class ConfigManager<T>(private val path: String, private val config: T) {
-  private var previous: String
-
-  init {
-    val mapper = getYamlObjectMapper()
-    previous = mapper.writeValueAsString(config)
-  }
-
-  fun save() {
-    val mapper = getYamlObjectMapper()
-    val newString = mapper.writeValueAsString(config)
-    if (newString != previous) {
-      saveYamlFile(mapper, path, config)
-      previous = newString
-    }
-  }
 }

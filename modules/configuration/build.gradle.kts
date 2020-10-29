@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.9.9.3")
+    api("com.fasterxml.jackson.core:jackson-databind:2.9.9.3")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9")
     implementation(group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = "1.4.0")

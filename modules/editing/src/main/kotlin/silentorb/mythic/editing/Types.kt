@@ -42,7 +42,6 @@ data class EditorState(
     val cameras: Map<Id, CameraRig> = mapOf(),
     val viewportBoundsMap: Map<Id, Vector4i> = mapOf(),
     val selection: NodeSelection = setOf(),
-    val graphLibrary: GraphLibrary = mapOf(),
 )
 
 data class Editor(
@@ -50,4 +49,5 @@ data class Editor(
     val propertyDefinitions: PropertyDefinitions,
     val textures: Options = listOf(),
     val meshes: Options = listOf(),
+    val graphLibrary: GraphLibrary = mapOf(),
 )

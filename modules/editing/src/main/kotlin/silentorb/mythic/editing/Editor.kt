@@ -6,8 +6,9 @@ import silentorb.mythic.editing.panels.drawPropertiesPanel
 import silentorb.mythic.editing.panels.drawViewportPanel
 import silentorb.mythic.editing.panels.renderTree
 
-fun drawEditor(editor: Editor): EditorState {
-  val graph = getActiveEditorGraph(editor)
+fun drawEditor(editor: Editor): Editor {
+  val graphId = getActiveEditorGraphId(editor)
+  val graph = editor.graphLibrary[graphId]
   val state = editor.state
 
   if (ImGui.beginMainMenuBar()) {
@@ -25,14 +26,16 @@ fun drawEditor(editor: Editor): EditorState {
   val nextSelection = renderTree(editor, graph)
   val viewport = drawViewportPanel();
   val nextGraph = drawPropertiesPanel(editor, graph)
-  val nextGraphLibrary = if (state.graph != null && nextGraph != null)
-    state.graphLibrary + (state.graph to nextGraph)
+  val nextGraphLibrary = if (graphId != null && nextGraph != null)
+    editor.graphLibrary + (graphId to nextGraph)
   else
-    state.graphLibrary
+    editor.graphLibrary
 
-  return state.copy(
-      viewportBoundsMap = mapOf(defaultViewportId to viewport),
-      selection = nextSelection,
+  return editor.copy(
+      state.copy(
+          viewportBoundsMap = mapOf(defaultViewportId to viewport),
+          selection = nextSelection,
+      ),
       graphLibrary = nextGraphLibrary,
   )
 }

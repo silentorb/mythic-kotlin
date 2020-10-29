@@ -1,5 +1,7 @@
 package silentorb.mythic.editing
 
+import silentorb.mythic.configuration.loadYamlFile
+import silentorb.mythic.configuration.saveYamlFile
 import silentorb.mythic.resource_loading.getUrlPath
 import silentorb.mythic.resource_loading.listFiles
 import silentorb.mythic.spatial.serialization.loadJsonResource
@@ -9,6 +11,8 @@ import java.io.IOException
 import java.io.UncheckedIOException
 import java.nio.file.Path
 import java.util.*
+
+const val defaultConfigFilePath = "editor.yaml"
 
 fun loadFromResources(fileName: String): ByteArray? {
   return try {
@@ -45,4 +49,16 @@ fun loadGraphLibrary(directoryPath: String): GraphLibrary {
     name to graph
   }
   return library
+}
+
+fun loadEditorState(filePath: String = defaultConfigFilePath): EditorState? =
+    loadYamlFile(filePath)
+
+fun loadEditorStateOrDefault(filePath: String = defaultConfigFilePath): EditorState =
+    loadEditorState(filePath) ?: defaultEditorState()
+
+fun checkSaveEditorState(previous: EditorState?, next: EditorState?, filePath: String = defaultConfigFilePath) {
+  if (next != null && previous != next) {
+    saveYamlFile(filePath, next)
+  }
 }

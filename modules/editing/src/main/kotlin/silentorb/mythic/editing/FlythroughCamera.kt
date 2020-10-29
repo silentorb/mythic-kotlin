@@ -1,5 +1,6 @@
 package silentorb.mythic.editing
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import silentorb.mythic.cameraman.*
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.spatial.Quaternion
@@ -14,6 +15,7 @@ data class CameraRig(
     val rotation: Vector2 = Vector2.zero,
     val lookVelocity: Vector2 = Vector2.zero
 ) {
+  @get:JsonIgnore
   val orientation:Quaternion get() = Quaternion()
       .rotateZ(rotation.x)
       .rotateY(-rotation.y)
