@@ -4,15 +4,16 @@ import imgui.ImGui
 import imgui.flag.ImGuiInputTextFlags
 import imgui.flag.ImGuiKey
 import imgui.type.ImString
+import silentorb.mythic.editing.Editor
 import silentorb.mythic.editing.EditorCommands
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 
 var nodeNameText = ImString()
 
-fun nodeNameDialog(title: String, triggerCommand: Any, nextCommand: Any): (Commands) -> Commands = { commands ->
+fun nodeNameDialog(title: String, triggerCommand: Any, nextCommand: Any, initialValue: () -> String): (Commands) -> Commands = { commands ->
   if (commands.any { it.type == triggerCommand } && !ImGui.isPopupOpen(title)) {
-    nodeNameText.set("")
+    nodeNameText.set(initialValue())
     ImGui.openPopup(title)
   }
 
@@ -41,10 +42,12 @@ val newNodeNameDialog = nodeNameDialog(
     "New Node",
     EditorCommands.addNodeWithNameDialog,
     EditorCommands.addNode
-)
+) { "" }
 
-val renameNodeDialog = nodeNameDialog(
+fun renameNodeDialog(editor: Editor) = nodeNameDialog(
     "Rename Node",
     EditorCommands.renameNodeWithNameDialog,
     EditorCommands.renameNode
-)
+) {
+  editor.state.selection.firstOrNull() ?: ""
+}

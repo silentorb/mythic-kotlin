@@ -23,7 +23,7 @@ fun updateSelection(commandTypes: List<Any>, editor: Editor, nextGraph: Graph?):
   return if (graph != null && nextGraph != null) {
     when {
 
-      commandTypes.contains(EditorCommands.addNode) -> {
+      commandTypes.contains(EditorCommands.addNode) || commandTypes.contains(EditorCommands.renameNode) -> {
         val newNodes = getTripleKeys(nextGraph) - getTripleKeys(graph)
         if (newNodes.any())
           newNodes

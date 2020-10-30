@@ -25,7 +25,7 @@ fun drawEditor(editor: Editor): Pair<Editor, Commands> {
   val nextGraph = drawPropertiesPanel(editor, graph)
   val nextGraphLibrary = incorporateGraphIntoLibrary(editor, nextGraph)
 
-  val dialogCommands = newNodeNameDialog(menuCommands) + renameNodeDialog(menuCommands)
+  val dialogCommands = newNodeNameDialog(menuCommands) + renameNodeDialog(editor)(menuCommands)
 
   return editor.copy(
       state.copy(

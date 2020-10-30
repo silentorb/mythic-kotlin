@@ -32,6 +32,27 @@ val onAddNode: GraphEditHandler = { editor, commandTypes, graph ->
     graph
 }
 
+val onRenameNode: GraphEditHandler = { editor, commandTypes, graph ->
+  val state = editor.state
+  if (commandTypes.contains(EditorCommands.renameNode)) {
+    if (state.selection.size != 1)
+      graph
+    else {
+      val selected = state.selection.first()
+      val key = nodeNameText.get()
+      graph.map {
+        if (it.source == selected)
+          it.copy(source = key)
+        else if (it.target == selected)
+          it.copy(target = key)
+        else
+          it
+      }
+    }
+  } else
+    graph
+}
+
 val onDeleteNode: GraphEditHandler = { editor, commandTypes, graph ->
   val state = editor.state
   val selection = state.selection
@@ -49,6 +70,7 @@ fun updateSceneGraph(commandTypes: List<Any>, editor: Editor): Graph? {
     listOf(
         onAddNode,
         onDeleteNode,
+        onRenameNode,
     )
         .fold(initialGraph) { graph, handler ->
           handler(editor, commandTypes, graph)

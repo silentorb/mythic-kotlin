@@ -8,6 +8,7 @@ fun mainMenus(): Commands =
     drawMainMenuBar(listOf(
         MenuItem("Edit", items = listOf(
             MenuItem("Add Node", "Ctrl+A", EditorCommands.addNodeWithNameDialog),
+            MenuItem("Rename Node", "Ctrl+R", EditorCommands.renameNodeWithNameDialog),
             MenuItem("Delete Node", "Del", EditorCommands.deleteNode),
             MenuItem("Assign Mesh", "Shift+M", EditorCommands.assignMesh),
             MenuItem("Assign Texture", "Shift+T", EditorCommands.assignTexture),
