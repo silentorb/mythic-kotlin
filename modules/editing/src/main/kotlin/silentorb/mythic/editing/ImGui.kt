@@ -17,8 +17,9 @@ fun initializeImGui(fonts: List<Typeface>, window: Long) {
   ImGui.createContext()
   val io = ImGui.getIO()
   io.iniFilename = null
-  io.addConfigFlags(ImGuiConfigFlags.NavEnableKeyboard)
   io.addConfigFlags(ImGuiConfigFlags.DockingEnable)
+  io.addConfigFlags(ImGuiConfigFlags.NavEnableKeyboard)
+//  io.addConfigFlags(ImGuiConfigFlags.NavEnableGamepad)
   io.configDockingTransparentPayload = true
   io.configViewportsNoAutoMerge = true
   io.configViewportsNoTaskBarIcon = true
