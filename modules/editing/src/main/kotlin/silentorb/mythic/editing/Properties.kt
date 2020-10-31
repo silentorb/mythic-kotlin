@@ -20,10 +20,12 @@ fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
     Properties.mesh to PropertyDefinition(
         displayName = "Mesh",
         widget = Widgets.meshSelect,
+        defaultValue = { editor -> editor.meshes.firstOrNull()?.value }
     ),
     Properties.texture to PropertyDefinition(
         displayName = "Texture",
         widget = Widgets.textureSelect,
-        dependencies = setOf(Properties.mesh)
+        dependencies = setOf(Properties.mesh),
+        defaultValue = { editor -> editor.textures.firstOrNull()?.value }
     ),
 )

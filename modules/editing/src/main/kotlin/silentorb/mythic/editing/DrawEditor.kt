@@ -22,7 +22,7 @@ fun drawEditor(editor: Editor): Pair<Editor, Commands> {
 
   val nextSelection = renderTree(editor, graph)
   val viewport = drawViewportPanel();
-  val nextGraph = drawPropertiesPanel(editor, graph)
+  val (nextGraph, propertiesCommands) = drawPropertiesPanel(editor, graph)
   val nextGraphLibrary = incorporateGraphIntoLibrary(editor, nextGraph)
 
   val dialogCommands = newNodeNameDialog(menuCommands) + renameNodeDialog(editor)(menuCommands)

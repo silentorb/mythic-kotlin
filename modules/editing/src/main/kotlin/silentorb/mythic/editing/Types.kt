@@ -19,11 +19,14 @@ data class Serialization(
     val save: SerializationMethod,
 )
 
+typealias DefaultValueSource = (Editor) -> Any?
+
 data class PropertyDefinition(
     val displayName: String,
     val serialization: Serialization? = null,
     val widget: Id?,
-    val dependencies: Set<Id> = setOf()
+    val dependencies: Set<Id> = setOf(),
+    val defaultValue: DefaultValueSource? = null
 )
 
 typealias PropertyDefinitions = Map<Id, PropertyDefinition>
