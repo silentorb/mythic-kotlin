@@ -2716,8 +2716,8 @@ data class Quaternion(
     val zero = Quaternion(0f, 0f, 0f, 1f)
 
     fun lookAt(vector: Vector3): Quaternion {
-      val yaw = getHorizontalLookAtAngle(vector.xy())
-      val pitch = -getVerticalLookAtAngle(vector)
+      val yaw = getYawAngle(vector.xy())
+      val pitch = -getPitchAngle(vector)
       return Quaternion()
           .rotateZ(yaw)
           .rotateY(pitch)

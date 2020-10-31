@@ -428,19 +428,25 @@ fun getAngleCourse(source: Float, destination: Float): Float {
 fun getAngleGap(a: Float, b: Float): Float =
     abs(getAngleCourse(a, b))
 
-fun getHorizontalLookAtAngle(lookAt: Vector2fMinimal): Float =
+fun getYawAngle(lookAt: Vector2fMinimal): Float =
     getAngle(Vector2(1f, 0f), lookAt.xy())
 
-fun getVerticalLookAtAngle(lookAt: Vector3) =
+fun getPitchAngle(lookAt: Vector3) =
     getAngle(Vector2(1f, 0f), Vector2(lookAt.xy().length(), lookAt.z))
 
+fun getYawAndPitch(lookAt: Vector3): Vector2 =
+    Vector2(
+        getYawAngle(lookAt),
+        getPitchAngle(lookAt)
+    )
+
 fun horizontalFacingDistance(angle: Float, lookAt: Vector3): Float {
-  val secondAngle = getHorizontalLookAtAngle(lookAt)
+  val secondAngle = getYawAngle(lookAt)
   return getAngleCourse(angle, secondAngle)
 }
 
 fun verticalFacingDistance(angle: Float, lookAt: Vector3): Float {
-  val secondAngle = getVerticalLookAtAngle(lookAt)
+  val secondAngle = getPitchAngle(lookAt)
   return getAngleCourse(angle, secondAngle)
 }
 
