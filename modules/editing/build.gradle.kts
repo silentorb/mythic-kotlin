@@ -25,6 +25,7 @@ dependencies {
   api("silentorb.mythic:spatial_serialization")
   implementation("silentorb.mythic:haft")
   api("silentorb.mythic:cameraman")
+  api("silentorb.mythic:debugging")
 }
 
 tasks {

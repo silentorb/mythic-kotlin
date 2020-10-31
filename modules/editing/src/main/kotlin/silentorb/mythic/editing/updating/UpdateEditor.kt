@@ -2,7 +2,9 @@ package silentorb.mythic.editing.updating
 
 import silentorb.mythic.editing.*
 import silentorb.mythic.haft.InputDeviceState
+import silentorb.mythic.haft.getMouseOffset
 import silentorb.mythic.happenings.Commands
+import silentorb.mythic.spatial.Vector2
 
 fun incorporateGraphIntoLibrary(editor: Editor, nextGraph: Graph?): GraphLibrary {
   val graphId = getActiveEditorGraphId(editor)
@@ -51,11 +53,11 @@ fun updateSelection(commandTypes: List<Any>, editor: Editor, nextGraph: Graph?):
     selection
 }
 
-fun updateEditorFromCommands(commands: Commands, editor: Editor): Editor {
+fun updateEditorFromCommands(mouseOffset: Vector2, commands: Commands, editor: Editor): Editor {
   val commandTypes = commands.map { it.type }
   val cameras = editor.state.cameras
       .mapValues { (_, camera) ->
-        updateFlyThroughCamera(commands, camera)
+        updateFlyThroughCamera(mouseOffset, commands, camera)
       }
   val graphId = getActiveEditorGraphId(editor)
   val nextGraphLibrary = updateGraphLibrary(commandTypes, editor)
@@ -74,5 +76,5 @@ fun updateEditor(deviceStates: List<InputDeviceState>, editor: Editor): Editor {
   val externalCommands = mapCommands(defaultEditorBindings(), deviceStates)
   val (nextEditor, guiCommands) = defineEditorGui(editor)
   val commands = externalCommands + guiCommands
-  return updateEditorFromCommands(commands, nextEditor)
+  return updateEditorFromCommands(getMouseOffset(deviceStates), commands, nextEditor)
 }

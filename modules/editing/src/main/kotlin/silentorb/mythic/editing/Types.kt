@@ -43,7 +43,6 @@ typealias Options = List<Option>
 data class EditorState(
     val graph: String? = null,
     val cameras: Map<Id, CameraRig> = mapOf(),
-    val viewportBoundsMap: Map<Id, Vector4i> = mapOf(),
     val selection: NodeSelection = setOf(),
 )
 
@@ -53,6 +52,7 @@ data class Editor(
     val textures: Options = listOf(),
     val meshes: Options = listOf(),
     val graphLibrary: GraphLibrary = mapOf(),
+    val viewportBoundsMap: Map<Id, Vector4i> = mapOf(),
 )
 
 data class MenuItem(

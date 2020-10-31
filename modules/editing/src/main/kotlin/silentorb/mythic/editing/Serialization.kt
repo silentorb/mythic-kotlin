@@ -2,6 +2,7 @@ package silentorb.mythic.editing
 
 import silentorb.mythic.configuration.loadYamlFile
 import silentorb.mythic.configuration.saveYamlFile
+import silentorb.mythic.debugging.getDebugBoolean
 import silentorb.mythic.resource_loading.getUrlPath
 import silentorb.mythic.resource_loading.listFiles
 import silentorb.mythic.spatial.serialization.loadJsonResource
@@ -58,7 +59,7 @@ fun loadEditorStateOrDefault(filePath: String = defaultConfigFilePath): EditorSt
     loadEditorState(filePath) ?: defaultEditorState()
 
 fun checkSaveEditorState(previous: EditorState?, next: EditorState?, filePath: String = defaultConfigFilePath) {
-  if (next != null && previous != next) {
+  if (next != null && previous != next && !getDebugBoolean("DISABLE_EDITOR_SAVE")) {
     saveYamlFile(filePath, next)
   }
 }

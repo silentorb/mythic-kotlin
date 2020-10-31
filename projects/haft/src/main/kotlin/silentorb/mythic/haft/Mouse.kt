@@ -20,6 +20,12 @@ fun applyMouseAxis(device: Int, value: Float, firstIndex: Int, secondIndex: Int,
     else
       null
 
+fun getMouseOffset(deviceStates: List<InputDeviceState>): Vector2 =
+    if (deviceStates.size < 2)
+      Vector2.zero
+    else
+      deviceStates.last().mousePosition - deviceStates.dropLast(1).last().mousePosition
+
 fun applyMouseMovement(device: Int, mouseOffset: Vector2): List<InputEvent> =
     listOfNotNull(
         applyMouseAxis(device, mouseOffset.x, MouseMovementRight, MouseMovementLeft, 1f),

@@ -20,6 +20,8 @@ fun drawEditor(editor: Editor): Pair<Editor, Commands> {
   ImGui.setNextWindowBgAlpha(0f)
   ImGui.dockSpaceOverViewport()
 
+  drawEditor3dElements(editor)
+
   val nextSelection = renderTree(editor, graph)
   val viewport = drawViewportPanel();
   val (nextGraph, propertiesCommands) = drawPropertiesPanel(editor, graph)
@@ -29,9 +31,9 @@ fun drawEditor(editor: Editor): Pair<Editor, Commands> {
 
   return editor.copy(
       state.copy(
-          viewportBoundsMap = mapOf(defaultViewportId to viewport),
           selection = nextSelection,
       ),
+      viewportBoundsMap = mapOf(defaultViewportId to viewport),
       graphLibrary = nextGraphLibrary,
   ) to menuCommands + dialogCommands
 }

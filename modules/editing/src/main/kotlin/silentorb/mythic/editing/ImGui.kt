@@ -18,13 +18,12 @@ fun initializeImGui(fonts: List<Typeface>, window: Long) {
   val io = ImGui.getIO()
   io.iniFilename = null
   io.addConfigFlags(ImGuiConfigFlags.DockingEnable)
-  io.addConfigFlags(ImGuiConfigFlags.NavEnableKeyboard)
+//  io.addConfigFlags(ImGuiConfigFlags.NavEnableKeyboard)
 //  io.addConfigFlags(ImGuiConfigFlags.NavEnableGamepad)
   io.configDockingTransparentPayload = true
   io.configViewportsNoAutoMerge = true
   io.configViewportsNoTaskBarIcon = true
   io.iniFilename = "editor.ini"
-
 
   val fontAtlas = io.fonts
   val fontConfig = ImFontConfig()
@@ -57,12 +56,9 @@ fun ensureImGuiIsInitialized(fonts: List<Typeface>, window: Long) {
 }
 
 fun defineEditorGui(editor: Editor): Pair<Editor, Commands> {
-  val state = editor.state
   if (!imguiInitialized)
     return editor.copy(
-        state.copy(
-            viewportBoundsMap = mapOf()
-        )
+        viewportBoundsMap = mapOf()
     ) to listOf()
 
   if (renderReady)

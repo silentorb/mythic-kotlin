@@ -21,6 +21,9 @@ fun defaultEditorState() =
         cameras = mapOf(defaultViewportId to CameraRig(location = Vector3(-10f, 0f, 0f))),
     )
 
+fun isAltDown(): Boolean =
+    ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_ALT) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_ALT)
+
 fun isShortcutPressed(shortcut: String): Boolean {
   val parts = shortcut.split("+")
   val key = parts.last()
