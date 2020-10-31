@@ -32,7 +32,7 @@ fun updateCameraOrbiting(mouseOffset: Vector2, camera: CameraRig): CameraRig {
   val b = getYawAndPitch((Vector3(10f, 0f, 5f) - pivot))
 
   val orientationOffset = Quaternion()
-      .rotateZ(reverseRotation.x + mouseOffset.x * 0.03f)
+      .rotateZ(reverseRotation.x - mouseOffset.x * 0.03f)
       .rotateY(-reverseRotation.y - mouseOffset.y * 0.025f)
 
   val nextLocation = orientationOffset.transform(pivotOffset) + pivot
