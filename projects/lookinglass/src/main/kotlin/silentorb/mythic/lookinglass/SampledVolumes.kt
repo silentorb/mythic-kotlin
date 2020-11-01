@@ -1,7 +1,6 @@
 package silentorb.mythic.lookinglass
 
 import silentorb.mythic.glowing.*
-import silentorb.mythic.scenery.SamplePoint
 import silentorb.mythic.scenery.Shading
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.toList
@@ -38,19 +37,19 @@ fun serializeNormal(normal: Vector3): Float =
         0
     )
 
-fun toFloatList(sample: SamplePoint) =
-    listOf<Float>() +
-
-        toList(sample.location) +
-        serializeShadingColor(sample.shading) +
-        sample.size +
-        bytesToFloat(
-            sample.level.toByte(),
-            normalizedFloatToSignedByte(sample.normal.x),
-            normalizedFloatToSignedByte(sample.normal.y),
-            normalizedFloatToSignedByte(sample.normal.z)
-        ) +
-        listOf()
+//fun toFloatList(sample: SamplePoint) =
+//    listOf<Float>() +
+//
+//        toList(sample.location) +
+//        serializeShadingColor(sample.shading) +
+//        sample.size +
+//        bytesToFloat(
+//            sample.level.toByte(),
+//            normalizedFloatToSignedByte(sample.normal.x),
+//            normalizedFloatToSignedByte(sample.normal.y),
+//            normalizedFloatToSignedByte(sample.normal.z)
+//        ) +
+//        listOf()
 
 enum class NormalSide {
   x_plus,
@@ -72,27 +71,27 @@ fun getNormalSide(normal: Vector3): NormalSide {
   }
 }
 
-fun partitionSamples(levels: Int, samples: List<SamplePoint>): Triple<List<SamplePoint>, SamplePartitioning, List<SamplePoint>> {
-  val (base, details) = samples.partition { it.level == 0 }
-  val groups = details
-      .groupBy { getNormalSide(it.normal) }
-
-
-  val detailRanges = NormalSide.values()
-      .map { side ->
-        val sideSamples = groups.getOrElse(side) { listOf() }
-        (0 until levels)
-            .map { level ->
-              sideSamples.filter { it.level == level }
-            }
-      }
-
-  return Triple(
-      base,
-      detailRanges.map { side -> side.map { it.size } },
-      base + detailRanges.flatMap { it.flatten() }
-  )
-}
+//fun partitionSamples(levels: Int, samples: List<SamplePoint>): Triple<List<SamplePoint>, SamplePartitioning, List<SamplePoint>> {
+//  val (base, details) = samples.partition { it.level == 0 }
+//  val groups = details
+//      .groupBy { getNormalSide(it.normal) }
+//
+//
+//  val detailRanges = NormalSide.values()
+//      .map { side ->
+//        val sideSamples = groups.getOrElse(side) { listOf() }
+//        (0 until levels)
+//            .map { level ->
+//              sideSamples.filter { it.level == level }
+//            }
+//      }
+//
+//  return Triple(
+//      base,
+//      detailRanges.map { side -> side.map { it.size } },
+//      base + detailRanges.flatMap { it.flatten() }
+//  )
+//}
 
 fun getVisibleSides(facing: Vector3): List<NormalSide> {
   return listOf(
@@ -123,45 +122,45 @@ fun getVolumeOffsets(baseSize: Int, partitioning: SamplePartitioning): List<Int>
   return listOf(0) + offsets
 }
 
-fun newSampledModel(vertexSchema: VertexSchema, lodRanges: LodRanges, levels: Int, initialPoints: List<SamplePoint>): SampledModel {
-  val (base, partitioning, points) = partitionSamples(levels, initialPoints)
-  val vertices = points
-      .flatMap(::toFloatList)
-      .toFloatArray()
-
-  val mesh = GeneralMesh(
-      vertexSchema = vertexSchema,
-      primitiveType = PrimitiveType.points,
-      vertexBuffer = newVertexBuffer(vertexSchema).load(createFloatBuffer(vertices)),
-      count = vertices.size / vertexSchema.floatSize
-  )
-
-  return SampledModel(
-      mesh = mesh,
-      partitioning = partitioning,
-      baseSize = base.size,
-      offsets = getVolumeOffsets(base.size, partitioning),
-      levels = levels,
-      lodRanges = lodRanges
-  )
-}
-
-fun serializeVertex(point: SamplePoint): List<Float> {
-  val shading = point.shading
-  val normal = point.normal
-  val color = shading.color
-
-  return toList(point.location) +
-      bytesToFloat(
-          normalizedFloatToUnsignedByte(color.x),
-          normalizedFloatToUnsignedByte(color.y),
-          normalizedFloatToUnsignedByte(color.z),
-          normalizedFloatToUnsignedByte(shading.opacity)
-      ) +
-      bytesToFloat(
-          normalizedFloatToSignedByte(normal.x),
-          normalizedFloatToSignedByte(normal.y),
-          normalizedFloatToSignedByte(normal.z),
-          normalizedFloatToUnsignedByte(shading.glow)
-      )
-}
+//fun newSampledModel(vertexSchema: VertexSchema, lodRanges: LodRanges, levels: Int, initialPoints: List<SamplePoint>): SampledModel {
+//  val (base, partitioning, points) = partitionSamples(levels, initialPoints)
+//  val vertices = points
+//      .flatMap(::toFloatList)
+//      .toFloatArray()
+//
+//  val mesh = GeneralMesh(
+//      vertexSchema = vertexSchema,
+//      primitiveType = PrimitiveType.points,
+//      vertexBuffer = newVertexBuffer(vertexSchema).load(createFloatBuffer(vertices)),
+//      count = vertices.size / vertexSchema.floatSize
+//  )
+//
+//  return SampledModel(
+//      mesh = mesh,
+//      partitioning = partitioning,
+//      baseSize = base.size,
+//      offsets = getVolumeOffsets(base.size, partitioning),
+//      levels = levels,
+//      lodRanges = lodRanges
+//  )
+//}
+//
+//fun serializeVertex(point: SamplePoint): List<Float> {
+//  val shading = point.shading
+//  val normal = point.normal
+//  val color = shading.color
+//
+//  return toList(point.location) +
+//      bytesToFloat(
+//          normalizedFloatToUnsignedByte(color.x),
+//          normalizedFloatToUnsignedByte(color.y),
+//          normalizedFloatToUnsignedByte(color.z),
+//          normalizedFloatToUnsignedByte(shading.opacity)
+//      ) +
+//      bytesToFloat(
+//          normalizedFloatToSignedByte(normal.x),
+//          normalizedFloatToSignedByte(normal.y),
+//          normalizedFloatToSignedByte(normal.z),
+//          normalizedFloatToUnsignedByte(shading.glow)
+//      )
+//}

@@ -19,8 +19,6 @@ data class CameraRig(
     get() = Quaternion()
         .rotateZ(rotation.x)
         .rotateY(-rotation.y)
-//  get() =
-//  Quaternion.lookAt((Vector3.zero - location).normalize())
 }
 
 fun updateCameraOrbiting(mouseOffset: Vector2, camera: CameraRig): CameraRig {
@@ -33,7 +31,7 @@ fun updateCameraOrbiting(mouseOffset: Vector2, camera: CameraRig): CameraRig {
 
   val orientationOffset = Quaternion()
       .rotateZ(reverseRotation.x - mouseOffset.x * 0.03f)
-      .rotateY(-reverseRotation.y - mouseOffset.y * 0.025f)
+      .rotateY(-reverseRotation.y - mouseOffset.y * 0.02f)
 
   val nextLocation = orientationOffset.transform(pivotOffset) + pivot
 

@@ -4,7 +4,6 @@ import silentorb.mythic.fathom.misc.getNormal
 import silentorb.mythic.fathom.surfacing.GridBounds
 import silentorb.mythic.fathom.surfacing.snapToSurfaceIncludingNormal
 import silentorb.mythic.imaging.texturing.anonymousSampler
-import silentorb.mythic.scenery.SamplePoint
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector3i

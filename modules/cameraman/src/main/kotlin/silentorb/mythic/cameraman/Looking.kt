@@ -1,6 +1,5 @@
 package silentorb.mythic.cameraman
 
-import silentorb.mythic.happenings.CommandName
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
@@ -17,7 +16,7 @@ data class MomentumAxis(
     val vertical: MomentumConfig
 )
 
-fun applyLookForce(lookMap: Map<CommandName, Vector3>, turnSpeed: Vector2, commands: Commands): Vector2 {
+fun applyLookForce(lookMap: Map<String, Vector3>, turnSpeed: Vector2, commands: Commands): Vector2 {
   val offset3 = joinInputVector(commands, lookMap)
   return if (offset3 != null) {
     val offset2 = Vector2(offset3.z, offset3.y)

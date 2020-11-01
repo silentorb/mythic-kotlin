@@ -26,6 +26,7 @@ dependencies {
   implementation("silentorb.mythic:haft")
   api("silentorb.mythic:cameraman")
   api("silentorb.mythic:debugging")
+  api("silentorb.mythic:scenery")
 }
 
 tasks {

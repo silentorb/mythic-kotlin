@@ -1,6 +1,5 @@
 package silentorb.mythic.cameraman
 
-import silentorb.mythic.cameraman.fpCameraRotation
 import silentorb.mythic.spatial.Quaternion
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.minMax
@@ -27,9 +26,4 @@ fun updateFirstPersonFacingRotation(facingRotation: Quaternion, mouseLookOffset:
   return facingRotation * Quaternion()
       .rotateZ(offset.x)
       .rotateY(offset.y)
-
-//  return Vector2(
-//      normalizeRadialAngle(next.x),
-//      minMax(next.y, -1.1f, 1.1f)
-//  )
 }
