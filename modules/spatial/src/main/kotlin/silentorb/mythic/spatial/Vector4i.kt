@@ -457,4 +457,10 @@ class Vector4i : Externalizable {
   companion object {
     private const val serialVersionUID = 1L
   }
+
+  fun xy(): Vector2i =
+      Vector2i(x, y)
+
+  fun zw(): Vector2i =
+      Vector2i(z, w)
 }

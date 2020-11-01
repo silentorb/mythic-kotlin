@@ -177,16 +177,6 @@ fun finishRender(renderer: Renderer, windowInfo: WindowInfo) {
   }
 }
 
-fun transformToScreen(transform: Matrix, target: Vector3): Vector2? {
-  val coordinate = transform * Vector4(target.x, target.y, target.z, 1f)
-
-  // The w condition filters out targets behind the camera
-  return if (coordinate.w > 0f)
-    coordinate.xy() / coordinate.w
-  else
-    null
-}
-
 fun createCanvas(renderer: Renderer, custom: Map<String, Any>, dimensions: Vector2i): Canvas {
   val unitScaling = getUnitScaling(dimensions)
   return Canvas(
