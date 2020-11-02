@@ -8,6 +8,7 @@ object EditorCommands {
   val deleteNode = "deleteNode"
   val assignMesh = "assignMesh"
   val assignTexture = "assignTexture"
+  val setGraphValue = "setGraphValue"
 
   val startTranslating = "startTranslating"
   val startRotating = "startRotating"

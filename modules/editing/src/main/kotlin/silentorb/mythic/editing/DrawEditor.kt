@@ -24,17 +24,16 @@ fun drawEditor(editor: Editor): Pair<Editor, Commands> {
 
   val nextSelection = renderTree(editor, graph)
   val viewport = drawViewportPanel();
-  val (nextGraph, propertiesCommands) = drawPropertiesPanel(editor, graph)
+  val propertiesCommands= drawPropertiesPanel(editor, graph)
 //  val nextGraphLibrary = incorporateGraphIntoLibrary(editor, nextGraph)
 
   val dialogCommands = newNodeNameDialog(menuCommands) + renameNodeDialog(editor)(menuCommands)
-
+  val imGuiCommands = getImGuiCommands(editor)
   return editor.copy(
       state.copy(
           selection = nextSelection,
       ),
       viewportBoundsMap = mapOf(defaultViewportId to viewport),
-      graph = nextGraph,
 //      history = appendHistory(editor.history, nextGraph),
-  ) to menuCommands + dialogCommands
+  ) to menuCommands + dialogCommands + imGuiCommands + propertiesCommands
 }

@@ -53,7 +53,7 @@ fun updateSelection(commandTypes: List<Any>, editor: Editor, nextGraph: Graph?):
     selection
 }
 
-fun updateEditorFromCommands(mouseOffset: Vector2, commands: Commands, editor: Editor): Editor {
+fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector2, commands: Commands, editor: Editor): Editor {
   val commandTypes = commands.map { it.type }
   val cameras = editor.state.cameras
       .mapValues { (_, camera) ->
@@ -62,12 +62,14 @@ fun updateEditorFromCommands(mouseOffset: Vector2, commands: Commands, editor: E
 
   val nextGraph = if (commandTypes.contains(EditorCommands.commitOperation) && editor.staging != null)
     editor.staging
+  else if (editor.staging != null)
+    editor.graph
   else
-    updateSceneGraph(commandTypes, editor)
+    updateSceneGraph(commands, editor)
 
   val nextSelection = updateSelection(commandTypes, editor, nextGraph)
   val nextOperation = updateOperation(commandTypes, editor)
-  val nextStaging = updateStaging(editor, mouseOffset, commandTypes, nextOperation)
+  val nextStaging = updateStaging(editor, previousMousePosition, mouseOffset, commandTypes, nextOperation)
   return editor.copy(
       state = editor.state.copy(
           cameras = cameras,
@@ -84,5 +86,6 @@ fun updateEditor(deviceStates: List<InputDeviceState>, editor: Editor): Editor {
   val externalCommands = mapCommands(defaultEditorBindings(), deviceStates)
   val (nextEditor, guiCommands) = defineEditorGui(editor)
   val commands = externalCommands + guiCommands
-  return updateEditorFromCommands(getMouseOffset(deviceStates), commands, nextEditor)
+  val previousMousePosition = deviceStates.dropLast(1).last().mousePosition
+  return updateEditorFromCommands(previousMousePosition, getMouseOffset(deviceStates), commands, nextEditor)
 }

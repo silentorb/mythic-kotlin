@@ -31,5 +31,11 @@ inline fun <reified T> groupProperty(relationship: Id): (Graph) -> Map<Id, T> = 
 fun getProperties(graph: Graph, key: String): List<Entry> =
     graph.filter { it.source == key }
 
-inline fun <reified T>getValue(graph: Graph, key: String, property: Id) : T? =
-    graph.firstOrNull { it.source == key && it.property == property } as T?
+inline fun <reified T> getValue(graph: Graph, key: String, property: Id): T? =
+    graph.firstOrNull { it.source == key && it.property == property }?.target as T?
+
+fun replaceValues(graph: Graph, additional: Graph): Graph =
+    graph.filter { entry ->
+      additional.none { it.source == entry.source && it.property == entry.property }
+    }
+        .plus(additional)

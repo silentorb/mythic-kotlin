@@ -2,6 +2,7 @@ package silentorb.mythic.editing.updating
 
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.nodeNameText
+import silentorb.mythic.happenings.Commands
 
 fun onGraphEditingCommand(commandType: Any, transform: EditorGraphTransform): GraphEditCommandsHandler =
     { editor, commandTypes, graph ->
@@ -59,12 +60,13 @@ val onDeleteNode = onGraphEditingCommand(EditorCommands.deleteNode) { editor, gr
   graph.filter { !selection.contains(it.source) }
 }
 
-fun updateSceneGraph(commandTypes: List<Any>, editor: Editor): Graph? {
+fun updateSceneGraph(commands: Commands, editor: Editor): Graph? {
+  val commandTypes = commands.map { it.type }
   val initialGraph = editor.graph ?: getActiveEditorGraph(editor)
   return if (initialGraph == null)
     null
   else {
-    listOf(
+    val graph2 = listOf(
         onAddNode,
         onDeleteNode,
         onRenameNode,
@@ -72,6 +74,15 @@ fun updateSceneGraph(commandTypes: List<Any>, editor: Editor): Graph? {
         .fold(initialGraph) { graph, handler ->
           handler(editor, commandTypes, graph)
         }
+
+    val graphChanges = commands
+        .filter { it.type == EditorCommands.setGraphValue }
+        .map { it.value as Entry }
+
+    if (graphChanges.any())
+      replaceValues(graph2, graphChanges)
+    else
+      graph2
   }
 }
 

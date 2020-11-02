@@ -1,8 +1,10 @@
 package silentorb.mythic.editing
 
 import imgui.ImGui
+import imgui.flag.ImGuiKey
 import org.lwjgl.glfw.GLFW
 import silentorb.mythic.editing.panels.defaultViewportId
+import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
 
 fun getActiveEditorGraphId(editor: Editor): Id? {
@@ -44,3 +46,24 @@ fun isShortcutPressed(shortcut: String): Boolean {
   }
   return isKeyPressed && modifiersArePressed
 }
+
+fun getTransform(graph: Graph, node: Id): Matrix {
+  val translation = getValue<Vector3>(graph, node, Properties.translation) ?: Vector3.zero
+  val rotation = getValue<Vector3>(graph, node, Properties.rotation) ?: Vector3.zero
+  val scale = getValue<Vector3>(graph, node, Properties.scale) ?: Vector3.unit
+  val localTransform = Matrix.identity
+      .translate(translation)
+      .rotateZ(rotation.z)
+      .rotateY(rotation.y)
+      .rotateX(rotation.x)
+      .scale(scale)
+
+  val parent = getValue<Id>(graph, node, Properties.parent)
+  return if (parent != null)
+    getTransform(graph, parent) * localTransform
+  else
+    localTransform
+}
+
+fun isEscapePressed(): Boolean =
+    ImGui.isKeyPressed(ImGui.getKeyIndex(ImGuiKey.Escape))

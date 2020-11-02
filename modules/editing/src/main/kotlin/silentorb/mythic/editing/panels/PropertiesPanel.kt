@@ -21,12 +21,12 @@ fun drawFormField(editor: Editor, definition: PropertyDefinition, entry: Entry):
   }
 }
 
-fun drawPropertiesPanel(editor: Editor, graph: Graph?): Pair<Graph?, Commands> {
+fun drawPropertiesPanel(editor: Editor, graph: Graph?): Commands {
   ImGui.begin("Properties", ImGuiWindowFlags.MenuBar)
   panelBackground()
 
   val result = if (graph != null) {
-    var nextGraph: Graph = graph
+    var commands: Commands = listOf()
     val selection = editor.state.selection
     if (selection.size == 1) {
       val node = selection.first()
@@ -41,7 +41,8 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): Pair<Graph?, Commands> {
           for ((property, definition) in availableDefinitions) {
             if (ImGui.selectable(definition.displayName)) {
               val target = definition.defaultValue?.invoke(editor) ?: ""
-              nextGraph = nextGraph + Entry(node, property, target)
+              commands = commands.plus(Command(EditorCommands.setGraphValue, value = Entry(node, property, target)))
+//              nextGraph = nextGraph + Entry(node, property, target)
             }
           }
           ImGui.endCombo()
@@ -60,16 +61,17 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): Pair<Graph?, Commands> {
             entry.target
 
           if (nextValue != entry.target) {
-            nextGraph = nextGraph
-                .minus(entry)
-                .plus(entry.copy(target = nextValue))
+            commands = commands.plus(Command(EditorCommands.setGraphValue, value = Entry(node, property, nextValue)))
+//            nextGraph = nextGraph
+//                .minus(entry)
+//                .plus(entry.copy(target = nextValue))
           }
         }
       }
     }
-    nextGraph to listOf<Command>()
+    commands
   } else
-    graph to listOf<Command>()
+    listOf<Command>()
 
   ImGui.end()
 

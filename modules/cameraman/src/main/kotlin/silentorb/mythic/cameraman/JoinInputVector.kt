@@ -7,8 +7,8 @@ import silentorb.mythic.spatial.Vector3
 fun joinInputVector(commands: Commands, commandMap: Map<String, Vector3>): Vector3? {
   val forces = commands.mapNotNull {
     val vector = commandMap[it.type]
-    if (vector != null && it.value > 0)
-      vector * it.value
+    if (vector != null && it.value as Float > 0)
+      vector * it.value as Float
     else
       null
   }

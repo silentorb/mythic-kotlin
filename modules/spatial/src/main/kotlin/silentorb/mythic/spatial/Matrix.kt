@@ -715,6 +715,9 @@ data class Matrix(
       mulGeneric(this, vector)
   }
 
+  fun translation(): Vector3 =
+      Vector3(m30, m31, m32)
+
   fun translation(x: Float, y: Float, z: Float): Matrix {
     return identityOrThis().copy(
         m30 = x,
@@ -774,6 +777,47 @@ data class Matrix(
 
   operator fun times(m: Matrix) = mul(m)
   operator fun times(v: Vector4) = transform(v)
+
+  fun unproject(winX: Float, winY: Float, winZ: Float, viewport: Vector4): Vector3 {
+    val a = m00 * m11 - m01 * m10
+    val b = m00 * m12 - m02 * m10
+    val c = m00 * m13 - m03 * m10
+    val d = m01 * m12 - m02 * m11
+    val e = m01 * m13 - m03 * m11
+    val f = m02 * m13 - m03 * m12
+    val g = m20 * m31 - m21 * m30
+    val h = m20 * m32 - m22 * m30
+    val i = m20 * m33 - m23 * m30
+    val j = m21 * m32 - m22 * m31
+    val k = m21 * m33 - m23 * m31
+    val l = m22 * m33 - m23 * m32
+    val det = 1.0f / (a * l - b * k + c * j + d * i - e * h + f * g)
+    val im00 = (m11 * l - m12 * k + m13 * j) * det
+    val im01 = (-m01 * l + m02 * k - m03 * j) * det
+    val im02 = (m31 * f - m32 * e + m33 * d) * det
+    val im03 = (-m21 * f + m22 * e - m23 * d) * det
+    val im10 = (-m10 * l + m12 * i - m13 * h) * det
+    val im11 = (m00 * l - m02 * i + m03 * h) * det
+    val im12 = (-m30 * f + m32 * c - m33 * b) * det
+    val im13 = (m20 * f - m22 * c + m23 * b) * det
+    val im20 = (m10 * k - m11 * i + m13 * g) * det
+    val im21 = (-m00 * k + m01 * i - m03 * g) * det
+    val im22 = (m30 * e - m31 * c + m33 * a) * det
+    val im23 = (-m20 * e + m21 * c - m23 * a) * det
+    val im30 = (-m10 * j + m11 * h - m12 * g) * det
+    val im31 = (m00 * j - m01 * h + m02 * g) * det
+    val im32 = (-m30 * d + m31 * b - m32 * a) * det
+    val im33 = (m20 * d - m21 * b + m22 * a) * det
+    val ndcX = (winX - viewport.x) / viewport.z * 2.0f - 1.0f
+    val ndcY = (winY - viewport.y) / viewport.w * 2.0f - 1.0f
+    val ndcZ = winZ + winZ - 1.0f
+    val invW = 1.0f / (im03 * ndcX + im13 * ndcY + im23 * ndcZ + im33)
+    return Vector3(
+        (im00 * ndcX + im10 * ndcY + im20 * ndcZ + im30) * invW,
+        (im01 * ndcX + im11 * ndcY + im21 * ndcZ + im31) * invW,
+        (im02 * ndcX + im12 * ndcY + im22 * ndcZ + im32) * invW
+    )
+  }
 
   fun getScale(): Vector3 {
     val value: Vector3m = Vector3m()

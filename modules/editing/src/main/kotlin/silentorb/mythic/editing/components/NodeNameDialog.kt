@@ -6,6 +6,7 @@ import imgui.flag.ImGuiKey
 import imgui.type.ImString
 import silentorb.mythic.editing.Editor
 import silentorb.mythic.editing.EditorCommands
+import silentorb.mythic.editing.isEscapePressed
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 
@@ -22,7 +23,7 @@ fun nodeNameDialog(title: String, triggerCommand: Any, nextCommand: Any, initial
     ImGui.setKeyboardFocusHere()
     val pressedEnter = ImGui.inputText("Name", nodeNameText, ImGuiInputTextFlags.EnterReturnsTrue)
     ImGui.separator()
-    if (ImGui.button("Cancel") || ImGui.isKeyPressed(ImGui.getKeyIndex(ImGuiKey.Escape))) {
+    if (ImGui.button("Cancel") || isEscapePressed()) {
       nodeNameText.set("")
       ImGui.closeCurrentPopup()
     }
