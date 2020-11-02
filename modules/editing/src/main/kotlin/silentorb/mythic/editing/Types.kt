@@ -40,6 +40,7 @@ data class Option(
 
 typealias Options = List<Option>
 
+// Persistent State
 data class EditorState(
     val graph: String? = null,
     val cameras: Map<Id, CameraRig> = mapOf(),
@@ -48,6 +49,8 @@ data class EditorState(
 
 data class Editor(
     val state: EditorState = EditorState(),
+    val graph: Graph? = null,
+    val operation: Any? = null,
     val propertyDefinitions: PropertyDefinitions,
     val textures: Options = listOf(),
     val meshes: Options = listOf(),

@@ -1,5 +1,6 @@
 package silentorb.mythic.editing
 
+import org.lwjgl.glfw.GLFW
 import silentorb.mythic.cameraman.CameramanCommands
 import silentorb.mythic.haft.*
 
@@ -18,5 +19,14 @@ fun defaultGamepadBindings() = mapOf(
     GAMEPAD_AXIS_RIGHT_RIGHT to CameramanCommands.lookRight,
 )
 
+fun defaultKeyboardBindings() = mapOf(
+    GLFW.GLFW_KEY_G to EditorCommands.startTranslating,
+    GLFW.GLFW_KEY_X to EditorCommands.restrictAxisX,
+    GLFW.GLFW_KEY_Y to EditorCommands.restrictAxisY,
+    GLFW.GLFW_KEY_Z to EditorCommands.restrictAxisZ,
+    GLFW.GLFW_KEY_ESCAPE to EditorCommands.cancelOperation,
+)
+
 fun defaultEditorBindings(): Bindings =
-    createBindings(DeviceIndexes.gamepad, defaultGamepadBindings())
+    createBindings(DeviceIndexes.keyboard, defaultKeyboardBindings()) +
+        createBindings(DeviceIndexes.gamepad, defaultGamepadBindings())

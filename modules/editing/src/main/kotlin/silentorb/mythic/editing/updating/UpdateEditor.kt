@@ -14,14 +14,14 @@ fun incorporateGraphIntoLibrary(editor: Editor, nextGraph: Graph?): GraphLibrary
     editor.graphLibrary
 }
 
-fun updateGraphLibrary(commandTypes: List<Any>, editor: Editor): GraphLibrary {
-  val nextGraph = updateSceneGraph(commandTypes, editor)
-  return incorporateGraphIntoLibrary(editor, nextGraph)
-}
+//fun updateGraphLibrary(commandTypes: List<Any>, editor: Editor): GraphLibrary {
+//  val nextGraph = updateSceneGraph(commandTypes, editor)
+//  return incorporateGraphIntoLibrary(editor, nextGraph)
+//}
 
 fun updateSelection(commandTypes: List<Any>, editor: Editor, nextGraph: Graph?): NodeSelection {
   val selection = editor.state.selection
-  val graph = getActiveEditorGraph(editor)
+  val graph = editor.graph
   return if (graph != null && nextGraph != null) {
     when {
 
@@ -59,16 +59,15 @@ fun updateEditorFromCommands(mouseOffset: Vector2, commands: Commands, editor: E
       .mapValues { (_, camera) ->
         updateFlyThroughCamera(mouseOffset, commands, camera)
       }
-  val graphId = getActiveEditorGraphId(editor)
-  val nextGraphLibrary = updateGraphLibrary(commandTypes, editor)
-  val nextGraph = nextGraphLibrary[graphId]
+//  val graphId = getActiveEditorGraphId(editor)
+  val nextGraph = updateSceneGraph(commandTypes, editor)
   val nextSelection = updateSelection(commandTypes, editor, nextGraph)
   return editor.copy(
       state = editor.state.copy(
           cameras = cameras,
           selection = nextSelection,
       ),
-      graphLibrary = nextGraphLibrary,
+      graph = nextGraph,
   )
 }
 

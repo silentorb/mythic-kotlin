@@ -12,7 +12,7 @@ import silentorb.mythic.editing.updating.incorporateGraphIntoLibrary
 import silentorb.mythic.happenings.Commands
 
 fun drawEditor(editor: Editor): Pair<Editor, Commands> {
-  val graph = getActiveEditorGraph(editor)
+  val graph = editor.graph
   val state = editor.state
 
   val menuCommands = mainMenus()
@@ -25,7 +25,7 @@ fun drawEditor(editor: Editor): Pair<Editor, Commands> {
   val nextSelection = renderTree(editor, graph)
   val viewport = drawViewportPanel();
   val (nextGraph, propertiesCommands) = drawPropertiesPanel(editor, graph)
-  val nextGraphLibrary = incorporateGraphIntoLibrary(editor, nextGraph)
+//  val nextGraphLibrary = incorporateGraphIntoLibrary(editor, nextGraph)
 
   val dialogCommands = newNodeNameDialog(menuCommands) + renameNodeDialog(editor)(menuCommands)
 
@@ -34,6 +34,6 @@ fun drawEditor(editor: Editor): Pair<Editor, Commands> {
           selection = nextSelection,
       ),
       viewportBoundsMap = mapOf(defaultViewportId to viewport),
-      graphLibrary = nextGraphLibrary,
+      graph = nextGraph,
   ) to menuCommands + dialogCommands
 }

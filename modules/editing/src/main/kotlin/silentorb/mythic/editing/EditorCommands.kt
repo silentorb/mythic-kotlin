@@ -8,4 +8,11 @@ object EditorCommands {
   val deleteNode = "deleteNode"
   val assignMesh = "assignMesh"
   val assignTexture = "assignTexture"
+
+  val startTranslating = "startTranslating"
+  val restrictAxisX = "restrictAxisX"
+  val restrictAxisY = "restrictAxisY"
+  val restrictAxisZ = "restrictAxisZ"
+  val finishTranslating = "finishTranslating"
+  val cancelOperation = "cancelOperation"
 }
