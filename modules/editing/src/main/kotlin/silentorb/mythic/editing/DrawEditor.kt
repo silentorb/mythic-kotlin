@@ -8,11 +8,11 @@ import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.editing.panels.drawPropertiesPanel
 import silentorb.mythic.editing.panels.drawViewportPanel
 import silentorb.mythic.editing.panels.renderTree
-import silentorb.mythic.editing.updating.incorporateGraphIntoLibrary
+import silentorb.mythic.editing.updating.appendHistory
 import silentorb.mythic.happenings.Commands
 
 fun drawEditor(editor: Editor): Pair<Editor, Commands> {
-  val graph = editor.graph
+  val graph = editor.staging ?: editor.graph
   val state = editor.state
 
   val menuCommands = mainMenus()
@@ -35,5 +35,6 @@ fun drawEditor(editor: Editor): Pair<Editor, Commands> {
       ),
       viewportBoundsMap = mapOf(defaultViewportId to viewport),
       graph = nextGraph,
+//      history = appendHistory(editor.history, nextGraph),
   ) to menuCommands + dialogCommands
 }

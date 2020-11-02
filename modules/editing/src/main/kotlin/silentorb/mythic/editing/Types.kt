@@ -39,6 +39,7 @@ data class Option(
 )
 
 typealias Options = List<Option>
+typealias GraphHistory = List<Graph>
 
 // Persistent State
 data class EditorState(
@@ -49,8 +50,10 @@ data class EditorState(
 
 data class Editor(
     val state: EditorState = EditorState(),
+    val staging: Graph? = null,
     val graph: Graph? = null,
-    val operation: Any? = null,
+//    val history: GraphHistory = listOf(),
+    val operation: Operation? = null,
     val propertyDefinitions: PropertyDefinitions,
     val textures: Options = listOf(),
     val meshes: Options = listOf(),

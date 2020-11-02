@@ -59,15 +59,24 @@ fun updateEditorFromCommands(mouseOffset: Vector2, commands: Commands, editor: E
       .mapValues { (_, camera) ->
         updateFlyThroughCamera(mouseOffset, commands, camera)
       }
-//  val graphId = getActiveEditorGraphId(editor)
-  val nextGraph = updateSceneGraph(commandTypes, editor)
+
+  val nextGraph = if (commandTypes.contains(EditorCommands.commitOperation) && editor.staging != null)
+    editor.staging
+  else
+    updateSceneGraph(commandTypes, editor)
+
   val nextSelection = updateSelection(commandTypes, editor, nextGraph)
+  val nextOperation = updateOperation(commandTypes, editor)
+  val nextStaging = updateStaging(editor, mouseOffset, commandTypes, nextOperation)
   return editor.copy(
       state = editor.state.copy(
           cameras = cameras,
           selection = nextSelection,
       ),
+      operation = nextOperation,
+      staging = nextStaging,
       graph = nextGraph,
+//      history = appendHistory(editor.history, nextGraph),
   )
 }
 

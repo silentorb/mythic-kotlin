@@ -1,6 +1,6 @@
 package silentorb.mythic.editing
 
-enum class SpatialTransformType {
+enum class OperationType {
   translate,
   rotate,
   scale,
@@ -12,11 +12,11 @@ enum class Axis {
   z,
 }
 
-data class SpatialTransformOperation(
-    val type: SpatialTransformType,
-    val axis: Set<Axis>
-) {
-  init {
-    assert(axis.any())
-  }
-}
+data class Operation(
+    val type: OperationType,
+    val data: Any
+)
+
+data class SpatialTransformState(
+    val axis: Set<Axis> = setOf()
+)

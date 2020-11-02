@@ -30,3 +30,6 @@ inline fun <reified T> groupProperty(relationship: Id): (Graph) -> Map<Id, T> = 
 
 fun getProperties(graph: Graph, key: String): List<Entry> =
     graph.filter { it.source == key }
+
+inline fun <reified T>getValue(graph: Graph, key: String, property: Id) : T? =
+    graph.firstOrNull { it.source == key && it.property == property } as T?

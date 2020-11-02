@@ -74,3 +74,11 @@ fun updateSceneGraph(commandTypes: List<Any>, editor: Editor): Graph? {
         }
   }
 }
+
+const val maxGraphHistory = 30
+
+fun appendHistory(history: List<Graph>, graph: Graph?): GraphHistory =
+    if (graph != null && graph != history.last())
+      history.takeLast(maxGraphHistory).plusElement(graph)
+    else
+      history

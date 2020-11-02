@@ -10,9 +10,11 @@ object EditorCommands {
   val assignTexture = "assignTexture"
 
   val startTranslating = "startTranslating"
+  val startRotating = "startRotating"
+  val startScaling = "startScaling"
   val restrictAxisX = "restrictAxisX"
   val restrictAxisY = "restrictAxisY"
   val restrictAxisZ = "restrictAxisZ"
-  val finishTranslating = "finishTranslating"
+  val commitOperation = "commitOperation"
   val cancelOperation = "cancelOperation"
 }
