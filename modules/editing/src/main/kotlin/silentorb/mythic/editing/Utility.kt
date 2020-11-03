@@ -26,6 +26,16 @@ fun defaultEditorState() =
 fun isAltDown(): Boolean =
     ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_ALT) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_ALT)
 
+fun mapKey(key: String): Int =
+    when {
+      key.length == 1 -> key.first().toInt()
+      // Currently only handling numeric keypad keys
+      key == "Del" -> GLFW.GLFW_KEY_DELETE
+      key == numpadPeriodKey -> GLFW.GLFW_KEY_KP_DECIMAL
+      key.contains(keypadKey) -> key.last().toInt() - '0'.toInt() + GLFW.GLFW_KEY_KP_0
+      else -> throw Error("Keystroke type yet supported: $key")
+    }
+
 fun isShortcutPressed(shortcut: String): Boolean {
   val parts = shortcut.split("+")
   val key = parts.last()
@@ -39,13 +49,7 @@ fun isShortcutPressed(shortcut: String): Boolean {
         }
       }
 
-  val keyIndex = when {
-    key.length == 1 -> key.first().toInt()
-    // Currently only handling numeric keypad keys
-    key.contains(keypadKey) -> key.last().toInt() - '0'.toInt() + GLFW.GLFW_KEY_KP_0
-    key == "Del" -> GLFW.GLFW_KEY_DELETE
-    else -> throw Error("Keystroke type yet supported: $key")
-  }
+  val keyIndex = mapKey(key)
 
   val isKeyPressed = ImGui.isKeyPressed(keyIndex)
   val modifiersArePressed = leftModifiers.all { leftModifier ->

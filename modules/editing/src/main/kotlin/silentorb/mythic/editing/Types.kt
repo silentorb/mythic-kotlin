@@ -62,6 +62,7 @@ data class Editor(
 )
 
 const val keypadKey = "Numpad"
+const val numpadPeriodKey = "$keypadKey ."
 
 data class MenuItem(
     val label: String,

@@ -26,4 +26,5 @@ object EditorCommands {
   val viewRight = "viewRight"
   val viewBottom = "viewBottom"
   val toggleProjectionMode = "toggleProjectionMode"
+  val centerOnSelection = "centerOnSelection"
 }

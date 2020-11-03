@@ -57,7 +57,7 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
   val commandTypes = commands.map { it.type }
   val cameras = editor.state.cameras
       .mapValues { (_, camera) ->
-        updateCamera(mouseOffset, commands, camera)
+        updateCamera(editor, mouseOffset, commands, camera)
       }
 
   val nextGraph = if (commandTypes.contains(EditorCommands.commitOperation) && editor.staging != null)

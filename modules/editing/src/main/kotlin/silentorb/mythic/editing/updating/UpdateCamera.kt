@@ -1,9 +1,6 @@
 package silentorb.mythic.editing.updating
 
-import silentorb.mythic.editing.CameraRig
-import silentorb.mythic.editing.EditorCommands
-import silentorb.mythic.editing.getCameraPivot
-import silentorb.mythic.editing.updateFlyThroughCamera
+import silentorb.mythic.editing.*
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.scenery.ProjectionType
 import silentorb.mythic.spatial.Vector2
@@ -28,7 +25,23 @@ fun toggleProjectionMode(camera: CameraRig): CameraRig =
           ProjectionType.perspective
     )
 
-fun applyCameraPresets(commandType: Any, camera: CameraRig): CameraRig? {
+fun centerOnSelection(editor: Editor, camera: CameraRig): CameraRig {
+  val selection = editor.state.selection
+  val graph = editor.staging ?: editor.graph
+  return if (selection.any() && graph != null){
+    val nodeLocation = getTransform(graph, selection.first()).translation()
+    val pivot = getCameraPivot(camera)
+    val pivotToCameraOffset = camera.location - pivot
+    val nextLocation = nodeLocation + pivotToCameraOffset
+    camera.copy(
+        location = nextLocation
+    )
+  }
+  else
+    camera
+}
+
+fun applyCameraPresets(editor: Editor, commandType: Any, camera: CameraRig): CameraRig? {
   return when (commandType) {
     EditorCommands.viewFront -> applyCameraPreset(camera, Vector3(0f, 1f, 0f))
     EditorCommands.viewBack -> applyCameraPreset(camera, Vector3(0f, -1f, 0f))
@@ -36,17 +49,18 @@ fun applyCameraPresets(commandType: Any, camera: CameraRig): CameraRig? {
     EditorCommands.viewLeft -> applyCameraPreset(camera, Vector3(1f, 0f, 0f))
     EditorCommands.viewTop -> applyCameraPreset(camera, Vector3(0f, 0f, -1f))
     EditorCommands.viewBottom -> applyCameraPreset(camera, Vector3(0f, 0f, 1f))
+    EditorCommands.centerOnSelection -> centerOnSelection(editor, camera)
     EditorCommands.toggleProjectionMode -> toggleProjectionMode(camera)
     else -> null
   }
 }
 
-fun applyCameraPresets(commands: List<Command>, camera: CameraRig): CameraRig? =
+fun applyCameraPresets(editor: Editor, commands: List<Command>, camera: CameraRig): CameraRig? =
     commands
-        .mapNotNull { applyCameraPresets(it.type, camera) }
+        .mapNotNull { applyCameraPresets(editor, it.type, camera) }
         .firstOrNull()
 
-fun updateCamera(mouseOffset: Vector2, commands: List<Command>, camera: CameraRig): CameraRig {
-  return applyCameraPresets(commands, camera)
+fun updateCamera(editor: Editor, mouseOffset: Vector2, commands: List<Command>, camera: CameraRig): CameraRig {
+  return applyCameraPresets(editor, commands, camera)
       ?: updateFlyThroughCamera(mouseOffset, commands, camera)
 }

@@ -3,6 +3,7 @@ package silentorb.mythic.editing.components
 import silentorb.mythic.editing.EditorCommands
 import silentorb.mythic.editing.MenuItem
 import silentorb.mythic.editing.keypadKey
+import silentorb.mythic.editing.numpadPeriodKey
 import silentorb.mythic.happenings.Commands
 
 fun mainMenus(): Commands =
@@ -22,5 +23,6 @@ fun mainMenus(): Commands =
             MenuItem("View Top", "$keypadKey 7", EditorCommands.viewTop),
             MenuItem("View Bottom", "Ctrl+$keypadKey 7", EditorCommands.viewBottom),
             MenuItem("Toggle Projection", "$keypadKey 5", EditorCommands.toggleProjectionMode),
+            MenuItem("Center on Selection", numpadPeriodKey, EditorCommands.centerOnSelection),
         ))
     ))
