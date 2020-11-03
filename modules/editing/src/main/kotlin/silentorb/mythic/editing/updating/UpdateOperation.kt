@@ -3,7 +3,7 @@ package silentorb.mythic.editing.updating
 import silentorb.mythic.editing.*
 import silentorb.mythic.spatial.*
 
-fun startOperation(previous: Operation?, type: OperationType): Operation? =
+fun startOperation(type: OperationType, previous: Operation?): Operation? =
     if (previous?.type == type)
       previous
     else
@@ -12,11 +12,24 @@ fun startOperation(previous: Operation?, type: OperationType): Operation? =
           data = SpatialTransformState()
       )
 
+fun restrictAxis(axis: Axis, previous: Operation?): Operation? =
+    if (previous == null || !(previous.data is SpatialTransformState))
+      previous
+    else
+      previous.copy(
+          data = SpatialTransformState(
+              axis = setOf(axis)
+          )
+      )
+
 fun updateOperation(commandType: Any, operation: Operation?): Operation? {
   return when (commandType) {
-    EditorCommands.startTranslating -> startOperation(operation, OperationType.translate)
-    EditorCommands.startRotating -> startOperation(operation, OperationType.rotate)
-    EditorCommands.startScaling -> startOperation(operation, OperationType.scale)
+    EditorCommands.startTranslating -> startOperation(OperationType.translate, operation)
+    EditorCommands.startRotating -> startOperation(OperationType.rotate, operation)
+    EditorCommands.startScaling -> startOperation(OperationType.scale, operation)
+    EditorCommands.restrictAxisX -> restrictAxis(Axis.x, operation)
+    EditorCommands.restrictAxisY -> restrictAxis(Axis.y, operation)
+    EditorCommands.restrictAxisZ -> restrictAxis(Axis.z, operation)
     EditorCommands.cancelOperation -> null
     EditorCommands.commitOperation -> null
     else -> operation
@@ -51,6 +64,7 @@ fun updateTranslation(previousMousePosition: Vector2, mouseOffset: Vector2, edit
       else {
         val viewport = viewportPair.value
         val viewTransform = createViewMatrix(camera.location, camera.orientation)
+        val data = editor.operation!!.data as SpatialTransformState
         val newEntries = selection.map { node ->
           val value = getValue<Vector3>(graph, node, Properties.translation) ?: Vector3.zero
           val globalObjectTransform = getTransform(graph, node)
@@ -62,9 +76,14 @@ fun updateTranslation(previousMousePosition: Vector2, mouseOffset: Vector2, edit
           val end = unproject(cameraTransform, viewport.toVector4(), mouseStart + mouseOffset, 1f)
           val offset = end - start
           val newValue = value + offset
-          println("$mouseOffset $offset $newValue")
+          val constrained = if (data.axis.any())
+            newValue * Vector3(axisMask(data.axis))
+          else
+            newValue
 
-          Entry(node, Properties.translation, newValue)
+//          println("$mouseOffset $offset $newValue")
+
+          Entry(node, Properties.translation, constrained)
         }
         replaceValues(graph, newEntries)
       }
@@ -86,7 +105,7 @@ fun updateStaging(editor: Editor, previousMousePosition: Vector2, mouseOffset: V
 fun updateStaging(editor: Editor, previousMousePosition: Vector2, mouseOffset: Vector2, commandTypes: List<Any>, nextOperation: Operation?): Graph? =
     if (nextOperation == null || commandTypes.contains(EditorCommands.cancelOperation))
       null
-    else if (editor.staging == null || editor.operation?.type != nextOperation.type)
+    else if (editor.staging == null || editor.operation != nextOperation)
       editor.graph
     else
       updateStaging(editor, previousMousePosition, mouseOffset, commandTypes)

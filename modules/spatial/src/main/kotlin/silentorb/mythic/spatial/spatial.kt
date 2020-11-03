@@ -459,8 +459,16 @@ tailrec fun normalizeRadialAngle(angle: Float): Float {
   }
 }
 
+fun transformToScreenRaw(transform: Matrix, target: Vector3): Vector4 =
+   transform * Vector4(target.x, target.y, target.z, 1f)
+
+fun transformToScreenIncludingBehind(transform: Matrix, target: Vector3): Vector2 {
+  val coordinate = transformToScreenRaw(transform, target)
+  return coordinate.xy() / coordinate.w
+}
+
 fun transformToScreen(transform: Matrix, target: Vector3): Vector2? {
-  val coordinate = transform * Vector4(target.x, target.y, target.z, 1f)
+  val coordinate = transformToScreenRaw(transform, target)
 
   // The w condition filters out targets behind the camera
   return if (coordinate.w > 0f)

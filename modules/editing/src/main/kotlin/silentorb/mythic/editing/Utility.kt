@@ -67,3 +67,11 @@ fun getTransform(graph: Graph, node: Id): Matrix {
 
 fun isEscapePressed(): Boolean =
     ImGui.isKeyPressed(ImGui.getKeyIndex(ImGuiKey.Escape))
+
+fun axisMask(axis: Set<Axis>): List<Float> =
+    (0 until 3).map { index ->
+      if (axis.any { it.ordinal == index })
+        1f
+      else
+        0f
+    }

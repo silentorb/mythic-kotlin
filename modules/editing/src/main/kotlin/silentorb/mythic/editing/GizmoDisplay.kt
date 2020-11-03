@@ -8,15 +8,55 @@ import silentorb.mythic.spatial.*
 typealias ScreenTransform = (Vector3) -> Vector2
 
 fun transformPoint(transform: Matrix, dimensions: Vector2, offset: Vector2): ScreenTransform = { point ->
-  transformToScreen(transform, point)!! * Vector2(1f, -2f) * dimensions + offset
+  val sample = transformToScreenIncludingBehind(transform, point)
+//  sample * Vector2(1f, -2f) * dimensions + offset
+  Vector2(sample.x + 1f, 1f - sample.y) / 2f * dimensions + offset
+}
+
+fun axisColors() = listOf(
+    ImColor.intToColor(255, 51, 82, 255),
+    ImColor.intToColor(139, 220, 0, 255),
+    ImColor.intToColor(40, 144, 255, 255),
+)
+
+fun drawAxisRails(axis: Axis, origin: Vector3, transform: ScreenTransform, drawList: ImDrawList) {
+  val mask = axisMask(setOf(axis))
+  val other = Vector3(mask.map { 1f - it }) * origin
+  val halfLength = 10f
+  val axisVector = Vector3(mask) * Vector3(halfLength)
+  val center = transform(origin)
+  val start = transform(other + axisVector)
+  val end = transform(other - axisVector)
+  drawList.addLine(center.x, center.y, start.x, start.y, axisColors()[axis.ordinal], 2f)
+  drawList.addLine(center.x, center.y, end.x, end.y, axisColors()[axis.ordinal], 2f)
+}
+
+fun drawAxisConstraints(editor: Editor, viewport: Vector4i, camera: CameraRig, drawList: ImDrawList) {
+  val selection = editor.state.selection
+  val graph = editor.staging ?: editor.graph
+  val operation = editor.operation
+  val data = operation?.data
+  if (selection.any() && graph != null && data != null && data is SpatialTransformState) {
+    val node = selection.first()
+    val location = getTransform(graph, node).translation()
+    val axisList = data.axis
+
+    val dimensions = viewport.zw()
+    val viewTransform = createViewMatrix(camera.location, camera.orientation)
+    val orthoTransform = createPerspectiveMatrix(dimensions, 45f, 0.01f, 1000f) * viewTransform
+    val offset = viewport.xy()
+    val transform = transformPoint(orthoTransform, dimensions.toVector2(), offset.toVector2())
+
+    for (axis in axisList) {
+      if (operation.type == OperationType.translate) {
+        drawAxisRails(axis, location, transform, drawList)
+      }
+    }
+  }
 }
 
 fun drawCompass(transform: ScreenTransform, drawList: ImDrawList) {
-  val colors = listOf(
-      ImColor.intToColor(255, 0, 0, 255),
-      ImColor.intToColor(0, 255, 0, 255),
-      ImColor.intToColor(0, 0, 255, 255),
-  )
+  val colors = axisColors()
   val vectors = listOf(
       Vector3(1f, 0f, 0f),
       Vector3(0f, 1f, 0f),
@@ -40,17 +80,24 @@ fun drawCompass(transform: ScreenTransform, drawList: ImDrawList) {
 
 fun drawEditor3dElements(editor: Editor, viewport: Vector4i, camera: CameraRig) {
   val drawList = ImGui.getBackgroundDrawList()
-  drawList.addCircle(viewport.x.toFloat() + viewport.z.toFloat() * 0.5f,
-      viewport.y.toFloat() + viewport.w.toFloat() * 0.5f,
-      100f, ImColor.intToColor(64, 64, 64, 255), 32, 2f)
+//  drawList.addCircle(viewport.x.toFloat() + viewport.z.toFloat() * 0.5f,
+//      viewport.y.toFloat() + viewport.w.toFloat() * 0.5f,
+//      100f, ImColor.intToColor(64, 64, 64, 255), 32, 2f)
 
   val dimensions = viewport.zw()
   val viewTransform = createViewMatrix(Vector3.zero, camera.orientation)
   val orthoTransform = createOrthographicMatrix(dimensions, 45f, 0.01f, 1000f) * viewTransform
   val compassPadding = 50
-  val compassOffset = Vector2i(viewport.x + compassPadding, viewport.y + viewport.w - compassPadding)
+  val compassOffset = viewport.xy() + Vector2i(compassPadding, viewport.w - compassPadding) - viewport.zw() / 2
   val compassTransform = transformPoint(orthoTransform, dimensions.toVector2(), compassOffset.toVector2())
+
+  val bounds = viewport.toVector4()
+  drawList.pushClipRect(bounds.x, bounds.y, bounds.x + bounds.z, bounds.y + bounds.w)
+
+  drawAxisConstraints(editor, viewport, camera, drawList)
   drawCompass(compassTransform, drawList)
+
+  drawList.popClipRect()
 }
 
 fun drawEditor3dElements(editor: Editor) {
