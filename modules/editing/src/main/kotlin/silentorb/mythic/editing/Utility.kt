@@ -26,6 +26,9 @@ fun defaultEditorState() =
 fun isAltDown(): Boolean =
     ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_ALT) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_ALT)
 
+fun isShiftDown(): Boolean =
+    ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_SHIFT)
+
 fun mapKey(key: String): Int =
     when {
       key.length == 1 -> key.first().toInt()

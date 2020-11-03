@@ -29,30 +29,49 @@ fun getCameraPivot(camera: CameraRig): Vector3 {
 }
 
 fun updateCameraOrbiting(mouseOffset: Vector2, camera: CameraRig): CameraRig {
-  val pivotOffset = Vector3(camera.pivotDistance, 0f, 0f)
-  val pivot = getCameraPivot(camera)
-//  val pivot = Vector3.zero
-  val reverseRotation = getYawAndPitch(camera.location - pivot)
-  val a = getYawAndPitch((Vector3(-10f, 0f, 5f) - pivot))
-  val b = getYawAndPitch((Vector3(10f, 0f, 5f) - pivot))
+  return if (mouseOffset == Vector2.zero)
+    camera
+  else {
+    val pivotOffset = Vector3(camera.pivotDistance, 0f, 0f)
+    val pivot = getCameraPivot(camera)
+    val reverseRotation = getYawAndPitch(camera.location - pivot)
 
-  val orientationOffset = Quaternion()
-      .rotateZ(reverseRotation.x - mouseOffset.x * 0.03f)
-      .rotateY(-reverseRotation.y - mouseOffset.y * 0.02f)
+    val orientationOffset = Quaternion()
+        .rotateZ(reverseRotation.x - mouseOffset.x * 0.03f)
+        .rotateY(-reverseRotation.y - mouseOffset.y * 0.02f)
 
-  val nextLocation = orientationOffset.transform(pivotOffset) + pivot
+    val nextLocation = orientationOffset.transform(pivotOffset) + pivot
 
-  val nextRotation = getYawAndPitch(pivot - nextLocation)
-  return camera.copy(
-      location = nextLocation,
-      rotation = nextRotation,
-      lookVelocity = Vector2.zero
-  )
+    val nextRotation = getYawAndPitch(pivot - nextLocation)
+    return camera.copy(
+        location = nextLocation,
+        rotation = nextRotation,
+        lookVelocity = Vector2.zero
+    )
+  }
+}
+
+fun updateCameraPanning(mouseOffset: Vector2, camera: CameraRig): CameraRig {
+  return if (mouseOffset == Vector2.zero)
+    camera
+  else {
+    val strength = 3f * simulationDelta
+    val horizontalOffset = camera.orientation.transform(Vector3(0f, -strength, 0f)) * mouseOffset.x
+    val verticalOffset = camera.orientation.transform(Vector3(0f, 0f, -strength)) * mouseOffset.y
+    val nextLocation = camera.location + horizontalOffset + verticalOffset
+
+    return camera.copy(
+        location = nextLocation,
+        lookVelocity = Vector2.zero
+    )
+  }
 }
 
 fun updateFlyThroughCamera(mouseOffset: Vector2, commands: List<Command>, camera: CameraRig): CameraRig {
   return if (isAltDown())
     updateCameraOrbiting(mouseOffset, camera)
+  else if (isShiftDown())
+    updateCameraPanning(mouseOffset, camera)
   else {
     val lookVelocity = updateLookVelocityFirstPerson(commands, defaultLookMomentumAxis(), camera.lookVelocity)
     val rotation = updateFirstPersonFacingRotation(camera.rotation, null, lookVelocity, simulationDelta)
