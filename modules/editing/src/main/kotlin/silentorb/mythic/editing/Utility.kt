@@ -39,7 +39,14 @@ fun isShortcutPressed(shortcut: String): Boolean {
         }
       }
 
-  val keyIndex = key.first().toInt()
+  val keyIndex = when {
+    key.length == 1 -> key.first().toInt()
+    // Currently only handling numeric keypad keys
+    key.contains(keypadKey) -> key.last().toInt() - '0'.toInt() + GLFW.GLFW_KEY_KP_0
+    key == "Del" -> GLFW.GLFW_KEY_DELETE
+    else -> throw Error("Keystroke type yet supported: $key")
+  }
+
   val isKeyPressed = ImGui.isKeyPressed(keyIndex)
   val modifiersArePressed = leftModifiers.all { leftModifier ->
     ImGui.isKeyDown(leftModifier) || ImGui.isKeyDown(leftModifier + 4)

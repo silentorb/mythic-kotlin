@@ -61,6 +61,8 @@ data class Editor(
     val viewportBoundsMap: Map<Id, Vector4i> = mapOf(),
 )
 
+const val keypadKey = "Numpad"
+
 data class MenuItem(
     val label: String,
     val shortcut: String? = null,

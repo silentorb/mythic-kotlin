@@ -3,6 +3,7 @@ package silentorb.mythic.editing
 import com.fasterxml.jackson.annotation.JsonIgnore
 import silentorb.mythic.cameraman.*
 import silentorb.mythic.happenings.Command
+import silentorb.mythic.scenery.ProjectionType
 import silentorb.mythic.spatial.*
 
 const val simulationFps = 60
@@ -13,6 +14,7 @@ data class CameraRig(
     val rotation: Vector2 = Vector2.zero,
     val lookVelocity: Vector2 = Vector2.zero,
     val pivotDistance: Float = 10f,
+    val projection: ProjectionType = ProjectionType.perspective,
 ) {
   @get:JsonIgnore
   val orientation: Quaternion
@@ -21,10 +23,15 @@ data class CameraRig(
         .rotateY(-rotation.y)
 }
 
+fun getCameraPivot(camera: CameraRig): Vector3 {
+  val pivotOffset = Vector3(camera.pivotDistance, 0f, 0f)
+  return camera.location + camera.orientation.transform(pivotOffset)
+}
+
 fun updateCameraOrbiting(mouseOffset: Vector2, camera: CameraRig): CameraRig {
   val pivotOffset = Vector3(camera.pivotDistance, 0f, 0f)
-//  val pivot = camera.location + camera.orientation.transform(pivotOffset)
-  val pivot = Vector3.zero
+  val pivot = getCameraPivot(camera)
+//  val pivot = Vector3.zero
   val reverseRotation = getYawAndPitch(camera.location - pivot)
   val a = getYawAndPitch((Vector3(-10f, 0f, 5f) - pivot))
   val b = getYawAndPitch((Vector3(10f, 0f, 5f) - pivot))
