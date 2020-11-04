@@ -20,6 +20,7 @@ fun createPerspectiveMatrix(dimensions: Vector2i, angle: Float, nearClip: Float,
 }
 
 fun createOrthographicMatrix(dimensions: Vector2i, zoom: Float, nearClip: Float, farClip: Float): Matrix {
+  val ratio = getAspectRatio(dimensions)
   return toMatrix(toMutableMatrix(Matrix.identity)
-      .setOrtho(-1f * zoom, 1f * zoom, -1f * zoom, 1f * zoom, nearClip, farClip))
+      .setOrtho(-1f * zoom * ratio, 1f * zoom * ratio, -1f * zoom, 1f * zoom, nearClip, farClip))
 }

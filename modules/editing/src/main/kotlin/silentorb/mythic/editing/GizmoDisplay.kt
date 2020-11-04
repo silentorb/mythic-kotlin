@@ -43,9 +43,9 @@ fun drawAxisConstraints(editor: Editor, viewport: Vector4i, camera: CameraRig, d
 
     val dimensions = viewport.zw()
     val viewTransform = createViewMatrix(camera.location, camera.orientation)
-    val orthoTransform = createPerspectiveMatrix(dimensions, 45f, 0.01f, 1000f) * viewTransform
+    val cameraTransform = createProjectionMatrix(camera, dimensions) * viewTransform
     val offset = viewport.xy()
-    val transform = transformPoint(orthoTransform, dimensions.toVector2(), offset.toVector2())
+    val transform = transformPoint(cameraTransform, dimensions.toVector2(), offset.toVector2())
 
     for (axis in axisList) {
       if (operation.type == OperationType.translate) {

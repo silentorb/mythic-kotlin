@@ -77,12 +77,15 @@ fun nodeToElement(data: SerialElementData, node: Id): ElementGroup? {
   }
 }
 
-fun cameraRigToCamera(rig: CameraRig): Camera =
+fun cameraRigToCamera(camera: CameraRig): Camera =
     Camera(
-        projectionType = ProjectionType.perspective,
-        position = rig.location,
-        orientation = rig.orientation,
-        angleOrZoom = 45f,
+        projectionType = camera.projection,
+        position = camera.location,
+        orientation = camera.orientation,
+        angleOrZoom = if (camera.projection == ProjectionType.perspective)
+          45f
+        else
+          getOrthoZoom(camera),
     )
 
 fun sceneFromEditorGraph(meshes: ModelMeshMap, editor: Editor, lightingConfig: LightingConfig, viewport: Id): GameScene {

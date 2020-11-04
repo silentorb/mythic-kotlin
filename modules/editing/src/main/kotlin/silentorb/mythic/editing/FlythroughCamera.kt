@@ -78,10 +78,19 @@ fun zoomCamera(camera: CameraRig, newPivotDistance: Float): CameraRig {
   )
 }
 
+fun getOrthoZoom(camera: CameraRig): Float =
+    camera.pivotDistance * 0.45f
+
+fun createProjectionMatrix(camera: CameraRig, dimensions: Vector2i, distance: Float = 1000f): Matrix =
+    if (camera.projection == ProjectionType.perspective)
+      createPerspectiveMatrix(dimensions, 45f, 0.01f, distance)
+    else
+      createOrthographicMatrix(dimensions, getOrthoZoom(camera), 0.01f, distance)
+
 fun updateFlyThroughCamera(mouseOffset: Vector2, commands: List<Command>, camera: CameraRig): CameraRig {
   return when {
     commands.any { it.type == EditorCommands.zoomIn } -> zoomCamera(camera, camera.pivotDistance * 0.7f)
-    commands.any { it.type == EditorCommands.zoomOut } -> zoomCamera(camera, camera.pivotDistance * 1.3f)
+    commands.any { it.type == EditorCommands.zoomOut } -> zoomCamera(camera, camera.pivotDistance * 1.3f + 0.1f)
     isAltDown() -> updateCameraOrbiting(mouseOffset, camera)
     isShiftDown() -> updateCameraPanning(mouseOffset, camera)
     else -> {

@@ -71,7 +71,7 @@ fun updateTranslation(previousMousePosition: Vector2, mouseOffset: Vector2, edit
           val globalObjectLocation = globalObjectTransform.translation()
           val distance = globalObjectLocation.distance(camera.location)
           val mouseStart = previousMousePosition - viewport.xy().toVector2()
-          val cameraTransform = createPerspectiveMatrix(viewport.zw(), 45f, 0.01f, distance) * viewTransform
+          val cameraTransform = createProjectionMatrix(camera, viewport.zw(), distance) * viewTransform
           val start = unproject(cameraTransform, viewport.toVector4(), mouseStart, 1f)
           val end = unproject(cameraTransform, viewport.toVector4(), mouseStart + mouseOffset, 1f)
           val offset = end - start
