@@ -19,6 +19,9 @@ object EditorCommands {
   val commitOperation = "commitOperation"
   val cancelOperation = "cancelOperation"
 
+  val zoomIn = "zoomIn"
+  val zoomOut = "zoomOut"
+
   val viewTop = "viewTop"
   val viewFront = "viewFront"
   val viewBack = "viewBack"

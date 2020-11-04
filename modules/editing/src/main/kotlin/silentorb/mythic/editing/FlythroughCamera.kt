@@ -67,33 +67,46 @@ fun updateCameraPanning(mouseOffset: Vector2, camera: CameraRig): CameraRig {
   }
 }
 
+fun zoomCamera(camera: CameraRig, newPivotDistance: Float): CameraRig {
+  val distanceOffset = camera.pivotDistance - newPivotDistance
+  val pivot = getCameraPivot(camera)
+  val lookAt = (pivot - camera.location).normalize()
+  val offset = lookAt * distanceOffset
+  return camera.copy(
+      location = camera.location + offset,
+      pivotDistance = camera.pivotDistance - distanceOffset,
+  )
+}
+
 fun updateFlyThroughCamera(mouseOffset: Vector2, commands: List<Command>, camera: CameraRig): CameraRig {
-  return if (isAltDown())
-    updateCameraOrbiting(mouseOffset, camera)
-  else if (isShiftDown())
-    updateCameraPanning(mouseOffset, camera)
-  else {
-    val lookVelocity = updateLookVelocityFirstPerson(commands, defaultLookMomentumAxis(), camera.lookVelocity)
-    val rotation = updateFirstPersonFacingRotation(camera.rotation, null, lookVelocity, simulationDelta)
+  return when {
+    commands.any { it.type == EditorCommands.zoomIn } -> zoomCamera(camera, camera.pivotDistance * 0.7f)
+    commands.any { it.type == EditorCommands.zoomOut } -> zoomCamera(camera, camera.pivotDistance * 1.3f)
+    isAltDown() -> updateCameraOrbiting(mouseOffset, camera)
+    isShiftDown() -> updateCameraPanning(mouseOffset, camera)
+    else -> {
+      val lookVelocity = updateLookVelocityFirstPerson(commands, defaultLookMomentumAxis(), camera.lookVelocity)
+      val rotation = updateFirstPersonFacingRotation(camera.rotation, null, lookVelocity, simulationDelta)
 
-    val movementVector = characterMovementVector(commands, camera.orientation)
-    val movementOffset = if (movementVector != null)
-      movementVector * 12f * simulationDelta
-    else
-      Vector3.zero
+      val movementVector = characterMovementVector(commands, camera.orientation)
+      val movementOffset = if (movementVector != null)
+        movementVector * 12f * simulationDelta
+      else
+        Vector3.zero
 
-    val zSpeed = 15f
-    val zOffset = if (commands.any { it.type == CameramanCommands.moveUp }) {
-      Vector3(0f, 0f, -zSpeed * simulationDelta)
-    } else if (commands.any { it.type == CameramanCommands.moveDown }) {
-      Vector3(0f, 0f, zSpeed * simulationDelta)
-    } else
-      Vector3.zero
+      val zSpeed = 15f
+      val zOffset = if (commands.any { it.type == CameramanCommands.moveUp }) {
+        Vector3(0f, 0f, -zSpeed * simulationDelta)
+      } else if (commands.any { it.type == CameramanCommands.moveDown }) {
+        Vector3(0f, 0f, zSpeed * simulationDelta)
+      } else
+        Vector3.zero
 
-    return camera.copy(
-        location = camera.location + movementOffset + zOffset,
-        rotation = rotation,
-        lookVelocity = lookVelocity,
-    )
+      return camera.copy(
+          location = camera.location + movementOffset + zOffset,
+          rotation = rotation,
+          lookVelocity = lookVelocity,
+      )
+    }
   }
 }

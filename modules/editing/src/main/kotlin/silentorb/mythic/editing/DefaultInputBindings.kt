@@ -27,6 +27,12 @@ fun defaultKeyboardBindings() = mapOf(
     GLFW.GLFW_KEY_ESCAPE to EditorCommands.cancelOperation,
 )
 
+fun defaultMouseBindings() = mapOf(
+    MOUSE_SCROLL_DOWN to EditorCommands.zoomOut,
+    MOUSE_SCROLL_UP to EditorCommands.zoomIn,
+)
+
 fun defaultEditorBindings(): Bindings =
     createBindings(DeviceIndexes.keyboard, defaultKeyboardBindings()) +
-        createBindings(DeviceIndexes.gamepad, defaultGamepadBindings())
+        createBindings(DeviceIndexes.gamepad, defaultGamepadBindings()) +
+        createBindings(DeviceIndexes.mouse, defaultMouseBindings())
