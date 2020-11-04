@@ -21,6 +21,8 @@ fun defaultGamepadBindings() = mapOf(
 
 fun defaultKeyboardBindings() = mapOf(
     GLFW.GLFW_KEY_G to EditorCommands.startTranslating,
+    GLFW.GLFW_KEY_R to EditorCommands.startRotating,
+    GLFW.GLFW_KEY_S to EditorCommands.startScaling,
     GLFW.GLFW_KEY_X to EditorCommands.restrictAxisX,
     GLFW.GLFW_KEY_Y to EditorCommands.restrictAxisY,
     GLFW.GLFW_KEY_Z to EditorCommands.restrictAxisZ,

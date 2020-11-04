@@ -48,9 +48,9 @@ fun drawAxisConstraints(editor: Editor, viewport: Vector4i, camera: CameraRig, d
     val transform = transformPoint(cameraTransform, dimensions.toVector2(), offset.toVector2())
 
     for (axis in axisList) {
-      if (operation.type == OperationType.translate) {
-        drawAxisRails(axis, location, transform, drawList)
-      }
+//      if (operation.type == OperationType.translate) {
+      drawAxisRails(axis, location, transform, drawList)
+//      }
     }
   }
 }
@@ -64,15 +64,16 @@ fun drawCompass(transform: ScreenTransform, drawList: ImDrawList) {
   )
   val start = transform(Vector3.zero)
   val black = ImColor.intToColor(0, 0, 0, 255)
+  val lineLength = 4f
 
   for (i in 0 until 3) {
-    val end = transform(vectors[i] * 2f)
+    val end = transform(vectors[i] * lineLength)
     drawList.addLine(start.x, start.y, end.x, end.y, colors[i], 3f)
   }
   drawList.addCircleFilled(start.x, start.y, 3f, ImColor.intToColor(128, 128, 128, 255))
 
   for (i in 0 until 3) {
-    val end = transform(vectors[i] * 2f)
+    val end = transform(vectors[i] * lineLength)
     drawList.addCircleFilled(end.x, end.y, 9f, colors[i])
     drawList.addText(end.x - 4f, end.y - 6f, black, ('X' + i).toString())
   }
@@ -86,7 +87,7 @@ fun drawEditor3dElements(editor: Editor, viewport: Vector4i, camera: CameraRig) 
 
   val dimensions = viewport.zw()
   val viewTransform = createViewMatrix(Vector3.zero, camera.orientation)
-  val orthoTransform = createOrthographicMatrix(dimensions, 45f, 0.01f, 1000f) * viewTransform
+  val orthoTransform = createOrthographicMatrix(dimensions, 30f, 0.01f, 1000f) * viewTransform
   val compassPadding = 50
   val compassOffset = viewport.xy() + Vector2i(compassPadding, viewport.w - compassPadding) - viewport.zw() / 2
   val compassTransform = transformPoint(orthoTransform, dimensions.toVector2(), compassOffset.toVector2())

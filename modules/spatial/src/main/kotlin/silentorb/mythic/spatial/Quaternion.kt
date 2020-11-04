@@ -1451,6 +1451,8 @@ data class Quaternion(
     return eulerAngles
   }
 
+  fun getAngles() = Vector3(angleX, angleY, angleZ)
+
   val angleX: Float
     get() =
       atan2(2.0 * (x * w - y * z), 1.0 - 2.0 * (x * x + y * y)).toFloat()
