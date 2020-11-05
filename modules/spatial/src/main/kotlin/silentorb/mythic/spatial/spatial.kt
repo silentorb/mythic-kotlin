@@ -459,6 +459,13 @@ tailrec fun normalizeRadialAngle(angle: Float): Float {
   }
 }
 
+fun normalizeRadialAngles(angles: Vector3): Vector3 =
+    Vector3(
+        normalizeRadialAngle(angles.x),
+        normalizeRadialAngle(angles.y),
+        normalizeRadialAngle(angles.z),
+    )
+
 fun transformToScreenRaw(transform: Matrix, target: Vector3): Vector4 =
    transform * Vector4(target.x, target.y, target.z, 1f)
 

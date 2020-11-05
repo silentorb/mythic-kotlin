@@ -5,7 +5,9 @@ import imgui.flag.ImGuiKey
 import org.lwjgl.glfw.GLFW
 import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.spatial.Matrix
+import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.transformToScreenIncludingBehind
 
 fun getActiveEditorGraphId(editor: Editor): Id? {
   val graph = editor.state.graph
@@ -89,3 +91,9 @@ fun axisMask(axis: Set<Axis>): List<Float> =
       else
         0f
     }
+
+fun transformPoint(transform: Matrix, dimensions: Vector2, offset: Vector2): ScreenTransform = { point ->
+  val sample = transformToScreenIncludingBehind(transform, point)
+//  sample * Vector2(1f, -2f) * dimensions + offset
+  Vector2(sample.x + 1f, 1f - sample.y) / 2f * dimensions + offset
+}

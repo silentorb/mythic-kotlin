@@ -7,12 +7,6 @@ import silentorb.mythic.spatial.*
 
 typealias ScreenTransform = (Vector3) -> Vector2
 
-fun transformPoint(transform: Matrix, dimensions: Vector2, offset: Vector2): ScreenTransform = { point ->
-  val sample = transformToScreenIncludingBehind(transform, point)
-//  sample * Vector2(1f, -2f) * dimensions + offset
-  Vector2(sample.x + 1f, 1f - sample.y) / 2f * dimensions + offset
-}
-
 fun axisColors() = listOf(
     ImColor.intToColor(255, 51, 82, 255),
     ImColor.intToColor(139, 220, 0, 255),

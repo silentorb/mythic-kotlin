@@ -28,6 +28,9 @@ fun getCameraPivot(camera: CameraRig): Vector3 {
   return camera.location + camera.orientation.transform(pivotOffset)
 }
 
+fun getCameraLookat(camera: CameraRig): Vector3 =
+  camera.orientation.transform(Vector3(1f, 0f, 0f))
+
 fun updateCameraOrbiting(mouseOffset: Vector2, camera: CameraRig): CameraRig {
   return if (mouseOffset == Vector2.zero)
     camera
@@ -56,8 +59,8 @@ fun updateCameraPanning(mouseOffset: Vector2, camera: CameraRig): CameraRig {
     camera
   else {
     val strength = 3f * simulationDelta
-    val horizontalOffset = camera.orientation.transform(Vector3(0f, -strength, 0f)) * mouseOffset.x
-    val verticalOffset = camera.orientation.transform(Vector3(0f, 0f, -strength)) * mouseOffset.y
+    val horizontalOffset = camera.orientation.transform(Vector3(0f, strength, 0f)) * mouseOffset.x
+    val verticalOffset = camera.orientation.transform(Vector3(0f, 0f, strength)) * mouseOffset.y
     val nextLocation = camera.location + horizontalOffset + verticalOffset
 
     return camera.copy(
