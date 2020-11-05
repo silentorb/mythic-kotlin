@@ -63,3 +63,15 @@ fun checkSaveEditorState(previous: EditorState?, next: EditorState?, filePath: S
     saveYamlFile(filePath, next)
   }
 }
+
+fun checkSaveGraph(editor: Editor, previous: Graph?, next: Graph?) {
+  if (next != null && previous != next) {
+    editor.graphLibrary
+    saveGraph(filePath, next)
+  }
+}
+
+fun checkSaveEditor(previous: Editor?, next: Editor?, filePath: String = defaultConfigFilePath) {
+  checkSaveEditorState(previous?.state, next?.state, filePath)
+
+}

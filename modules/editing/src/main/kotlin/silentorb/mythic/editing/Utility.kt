@@ -97,3 +97,18 @@ fun transformPoint(transform: Matrix, dimensions: Vector2, offset: Vector2): Scr
 //  sample * Vector2(1f, -2f) * dimensions + offset
   Vector2(sample.x + 1f, 1f - sample.y) / 2f * dimensions + offset
 }
+
+tailrec fun gatherChildren(graph: Graph, nodes: Set<Id>, accumulator: Set<Id> = setOf()): Set<Id> {
+  val next = nodes
+      .flatMap { node ->
+        graph.filter { it.property == Properties.parent && it.target == node }
+      }
+      .map { it.source }
+      .toSet()
+
+  val nextAccumulator = accumulator + nodes
+  return if (next.none())
+    nextAccumulator
+  else
+    gatherChildren(graph, next, nextAccumulator)
+}

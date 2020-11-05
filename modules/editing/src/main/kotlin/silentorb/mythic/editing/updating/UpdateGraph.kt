@@ -12,17 +12,27 @@ fun onGraphEditingCommand(commandType: Any, transform: EditorGraphTransform): Gr
         graph
     }
 
-val defaultNodeNamePattern = Regex("^node(\\d+)$")
 
-fun newNodeKey(graph: Graph): String {
+fun uniqueNodeName(graph: Graph, name: String): String {
   val keys = getTripleKeys(graph)
-  val takenNumbers = keys
-      .mapNotNull {
-        defaultNodeNamePattern.matchEntire(it)
-      }
-      .map { it.groupValues[1].toInt() }
-  val number = (takenNumbers.maxOrNull() ?: 0) + 1
-  return "node$number"
+  return if (!keys.contains(name))
+    name
+  else {
+    val numberPattern = Regex("^\\d+$")
+    val takenNumbers = keys
+        .mapNotNull { id ->
+          if (id.substring(0, name.length) == name) {
+            val numberText = id.substring(name.length)
+            if (numberText.matches(numberPattern))
+              numberText.toInt()
+            else
+              null
+          } else
+            null
+        }
+    val number = (takenNumbers.maxOrNull() ?: 0) + 1
+    "$name$number"
+  }
 }
 
 val onAddNode = onGraphEditingCommand(EditorCommands.addNode) { editor, graph ->
@@ -57,7 +67,8 @@ val onRenameNode = onGraphEditingCommand(EditorCommands.renameNode) { editor, gr
 val onDeleteNode = onGraphEditingCommand(EditorCommands.deleteNode) { editor, graph ->
   val state = editor.state
   val selection = state.selection
-  graph.filter { !selection.contains(it.source) }
+  val selectionAndChildren = gatherChildren(graph, selection)
+  graph.filter { !selectionAndChildren.contains(it.source) }
 }
 
 fun updateSceneGraph(commands: Commands, editor: Editor): Graph? {
