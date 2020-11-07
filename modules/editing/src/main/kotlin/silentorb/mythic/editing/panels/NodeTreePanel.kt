@@ -1,68 +1,48 @@
 package silentorb.mythic.editing.panels
 
 import imgui.ImGui
-import imgui.flag.ImGuiTreeNodeFlags
-import imgui.flag.ImGuiWindowFlags
 import silentorb.mythic.editing.*
+import silentorb.mythic.editing.components.getSelectionCommands
+import silentorb.mythic.editing.components.newTreeFlags
 import silentorb.mythic.editing.components.panelBackground
+import silentorb.mythic.happenings.Command
+import silentorb.mythic.happenings.Commands
 
-fun renderTree(tree: SceneTree, id: String, selection: NodeSelection): NodeSelection {
+fun renderTree(tree: SceneTree, id: String, selection: NodeSelection): Commands {
   val selected = selection.contains(id)
   val children = tree.filter { it.value == id }
-
-  val selectionFlags = if (selected)
-    ImGuiTreeNodeFlags.Selected
-  else
-    ImGuiTreeNodeFlags.None
-
-  val leafFlags = if (children.none())
-    ImGuiTreeNodeFlags.Leaf
-  else
-    ImGuiTreeNodeFlags.None
-
-  val flags = selectionFlags or leafFlags or
-      ImGuiTreeNodeFlags.OpenOnArrow or
-      ImGuiTreeNodeFlags.OpenOnDoubleClick or
-      ImGuiTreeNodeFlags.DefaultOpen or
-      (1 shl 11)
+  val flags = newTreeFlags(selected, children.any())
 
   val isOpen = ImGui.treeNodeEx("Tree-$id", flags, id)
-  var nextSelection = if (ImGui.isItemClicked()) {
-    if (selected) {
-      selection - id
-    } else {
-      setOf(id)
-    }
-  }
-  else
-    selection
+  val selectionCommands = getSelectionCommands(EditorCommands.setNodeSelection, selection, id)
 
+  val childCommands = mutableListOf<Command>()
   if (isOpen) {
     for (child in children) {
-      nextSelection = renderTree(tree, child.key, nextSelection)
+      childCommands += renderTree(tree, child.key, selection)
     }
     ImGui.treePop()
   }
 
-  return nextSelection
+  return selectionCommands + childCommands
 }
 
-fun renderTree(editor: Editor, graph: Graph?): NodeSelection {
-  ImGui.begin("Node Tree", ImGuiWindowFlags.MenuBar)
+fun renderTree(editor: Editor, graph: Graph?): Commands {
+  ImGui.begin("Node Tree")
   panelBackground()
 
-  val nextSelection = if (graph != null) {
+  val commands = if (graph != null) {
     val tree = getSceneTree(graph)
     val rootNodes = getTripleKeys(graph)
         .plus(tree.values)
         .minus(tree.keys)
     assert(rootNodes.size == 1)
     val rootId = rootNodes.first()
-    renderTree(tree, rootId, editor.state.selection)
+    renderTree(tree, rootId, editor.state.nodeSelection)
   } else
-    editor.state.selection
+    listOf()
 
   ImGui.end()
 
-  return nextSelection
+  return commands
 }

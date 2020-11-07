@@ -2,7 +2,6 @@ package silentorb.mythic.editing.components
 
 import imgui.ImGui
 import imgui.flag.ImGuiInputTextFlags
-import imgui.flag.ImGuiKey
 import imgui.type.ImString
 import silentorb.mythic.editing.Editor
 import silentorb.mythic.editing.EditorCommands
@@ -50,5 +49,5 @@ fun renameNodeDialog(editor: Editor) = nodeNameDialog(
     EditorCommands.renameNodeWithNameDialog,
     EditorCommands.renameNode
 ) {
-  editor.state.selection.firstOrNull() ?: ""
+  editor.state.nodeSelection.firstOrNull() ?: ""
 }

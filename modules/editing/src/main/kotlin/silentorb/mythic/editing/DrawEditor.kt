@@ -4,15 +4,11 @@ import imgui.ImGui
 import silentorb.mythic.editing.components.mainMenus
 import silentorb.mythic.editing.components.newNodeNameDialog
 import silentorb.mythic.editing.components.renameNodeDialog
-import silentorb.mythic.editing.panels.defaultViewportId
-import silentorb.mythic.editing.panels.drawPropertiesPanel
-import silentorb.mythic.editing.panels.drawViewportPanel
-import silentorb.mythic.editing.panels.renderTree
-import silentorb.mythic.editing.updating.appendHistory
+import silentorb.mythic.editing.panels.*
 import silentorb.mythic.happenings.Commands
 
 fun drawEditor(editor: Editor): Pair<Editor, Commands> {
-  val graph = editor.staging ?: editor.graph
+  val graph = getActiveEditorGraph(editor)
   val state = editor.state
 
   val menuCommands = mainMenus()
@@ -22,18 +18,15 @@ fun drawEditor(editor: Editor): Pair<Editor, Commands> {
 
   drawEditor3dElements(editor)
 
-  val nextSelection = renderTree(editor, graph)
-  val viewport = drawViewportPanel();
-  val propertiesCommands= drawPropertiesPanel(editor, graph)
-//  val nextGraphLibrary = incorporateGraphIntoLibrary(editor, nextGraph)
+  val panelCommands = renderTree(editor, graph) +
+      renderProject(editor) +
+      drawPropertiesPanel(editor, graph) +
+      getImGuiCommands(editor)
+
+  val viewport = drawViewportPanel()
 
   val dialogCommands = newNodeNameDialog(menuCommands) + renameNodeDialog(editor)(menuCommands)
-  val imGuiCommands = getImGuiCommands(editor)
   return editor.copy(
-      state.copy(
-          selection = nextSelection,
-      ),
       viewportBoundsMap = mapOf(defaultViewportId to viewport),
-//      history = appendHistory(editor.history, nextGraph),
-  ) to menuCommands + dialogCommands + imGuiCommands + propertiesCommands
+  ) to menuCommands + dialogCommands + panelCommands
 }

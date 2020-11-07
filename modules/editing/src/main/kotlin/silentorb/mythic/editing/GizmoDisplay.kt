@@ -26,8 +26,8 @@ fun drawAxisRails(axis: Axis, origin: Vector3, transform: ScreenTransform, drawL
 }
 
 fun drawAxisConstraints(editor: Editor, viewport: Vector4i, camera: CameraRig, drawList: ImDrawList) {
-  val selection = editor.state.selection
-  val graph = editor.staging ?: editor.graph
+  val selection = editor.state.nodeSelection
+  val graph = getActiveEditorGraph(editor)
   val operation = editor.operation
   val data = operation?.data
   if (selection.any() && graph != null && data != null && data is SpatialTransformState) {

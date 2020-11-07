@@ -37,10 +37,10 @@ fun uniqueNodeName(graph: Graph, name: String): String {
 
 val onAddNode = onGraphEditingCommand(EditorCommands.addNode) { editor, graph ->
   val state = editor.state
-  if (state.selection.size != 1)
+  if (state.nodeSelection.size != 1)
     graph
   else {
-    val selected = state.selection.first()
+    val selected = state.nodeSelection.first()
     val key = nodeNameText.get()
     graph + Entry(key, Properties.parent, selected)
   }
@@ -48,10 +48,10 @@ val onAddNode = onGraphEditingCommand(EditorCommands.addNode) { editor, graph ->
 
 val onRenameNode = onGraphEditingCommand(EditorCommands.renameNode) { editor, graph ->
   val state = editor.state
-  if (state.selection.size != 1)
+  if (state.nodeSelection.size != 1)
     graph
   else {
-    val selected = state.selection.first()
+    val selected = state.nodeSelection.first()
     val key = nodeNameText.get()
     graph.map {
       if (it.source == selected)
@@ -66,14 +66,14 @@ val onRenameNode = onGraphEditingCommand(EditorCommands.renameNode) { editor, gr
 
 val onDeleteNode = onGraphEditingCommand(EditorCommands.deleteNode) { editor, graph ->
   val state = editor.state
-  val selection = state.selection
+  val selection = state.nodeSelection
   val selectionAndChildren = gatherChildren(graph, selection)
   graph.filter { !selectionAndChildren.contains(it.source) }
 }
 
 fun updateSceneGraph(commands: Commands, editor: Editor): Graph? {
   val commandTypes = commands.map { it.type }
-  val initialGraph = editor.graph ?: getActiveEditorGraph(editor)
+  val initialGraph = getActiveEditorGraph(editor)
   return if (initialGraph == null)
     null
   else {

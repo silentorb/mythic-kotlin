@@ -26,8 +26,8 @@ fun toggleProjectionMode(camera: CameraRig): CameraRig =
     )
 
 fun centerOnSelection(editor: Editor, camera: CameraRig): CameraRig {
-  val selection = editor.state.selection
-  val graph = editor.staging ?: editor.graph
+  val selection = editor.state.nodeSelection
+  val graph = getActiveEditorGraph(editor)
   return if (selection.any() && graph != null){
     val nodeLocation = getTransform(graph, selection.first()).translation()
     val pivot = getCameraPivot(camera)

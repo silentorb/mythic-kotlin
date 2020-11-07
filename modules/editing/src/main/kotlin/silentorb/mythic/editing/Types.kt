@@ -1,6 +1,7 @@
 package silentorb.mythic.editing
 
 import silentorb.mythic.spatial.Vector4i
+import java.nio.file.Path
 
 typealias SceneTree = Map<Id, Id>
 
@@ -45,10 +46,12 @@ typealias GraphHistory = List<Graph>
 data class EditorState(
     val graph: String? = null,
     val cameras: Map<Id, CameraRig> = mapOf(),
-    val selection: NodeSelection = setOf(),
+    val nodeSelection: NodeSelection = setOf(),
+    val fileSelection: Set<String> = setOf(),
 )
 
 data class Editor(
+    val projectPath: Path,
     val state: EditorState = EditorState(),
     val staging: Graph? = null,
     val graph: Graph? = null,
@@ -57,6 +60,7 @@ data class Editor(
     val propertyDefinitions: PropertyDefinitions,
     val textures: Options = listOf(),
     val meshes: Options = listOf(),
+    val fileItems: FileItems,
     val graphLibrary: GraphLibrary = mapOf(),
     val viewportBoundsMap: Map<Id, Vector4i> = mapOf(),
 )

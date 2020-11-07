@@ -20,6 +20,9 @@ dependencies {
   implementation("org.lwjgl:lwjgl-opengl:3.2.3")
   runtimeOnly("org.lwjgl:lwjgl-opengl:3.2.3:natives-windows")
 
+  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9")
+  implementation(group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = "1.4.0")
+
   api("silentorb.mythic:spatial")
   implementation("silentorb.mythic:resource-loading")
   api("silentorb.mythic:spatial_serialization")

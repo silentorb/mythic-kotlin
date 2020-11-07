@@ -22,12 +22,12 @@ fun drawFormField(editor: Editor, definition: PropertyDefinition, entry: Entry):
 }
 
 fun drawPropertiesPanel(editor: Editor, graph: Graph?): Commands {
-  ImGui.begin("Properties", ImGuiWindowFlags.MenuBar)
+  ImGui.begin("Properties")
   panelBackground()
 
   val result = if (graph != null) {
     var commands: Commands = listOf()
-    val selection = editor.state.selection
+    val selection = editor.state.nodeSelection
     if (selection.size == 1) {
       val node = selection.first()
       val definitions = editor.propertyDefinitions

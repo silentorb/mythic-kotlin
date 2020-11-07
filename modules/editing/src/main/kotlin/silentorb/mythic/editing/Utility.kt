@@ -18,7 +18,7 @@ fun getActiveEditorGraphId(editor: Editor): Id? {
 }
 
 fun getActiveEditorGraph(editor: Editor): Graph? =
-    editor.graphLibrary[getActiveEditorGraphId(editor)]
+    editor.staging ?: editor.graph ?: editor.graphLibrary[editor.state.graph]
 
 fun defaultEditorState() =
     EditorState(

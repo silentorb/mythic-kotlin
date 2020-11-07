@@ -1,6 +1,6 @@
 package silentorb.mythic.lookinglass.meshes.loading
 
-import silentorb.mythic.spatial.serialization.loadJsonResource
+import silentorb.mythic.spatial.serialization.loadSpatialJsonResource
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.lookinglass.Armature
 import silentorb.mythic.lookinglass.Material
@@ -67,7 +67,7 @@ fun gatherChildLights(info: GltfInfo, node: Node): List<Light> {
 }
 
 fun loadGltf(vertexSchemas: VertexSchemas, filename: String, resourcePath: String): ModelImport {
-  val info = loadJsonResource<GltfInfo>(resourcePath + ".gltf")
+  val info = loadSpatialJsonResource<GltfInfo>(resourcePath + ".gltf")
   val directoryPath = resourcePath.split("/").dropLast(1).joinToString("/")
   val buffer = loadGltfByteBuffer(directoryPath, info)
 

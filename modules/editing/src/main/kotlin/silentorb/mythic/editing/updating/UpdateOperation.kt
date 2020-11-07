@@ -65,7 +65,7 @@ fun mouseTransform(property: String, handler: MouseTransformHandler): (Vector2, 
       if (mouseOffset == Vector2.zero)
         graph
       else {
-        val selection = editor.state.selection
+        val selection = editor.state.nodeSelection
         val viewportPair = editor.viewportBoundsMap.entries.firstOrNull { (_, viewport) ->
           isInBounds(previousMousePosition.toVector2i(), viewport)
         }
@@ -96,7 +96,7 @@ fun updateTranslation(previousMousePosition: Vector2, mouseOffset: Vector2, edit
     if (mouseOffset == Vector2.zero)
       graph
     else {
-      val selection = editor.state.selection
+      val selection = editor.state.nodeSelection
       val viewportPair = editor.viewportBoundsMap.entries.firstOrNull { (_, viewport) ->
         isInBounds(previousMousePosition.toVector2i(), viewport)
       }
@@ -135,7 +135,7 @@ fun updateRotation(previousMousePosition: Vector2, mouseOffset: Vector2, editor:
   if (mouseOffset == Vector2.zero)
     graph
   else {
-    val selection = editor.state.selection
+    val selection = editor.state.nodeSelection
     val viewportPair = editor.viewportBoundsMap.entries.firstOrNull { (_, viewport) ->
       isInBounds(previousMousePosition.toVector2i(), viewport)
     }
@@ -186,7 +186,7 @@ fun updateScaling(previousMousePosition: Vector2, mouseOffset: Vector2, editor: 
     if (mouseOffset == Vector2.zero)
       graph
     else {
-      val selection = editor.state.selection
+      val selection = editor.state.nodeSelection
       val viewportPair = editor.viewportBoundsMap.entries.firstOrNull { (_, viewport) ->
         isInBounds(previousMousePosition.toVector2i(), viewport)
       }
