@@ -7,6 +7,8 @@ import silentorb.mythic.scenery.LightingConfig
 import silentorb.mythic.scenery.ProjectionType
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.Vector4
+import silentorb.mythic.typography.IndexedTextStyle
 
 data class SerialElementData(
     val parents: SceneTree,
@@ -59,6 +61,7 @@ fun nodesToElements(graphs: GraphLibrary, graph: Graph): List<ElementGroup> {
 fun nodeToElements(graphs: GraphLibrary, graph: Graph, node: Id): List<ElementGroup> {
   val mesh = getValue<Id>(graph, node, Properties.mesh)
   val type = getValue<Id>(graph, node, Properties.type)
+  val text3d = getValue<String>(graph, node, Properties.text3d)
 
   return if (type != null) {
     val subGraph = graphs[type]
@@ -77,26 +80,40 @@ fun nodeToElements(graphs: GraphLibrary, graph: Graph, node: Id): List<ElementGr
             )
           }
     }
-  } else if (mesh == null)
+  } else if (mesh == null && text3d == null)
     listOf()
   else {
-    val texture = getValue<Id>(graph, node, Properties.texture)
-    val material = if (texture != null)
-      Material(texture = texture, shading = true)
-    else
-      null
-
     val transform = getTransform(graph, node)
+    val meshes = if (mesh != null) {
+      val texture = getValue<Id>(graph, node, Properties.texture)
+      val material = if (texture != null)
+        Material(texture = texture, shading = true)
+      else
+        null
+
+      listOf(
+          MeshElement(
+              mesh = mesh,
+              material = material,
+              transform = transform
+          )
+      )
+    } else
+      listOf()
+
+    val textBillboards = if (text3d != null)
+      listOf(TextBillboard(text3d, transform.translation(), IndexedTextStyle(
+          0,
+          22,
+          color = Vector4(1f)
+      )))
+    else
+      listOf()
 
     listOf(
         ElementGroup(
-            meshes = listOf(
-                MeshElement(
-                    mesh = mesh,
-                    material = material,
-                    transform = transform
-                )
-            )
+            textBillboards = textBillboards,
+            meshes = meshes,
         )
     )
   }

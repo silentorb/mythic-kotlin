@@ -29,21 +29,19 @@ val activeInputTextValue = ImString()
 val inputTextValue = ImString()
 var activeFieldId: String? = null
 
-fun axisInput(owner: String, label: String, value: Float): Float {
-  val fieldId = "$owner.$label"
-  val valueReference = if (fieldId == activeFieldId)
-    activeInputTextValue
-  else {
-    inputTextValue.set(value.toString())
-    inputTextValue
-  }
+fun getTextValueReference(fieldId: String, value: String) =
+    if (fieldId == activeFieldId)
+      activeInputTextValue
+    else {
+      inputTextValue.set(value)
+      inputTextValue
+    }
 
-  ImGui.text(label)
-  ImGui.sameLine()
-  ImGui.setNextItemWidth(80f)
+fun textField(fieldId: String, value: String, flags: Int = ImGuiInputTextFlags.None): String {
+  val valueReference = getTextValueReference(fieldId, value)
   ImGui.pushID(fieldId)
-  ImGui.inputText("", valueReference, ImGuiInputTextFlags.CharsDecimal or ImGuiInputTextFlags.AutoSelectAll)
-  checkActiveInputType(InputType.dropdown)
+  ImGui.inputText("", valueReference, flags)
+  checkActiveInputType(InputType.text)
 
   if (ImGui.isItemActive()) {
     if (activeFieldId != fieldId) {
@@ -54,7 +52,26 @@ fun axisInput(owner: String, label: String, value: Float): Float {
     activeFieldId = null
   }
   ImGui.popID()
-  return valueReference.get().toFloatOrNull() ?: value
+  return valueReference.get()
+}
+
+fun textField(label: String, entry: Entry): String {
+  val value = entry.target as String
+  val owner = "${entry.source}.${entry.property}"
+  ImGui.text(label)
+  ImGui.sameLine()
+  val fieldId = "$owner.$label"
+  return textField(fieldId, value)
+}
+
+fun axisInput(owner: String, label: String, value: Float): Float {
+  val flags = ImGuiInputTextFlags.CharsDecimal or ImGuiInputTextFlags.AutoSelectAll
+  ImGui.text(label)
+  ImGui.sameLine()
+  val fieldId = "$owner.$label"
+  ImGui.setNextItemWidth(80f)
+  val result = textField(fieldId, value.toString(), flags)
+  return result.toFloatOrNull() ?: value
 }
 
 fun spatialWidget(entry: Entry): Vector3 {

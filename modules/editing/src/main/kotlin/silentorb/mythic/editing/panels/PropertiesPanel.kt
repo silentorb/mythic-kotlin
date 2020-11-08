@@ -5,6 +5,7 @@ import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.dropDownWidget
 import silentorb.mythic.editing.components.panelBackground
 import silentorb.mythic.editing.components.spatialWidget
+import silentorb.mythic.editing.components.textField
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 
@@ -22,6 +23,7 @@ fun drawFormField(editor: Editor, definition: PropertyDefinition, entry: Entry):
     Widgets.translation -> spatialWidget(entry)
     Widgets.rotation -> spatialWidget(entry)
     Widgets.scale -> spatialWidget(entry)
+    Widgets.text -> textField("", entry)
     else -> entry.target
   }
 }
@@ -84,8 +86,7 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): Commands {
               commands = commands.plus(Command(EditorCommands.removeGraphValue, value = entry))
             }
             drawFormField(editor, definition, entry)
-          }
-          else
+          } else
             entry.target
 
           if (nextValue != entry.target) {

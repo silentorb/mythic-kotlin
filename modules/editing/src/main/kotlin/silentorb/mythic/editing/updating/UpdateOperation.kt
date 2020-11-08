@@ -117,15 +117,15 @@ fun updateTranslation(previousMousePosition: Vector2, mouseOffset: Vector2, edit
           val start = unproject(cameraTransform, viewport.toVector4(), mouseStart, 1f)
           val end = unproject(cameraTransform, viewport.toVector4(), mouseStart + mouseOffset, 1f)
           val offset = end - start
-          val newValue = value + offset
-          val constrained = if (data.axis.any())
-            newValue * Vector3(axisMask(data.axis))
+          val finalOffset = if (data.axis.any())
+            offset * Vector3(axisMask(data.axis))
           else
-            newValue
+            offset
 
+          val newValue = value + finalOffset
 //          println("$mouseOffset $offset $newValue")
 
-          Entry(node, Properties.translation, constrained)
+          Entry(node, Properties.translation, newValue)
         }
         replaceValues(graph, newEntries)
       }

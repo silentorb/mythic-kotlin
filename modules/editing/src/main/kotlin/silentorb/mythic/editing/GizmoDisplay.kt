@@ -53,7 +53,7 @@ fun drawSelectedObjectAnnotations(editor: Editor, viewport: Vector4i, camera: Ca
   }
 }
 
-fun drawCompass(transform: ScreenTransform, drawList: ImDrawList) {
+fun drawCompass(transform: ScreenTransform, lookAt: Vector3, drawList: ImDrawList) {
   val colors = axisColors()
   val vectors = listOf(
       Vector3(1f, 0f, 0f),
@@ -64,14 +64,14 @@ fun drawCompass(transform: ScreenTransform, drawList: ImDrawList) {
   val black = ImColor.intToColor(0, 0, 0, 255)
   val lineLength = 4f
 
-  for (i in 0 until 3) {
-    val end = transform(vectors[i] * lineLength)
-    drawList.addLine(start.x, start.y, end.x, end.y, colors[i], 3f)
-  }
+  val indices = (0 until 3)
+      .sortedByDescending { vectors[it].dot(lookAt) }
+
   drawList.addCircleFilled(start.x, start.y, 3f, ImColor.intToColor(128, 128, 128, 255))
 
-  for (i in 0 until 3) {
+  for (i in indices) {
     val end = transform(vectors[i] * lineLength)
+    drawList.addLine(start.x, start.y, end.x, end.y, colors[i], 3f)
     drawList.addCircleFilled(end.x, end.y, 9f, colors[i])
     drawList.addText(end.x - 4f, end.y - 6f, black, ('X' + i).toString())
   }
@@ -93,8 +93,9 @@ fun drawEditor3dElements(editor: Editor, viewport: Vector4i, camera: CameraRig) 
   val bounds = viewport.toVector4()
   drawList.pushClipRect(bounds.x, bounds.y, bounds.x + bounds.z, bounds.y + bounds.w)
 
+  val lookAt = getCameraLookat(camera)
   drawSelectedObjectAnnotations(editor, viewport, camera, drawList)
-  drawCompass(compassTransform, drawList)
+  drawCompass(compassTransform, lookAt, drawList)
 
   drawList.popClipRect()
 }

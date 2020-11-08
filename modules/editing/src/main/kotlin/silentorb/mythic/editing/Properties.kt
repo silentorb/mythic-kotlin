@@ -13,6 +13,7 @@ object Properties {
   const val mesh = "mesh"
   const val texture = "texture"
   const val type = "type"
+  const val text3d = "text3d"
   const val attribute = "attribute"
 }
 
@@ -25,7 +26,7 @@ object Widgets {
   const val translation = "translation"
   const val rotation = "rotation"
   const val scale = "scale"
-  const val type = "type"
+  const val text = "text"
 }
 
 object Attributes {
@@ -58,6 +59,11 @@ fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
     Properties.type to PropertyDefinition(
         displayName = "Type",
         widget = Widgets.typeSelect,
+        defaultValue = { editor -> getAvailableTypes(editor).firstOrNull() }
+    ),
+    Properties.text3d to PropertyDefinition(
+        displayName = "3D Text",
+        widget = Widgets.text,
         defaultValue = { editor -> getAvailableTypes(editor).firstOrNull() }
     ),
     Properties.translation to PropertyDefinition(
