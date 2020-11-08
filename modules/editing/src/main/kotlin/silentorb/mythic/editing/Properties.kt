@@ -1,6 +1,7 @@
 package silentorb.mythic.editing
 
 import silentorb.mythic.editing.panels.getAvailableTypes
+import silentorb.mythic.ent.reflectProperties
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.toList
 
@@ -12,6 +13,7 @@ object Properties {
   const val mesh = "mesh"
   const val texture = "texture"
   const val type = "type"
+  const val attribute = "attribute"
 }
 
 val getSceneTree: (Graph) -> SceneTree = groupProperty(Properties.parent)
@@ -25,6 +27,13 @@ object Widgets {
   const val scale = "scale"
   const val type = "type"
 }
+
+object Attributes {
+  val editorOnly = "editorOnly"
+}
+
+fun getCommonEditorAttributes() =
+    reflectProperties<String>(Attributes)
 
 val vector3Serialization = Serialization(
     load = {

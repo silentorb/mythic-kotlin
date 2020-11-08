@@ -9,6 +9,7 @@ object EditorCommands {
   val assignMesh = "assignMesh"
   val assignTexture = "assignTexture"
   val setGraphValue = "setGraphValue"
+  val removeGraphValue = "removeGraphValue"
   val setActiveGraph = "setActiveGraph"
   val setNodeSelection = "setNodeSelection"
   val setFileSelection = "setFileSelection"

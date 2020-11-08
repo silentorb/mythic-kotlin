@@ -25,27 +25,31 @@ fun drawAxisRails(axis: Axis, origin: Vector3, transform: ScreenTransform, drawL
   drawList.addLine(center.x, center.y, end.x, end.y, axisColors()[axis.ordinal], 2f)
 }
 
-fun drawAxisConstraints(editor: Editor, viewport: Vector4i, camera: CameraRig, drawList: ImDrawList) {
+fun drawSelectedObjectAnnotations(editor: Editor, viewport: Vector4i, camera: CameraRig, drawList: ImDrawList) {
   val selection = editor.state.nodeSelection
   val graph = getActiveEditorGraph(editor)
   val operation = editor.operation
   val data = operation?.data
-  if (selection.any() && graph != null && data != null && data is SpatialTransformState) {
-    val node = selection.first()
-    val location = getTransform(graph, node).translation()
-    val axisList = data.axis
-
+  val node = selection.firstOrNull()
+  if (node != null && graph != null) {
     val dimensions = viewport.zw()
     val viewTransform = createViewMatrix(camera.location, camera.orientation)
     val cameraTransform = createProjectionMatrix(camera, dimensions) * viewTransform
     val offset = viewport.xy()
     val transform = transformPoint(cameraTransform, dimensions.toVector2(), offset.toVector2())
+    val location = getTransform(graph, node).translation()
 
-    for (axis in axisList) {
-//      if (operation.type == OperationType.translate) {
-      drawAxisRails(axis, location, transform, drawList)
-//      }
+    if (data != null && data is SpatialTransformState) {
+      val axisList = data.axis
+
+      for (axis in axisList) {
+        drawAxisRails(axis, location, transform, drawList)
+      }
     }
+
+    val center = transform(location)
+    val cb = 255
+    drawList.addCircleFilled(center.x, center.y, 3f, ImColor.intToColor(cb, cb, cb, 128))
   }
 }
 
@@ -89,7 +93,7 @@ fun drawEditor3dElements(editor: Editor, viewport: Vector4i, camera: CameraRig) 
   val bounds = viewport.toVector4()
   drawList.pushClipRect(bounds.x, bounds.y, bounds.x + bounds.z, bounds.y + bounds.w)
 
-  drawAxisConstraints(editor, viewport, camera, drawList)
+  drawSelectedObjectAnnotations(editor, viewport, camera, drawList)
   drawCompass(compassTransform, drawList)
 
   drawList.popClipRect()

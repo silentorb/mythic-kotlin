@@ -15,7 +15,6 @@ fun getAvailableTypes(editor: Editor): List<Id> =
         .toList()
 
 fun drawFormField(editor: Editor, definition: PropertyDefinition, entry: Entry): Any {
-  ImGui.text(definition.displayName)
   return when (definition.widget!!) {
     Widgets.textureSelect -> dropDownWidget(editor.textures, entry)
     Widgets.meshSelect -> dropDownWidget(editor.meshes, entry)
@@ -42,12 +41,20 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): Commands {
       ImGui.text(node)
       ImGui.separator()
       val availableDefinitions = definitions.minus(entries.map { it.property })
+      val attributes = getPropertyValues<Id>(graph, node, Properties.attribute)
       if (availableDefinitions.any()) {
+        val allAttributes = getCommonEditorAttributes()
+        val availableAttributes = allAttributes - attributes
         if (ImGui.beginCombo("Add Property", "")) {
           for ((property, definition) in availableDefinitions) {
             if (ImGui.selectable(definition.displayName)) {
               val target = definition.defaultValue?.invoke(editor) ?: ""
               commands = commands.plus(Command(EditorCommands.setGraphValue, value = Entry(node, property, target)))
+            }
+          }
+          for (attribute in availableAttributes) {
+            if (ImGui.selectable(attribute)) {
+              commands = commands.plus(Command(EditorCommands.setGraphValue, value = Entry(node, Properties.attribute, attribute)))
             }
           }
           if (commands.none()) {
@@ -58,12 +65,26 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): Commands {
       }
 
       ImGui.separator()
+      for (attribute in attributes) {
+        ImGui.text(attribute)
+        ImGui.sameLine()
+        if (ImGui.smallButton("x##attribute-$attribute")) {
+          commands = commands.plus(Command(EditorCommands.removeGraphValue, value = Entry(node, Properties.attribute, attribute)))
+        }
+      }
+
       for ((property, definition) in definitions) {
         val entry = entries.firstOrNull { it.property == property }
         if (entry != null) {
           ImGui.separator()
-          val nextValue = if (definition.widget != null)
+          val nextValue = if (definition.widget != null) {
+            ImGui.text(definition.displayName)
+            ImGui.sameLine()
+            if (ImGui.smallButton("x##property-${entry.target}")) {
+              commands = commands.plus(Command(EditorCommands.removeGraphValue, value = entry))
+            }
             drawFormField(editor, definition, entry)
+          }
           else
             entry.target
 

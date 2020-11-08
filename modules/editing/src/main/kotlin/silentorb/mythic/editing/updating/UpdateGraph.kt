@@ -90,10 +90,16 @@ fun updateSceneGraph(commands: Commands, editor: Editor): Graph? {
         .filter { it.type == EditorCommands.setGraphValue }
         .map { it.value as Entry }
 
-    if (graphChanges.any())
+    val graphRemovals = commands
+        .filter { it.type == EditorCommands.removeGraphValue }
+        .map { it.value as Entry }
+
+    val graph3 = if (graphChanges.any())
       replaceValues(graph2, graphChanges)
     else
       graph2
+
+    graph3 - graphRemovals
   }
 }
 

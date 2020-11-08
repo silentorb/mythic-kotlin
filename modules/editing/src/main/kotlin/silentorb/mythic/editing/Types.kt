@@ -29,7 +29,8 @@ data class PropertyDefinition(
     val serialization: Serialization? = null,
     val widget: Id?,
     val dependencies: Set<Id> = setOf(),
-    val defaultValue: DefaultValueSource? = null
+    val defaultValue: DefaultValueSource? = null,
+    val single: Boolean = true,
 )
 
 typealias PropertyDefinitions = Map<Id, PropertyDefinition>
@@ -60,6 +61,7 @@ data class Editor(
 //    val history: GraphHistory = listOf(),
     val operation: Operation? = null,
     val propertyDefinitions: PropertyDefinitions,
+    val attributes: List<Id> = listOf(),
     val textures: List<Id> = listOf(),
     val meshes: List<Id> = listOf(),
     val fileItems: FileItems,
