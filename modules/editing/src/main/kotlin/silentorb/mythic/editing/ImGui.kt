@@ -12,6 +12,22 @@ private var imGuiGlfw: ImGuiImplGlfw? = null
 private var imGuiGl3: ImGuiImplGl3? = null
 private var renderReady: Boolean = false
 
+enum class InputType {
+  dropdown,
+  text,
+}
+
+var activeInputType: InputType? = null
+
+fun checkActiveInputType(type: InputType) {
+  if (ImGui.isItemActive()) {
+    activeInputType = type
+  }
+}
+
+fun isImGuiFieldActive(): Boolean =
+    activeInputType != null
+
 fun initializeImGui(fonts: List<Typeface>, window: Long) {
   imguiInitialized = true
   ImGui.createContext()
@@ -55,19 +71,18 @@ fun ensureImGuiIsInitialized(fonts: List<Typeface>, window: Long) {
   }
 }
 
-fun defineEditorGui(editor: Editor): Pair<Editor, Commands> {
+fun defineEditorGui(editor: Editor): Commands {
   if (!imguiInitialized)
-    return editor.copy(
-        viewportBoundsMap = mapOf()
-    ) to listOf()
+    return listOf()
 
   if (renderReady)
-    return editor to listOf()
+    return listOf()
 
   renderReady = true
   imGuiGlfw!!.newFrame()
   ImGui.newFrame()
 
+  activeInputType = null
   return drawEditor(editor)
 }
 

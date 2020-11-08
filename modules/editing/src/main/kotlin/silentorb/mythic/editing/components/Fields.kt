@@ -3,19 +3,21 @@ package silentorb.mythic.editing.components
 import imgui.ImGui
 import imgui.flag.ImGuiInputTextFlags
 import imgui.type.ImString
-import silentorb.mythic.editing.Entry
-import silentorb.mythic.editing.Option
+import silentorb.mythic.editing.*
 import silentorb.mythic.spatial.Vector3
 
-fun dropDownWidget(options: List<Option>, entry: Entry): String {
+fun dropDownWidget(options: List<Id>, entry: Entry): String {
   val value = entry.target as String
   var nextValue = value
   ImGui.pushID(entry.property)
   if (ImGui.beginCombo("", value)) {
     for (option in options) {
-      if (ImGui.selectable(option.value)) {
-        nextValue = option.value
+      if (ImGui.selectable(option)) {
+        nextValue = option
       }
+    }
+    if (nextValue == value) {
+      activeInputType = InputType.dropdown
     }
     ImGui.endCombo()
   }
@@ -41,13 +43,14 @@ fun axisInput(owner: String, label: String, value: Float): Float {
   ImGui.setNextItemWidth(80f)
   ImGui.pushID(fieldId)
   ImGui.inputText("", valueReference, ImGuiInputTextFlags.CharsDecimal or ImGuiInputTextFlags.AutoSelectAll)
+  checkActiveInputType(InputType.dropdown)
+
   if (ImGui.isItemActive()) {
     if (activeFieldId != fieldId) {
       activeFieldId = fieldId
       activeInputTextValue.set(valueReference.get())
     }
-  }
-  else if (activeFieldId == fieldId) {
+  } else if (activeFieldId == fieldId) {
     activeFieldId = null
   }
   ImGui.popID()

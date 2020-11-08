@@ -31,6 +31,11 @@ fun renderTree(editor: Editor, graph: Graph?): Commands {
   ImGui.begin("Node Tree")
   panelBackground()
 
+  if (editor.state.graph != null) {
+    ImGui.text(editor.state.graph)
+    ImGui.separator()
+  }
+
   val commands = if (graph != null) {
     val tree = getSceneTree(graph)
     val rootNodes = getTripleKeys(graph)

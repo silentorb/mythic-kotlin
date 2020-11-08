@@ -15,7 +15,7 @@ class Loading
 fun sanitizeResourcePath(path: String): String =
     if (path.first() == '/')
       path.drop(1)
-else
+    else
       path
 
 fun getResourceUrl(path: String): URL? =
@@ -118,3 +118,30 @@ fun listFiles(path: Path): List<Path> =
               .toList()
               .filterIsInstance<Path>()
         }
+
+fun listFilesRecursive(path: Path): List<Path> =
+    if (Files.isDirectory(path))
+      Files.list(path)
+          .use { paths ->
+            paths
+                .toList()
+                .filterIsInstance<Path>()
+                .flatMap { listFilesRecursive(path.resolve(it)) }
+          }
+    else
+      listOf(path)
+
+fun listFilesAndFoldersRecursive(path: Path): List<Path> =
+    if (Files.isDirectory(path))
+      listOf(path) +
+          Files.list(path)
+              .use { paths ->
+                paths
+                    .toList()
+                    .filterIsInstance<Path>()
+                    .flatMap {child ->
+                      listFilesAndFoldersRecursive(child)
+                    }
+              }
+    else
+      listOf(path)

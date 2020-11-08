@@ -2,14 +2,16 @@ package silentorb.mythic.editing
 
 import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonGenerator
-import com.fasterxml.jackson.core.util.DefaultIndenter
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import silentorb.mythic.configuration.*
+import silentorb.mythic.configuration.loadJsonFile
+import silentorb.mythic.configuration.loadYamlFile
+import silentorb.mythic.configuration.saveYamlFile
 import silentorb.mythic.debugging.getDebugBoolean
 import silentorb.mythic.resource_loading.getUrlPath
 import silentorb.mythic.resource_loading.listFiles
+import silentorb.mythic.resource_loading.listFilesAndFoldersRecursive
+import silentorb.mythic.resource_loading.listFilesRecursive
 import silentorb.mythic.spatial.serialization.loadSpatialJsonResource
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -102,15 +104,14 @@ fun saveGraph(propertyDefinitions: PropertyDefinitions, path: String, graph: Gra
       stream.newLine()
       stream.write("}")
       stream.newLine()
-      stream.newLine()
     }
 
 fun loadGraphLibrary(propertyDefinitions: PropertyDefinitions, directoryPath: String): GraphLibrary {
   val rootPath = getUrlPath(directoryPath)
   val resourcesPath = rootPath.getRoot().resolve(rootPath.subpath(0, rootPath.nameCount - Path.of(directoryPath).nameCount))
-  val files = listFiles(rootPath)
+  val files = listFilesRecursive(rootPath)
   val library: GraphLibrary = files.associate { filePath ->
-    val name = filePath.fileName.toString().dropLast(".json".length)
+    val name = filePath.fileName.toString().dropLast(sceneFileExtension.length)
     val relativePath = resourcesPath.relativize(filePath)
     val path = relativePath.toString().replace("\\", "/")
     val graph = loadGraphResource(propertyDefinitions, path)
@@ -120,7 +121,7 @@ fun loadGraphLibrary(propertyDefinitions: PropertyDefinitions, directoryPath: St
 }
 
 fun loadProjectTree(rootPath: Path, rootName: String): FileItems {
-  val files = listFiles(rootPath)
+  val files = listFilesAndFoldersRecursive(rootPath)
   val fileItems = files.associate { filePath ->
     val relativePath = rootPath.relativize(filePath)
     val path = relativePath.toString().replace("\\", "/")
@@ -131,22 +132,8 @@ fun loadProjectTree(rootPath: Path, rootName: String): FileItems {
 
     path to newFileItem(path, type)
   }
-      .mapValues { (_, item) ->
-        if (item.parent == null)
-          item.copy(
-              parent = rootName
-          )
-        else
-          item
-      }
-      .plus(mapOf(
-          "" to FileItem(
-              type = FileItemType.directory,
-              fullPath = rootName,
-              name = rootName,
-              parent = null
-          )
-      ))
+      .minus("")
+
   return fileItems
 }
 
@@ -162,15 +149,18 @@ fun checkSaveEditorState(previous: EditorState?, next: EditorState?, filePath: S
   }
 }
 
+fun resolveProjectFilePath(editor: Editor, path: String): String =
+    editor.projectPath.resolve(Path.of(path)).toString()
+
 fun getGraphFilePath(editor: Editor, graphName: String): String? {
-  val fullFileName = "$graphName.json"
+  val fullFileName = "$graphName$sceneFileExtension"
   val options = editor.fileItems.values.filter { it.name == fullFileName }
   assert(options.size < 2)
   val path = options.firstOrNull()?.fullPath
   return if (path == null)
     null
   else
-    editor.projectPath.resolve(Path.of(path)).toString()
+    resolveProjectFilePath(editor, path)
 }
 
 fun loadGraph(editor: Editor, graphName: String): Graph? {

@@ -2,7 +2,6 @@ package silentorb.mythic.editing.components
 
 import imgui.ImGui
 import imgui.flag.ImGuiTreeNodeFlags
-import silentorb.mythic.editing.EditorCommands
 import silentorb.mythic.editing.Id
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands

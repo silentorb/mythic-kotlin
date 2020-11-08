@@ -12,6 +12,7 @@ object EditorCommands {
   val setActiveGraph = "setActiveGraph"
   val setNodeSelection = "setNodeSelection"
   val setFileSelection = "setFileSelection"
+  val setViewportBounds = "setViewportBounds"
 
   val startTranslating = "startTranslating"
   val startRotating = "startRotating"
@@ -33,4 +34,13 @@ object EditorCommands {
   val viewBottom = "viewBottom"
   val toggleProjectionMode = "toggleProjectionMode"
   val centerOnSelection = "centerOnSelection"
+
+  val newFile = "newFile"
+  val newFileWithNameDialog = "newFileWithNameDialog"
+  val newFolder = "newFolder"
+  val newFolderWithNameDialog = "newFolderWithNameDialog"
+  val renameFile = "renameFile"
+  val renameFileWithNameDialog = "renameFileWithNameDialog"
+  val renameFolder = "renameFolder"
+  val renameFolderWithNameDialog = "renameFolderWithNameDialog"
 }

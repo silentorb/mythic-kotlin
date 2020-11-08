@@ -14,8 +14,18 @@ fun updateSceneCaching(editor: Editor): GraphLibrary {
       else
         library + mapOf(graphId to loadedGraph)
     }
-  } else if (graphId != null && graph != library[graphId])
-    library + mapOf(graphId to graph)
-  else
+  } else if (graphId != null) {
+    val update = if (graph != library[graphId])
+      mapOf(graphId to graph)
+    else
+      mapOf()
+
+    val dependencies = getGraphDependencies(library, setOf(graphId)) - library.keys
+    val loaded = dependencies
+        .associateWith { loadGraph(editor, it) }
+        .filter { it.value != null } as GraphLibrary
+
+    library + update + loaded
+  } else
     library
 }

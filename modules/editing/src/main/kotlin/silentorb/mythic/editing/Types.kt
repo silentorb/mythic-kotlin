@@ -3,6 +3,8 @@ package silentorb.mythic.editing
 import silentorb.mythic.spatial.Vector4i
 import java.nio.file.Path
 
+const val sceneFileExtension = ".scene"
+
 typealias SceneTree = Map<Id, Id>
 
 typealias GraphLibrary = Map<String, Graph>
@@ -58,8 +60,8 @@ data class Editor(
 //    val history: GraphHistory = listOf(),
     val operation: Operation? = null,
     val propertyDefinitions: PropertyDefinitions,
-    val textures: Options = listOf(),
-    val meshes: Options = listOf(),
+    val textures: List<Id> = listOf(),
+    val meshes: List<Id> = listOf(),
     val fileItems: FileItems,
     val graphLibrary: GraphLibrary = mapOf(),
     val viewportBoundsMap: Map<Id, Vector4i> = mapOf(),

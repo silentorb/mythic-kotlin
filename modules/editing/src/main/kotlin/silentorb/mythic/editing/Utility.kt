@@ -9,14 +9,6 @@ import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.transformToScreenIncludingBehind
 
-fun getActiveEditorGraphId(editor: Editor): Id? {
-  val graph = editor.state.graph
-  return if (editor.graphLibrary.containsKey(graph))
-    graph
-  else
-    editor.graphLibrary.keys.firstOrNull()
-}
-
 fun getActiveEditorGraph(editor: Editor): Graph? =
     editor.staging ?: editor.graph ?: editor.graphLibrary[editor.state.graph]
 
@@ -112,3 +104,45 @@ tailrec fun gatherChildren(graph: Graph, nodes: Set<Id>, accumulator: Set<Id> = 
   else
     gatherChildren(graph, next, nextAccumulator)
 }
+
+fun sceneFileNameWithoutExtension(fileName: String): String =
+    fileName.replace(sceneFileExtension, "")
+
+fun isSceneFile(fileName: String): Boolean =
+    fileName.substring(fileName.length - sceneFileExtension.length) == sceneFileExtension
+
+fun getSceneFiles(editor: Editor): Sequence<FileItem> =
+    editor.fileItems
+        .values
+        .asSequence()
+        .filter { it.type == FileItemType.file && isSceneFile(it.name) }
+
+// This function will recursively scans loaded graphs but does no graph loading
+// so it does not recursively scan unloaded graphs.
+// It's assumed that this function will be called multiple times between loading, where each
+// pass includes more missing graphs until the unloaded set is loaded
+tailrec fun getGraphDependencies(
+    graphLibrary: GraphLibrary,
+    graphs: Set<Id>,
+    accumulator: Set<Id> = setOf()
+): Set<Id> =
+    if (graphs.none())
+      accumulator
+    else {
+      val dependencies = graphs
+          .flatMap { graphId ->
+            val graph = graphLibrary[graphId]
+            if (graph == null)
+              listOf()
+            else
+              graph
+                  .filter { it.property == Properties.type }
+                  .map { it.target as Id }
+          }
+          .toSet()
+
+      val nextGraphs = dependencies - accumulator
+      val nextAccumulator = accumulator + dependencies
+
+      getGraphDependencies(graphLibrary, nextGraphs, nextAccumulator)
+    }

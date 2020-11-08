@@ -1,5 +1,6 @@
 package silentorb.mythic.editing
 
+import silentorb.mythic.editing.panels.getAvailableTypes
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.toList
 
@@ -10,6 +11,7 @@ object Properties {
   const val scale = "scale"
   const val mesh = "mesh"
   const val texture = "texture"
+  const val type = "type"
 }
 
 val getSceneTree: (Graph) -> SceneTree = groupProperty(Properties.parent)
@@ -17,9 +19,11 @@ val getSceneTree: (Graph) -> SceneTree = groupProperty(Properties.parent)
 object Widgets {
   const val meshSelect = "meshSelect"
   const val textureSelect = "textureSelect"
+  const val typeSelect = "typeSelect"
   const val translation = "translation"
   const val rotation = "rotation"
   const val scale = "scale"
+  const val type = "type"
 }
 
 val vector3Serialization = Serialization(
@@ -34,13 +38,18 @@ fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
     Properties.mesh to PropertyDefinition(
         displayName = "Mesh",
         widget = Widgets.meshSelect,
-        defaultValue = { editor -> editor.meshes.firstOrNull()?.value }
+        defaultValue = { editor -> editor.meshes.firstOrNull() }
     ),
     Properties.texture to PropertyDefinition(
         displayName = "Texture",
         widget = Widgets.textureSelect,
         dependencies = setOf(Properties.mesh),
-        defaultValue = { editor -> editor.textures.firstOrNull()?.value }
+        defaultValue = { editor -> editor.textures.firstOrNull() }
+    ),
+    Properties.type to PropertyDefinition(
+        displayName = "Type",
+        widget = Widgets.typeSelect,
+        defaultValue = { editor -> getAvailableTypes(editor).firstOrNull() }
     ),
     Properties.translation to PropertyDefinition(
         displayName = "Translation",

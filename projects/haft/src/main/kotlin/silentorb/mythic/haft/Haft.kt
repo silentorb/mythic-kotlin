@@ -26,8 +26,8 @@ fun mapEventsToCommandsOld(deviceStates: List<InputDeviceState>, getBinding: Bin
               debugLog("Haft Command: isStroke $isStroke ${binding.command} $target ${event.value}")
             Command(
                 type = binding.command,
-                target = target,
                 value = event.value,
+                target = target,
                 device = event.device
             )
           } else
@@ -57,8 +57,8 @@ fun mapInputToCommands(strokes: Set<Any>, bindings: Bindings, deviceStates: List
             }
             Command(
                 type = binding.command,
-                target = target,
                 value = event.value,
+                target = target,
                 device = event.device
             )
           } else

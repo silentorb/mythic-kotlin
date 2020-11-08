@@ -44,3 +44,11 @@ fun drawMainMenuBar(items: List<MenuItem>): List<Command> =
       result
     } else
       items.flatMap(::pollMenu)
+
+fun drawMenuBar(items: List<MenuItem>): List<Command> =
+    if (ImGui.beginMenuBar()) {
+      val result = items.flatMap(::drawMenu)
+      ImGui.endMenuBar()
+      result
+    } else
+      items.flatMap(::pollMenu)

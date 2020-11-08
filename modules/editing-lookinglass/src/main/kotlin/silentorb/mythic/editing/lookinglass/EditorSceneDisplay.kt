@@ -10,7 +10,6 @@ import silentorb.mythic.spatial.Vector3
 
 data class SerialElementData(
     val parents: SceneTree,
-    val nodes: Set<Id>,
     val meshes: Map<Id, String>,
     val textures: Map<Id, String>,
     val translation: Map<Id, Vector3>,
@@ -20,12 +19,8 @@ data class SerialElementData(
 
 fun newSerialElementData(graph: Graph): SerialElementData {
   val tree = getSceneTree(graph)
-  val nodes = getTripleKeys(graph)
-      .plus(tree.values)
-
   return SerialElementData(
       parents = tree,
-      nodes = nodes,
       meshes = groupProperty<String>(Properties.mesh)(graph),
       textures = groupProperty<String>(Properties.texture)(graph),
       translation = groupProperty<Vector3>(Properties.translation)(graph),
@@ -52,25 +47,55 @@ fun getTransform(data: SerialElementData, node: Id): Matrix {
     localTransform
 }
 
-fun nodeToElement(data: SerialElementData, node: Id): ElementGroup? {
-  val mesh = data.meshes[node]
-  return if (mesh == null)
-    null
+
+fun nodesToElements(graphs: GraphLibrary, graph: Graph): List<ElementGroup> {
+  val tree = getSceneTree(graph)
+  val nodes = getTripleKeys(graph)
+      .plus(tree.values)
+
+  return nodes.flatMap { node -> nodeToElements(graphs, graph, node) }
+}
+
+fun nodeToElements(graphs: GraphLibrary, graph: Graph, node: Id): List<ElementGroup> {
+  val mesh = getValue<Id>(graph, node, Properties.mesh)
+  val type = getValue<Id>(graph, node, Properties.type)
+
+  return if (type != null) {
+    val subGraph = graphs[type]
+    if (subGraph == null || subGraph == graph)
+      listOf()
+    else {
+      val instanceTransform = getTransform(graph, node)
+      nodesToElements(graphs, subGraph)
+          .map { group ->
+            group.copy(
+                meshes = group.meshes.map { meshElement ->
+                  meshElement.copy(
+                      transform = instanceTransform * meshElement.transform
+                  )
+                }
+            )
+          }
+    }
+  } else if (mesh == null)
+    listOf()
   else {
-    val texture = data.textures[node]
+    val texture = getValue<Id>(graph, node, Properties.texture)
     val material = if (texture != null)
       Material(texture = texture, shading = true)
     else
       null
 
-    val transform = getTransform(data, node)
+    val transform = getTransform(graph, node)
 
-    ElementGroup(
-        meshes = listOf(
-            MeshElement(
-                mesh = mesh,
-                material = material,
-                transform = transform
+    listOf(
+        ElementGroup(
+            meshes = listOf(
+                MeshElement(
+                    mesh = mesh,
+                    material = material,
+                    transform = transform
+                )
             )
         )
     )
@@ -90,12 +115,12 @@ fun cameraRigToCamera(camera: CameraRig): Camera =
 
 fun sceneFromEditorGraph(meshes: ModelMeshMap, editor: Editor, lightingConfig: LightingConfig, viewport: Id): GameScene {
   val graph = getActiveEditorGraph(editor) ?: listOf()
-  val data = newSerialElementData(graph)
+//  val data = newSerialElementData(graph)
   val camera = cameraRigToCamera(editor.state.cameras[viewport] ?: CameraRig())
 
   val layers = listOf(
       SceneLayer(
-          elements = data.nodes.mapNotNull { node -> nodeToElement(data, node) },
+          elements = nodesToElements(editor.graphLibrary, graph),
           useDepth = true
       ),
   )

@@ -2,13 +2,22 @@ package silentorb.mythic.editing.panels
 
 import imgui.ImGui
 import imgui.flag.ImGuiMouseButton
+import imgui.flag.ImGuiWindowFlags
 import silentorb.mythic.editing.*
+import silentorb.mythic.editing.components.drawMenuBar
 import silentorb.mythic.editing.components.getSelectionCommands
 import silentorb.mythic.editing.components.newTreeFlags
 import silentorb.mythic.editing.components.panelBackground
-import silentorb.mythic.editing.components.updateSelectionToggle
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
+
+fun projectMenus(): Commands =
+    drawMenuBar(listOf(
+        MenuItem("File", items = listOf(
+            MenuItem("New File", "Ctrl+N", EditorCommands.newFileWithNameDialog),
+            MenuItem("New Folder", "Ctrl+Alt+N", EditorCommands.newFolderWithNameDialog),
+        ))
+    ))
 
 fun renderProjectTree(items: Collection<FileItem>, item: FileItem, selection: NodeSelection): Commands {
   val id = item.fullPath
@@ -19,7 +28,7 @@ fun renderProjectTree(items: Collection<FileItem>, item: FileItem, selection: No
   val isOpen = ImGui.treeNodeEx("File-Tree-$id", flags, item.name)
   val selectionCommands = getSelectionCommands(EditorCommands.setFileSelection, selection, id)
   val activateCommands: Commands = if (ImGui.isItemClicked(ImGuiMouseButton.Left) && ImGui.isMouseDoubleClicked(ImGuiMouseButton.Left))
-    listOf(Command(EditorCommands.setActiveGraph, value = item.name.replace(".json", "")))
+    listOf(Command(EditorCommands.setActiveGraph, value = sceneFileNameWithoutExtension(item.name)))
   else
     listOf()
 
@@ -35,8 +44,9 @@ fun renderProjectTree(items: Collection<FileItem>, item: FileItem, selection: No
 }
 
 fun renderProject(editor: Editor): Commands {
-  ImGui.begin("Project")
+  ImGui.begin("Project", ImGuiWindowFlags.MenuBar)
   panelBackground()
+  val menuCommands = projectMenus()
 
   val items = editor.fileItems.values
   val root = items.firstOrNull { it.parent == null }
@@ -47,5 +57,5 @@ fun renderProject(editor: Editor): Commands {
 
   ImGui.end()
 
-  return commands
+  return menuCommands + commands
 }

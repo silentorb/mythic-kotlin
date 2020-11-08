@@ -1,7 +1,7 @@
 package silentorb.mythic.editing.updating
 
 import silentorb.mythic.editing.*
-import silentorb.mythic.editing.components.nodeNameText
+import silentorb.mythic.editing.components.nameText
 import silentorb.mythic.happenings.Commands
 
 fun onGraphEditingCommand(commandType: Any, transform: EditorGraphTransform): GraphEditCommandsHandler =
@@ -41,7 +41,7 @@ val onAddNode = onGraphEditingCommand(EditorCommands.addNode) { editor, graph ->
     graph
   else {
     val selected = state.nodeSelection.first()
-    val key = nodeNameText.get()
+    val key = nameText.get()
     graph + Entry(key, Properties.parent, selected)
   }
 }
@@ -52,7 +52,7 @@ val onRenameNode = onGraphEditingCommand(EditorCommands.renameNode) { editor, gr
     graph
   else {
     val selected = state.nodeSelection.first()
-    val key = nodeNameText.get()
+    val key = nameText.get()
     graph.map {
       if (it.source == selected)
         it.copy(source = key)

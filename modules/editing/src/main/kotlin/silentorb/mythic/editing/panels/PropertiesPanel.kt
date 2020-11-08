@@ -1,7 +1,6 @@
 package silentorb.mythic.editing.panels
 
 import imgui.ImGui
-import imgui.flag.ImGuiWindowFlags
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.dropDownWidget
 import silentorb.mythic.editing.components.panelBackground
@@ -9,11 +8,18 @@ import silentorb.mythic.editing.components.spatialWidget
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 
+fun getAvailableTypes(editor: Editor): List<Id> =
+    getSceneFiles(editor)
+        .map { sceneFileNameWithoutExtension(it.name) }
+        .minus(editor.state.graph ?: "")
+        .toList()
+
 fun drawFormField(editor: Editor, definition: PropertyDefinition, entry: Entry): Any {
   ImGui.text(definition.displayName)
   return when (definition.widget!!) {
     Widgets.textureSelect -> dropDownWidget(editor.textures, entry)
     Widgets.meshSelect -> dropDownWidget(editor.meshes, entry)
+    Widgets.typeSelect -> dropDownWidget(getAvailableTypes(editor), entry)
     Widgets.translation -> spatialWidget(entry)
     Widgets.rotation -> spatialWidget(entry)
     Widgets.scale -> spatialWidget(entry)
@@ -42,8 +48,10 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): Commands {
             if (ImGui.selectable(definition.displayName)) {
               val target = definition.defaultValue?.invoke(editor) ?: ""
               commands = commands.plus(Command(EditorCommands.setGraphValue, value = Entry(node, property, target)))
-//              nextGraph = nextGraph + Entry(node, property, target)
             }
+          }
+          if (commands.none()) {
+            activeInputType = InputType.dropdown
           }
           ImGui.endCombo()
         }
@@ -53,7 +61,6 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): Commands {
       for ((property, definition) in definitions) {
         val entry = entries.firstOrNull { it.property == property }
         if (entry != null) {
-//          val definition = definitions[entry.property]
           ImGui.separator()
           val nextValue = if (definition.widget != null)
             drawFormField(editor, definition, entry)
@@ -62,9 +69,6 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): Commands {
 
           if (nextValue != entry.target) {
             commands = commands.plus(Command(EditorCommands.setGraphValue, value = Entry(node, property, nextValue)))
-//            nextGraph = nextGraph
-//                .minus(entry)
-//                .plus(entry.copy(target = nextValue))
           }
         }
       }
