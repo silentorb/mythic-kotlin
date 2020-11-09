@@ -4,6 +4,11 @@ import imgui.ImGui
 import imgui.flag.ImGuiKey
 import org.lwjgl.glfw.GLFW
 import silentorb.mythic.editing.panels.defaultViewportId
+import silentorb.mythic.ent.Graph
+import silentorb.mythic.ent.GraphLibrary
+import silentorb.mythic.ent.Key
+import silentorb.mythic.ent.getValue
+import silentorb.mythic.scenery.Properties
 import silentorb.mythic.spatial.*
 
 fun getActiveEditorGraph(editor: Editor): Graph? =
@@ -52,7 +57,7 @@ fun isShortcutPressed(shortcut: String): Boolean {
   return isKeyPressed && modifiersArePressed
 }
 
-fun getTransform(graph: Graph, node: Id): Matrix {
+fun getTransform(graph: Graph, node: Key): Matrix {
   val translation = getValue<Vector3>(graph, node, Properties.translation) ?: Vector3.zero
   val rotation = getValue<Vector3>(graph, node, Properties.rotation) ?: Vector3.zero
   val scale = getValue<Vector3>(graph, node, Properties.scale) ?: Vector3.unit
@@ -63,7 +68,7 @@ fun getTransform(graph: Graph, node: Id): Matrix {
       .rotateX(rotation.x)
       .scale(scale)
 
-  val parent = getValue<Id>(graph, node, Properties.parent)
+  val parent = getValue<Key>(graph, node, Properties.parent)
   return if (parent != null)
     getTransform(graph, parent) * localTransform
   else
@@ -87,7 +92,7 @@ fun transformPoint(transform: Matrix, dimensions: Vector2, offset: Vector2): Scr
   Vector2(sample.x + 1f, 1f - sample.y) / 2f * dimensions + offset
 }
 
-tailrec fun gatherChildren(graph: Graph, nodes: Set<Id>, accumulator: Set<Id> = setOf()): Set<Id> {
+tailrec fun gatherChildren(graph: Graph, nodes: Set<Key>, accumulator: Set<Key> = setOf()): Set<Key> {
   val next = nodes
       .flatMap { node ->
         graph.filter { it.property == Properties.parent && it.target == node }
@@ -120,9 +125,9 @@ fun getSceneFiles(editor: Editor): Sequence<FileItem> =
 // pass includes more missing graphs until the unloaded set is loaded
 tailrec fun getGraphDependencies(
     graphLibrary: GraphLibrary,
-    graphs: Set<Id>,
-    accumulator: Set<Id> = setOf()
-): Set<Id> =
+    graphs: Set<Key>,
+    accumulator: Set<Key> = setOf()
+): Set<Key> =
     if (graphs.none())
       accumulator
     else {
@@ -134,7 +139,7 @@ tailrec fun getGraphDependencies(
             else
               graph
                   .filter { it.property == Properties.type }
-                  .map { it.target as Id }
+                  .map { it.target as Key }
           }
           .toSet()
 

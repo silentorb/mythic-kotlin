@@ -3,35 +3,26 @@ package silentorb.mythic.editing.panels
 import imgui.ImGui
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.*
+import silentorb.mythic.ent.*
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
-import silentorb.mythic.scenery.LightType
+import silentorb.mythic.scenery.Properties
 
-fun getAvailableTypes(editor: Editor): List<Id> =
+fun getAvailableTypes(editor: Editor): List<Key> =
     getSceneFiles(editor)
         .map { sceneFileNameWithoutExtension(it.name) }
         .minus(editor.state.graph ?: "")
         .toList()
 
 fun drawFormField(editor: Editor, definition: PropertyDefinition, entry: Entry): Any {
-  return when (definition.widget!!) {
-    Widgets.select -> dropDownWidget(definition.options!!(editor), entry)
-    Widgets.textureSelect -> dropDownWidget(editor.enumerations.textures, entry)
-    Widgets.meshSelect -> dropDownWidget(editor.enumerations.meshes, entry)
-    Widgets.typeSelect -> dropDownWidget(getAvailableTypes(editor), entry)
-    Widgets.translation -> spatialWidget(entry)
-    Widgets.rotation -> spatialWidget(entry)
-    Widgets.scale -> spatialWidget(entry)
-    Widgets.text -> textField("", entry)
-    Widgets.decimalText -> decimalTextField("", entry)
-    Widgets.rgba -> rgbaField(entry)
-    Widgets.light -> dropDownWidget(LightType.values().map { it.name }, entry)
-    Widgets.bitmask -> bitmaskField(entry)
-    else -> entry.target
-  }
+  val widget = definition.widget
+  return if (widget != null) {
+    widget(editor, entry)
+  } else
+    entry.target
 }
 
-fun addPropertiesDropDown(editor: Editor, availableDefinitions: PropertyDefinitions, attributes: List<Id>, entries: Graph, node: Id): Commands {
+fun addPropertiesDropDown(editor: Editor, availableDefinitions: PropertyDefinitions, attributes: List<Key>, entries: Graph, node: Key): Commands {
   var commands: Commands = listOf()
   if (ImGui.beginCombo("Add Property", "")) {
     val allAttributes = editor.enumerations.attributes
@@ -85,7 +76,7 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): Commands {
       ImGui.text(node)
       ImGui.separator()
       val availableDefinitions = definitions.minus(entries.map { it.property })
-      val attributes = getPropertyValues<Id>(graph, node, Properties.attribute)
+      val attributes = getPropertyValues<Key>(graph, node, Properties.attribute)
       if (availableDefinitions.any()) {
         commands = commands + addPropertiesDropDown(editor, availableDefinitions, attributes, entries, node)
       }

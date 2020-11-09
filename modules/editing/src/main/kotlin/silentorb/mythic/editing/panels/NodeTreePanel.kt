@@ -5,6 +5,8 @@ import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.getSelectionCommands
 import silentorb.mythic.editing.components.newTreeFlags
 import silentorb.mythic.editing.components.panelBackground
+import silentorb.mythic.ent.Graph
+import silentorb.mythic.ent.getTripleKeys
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 

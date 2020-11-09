@@ -1,6 +1,11 @@
 package silentorb.mythic.editing.updating
 
 import silentorb.mythic.editing.*
+import silentorb.mythic.ent.Entry
+import silentorb.mythic.ent.Graph
+import silentorb.mythic.ent.getValue
+import silentorb.mythic.ent.replaceValues
+import silentorb.mythic.scenery.Properties
 import silentorb.mythic.spatial.*
 
 fun startOperation(type: OperationType, previous: Operation?): Operation? =

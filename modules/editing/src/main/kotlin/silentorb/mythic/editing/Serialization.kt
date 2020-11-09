@@ -8,8 +8,11 @@ import silentorb.mythic.configuration.loadJsonFile
 import silentorb.mythic.configuration.loadYamlFile
 import silentorb.mythic.configuration.saveYamlFile
 import silentorb.mythic.debugging.getDebugBoolean
+import silentorb.mythic.ent.Entry
+import silentorb.mythic.ent.Graph
+import silentorb.mythic.ent.GraphFile
+import silentorb.mythic.ent.GraphLibrary
 import silentorb.mythic.resource_loading.getUrlPath
-import silentorb.mythic.resource_loading.listFiles
 import silentorb.mythic.resource_loading.listFilesAndFoldersRecursive
 import silentorb.mythic.resource_loading.listFilesRecursive
 import silentorb.mythic.spatial.serialization.loadSpatialJsonResource

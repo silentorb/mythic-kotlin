@@ -1,6 +1,7 @@
-package marloth.integration.editing
+package silentorb.mythic.editing.lookinglass
 
 import silentorb.mythic.editing.*
+import silentorb.mythic.ent.*
 import silentorb.mythic.glowing.DrawMethod
 import silentorb.mythic.lookinglass.*
 import silentorb.mythic.scenery.*
@@ -11,11 +12,11 @@ import silentorb.mythic.typography.IndexedTextStyle
 
 data class SerialElementData(
     val parents: SceneTree,
-    val meshes: Map<Id, String>,
-    val textures: Map<Id, String>,
-    val translation: Map<Id, Vector3>,
-    val rotation: Map<Id, Vector3>,
-    val scale: Map<Id, Vector3>
+    val meshes: Map<Key, String>,
+    val textures: Map<Key, String>,
+    val translation: Map<Key, Vector3>,
+    val rotation: Map<Key, Vector3>,
+    val scale: Map<Key, Vector3>
 )
 
 fun newSerialElementData(graph: Graph): SerialElementData {
@@ -30,7 +31,7 @@ fun newSerialElementData(graph: Graph): SerialElementData {
   )
 }
 
-fun getTransform(data: SerialElementData, node: Id): Matrix {
+fun getTransform(data: SerialElementData, node: Key): Matrix {
   val translation = data.translation[node] ?: Vector3.zero
   val rotation = data.rotation[node] ?: Vector3.zero
   val scale = data.scale[node] ?: Vector3.unit
@@ -56,10 +57,10 @@ fun nodesToElements(meshes: ModelMeshMap, selection: NodeSelection, graphs: Grap
   return nodes.flatMap { node -> nodeToElements(meshes, selection, graphs, graph, node) }
 }
 
-fun nodeToElements(meshes: ModelMeshMap, selection: NodeSelection, graphs: GraphLibrary, graph: Graph, node: Id): List<ElementGroup> {
+fun nodeToElements(meshes: ModelMeshMap, selection: NodeSelection, graphs: GraphLibrary, graph: Graph, node: Key): List<ElementGroup> {
   val isSelected = selection.contains(node)
-  val mesh = getValue<Id>(graph, node, Properties.mesh)
-  val type = getValue<Id>(graph, node, Properties.type)
+  val mesh = getValue<Key>(graph, node, Properties.mesh)
+  val type = getValue<Key>(graph, node, Properties.type)
   val text3d = getValue<String>(graph, node, Properties.text3d)
   val light = getValue<String>(graph, node, Properties.light)
   val collisionShape = if (isSelected)
@@ -89,7 +90,7 @@ fun nodeToElements(meshes: ModelMeshMap, selection: NodeSelection, graphs: Graph
   else {
     val transform = getTransform(graph, node)
     val meshElements = if (mesh != null) {
-      val texture = getValue<Id>(graph, node, Properties.texture)
+      val texture = getValue<Key>(graph, node, Properties.texture)
       val material = if (texture != null)
         Material(texture = texture, shading = true)
       else
@@ -167,7 +168,7 @@ fun cameraRigToCamera(camera: CameraRig): Camera =
           getOrthoZoom(camera),
     )
 
-fun sceneFromEditorGraph(meshes: ModelMeshMap, editor: Editor, lightingConfig: LightingConfig, viewport: Id): GameScene {
+fun sceneFromEditorGraph(meshes: ModelMeshMap, editor: Editor, lightingConfig: LightingConfig, viewport: Key): GameScene {
   val graph = getActiveEditorGraph(editor) ?: listOf()
 //  val data = newSerialElementData(graph)
   val camera = cameraRigToCamera(editor.state.cameras[viewport] ?: CameraRig())

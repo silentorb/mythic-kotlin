@@ -1,44 +1,16 @@
 package silentorb.mythic.editing
 
+import silentorb.mythic.editing.components.*
 import silentorb.mythic.editing.panels.getAvailableTypes
+import silentorb.mythic.ent.Graph
+import silentorb.mythic.ent.groupProperty
 import silentorb.mythic.ent.reflectProperties
+import silentorb.mythic.scenery.LightType
+import silentorb.mythic.scenery.Properties
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.toList
 
-object Properties {
-  const val parent = "parent"
-  const val translation = "translation"
-  const val rotation = "rotation"
-  const val scale = "scale"
-  const val mesh = "mesh"
-  const val texture = "texture"
-  const val type = "type"
-  const val text3d = "text3d"
-  const val light = "light"
-  const val attribute = "attribute"
-  const val rgba = "rgba"
-  const val range = "range"
-  const val collisionShape = "collisionShape"
-  const val collisionGroups = "collisionGroups"
-  const val collisionMask = "collisionMask"
-}
-
 val getSceneTree: (Graph) -> SceneTree = groupProperty(Properties.parent)
-
-object Widgets {
-  const val select = "select"
-  const val meshSelect = "meshSelect"
-  const val textureSelect = "textureSelect"
-  const val typeSelect = "typeSelect"
-  const val translation = "translation"
-  const val rotation = "rotation"
-  const val scale = "scale"
-  const val text = "text"
-  const val light = "light"
-  const val rgba = "rgba"
-  const val decimalText = "decimalText"
-  const val bitmask = "bitmask"
-}
 
 fun commonEditorAttributes() =
     reflectProperties<String>(CommonEditorAttributes)
@@ -62,74 +34,73 @@ val floatSerialization = Serialization(
 fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
     Properties.mesh to PropertyDefinition(
         displayName = "Mesh",
-        widget = Widgets.meshSelect,
+        widget = dropDownWidget { it.enumerations.meshes },
         defaultValue = { editor -> editor.enumerations.meshes.firstOrNull() },
     ),
     Properties.texture to PropertyDefinition(
         displayName = "Texture",
-        widget = Widgets.textureSelect,
+        widget = dropDownWidget { it.enumerations.textures },
         dependencies = setOf(Properties.mesh),
         defaultValue = { editor -> editor.enumerations.textures.firstOrNull() },
     ),
     Properties.type to PropertyDefinition(
         displayName = "Type",
-        widget = Widgets.typeSelect,
+        widget = dropDownWidget(::getAvailableTypes),
         defaultValue = { editor -> getAvailableTypes(editor).firstOrNull() },
     ),
     Properties.text3d to PropertyDefinition(
         displayName = "3D Text",
-        widget = Widgets.text,
+        widget = propertyTextField,
         defaultValue = { editor -> getAvailableTypes(editor).firstOrNull() },
     ),
     Properties.translation to PropertyDefinition(
         displayName = "Translation",
-        widget = Widgets.translation,
-        defaultValue = { Vector3.zero },
         serialization = vector3Serialization,
+        widget = propertySpatialWidget,
+        defaultValue = { Vector3.zero },
     ),
     Properties.rotation to PropertyDefinition(
         displayName = "Rotation",
-        widget = Widgets.rotation,
-        defaultValue = { Vector3.zero },
         serialization = vector3Serialization,
+        widget = propertySpatialWidget,
+        defaultValue = { Vector3.zero },
     ),
     Properties.scale to PropertyDefinition(
         displayName = "Scale",
-        widget = Widgets.scale,
-        defaultValue = { Vector3.unit },
         serialization = vector3Serialization,
+        widget = propertySpatialWidget,
+        defaultValue = { Vector3.unit },
     ),
     Properties.rgba to PropertyDefinition(
         displayName = "Color",
-        widget = Widgets.rgba,
+        widget = propertyRgbaField,
         defaultValue = { "#ffffffff" },
     ),
     Properties.range to PropertyDefinition(
         displayName = "Range",
         serialization = floatSerialization,
-        widget = Widgets.decimalText,
+        widget = propertyDecimalTextField,
         defaultValue = { 1f },
     ),
     Properties.light to PropertyDefinition(
         displayName = "Light",
-        widget = Widgets.light,
-        defaultValue = { "point" },
+        widget = dropDownWidget { LightType.values().map { it.name } },
         dependencies = setOf(Properties.rgba, Properties.range),
+        defaultValue = { "point" },
     ),
     Properties.collisionShape to PropertyDefinition(
         displayName = "Collision Shape",
-        widget = Widgets.select,
-        defaultValue = { CollisionShape.box.name },
-        options = { CollisionShape.values().map { it.name } }
+        widget = dropDownWidget { CollisionShape.values().map { it.name } },
+        defaultValue = { CollisionShape.box.name }
     ),
     Properties.collisionGroups to PropertyDefinition(
         displayName = "Collision Group",
-        widget = Widgets.bitmask,
+        widget = propertyBitmaskField,
         defaultValue = { 0 },
     ),
     Properties.collisionMask to PropertyDefinition(
         displayName = "Collision Mask",
-        widget = Widgets.bitmask,
+        widget = propertyBitmaskField,
         defaultValue = { 0 },
     ),
 )

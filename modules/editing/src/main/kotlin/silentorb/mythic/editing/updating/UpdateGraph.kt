@@ -2,7 +2,12 @@ package silentorb.mythic.editing.updating
 
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.nameText
+import silentorb.mythic.ent.Entry
+import silentorb.mythic.ent.Graph
+import silentorb.mythic.ent.getTripleKeys
+import silentorb.mythic.ent.replaceValues
 import silentorb.mythic.happenings.Commands
+import silentorb.mythic.scenery.Properties
 
 fun onGraphEditingCommand(commandType: Any, transform: EditorGraphTransform): GraphEditCommandsHandler =
     { editor, commandTypes, graph ->

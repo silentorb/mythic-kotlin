@@ -4,10 +4,12 @@ import imgui.ImGui
 import imgui.flag.ImGuiInputTextFlags
 import imgui.type.ImString
 import silentorb.mythic.editing.*
+import silentorb.mythic.ent.Entry
+import silentorb.mythic.ent.Key
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.toList
 
-fun dropDownWidget(options: List<Id>, entry: Entry): String {
+fun dropDownWidget(options: List<Key>, entry: Entry): String {
   val value = entry.target as String
   var nextValue = value
   ImGui.pushID(entry.property)
@@ -24,6 +26,12 @@ fun dropDownWidget(options: List<Id>, entry: Entry): String {
   }
   ImGui.popID()
   return nextValue
+}
+
+typealias EditorOptionsSource = (Editor) -> List<Key>
+
+fun dropDownWidget(options: EditorOptionsSource): PropertyWidget = { editor, entry ->
+  dropDownWidget(options(editor), entry)
 }
 
 val activeInputTextValue = ImString()
@@ -66,24 +74,24 @@ fun rgbaField(entry: Entry): String {
   return arrayToHexColorString(reference)
 }
 
-fun textField(label: String, entry: Entry): String {
+val propertyRgbaField: PropertyWidget = { _, entry -> rgbaField(entry) }
+
+fun textField(entry: Entry): String {
   val value = entry.target as String
   val owner = "${entry.source}.${entry.property}"
-  ImGui.text(label)
-  ImGui.sameLine()
-  val fieldId = "$owner.$label"
-  return textField(fieldId, value)
+  return textField(owner, value)
 }
 
-fun decimalTextField(label: String, entry: Entry): Float {
+val propertyTextField: PropertyWidget = { _, entry -> textField(entry) }
+
+fun decimalTextField(entry: Entry): Float {
   val value = entry.target as Float
   val owner = "${entry.source}.${entry.property}"
-  ImGui.text(label)
-  ImGui.sameLine()
-  val fieldId = "$owner.$label"
-  val result = textField(fieldId, value.toString(), ImGuiInputTextFlags.CharsDecimal)
+  val result = textField(owner, value.toString(), ImGuiInputTextFlags.CharsDecimal)
   return result.toFloatOrNull() ?: value
 }
+
+val propertyDecimalTextField: PropertyWidget = { _, entry -> decimalTextField(entry) }
 
 fun axisInput(owner: String, label: String, value: Float): Float {
   val flags = ImGuiInputTextFlags.CharsDecimal or ImGuiInputTextFlags.AutoSelectAll
@@ -107,6 +115,10 @@ fun spatialWidget(entry: Entry): Vector3 {
 //  return Vector3(x, 0f, 0f)
 }
 
+val propertySpatialWidget: PropertyWidget = { _, entry -> spatialWidget(entry) }
+
 fun bitmaskField(entry: Entry): Int {
   return 0
 }
+
+val propertyBitmaskField: PropertyWidget = { _, entry -> bitmaskField(entry) }

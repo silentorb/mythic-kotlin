@@ -1,5 +1,7 @@
 package silentorb.mythic.editing
 
+import silentorb.mythic.ent.GraphLibrary
+
 fun updateSceneCaching(editor: Editor): GraphLibrary {
   val graph = getActiveEditorGraph(editor)
   val library = editor.graphLibrary

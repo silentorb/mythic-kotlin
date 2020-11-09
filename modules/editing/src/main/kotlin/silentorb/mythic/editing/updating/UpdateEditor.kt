@@ -1,11 +1,14 @@
 package silentorb.mythic.editing.updating
 
 import silentorb.mythic.editing.*
+import silentorb.mythic.ent.Graph
+import silentorb.mythic.ent.getTripleKeys
 import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.haft.getMouseOffset
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.happenings.handleCommands
 import silentorb.mythic.happenings.onSetCommand
+import silentorb.mythic.scenery.Properties
 import silentorb.mythic.spatial.Vector2
 
 fun updateNodeSelection(editor: Editor, nextGraph: Graph?) = handleCommands<NodeSelection> { command, selection ->

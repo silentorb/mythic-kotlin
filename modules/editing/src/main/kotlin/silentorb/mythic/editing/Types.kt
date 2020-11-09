@@ -1,13 +1,15 @@
 package silentorb.mythic.editing
 
+import silentorb.mythic.ent.Entry
+import silentorb.mythic.ent.Graph
+import silentorb.mythic.ent.GraphLibrary
+import silentorb.mythic.ent.Key
 import silentorb.mythic.spatial.Vector4i
 import java.nio.file.Path
 
 const val sceneFileExtension = ".scene"
 
-typealias SceneTree = Map<Id, Id>
-
-typealias GraphLibrary = Map<String, Graph>
+typealias SceneTree = Map<Key, Key>
 
 data class Typeface(
     val name: String,
@@ -23,21 +25,21 @@ data class Serialization(
 )
 
 typealias DefaultValueSource = (Editor) -> Any?
-typealias OptionsSource = (Editor) -> List<Id>
+typealias OptionsSource = (Editor) -> List<Key>
+typealias PropertyWidget = (Editor, Entry) -> Any
 
 data class PropertyDefinition(
     val displayName: String,
     val serialization: Serialization? = null,
-    val widget: Id?,
-    val options: OptionsSource? = null,
-    val dependencies: Set<Id> = setOf(),
+    val widget: PropertyWidget?,
+    val dependencies: Set<Key> = setOf(),
     val defaultValue: DefaultValueSource? = null,
     val single: Boolean = true,
 )
 
-typealias PropertyDefinitions = Map<Id, PropertyDefinition>
+typealias PropertyDefinitions = Map<Key, PropertyDefinition>
 
-typealias NodeSelection = Set<Id>
+typealias NodeSelection = Set<Key>
 
 data class Option(
     val label: String,
@@ -50,17 +52,17 @@ typealias GraphHistory = List<Graph>
 // Persistent State
 data class EditorState(
     val graph: String? = null,
-    val cameras: Map<Id, CameraRig> = mapOf(),
+    val cameras: Map<Key, CameraRig> = mapOf(),
     val nodeSelection: NodeSelection = setOf(),
     val fileSelection: Set<String> = setOf(),
 )
 
 data class EditorEnumerations(
     val propertyDefinitions: PropertyDefinitions,
-    val attributes: List<Id> = listOf(),
-    val textures: List<Id> = listOf(),
-    val meshes: List<Id> = listOf(),
-    val collisionGroups: List<Id> = listOf(),
+    val attributes: List<Key> = listOf(),
+    val textures: List<Key> = listOf(),
+    val meshes: List<Key> = listOf(),
+    val collisionGroups: List<Key> = listOf(),
 )
 
 data class Editor(
@@ -73,7 +75,7 @@ data class Editor(
     val enumerations: EditorEnumerations,
     val fileItems: FileItems,
     val graphLibrary: GraphLibrary = mapOf(),
-    val viewportBoundsMap: Map<Id, Vector4i> = mapOf(),
+    val viewportBoundsMap: Map<Key, Vector4i> = mapOf(),
 )
 
 const val keypadKey = "Numpad"

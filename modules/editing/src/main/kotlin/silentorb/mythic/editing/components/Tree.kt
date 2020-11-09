@@ -2,7 +2,7 @@ package silentorb.mythic.editing.components
 
 import imgui.ImGui
 import imgui.flag.ImGuiTreeNodeFlags
-import silentorb.mythic.editing.Id
+import silentorb.mythic.ent.Key
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 
@@ -24,19 +24,19 @@ fun newTreeFlags(selected: Boolean, hasChildren: Boolean): Int {
       (1 shl 11)
 }
 
-fun updateSelectionToggle(selection: Set<Id>, id: Id) =
+fun updateSelectionToggle(selection: Set<Key>, key: Key) =
     if (ImGui.isItemClicked()) {
-      if (selection.contains(id)) {
-        selection - id
+      if (selection.contains(key)) {
+        selection - key
       } else {
-        setOf(id)
+        setOf(key)
       }
     } else
       selection
 
-fun getSelectionCommands(selectCommandType: Any, selection: Set<Id>, id: Id): Commands =
+fun getSelectionCommands(selectCommandType: Any, selection: Set<Key>, key: Key): Commands =
     if (ImGui.isItemClicked()) {
-      val newSelection = setOf(id)
+      val newSelection = setOf(key)
       listOf(Command(selectCommandType, value = newSelection))
     } else
       listOf()
