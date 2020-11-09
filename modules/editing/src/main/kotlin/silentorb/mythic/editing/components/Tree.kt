@@ -36,11 +36,7 @@ fun updateSelectionToggle(selection: Set<Id>, id: Id) =
 
 fun getSelectionCommands(selectCommandType: Any, selection: Set<Id>, id: Id): Commands =
     if (ImGui.isItemClicked()) {
-      val newSelection = if (selection.contains(id))
-        selection - id
-      else
-        setOf(id)
-
+      val newSelection = setOf(id)
       listOf(Command(selectCommandType, value = newSelection))
     } else
       listOf()

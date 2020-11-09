@@ -5,6 +5,7 @@ import imgui.flag.ImGuiInputTextFlags
 import imgui.type.ImString
 import silentorb.mythic.editing.*
 import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.toList
 
 fun dropDownWidget(options: List<Id>, entry: Entry): String {
   val value = entry.target as String
@@ -55,6 +56,16 @@ fun textField(fieldId: String, value: String, flags: Int = ImGuiInputTextFlags.N
   return valueReference.get()
 }
 
+fun rgbaField(entry: Entry): String {
+  val value = entry.target as String
+  val owner = "${entry.source}.${entry.property}"
+  val reference = toList(hexColorStringToVector4(value)).toFloatArray()
+  if (ImGui.colorEdit3("##$owner", reference)) {
+    val k = 0
+  }
+  return arrayToHexColorString(reference)
+}
+
 fun textField(label: String, entry: Entry): String {
   val value = entry.target as String
   val owner = "${entry.source}.${entry.property}"
@@ -62,6 +73,16 @@ fun textField(label: String, entry: Entry): String {
   ImGui.sameLine()
   val fieldId = "$owner.$label"
   return textField(fieldId, value)
+}
+
+fun decimalTextField(label: String, entry: Entry): Float {
+  val value = entry.target as Float
+  val owner = "${entry.source}.${entry.property}"
+  ImGui.text(label)
+  ImGui.sameLine()
+  val fieldId = "$owner.$label"
+  val result = textField(fieldId, value.toString(), ImGuiInputTextFlags.CharsDecimal)
+  return result.toFloatOrNull() ?: value
 }
 
 fun axisInput(owner: String, label: String, value: Float): Float {

@@ -144,7 +144,7 @@ fun loadEditorStateOrDefault(filePath: String = defaultConfigFilePath): EditorSt
     loadEditorState(filePath) ?: defaultEditorState()
 
 fun checkSaveEditorState(previous: EditorState?, next: EditorState?, filePath: String = defaultConfigFilePath) {
-  if (next != null && previous != next && !getDebugBoolean("DISABLE_EDITOR_SAVE")) {
+  if (next != null && previous != next && !getDebugBoolean("EDITOR_DISABLE_SAVE")) {
     saveYamlFile(filePath, next)
   }
 }
@@ -172,6 +172,9 @@ fun loadGraph(editor: Editor, graphName: String): Graph? {
 }
 
 fun checkSaveGraph(previous: Editor, next: Editor) {
+  if (getDebugBoolean("EDITOR_DISABLE_SAVE"))
+    return
+
   val graphName = next.state.graph
   val nextGraph = next.graphLibrary[graphName]
   val previousGraph = previous.graphLibrary[graphName]

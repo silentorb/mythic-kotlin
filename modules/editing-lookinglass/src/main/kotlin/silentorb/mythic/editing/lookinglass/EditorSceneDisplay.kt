@@ -2,9 +2,7 @@ package marloth.integration.editing
 
 import silentorb.mythic.editing.*
 import silentorb.mythic.lookinglass.*
-import silentorb.mythic.scenery.Camera
-import silentorb.mythic.scenery.LightingConfig
-import silentorb.mythic.scenery.ProjectionType
+import silentorb.mythic.scenery.*
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
@@ -62,6 +60,7 @@ fun nodeToElements(graphs: GraphLibrary, graph: Graph, node: Id): List<ElementGr
   val mesh = getValue<Id>(graph, node, Properties.mesh)
   val type = getValue<Id>(graph, node, Properties.type)
   val text3d = getValue<String>(graph, node, Properties.text3d)
+  val light = getValue<String>(graph, node, Properties.light)
 
   return if (type != null) {
     val subGraph = graphs[type]
@@ -80,7 +79,7 @@ fun nodeToElements(graphs: GraphLibrary, graph: Graph, node: Id): List<ElementGr
             )
           }
     }
-  } else if (mesh == null && text3d == null)
+  } else if (mesh == null && text3d == null && light == null)
     listOf()
   else {
     val transform = getTransform(graph, node)
@@ -102,11 +101,26 @@ fun nodeToElements(graphs: GraphLibrary, graph: Graph, node: Id): List<ElementGr
       listOf()
 
     val textBillboards = if (text3d != null)
-      listOf(TextBillboard(text3d, transform.translation(), IndexedTextStyle(
-          0,
-          22,
-          color = Vector4(1f)
-      )))
+      listOf(
+          TextBillboard(text3d, transform.translation(), IndexedTextStyle(
+              0,
+              22,
+              color = Vector4(1f)
+          ))
+      )
+    else
+      listOf()
+
+    val lights = if (light != null)
+      listOf(
+          Light(
+              type = LightType.valueOf(light),
+              range = getValue<Float>(graph, node, Properties.range) ?: 1f,
+              offset = transform.translation(),
+              direction = Vector3.unit,
+              color = hexColorStringToVector4(getValue<String>(graph, node, Properties.rgba) ?: "#ffffffff"),
+          )
+      )
     else
       listOf()
 
@@ -114,6 +128,7 @@ fun nodeToElements(graphs: GraphLibrary, graph: Graph, node: Id): List<ElementGr
         ElementGroup(
             textBillboards = textBillboards,
             meshes = meshes,
+            lights = lights,
         )
     )
   }
@@ -141,10 +156,13 @@ fun sceneFromEditorGraph(meshes: ModelMeshMap, editor: Editor, lightingConfig: L
           useDepth = true
       ),
   )
+  val elementLights = layers.flatMap { layer ->
+    layer.elements.flatMap { it.lights }
+  }
   return GameScene(
       main = Scene(
           camera = camera,
-          lights = listOf(),
+          lights = elementLights,
           lightingConfig = lightingConfig
       ),
       layers = layers,

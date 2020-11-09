@@ -2,12 +2,10 @@ package silentorb.mythic.editing.panels
 
 import imgui.ImGui
 import silentorb.mythic.editing.*
-import silentorb.mythic.editing.components.dropDownWidget
-import silentorb.mythic.editing.components.panelBackground
-import silentorb.mythic.editing.components.spatialWidget
-import silentorb.mythic.editing.components.textField
+import silentorb.mythic.editing.components.*
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
+import silentorb.mythic.scenery.LightType
 
 fun getAvailableTypes(editor: Editor): List<Id> =
     getSceneFiles(editor)
@@ -24,6 +22,9 @@ fun drawFormField(editor: Editor, definition: PropertyDefinition, entry: Entry):
     Widgets.rotation -> spatialWidget(entry)
     Widgets.scale -> spatialWidget(entry)
     Widgets.text -> textField("", entry)
+    Widgets.decimalText -> decimalTextField("", entry)
+    Widgets.rgba -> rgbaField(entry)
+    Widgets.light -> dropDownWidget(LightType.values().map { it.name }, entry)
     else -> entry.target
   }
 }
@@ -51,7 +52,21 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): Commands {
           for ((property, definition) in availableDefinitions) {
             if (ImGui.selectable(definition.displayName)) {
               val target = definition.defaultValue?.invoke(editor) ?: ""
-              commands = commands.plus(Command(EditorCommands.setGraphValue, value = Entry(node, property, target)))
+              val missingDependencies = definition.dependencies - entries.map { it.property }
+              val addPropertyCommands = listOf(
+                  Command(EditorCommands.setGraphValue, value = Entry(node, property, target))
+              )
+                  .plus(
+                      missingDependencies.mapNotNull {
+                        val dependencyDefinition = editor.propertyDefinitions[it]
+                        if (dependencyDefinition != null) {
+                          val dependencyValue = dependencyDefinition.defaultValue?.invoke(editor) ?: ""
+                          Command(EditorCommands.setGraphValue, value = Entry(node, it, dependencyValue))
+                        } else
+                          null
+                      }
+                  )
+              commands = commands.plus(addPropertyCommands)
             }
           }
           for (attribute in availableAttributes) {

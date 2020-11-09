@@ -1,7 +1,8 @@
 package silentorb.mythic.spatial
 
-import org.joml.*
-
+import org.joml.Matrix4x3fc
+import org.joml.Vector2ic
+import org.joml.Vector3f
 import java.io.IOException
 import java.io.ObjectInput
 import java.io.ObjectOutput
@@ -284,9 +285,12 @@ data class Vector4(
     return div(v, thisOrNew())
   }
 
+  operator fun times(value: Float): Vector4 =
+      Vector4(x * value, y * value, z * value, w * value)
+
   /* (non-Javadoc)
-     * @see Vector4#div(Vector4, Vector4)
-     */
+   * @see Vector4#div(Vector4, Vector4)
+   */
   fun div(v: Vector4, dest: Vector4): Vector4 {
     dest.x = x / v.x
     dest.y = y / v.y
@@ -922,6 +926,7 @@ data class Vector4(
   }
 
 }
+
 /**
  * Normalize this vector by computing only the norm of <tt>(x, y, z)</tt>.
  *
