@@ -15,8 +15,9 @@ fun getAvailableTypes(editor: Editor): List<Id> =
 
 fun drawFormField(editor: Editor, definition: PropertyDefinition, entry: Entry): Any {
   return when (definition.widget!!) {
-    Widgets.textureSelect -> dropDownWidget(editor.textures, entry)
-    Widgets.meshSelect -> dropDownWidget(editor.meshes, entry)
+    Widgets.select -> dropDownWidget(definition.options!!(editor), entry)
+    Widgets.textureSelect -> dropDownWidget(editor.enumerations.textures, entry)
+    Widgets.meshSelect -> dropDownWidget(editor.enumerations.meshes, entry)
     Widgets.typeSelect -> dropDownWidget(getAvailableTypes(editor), entry)
     Widgets.translation -> spatialWidget(entry)
     Widgets.rotation -> spatialWidget(entry)
@@ -25,8 +26,48 @@ fun drawFormField(editor: Editor, definition: PropertyDefinition, entry: Entry):
     Widgets.decimalText -> decimalTextField("", entry)
     Widgets.rgba -> rgbaField(entry)
     Widgets.light -> dropDownWidget(LightType.values().map { it.name }, entry)
+    Widgets.bitmask -> bitmaskField(entry)
     else -> entry.target
   }
+}
+
+fun addPropertiesDropDown(editor: Editor, availableDefinitions: PropertyDefinitions, attributes: List<Id>, entries: Graph, node: Id): Commands {
+  var commands: Commands = listOf()
+  if (ImGui.beginCombo("Add Property", "")) {
+    val allAttributes = editor.enumerations.attributes
+    val availableAttributes = allAttributes - attributes
+
+    for ((property, definition) in availableDefinitions) {
+      if (ImGui.selectable(definition.displayName)) {
+        val target = definition.defaultValue?.invoke(editor) ?: ""
+        val missingDependencies = definition.dependencies - entries.map { it.property }
+        val addPropertyCommands = listOf(
+            Command(EditorCommands.setGraphValue, value = Entry(node, property, target))
+        )
+            .plus(
+                missingDependencies.mapNotNull {
+                  val dependencyDefinition = editor.enumerations.propertyDefinitions[it]
+                  if (dependencyDefinition != null) {
+                    val dependencyValue = dependencyDefinition.defaultValue?.invoke(editor) ?: ""
+                    Command(EditorCommands.setGraphValue, value = Entry(node, it, dependencyValue))
+                  } else
+                    null
+                }
+            )
+        commands = commands.plus(addPropertyCommands)
+      }
+    }
+    for (attribute in availableAttributes) {
+      if (ImGui.selectable(attribute)) {
+        commands = commands.plus(Command(EditorCommands.setGraphValue, value = Entry(node, Properties.attribute, attribute)))
+      }
+    }
+    if (commands.none()) {
+      activeInputType = InputType.dropdown
+    }
+    ImGui.endCombo()
+  }
+  return commands
 }
 
 fun drawPropertiesPanel(editor: Editor, graph: Graph?): Commands {
@@ -38,7 +79,7 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): Commands {
     val selection = editor.state.nodeSelection
     if (selection.size == 1) {
       val node = selection.first()
-      val definitions = editor.propertyDefinitions
+      val definitions = editor.enumerations.propertyDefinitions
       val entries = getProperties(graph, node)
 
       ImGui.text(node)
@@ -46,39 +87,7 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): Commands {
       val availableDefinitions = definitions.minus(entries.map { it.property })
       val attributes = getPropertyValues<Id>(graph, node, Properties.attribute)
       if (availableDefinitions.any()) {
-        val allAttributes = getCommonEditorAttributes()
-        val availableAttributes = allAttributes - attributes
-        if (ImGui.beginCombo("Add Property", "")) {
-          for ((property, definition) in availableDefinitions) {
-            if (ImGui.selectable(definition.displayName)) {
-              val target = definition.defaultValue?.invoke(editor) ?: ""
-              val missingDependencies = definition.dependencies - entries.map { it.property }
-              val addPropertyCommands = listOf(
-                  Command(EditorCommands.setGraphValue, value = Entry(node, property, target))
-              )
-                  .plus(
-                      missingDependencies.mapNotNull {
-                        val dependencyDefinition = editor.propertyDefinitions[it]
-                        if (dependencyDefinition != null) {
-                          val dependencyValue = dependencyDefinition.defaultValue?.invoke(editor) ?: ""
-                          Command(EditorCommands.setGraphValue, value = Entry(node, it, dependencyValue))
-                        } else
-                          null
-                      }
-                  )
-              commands = commands.plus(addPropertyCommands)
-            }
-          }
-          for (attribute in availableAttributes) {
-            if (ImGui.selectable(attribute)) {
-              commands = commands.plus(Command(EditorCommands.setGraphValue, value = Entry(node, Properties.attribute, attribute)))
-            }
-          }
-          if (commands.none()) {
-            activeInputType = InputType.dropdown
-          }
-          ImGui.endCombo()
-        }
+        commands = commands + addPropertiesDropDown(editor, availableDefinitions, attributes, entries, node)
       }
 
       ImGui.separator()

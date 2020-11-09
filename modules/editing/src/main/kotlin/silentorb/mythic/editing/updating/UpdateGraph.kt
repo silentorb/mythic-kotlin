@@ -89,7 +89,7 @@ fun updateSceneGraph(commands: Commands, editor: Editor): Graph? {
     val (replacements, additions) = commands
         .filter { it.type == EditorCommands.setGraphValue }
         .map { it.value as Entry }
-        .partition { editor.propertyDefinitions[it.property]?.single ?: false }
+        .partition { editor.enumerations.propertyDefinitions[it.property]?.single ?: false }
 
     val graphRemovals = commands
         .filter { it.type == EditorCommands.removeGraphValue }

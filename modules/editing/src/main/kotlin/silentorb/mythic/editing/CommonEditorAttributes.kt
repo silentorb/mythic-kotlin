@@ -1,6 +1,6 @@
 package silentorb.mythic.editing
 
-object Attributes {
+object CommonEditorAttributes {
   val editorOnly = "editorOnly"
   val playerSpawn = "playerSpawn"
 }

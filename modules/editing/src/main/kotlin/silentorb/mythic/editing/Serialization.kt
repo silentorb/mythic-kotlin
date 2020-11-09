@@ -168,7 +168,7 @@ fun loadGraph(editor: Editor, graphName: String): Graph? {
   return if (filePath == null)
     null
   else
-    loadGraph(editor.propertyDefinitions, filePath)
+    loadGraph(editor.enumerations.propertyDefinitions, filePath)
 }
 
 fun checkSaveGraph(previous: Editor, next: Editor) {
@@ -181,7 +181,7 @@ fun checkSaveGraph(previous: Editor, next: Editor) {
   if (graphName != null && previousGraph != null && nextGraph != null && previousGraph != nextGraph) {
     val filePath = getGraphFilePath(next, graphName)
     if (filePath != null) {
-      saveGraph(next.propertyDefinitions, filePath, nextGraph)
+      saveGraph(next.enumerations.propertyDefinitions, filePath, nextGraph)
     }
   }
 }

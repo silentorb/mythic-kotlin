@@ -3,7 +3,6 @@ package silentorb.mythic.editing
 import silentorb.mythic.editing.panels.getAvailableTypes
 import silentorb.mythic.ent.reflectProperties
 import silentorb.mythic.spatial.Vector3
-import silentorb.mythic.spatial.Vector4i
 import silentorb.mythic.spatial.toList
 
 object Properties {
@@ -19,11 +18,15 @@ object Properties {
   const val attribute = "attribute"
   const val rgba = "rgba"
   const val range = "range"
+  const val collisionShape = "collisionShape"
+  const val collisionGroups = "collisionGroups"
+  const val collisionMask = "collisionMask"
 }
 
 val getSceneTree: (Graph) -> SceneTree = groupProperty(Properties.parent)
 
 object Widgets {
+  const val select = "select"
   const val meshSelect = "meshSelect"
   const val textureSelect = "textureSelect"
   const val typeSelect = "typeSelect"
@@ -34,10 +37,11 @@ object Widgets {
   const val light = "light"
   const val rgba = "rgba"
   const val decimalText = "decimalText"
+  const val bitmask = "bitmask"
 }
 
-fun getCommonEditorAttributes() =
-    reflectProperties<String>(Attributes)
+fun commonEditorAttributes() =
+    reflectProperties<String>(CommonEditorAttributes)
 
 val vector3Serialization = Serialization(
     load = {
@@ -59,13 +63,13 @@ fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
     Properties.mesh to PropertyDefinition(
         displayName = "Mesh",
         widget = Widgets.meshSelect,
-        defaultValue = { editor -> editor.meshes.firstOrNull() },
+        defaultValue = { editor -> editor.enumerations.meshes.firstOrNull() },
     ),
     Properties.texture to PropertyDefinition(
         displayName = "Texture",
         widget = Widgets.textureSelect,
         dependencies = setOf(Properties.mesh),
-        defaultValue = { editor -> editor.textures.firstOrNull() },
+        defaultValue = { editor -> editor.enumerations.textures.firstOrNull() },
     ),
     Properties.type to PropertyDefinition(
         displayName = "Type",
@@ -111,5 +115,21 @@ fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
         widget = Widgets.light,
         defaultValue = { "point" },
         dependencies = setOf(Properties.rgba, Properties.range),
+    ),
+    Properties.collisionShape to PropertyDefinition(
+        displayName = "Collision Shape",
+        widget = Widgets.select,
+        defaultValue = { CollisionShape.box.name },
+        options = { CollisionShape.values().map { it.name } }
+    ),
+    Properties.collisionGroups to PropertyDefinition(
+        displayName = "Collision Group",
+        widget = Widgets.bitmask,
+        defaultValue = { 0 },
+    ),
+    Properties.collisionMask to PropertyDefinition(
+        displayName = "Collision Mask",
+        widget = Widgets.bitmask,
+        defaultValue = { 0 },
     ),
 )

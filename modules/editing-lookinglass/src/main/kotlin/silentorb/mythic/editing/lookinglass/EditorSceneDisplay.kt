@@ -1,6 +1,7 @@
 package marloth.integration.editing
 
 import silentorb.mythic.editing.*
+import silentorb.mythic.glowing.DrawMethod
 import silentorb.mythic.lookinglass.*
 import silentorb.mythic.scenery.*
 import silentorb.mythic.spatial.Matrix
@@ -47,20 +48,24 @@ fun getTransform(data: SerialElementData, node: Id): Matrix {
     localTransform
 }
 
-
-fun nodesToElements(graphs: GraphLibrary, graph: Graph): List<ElementGroup> {
+fun nodesToElements(meshes: ModelMeshMap, selection: NodeSelection, graphs: GraphLibrary, graph: Graph): List<ElementGroup> {
   val tree = getSceneTree(graph)
   val nodes = getTripleKeys(graph)
       .plus(tree.values)
 
-  return nodes.flatMap { node -> nodeToElements(graphs, graph, node) }
+  return nodes.flatMap { node -> nodeToElements(meshes, selection, graphs, graph, node) }
 }
 
-fun nodeToElements(graphs: GraphLibrary, graph: Graph, node: Id): List<ElementGroup> {
+fun nodeToElements(meshes: ModelMeshMap, selection: NodeSelection, graphs: GraphLibrary, graph: Graph, node: Id): List<ElementGroup> {
+  val isSelected = selection.contains(node)
   val mesh = getValue<Id>(graph, node, Properties.mesh)
   val type = getValue<Id>(graph, node, Properties.type)
   val text3d = getValue<String>(graph, node, Properties.text3d)
   val light = getValue<String>(graph, node, Properties.light)
+  val collisionShape = if (isSelected)
+    getValue<String>(graph, node, Properties.collisionShape)
+  else
+    null
 
   return if (type != null) {
     val subGraph = graphs[type]
@@ -68,7 +73,7 @@ fun nodeToElements(graphs: GraphLibrary, graph: Graph, node: Id): List<ElementGr
       listOf()
     else {
       val instanceTransform = getTransform(graph, node)
-      nodesToElements(graphs, subGraph)
+      nodesToElements(meshes, selection, graphs, subGraph)
           .map { group ->
             group.copy(
                 meshes = group.meshes.map { meshElement ->
@@ -79,11 +84,11 @@ fun nodeToElements(graphs: GraphLibrary, graph: Graph, node: Id): List<ElementGr
             )
           }
     }
-  } else if (mesh == null && text3d == null && light == null)
+  } else if (mesh == null && text3d == null && light == null && collisionShape == null)
     listOf()
   else {
     val transform = getTransform(graph, node)
-    val meshes = if (mesh != null) {
+    val meshElements = if (mesh != null) {
       val texture = getValue<Id>(graph, node, Properties.texture)
       val material = if (texture != null)
         Material(texture = texture, shading = true)
@@ -95,6 +100,23 @@ fun nodeToElements(graphs: GraphLibrary, graph: Graph, node: Id): List<ElementGr
               mesh = mesh,
               material = material,
               transform = transform
+          )
+      )
+    } else
+      listOf()
+
+    val collisionMeshes = if (collisionShape != null) {
+      val meshShape = meshes[mesh]?.bounds
+      val collisionTransform = if (meshShape == null)
+        transform
+      else
+        transform.scale(Vector3(meshShape.x / 2f, meshShape.y / 2f, meshShape.height / 2f))
+
+      listOf(
+          MeshElement(
+              mesh = "cube",
+              material = Material(color = Vector4(1f), shading = false, drawMethod = DrawMethod.lineLoop),
+              transform = collisionTransform
           )
       )
     } else
@@ -127,7 +149,7 @@ fun nodeToElements(graphs: GraphLibrary, graph: Graph, node: Id): List<ElementGr
     listOf(
         ElementGroup(
             textBillboards = textBillboards,
-            meshes = meshes,
+            meshes = meshElements + collisionMeshes,
             lights = lights,
         )
     )
@@ -152,7 +174,7 @@ fun sceneFromEditorGraph(meshes: ModelMeshMap, editor: Editor, lightingConfig: L
 
   val layers = listOf(
       SceneLayer(
-          elements = nodesToElements(editor.graphLibrary, graph),
+          elements = nodesToElements(meshes, editor.state.nodeSelection, editor.graphLibrary, graph),
           useDepth = true
       ),
   )

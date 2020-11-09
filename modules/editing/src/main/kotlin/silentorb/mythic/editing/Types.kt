@@ -23,11 +23,13 @@ data class Serialization(
 )
 
 typealias DefaultValueSource = (Editor) -> Any?
+typealias OptionsSource = (Editor) -> List<Id>
 
 data class PropertyDefinition(
     val displayName: String,
     val serialization: Serialization? = null,
     val widget: Id?,
+    val options: OptionsSource? = null,
     val dependencies: Set<Id> = setOf(),
     val defaultValue: DefaultValueSource? = null,
     val single: Boolean = true,
@@ -53,6 +55,14 @@ data class EditorState(
     val fileSelection: Set<String> = setOf(),
 )
 
+data class EditorEnumerations(
+    val propertyDefinitions: PropertyDefinitions,
+    val attributes: List<Id> = listOf(),
+    val textures: List<Id> = listOf(),
+    val meshes: List<Id> = listOf(),
+    val collisionGroups: List<Id> = listOf(),
+)
+
 data class Editor(
     val projectPath: Path,
     val state: EditorState = EditorState(),
@@ -60,10 +70,7 @@ data class Editor(
     val graph: Graph? = null,
 //    val history: GraphHistory = listOf(),
     val operation: Operation? = null,
-    val propertyDefinitions: PropertyDefinitions,
-    val attributes: List<Id> = listOf(),
-    val textures: List<Id> = listOf(),
-    val meshes: List<Id> = listOf(),
+    val enumerations: EditorEnumerations,
     val fileItems: FileItems,
     val graphLibrary: GraphLibrary = mapOf(),
     val viewportBoundsMap: Map<Id, Vector4i> = mapOf(),
@@ -78,3 +85,10 @@ data class MenuItem(
     val command: Any? = null,
     val items: List<MenuItem>? = null
 )
+
+enum class CollisionShape {
+  box,
+  composite,
+  cylinder,
+  mesh,
+}

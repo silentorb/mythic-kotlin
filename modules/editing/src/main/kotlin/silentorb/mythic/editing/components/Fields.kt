@@ -106,3 +106,7 @@ fun spatialWidget(entry: Entry): Vector3 {
   return Vector3(x, y, z)
 //  return Vector3(x, 0f, 0f)
 }
+
+fun bitmaskField(entry: Entry): Int {
+  return 0
+}
