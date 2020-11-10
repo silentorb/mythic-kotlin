@@ -73,13 +73,18 @@ fun nodeToElements(meshes: ModelMeshMap, selection: NodeSelection, graphs: Graph
     if (subGraph == null || subGraph == graph)
       listOf()
     else {
-      val instanceTransform = getTransform(graph, node)
+      val instanceTransform = silentorb.mythic.ent.spatial.getTransform(graph, node)
       nodesToElements(meshes, selection, graphs, subGraph)
           .map { group ->
             group.copy(
                 meshes = group.meshes.map { meshElement ->
                   meshElement.copy(
                       transform = instanceTransform * meshElement.transform
+                  )
+                },
+                textBillboards = group.textBillboards.map { textBillboard ->
+                  textBillboard.copy(
+                      position = instanceTransform.translation() + textBillboard.position
                   )
                 }
             )
@@ -88,7 +93,7 @@ fun nodeToElements(meshes: ModelMeshMap, selection: NodeSelection, graphs: Graph
   } else if (mesh == null && text3d == null && light == null && collisionShape == null)
     listOf()
   else {
-    val transform = getTransform(graph, node)
+    val transform = silentorb.mythic.ent.spatial.getTransform(graph, node)
     val meshElements = if (mesh != null) {
       val texture = getValue<Key>(graph, node, Properties.texture)
       val material = if (texture != null)
@@ -169,7 +174,7 @@ fun cameraRigToCamera(camera: CameraRig): Camera =
     )
 
 fun sceneFromEditorGraph(meshes: ModelMeshMap, editor: Editor, lightingConfig: LightingConfig, viewport: Key): GameScene {
-  val graph = getActiveEditorGraph(editor) ?: listOf()
+  val graph = getActiveEditorGraph(editor) ?: newGraph()
 //  val data = newSerialElementData(graph)
   val camera = cameraRigToCamera(editor.state.cameras[viewport] ?: CameraRig())
 

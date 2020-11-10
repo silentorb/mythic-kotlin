@@ -97,7 +97,11 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
 }
 
 fun updateEditor(deviceStates: List<InputDeviceState>, editor: Editor): Editor {
-  val externalCommands = mapCommands(defaultEditorBindings(), deviceStates)
+  val externalCommands = if (isCtrlDown() || isAltDown() || isShiftDown())
+    listOf()
+  else
+    mapCommands(defaultEditorBindings(), deviceStates)
+
   val guiCommands = defineEditorGui(editor)
   return if (isImGuiFieldActive())
     editor

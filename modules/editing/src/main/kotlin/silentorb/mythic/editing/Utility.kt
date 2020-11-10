@@ -7,7 +7,6 @@ import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.GraphLibrary
 import silentorb.mythic.ent.Key
-import silentorb.mythic.ent.getValue
 import silentorb.mythic.scenery.Properties
 import silentorb.mythic.spatial.*
 
@@ -18,6 +17,9 @@ fun defaultEditorState() =
     EditorState(
         cameras = mapOf(defaultViewportId to CameraRig(location = Vector3(-10f, 0f, 0f))),
     )
+
+fun isCtrlDown(): Boolean =
+    ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL)
 
 fun isAltDown(): Boolean =
     ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_ALT) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_ALT)
@@ -55,24 +57,6 @@ fun isShortcutPressed(shortcut: String): Boolean {
     ImGui.isKeyDown(leftModifier) || ImGui.isKeyDown(leftModifier + 4)
   }
   return isKeyPressed && modifiersArePressed
-}
-
-fun getTransform(graph: Graph, node: Key): Matrix {
-  val translation = getValue<Vector3>(graph, node, Properties.translation) ?: Vector3.zero
-  val rotation = getValue<Vector3>(graph, node, Properties.rotation) ?: Vector3.zero
-  val scale = getValue<Vector3>(graph, node, Properties.scale) ?: Vector3.unit
-  val localTransform = Matrix.identity
-      .translate(translation)
-      .rotateZ(rotation.z)
-      .rotateY(rotation.y)
-      .rotateX(rotation.x)
-      .scale(scale)
-
-  val parent = getValue<Key>(graph, node, Properties.parent)
-  return if (parent != null)
-    getTransform(graph, parent) * localTransform
-  else
-    localTransform
 }
 
 fun isEscapePressed(): Boolean =

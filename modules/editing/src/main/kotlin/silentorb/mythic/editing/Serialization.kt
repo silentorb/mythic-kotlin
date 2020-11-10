@@ -67,6 +67,7 @@ fun deserializeGraph(propertyDefinitions: PropertyDefinitions, file: GraphFile) 
 
           Entry(it[0].toString(), property, value)
         }
+        .toSet()
 
 fun loadGraph(propertyDefinitions: PropertyDefinitions, path: String): Graph =
     deserializeGraph(propertyDefinitions, loadJsonFile(path))

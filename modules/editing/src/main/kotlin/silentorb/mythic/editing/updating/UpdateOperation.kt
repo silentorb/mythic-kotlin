@@ -5,6 +5,7 @@ import silentorb.mythic.ent.Entry
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.getValue
 import silentorb.mythic.ent.replaceValues
+import silentorb.mythic.ent.spatial.getTransform
 import silentorb.mythic.scenery.Properties
 import silentorb.mythic.spatial.*
 

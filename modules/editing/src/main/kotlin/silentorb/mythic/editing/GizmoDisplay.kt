@@ -3,6 +3,7 @@ package silentorb.mythic.editing
 import imgui.ImColor
 import imgui.ImDrawList
 import imgui.ImGui
+import silentorb.mythic.ent.spatial.getTransform
 import silentorb.mythic.spatial.*
 
 typealias ScreenTransform = (Vector3) -> Vector2

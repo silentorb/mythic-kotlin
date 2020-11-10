@@ -24,6 +24,7 @@ dependencies {
   implementation(group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = "1.4.0")
 
   api("silentorb.mythic:spatial")
+  api("silentorb.mythic:ent-spatial")
   implementation("silentorb.mythic:resource-loading")
   api("silentorb.mythic:spatial_serialization")
   implementation("silentorb.mythic:haft")

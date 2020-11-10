@@ -17,7 +17,6 @@ fun onGraphEditingCommand(commandType: Any, transform: EditorGraphTransform): Gr
         graph
     }
 
-
 fun uniqueNodeName(graph: Graph, name: String): String {
   val keys = getTripleKeys(graph)
   return if (!keys.contains(name))
@@ -67,13 +66,16 @@ val onRenameNode = onGraphEditingCommand(EditorCommands.renameNode) { editor, gr
         it
     }
   }
+      .toSet()
 }
 
 val onDeleteNode = onGraphEditingCommand(EditorCommands.deleteNode) { editor, graph ->
   val state = editor.state
   val selection = state.nodeSelection
   val selectionAndChildren = gatherChildren(graph, selection)
-  graph.filter { !selectionAndChildren.contains(it.source) }
+  graph
+      .filter { !selectionAndChildren.contains(it.source) }
+      .toSet()
 }
 
 fun updateSceneGraph(commands: Commands, editor: Editor): Graph? {

@@ -28,6 +28,7 @@ fun nameDialog(title: String, triggerCommand: Any, nextCommand: Any, initialValu
     ImGui.sameLine()
     val result = if (ImGui.button("OK") || pressedEnter) {
       ImGui.closeCurrentPopup()
+      activeInputType = null
       listOf(Command(nextCommand, nameText.get()))
     } else
       listOf()
