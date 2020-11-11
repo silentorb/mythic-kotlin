@@ -3,14 +3,10 @@ package silentorb.mythic.editing
 import silentorb.mythic.editing.components.*
 import silentorb.mythic.editing.panels.getAvailableTypes
 import silentorb.mythic.ent.*
-import silentorb.mythic.ent.filterByProperty
 import silentorb.mythic.scenery.LightType
 import silentorb.mythic.scenery.Properties
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.toList
-
-fun getSceneTree(graph: Graph): SceneTree =
-    mapByProperty(graph, Properties.parent)
 
 fun commonEditorAttributes() =
     reflectProperties<String>(CommonEditorAttributes)

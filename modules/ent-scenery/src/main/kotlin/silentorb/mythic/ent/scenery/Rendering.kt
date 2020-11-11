@@ -1,0 +1,128 @@
+package silentorb.mythic.ent.scenery
+
+import silentorb.mythic.ent.*
+import silentorb.mythic.glowing.DrawMethod
+import silentorb.mythic.lookinglass.ElementGroup
+import silentorb.mythic.lookinglass.Material
+import silentorb.mythic.lookinglass.MeshElement
+import silentorb.mythic.lookinglass.TextBillboard
+import silentorb.mythic.scenery.Light
+import silentorb.mythic.scenery.LightType
+import silentorb.mythic.scenery.Properties
+import silentorb.mythic.scenery.Shape
+import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.Vector4
+import silentorb.mythic.typography.IndexedTextStyle
+
+fun nodesToElements(meshesShapes: Map<String, Shape>, selection: Set<Key>, graphs: GraphLibrary, graph: Graph): List<ElementGroup> {
+  val tree = getSceneTree(graph)
+  val nodes = getGraphKeys(graph)
+      .plus(tree.values)
+
+  return nodes.flatMap { node -> nodeToElements(meshesShapes, selection, graphs, graph, node) }
+}
+
+fun nodeToElements(meshesShapes: Map<String, Shape>, selection: Set<Key>, graphs: GraphLibrary, graph: Graph, node: Key): List<ElementGroup> {
+  val isSelected = selection.contains(node)
+  val mesh = getValue<Key>(graph, node, Properties.mesh)
+  val type = getValue<Key>(graph, node, Properties.instance)
+  val text3d = getValue<String>(graph, node, Properties.text3d)
+  val light = getValue<String>(graph, node, Properties.light)
+  val collisionShape = if (isSelected)
+    getValue<String>(graph, node, Properties.collisionShape)
+  else
+    null
+
+  return if (type != null) {
+    val subGraph = graphs[type]
+    if (subGraph == null || subGraph == graph)
+      listOf()
+    else {
+      val instanceTransform = silentorb.mythic.ent.scenery.getTransform(graph, node)
+      nodesToElements(meshesShapes, selection, graphs, subGraph)
+          .map { group ->
+            group.copy(
+                meshes = group.meshes.map { meshElement ->
+                  meshElement.copy(
+                      transform = instanceTransform * meshElement.transform
+                  )
+                },
+                textBillboards = group.textBillboards.map { textBillboard ->
+                  textBillboard.copy(
+                      position = instanceTransform.translation() + textBillboard.position
+                  )
+                }
+            )
+          }
+    }
+  } else if (mesh == null && text3d == null && light == null && collisionShape == null)
+    listOf()
+  else {
+    val transform = getTransform(graph, node)
+    val meshElements = if (mesh != null) {
+      val texture = getValue<Key>(graph, node, Properties.texture)
+      val material = if (texture != null)
+        Material(texture = texture, shading = true)
+      else
+        null
+
+      listOf(
+          MeshElement(
+              mesh = mesh,
+              material = material,
+              transform = transform
+          )
+      )
+    } else
+      listOf()
+
+    val collisionMeshes = if (collisionShape != null) {
+      val meshShape = meshesShapes[mesh]
+      val collisionTransform = if (meshShape == null)
+        transform
+      else
+        transform.scale(Vector3(meshShape.x / 2f, meshShape.y / 2f, meshShape.height / 2f))
+
+      listOf(
+          MeshElement(
+              mesh = "cube",
+              material = Material(color = Vector4(1f), shading = false, drawMethod = DrawMethod.lineLoop),
+              transform = collisionTransform
+          )
+      )
+    } else
+      listOf()
+
+    val textBillboards = if (text3d != null)
+      listOf(
+          TextBillboard(text3d, transform.translation(), IndexedTextStyle(
+              0,
+              22,
+              color = Vector4(1f)
+          ))
+      )
+    else
+      listOf()
+
+    val lights = if (light != null)
+      listOf(
+          Light(
+              type = LightType.valueOf(light),
+              range = getValue<Float>(graph, node, Properties.range) ?: 1f,
+              offset = transform.translation(),
+              direction = Vector3.unit,
+              color = hexColorStringToVector4(getValue<String>(graph, node, Properties.rgba) ?: "#ffffffff"),
+          )
+      )
+    else
+      listOf()
+
+    listOf(
+        ElementGroup(
+            textBillboards = textBillboards,
+            meshes = meshElements + collisionMeshes,
+            lights = lights,
+        )
+    )
+  }
+}

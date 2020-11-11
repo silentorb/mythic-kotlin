@@ -9,7 +9,7 @@ import silentorb.mythic.ent.Id
 import silentorb.mythic.spatial.Vector3
 
 data class RayCastResult(
-    val collisionObject: Id,
+    val collisionObject: Any,
     val hitPoint: Vector3
 )
 
@@ -25,7 +25,7 @@ fun firstRayHit(dynamicsWorld: btDiscreteDynamicsWorld, start: Vector3, end: Vec
   val hasHit = callback.hasHit()
   val result = if (hasHit) {
     val collisionObject = callback.collisionObject
-    val collisionObjectId = collisionObject.userData as Id
+    val collisionObjectId = collisionObject.userData
     val hitPoint = com.badlogic.gdx.math.Vector3()
     callback.getHitPointWorld(hitPoint)
     RayCastResult(

@@ -117,29 +117,3 @@ tailrec fun getGraphDependencies(
 
       getGraphDependencies(graphLibrary, nextGraphs, nextAccumulator)
     }
-
-fun hexColorStringToVector4(value: String): Vector4 {
-  assert(value.length == 9)
-  val red = value.substring(1, 3).toInt(16).toFloat()
-  val green = value.substring(3, 5).toInt(16).toFloat()
-  val blue = value.substring(5, 7).toInt(16).toFloat()
-  val alpha = value.substring(7, 9).toInt(16).toFloat()
-  return Vector4(red, green, blue, alpha) / 255f
-}
-
-//fun vector4toHexColorString(value: Vector4): String {
-//  val temp = (value * 255f).toVector4i()
-//  val red = temp.x shl 32
-//  val green = temp.y shl 16
-//  val blue = temp.z shl 8
-//  val alpha = temp.w shl 0
-//  return red + green + blue + alpha
-//}
-
-fun arrayToHexColorString(values: FloatArray): String {
-  val red = Integer.toHexString((values[0] * 255f).toInt())
-  val green = Integer.toHexString((values[1] * 255f).toInt())
-  val blue = Integer.toHexString((values[2] * 255f).toInt())
-  val alpha = Integer.toHexString((values[3] * 255f).toInt())
-  return "#$red$green$blue$alpha"
-}

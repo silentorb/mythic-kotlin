@@ -6,6 +6,8 @@ import imgui.type.ImString
 import silentorb.mythic.editing.*
 import silentorb.mythic.ent.Entry
 import silentorb.mythic.ent.Key
+import silentorb.mythic.ent.scenery.arrayToHexColorString
+import silentorb.mythic.ent.scenery.hexColorStringToVector4
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.toList
 

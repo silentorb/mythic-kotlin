@@ -1,5 +1,6 @@
 package silentorb.mythic.lookinglass
 
+import silentorb.mythic.scenery.Shape
 import silentorb.mythic.spatial.Vector4i
 import silentorb.mythic.spatial.radiansToDegrees
 import kotlin.math.abs
@@ -14,3 +15,8 @@ fun toCamelCase(identifier: String) =
 
 fun getNearPlaneHeight(viewport: Vector4i, fov: Float): Float =
     abs(viewport.w - viewport.y).toFloat() / (2f * tan(0.5f * radiansToDegrees(fov)))
+
+fun getMeshShapes(renderer: Renderer): Map<String, Shape> =
+    renderer.meshes
+        .filterValues { it.bounds != null }
+        .mapValues { it.value.bounds!! }

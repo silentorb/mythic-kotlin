@@ -12,7 +12,7 @@ data class CollisionObject(
 )
 
 data class Collision(
-    val first: Id,
-    val second: Id,
+    val first: Any,
+    val second: Any,
     val hitPoint: Vector3? = null
 )typealias Collisions = List<Collision>

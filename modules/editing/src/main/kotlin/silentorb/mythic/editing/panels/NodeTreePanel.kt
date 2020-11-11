@@ -7,6 +7,7 @@ import silentorb.mythic.editing.components.newTreeFlags
 import silentorb.mythic.editing.components.panelBackground
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.getGraphKeys
+import silentorb.mythic.ent.scenery.getSceneTree
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 
