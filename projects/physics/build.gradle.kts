@@ -8,6 +8,7 @@ dependencies {
   api("silentorb.mythic:ent")
   api("silentorb.mythic:spatial")
   api("silentorb.mythic:scenery")
+  api("silentorb.mythic:ent-scenery")
 }
 
 requires(project, "sculpting", "happenings")

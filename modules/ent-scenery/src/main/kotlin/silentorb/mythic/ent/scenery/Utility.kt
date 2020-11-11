@@ -1,7 +1,9 @@
 package silentorb.mythic.ent.scenery
 
 import silentorb.mythic.ent.*
+import silentorb.mythic.scenery.Box
 import silentorb.mythic.scenery.Properties
+import silentorb.mythic.scenery.Shape
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
 
@@ -88,4 +90,16 @@ fun expandInstances(graphs: GraphLibrary, graph: Graph): Graph {
       .filter { graphs.containsKey(it.target) }
 
   return expandInstances(graphs, instances, graph)
+}
+
+fun getShape(meshShapeMap: Map<Key, Shape>, graph: Graph, node: Key): Shape? {
+  val shapeType = getValue<Key>(graph, node, Properties.collisionShape)
+  return if (shapeType == null)
+    null
+  else {
+    val mesh = getValue<Key>(graph, node, Properties.mesh)
+    val meshBounds = meshShapeMap[mesh]
+    val transform = getTransform(graph, node)
+    return meshBounds ?: Box(transform.getScale())
+  }
 }

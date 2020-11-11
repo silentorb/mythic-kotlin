@@ -6,9 +6,11 @@ import com.badlogic.gdx.physics.bullet.collision.*
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver
+import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Id
 import silentorb.mythic.ent.Table
 import silentorb.mythic.happenings.GameEvent
+import silentorb.mythic.scenery.Shape
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
 import com.badlogic.gdx.math.Vector3 as GdxVector3
@@ -19,7 +21,7 @@ import com.badlogic.gdx.math.Vector3 as GdxVector3
 data class BulletState(
     var dynamicsWorld: btDiscreteDynamicsWorld,
     var dynamicBodies: Map<Id, btRigidBody>,
-    var staticBodies: Map<Id, btCollisionObject>,
+    var staticBodies: Map<Any, btCollisionObject>,
 //    var collisionObjectMap: Map<Int, Id>,
     var isMapSynced: Boolean = false
 )
@@ -101,7 +103,9 @@ data class PhysicsDeck(
 
 data class PhysicsWorld(
     val bulletState: BulletState,
-    val deck: PhysicsDeck
+    val deck: PhysicsDeck,
+    val graph: Graph,
+    val meshShapeMap: Map<String, Shape>,
 )
 
 fun updateBulletPhysics(linearForces: List<LinearImpulse>): (PhysicsWorld) -> PhysicsWorld = { world ->

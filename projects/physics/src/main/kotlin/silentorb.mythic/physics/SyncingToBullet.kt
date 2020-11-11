@@ -7,6 +7,8 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState
 import silentorb.mythic.ent.Id
 import silentorb.mythic.ent.Table
+import silentorb.mythic.ent.scenery.getShape
+import silentorb.mythic.ent.scenery.getTransform
 import silentorb.mythic.sculpting.ImmutableFace
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Pi
@@ -75,17 +77,17 @@ fun createStaticFaceBody(face: ImmutableFace): btCollisionObject {
   return btBody
 }
 
-fun createStaticBody(body: Body, shape: btCollisionShape): btCollisionObject {
+fun createStaticBody(transform: Matrix, shape: btCollisionShape): btCollisionObject {
   val btBody = btCollisionObject()
   btBody.collisionShape = shape
-  btBody.worldTransform = toGdxMatrix4(getBodyTransform(body))
+  btBody.worldTransform = toGdxMatrix4(transform)
   return btBody
 }
 
-fun createGhostBody(body: Body, shape: btCollisionShape): btCollisionObject {
+fun createGhostBody(transform: Matrix, shape: btCollisionShape): btCollisionObject {
   val btBody = btCollisionObject()
   btBody.collisionShape = shape
-  btBody.worldTransform = toGdxMatrix4(getBodyTransform(body))
+  btBody.worldTransform = toGdxMatrix4(transform)
 //  val j = btBody.collisionFlags
   btBody.collisionFlags = btBody.collisionFlags or btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE
   return btBody
@@ -93,6 +95,7 @@ fun createGhostBody(body: Body, shape: btCollisionShape): btCollisionObject {
 
 fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
   val deck = world.deck
+  val graph = world.graph
 
   val newDynamicBodies = deck.dynamicBodies
       .filterKeys { key ->
@@ -131,21 +134,30 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
         Pair(key, bulletBody)
       }
 
-  val newStaticBodies = deck.collisionObjects
-      .filterKeys { key ->
-        !deck.dynamicBodies.containsKey(key) && !bulletState.staticBodies.containsKey(key)
-      }
-      .map { (key, shapeDefinition) ->
-        val body = deck.bodies[key]!!
-        val shape = createCollisionShape(shapeDefinition.shape, body.scale)
-        val collisionObject = if (shapeDefinition.isSolid)
-          createStaticBody(body, shape)
-        else
-          createGhostBody(body, shape)
+  val collisionShapes = graph.filter { it.property == Properties.collisionShape }
+  val newStaticBodies = collisionShapes
+//      .filterKeys { key ->
+//        !deck.dynamicBodies.containsKey(key) && !bulletState.staticBodies.containsKey(key)
+//      }
+      .mapNotNull { (node) ->
+        val shapeDefinition = getShape(world.meshShapeMap, graph, node)
+        if (shapeDefinition == null)
+          null
+        else {
+          val transform = getTransform(graph, node)
+          val shape = createCollisionShape(shapeDefinition, transform.getScale())
+          val groups = 1
+          val mask = 2 or 4
+          val isSolid = true
+          val collisionObject = if (isSolid)
+            createStaticBody(transform, shape)
+          else
+            createGhostBody(transform, shape)
 
-        collisionObject.userData = key
-        bulletState.dynamicsWorld.addCollisionObject(collisionObject, shapeDefinition.groups, shapeDefinition.mask)
-        Pair(key, collisionObject)
+          collisionObject.userData = node
+          bulletState.dynamicsWorld.addCollisionObject(collisionObject, groups, mask)
+          Pair(node, collisionObject)
+        }
       }
 
   bulletState.dynamicBodies = bulletState.dynamicBodies
@@ -166,7 +178,9 @@ fun syncRemovedBodies(world: PhysicsWorld, bulletState: BulletState) {
   }
   bulletState.dynamicBodies = bulletState.dynamicBodies.minus(removedDynamic.keys)
 
-  val removedStatic = bulletState.staticBodies.filterValues { !world.deck.bodies.containsKey(it.userData as Id) }
+  val removedStatic = bulletState.staticBodies
+      .filterValues { it.userData is Id && !world.deck.bodies.containsKey(it.userData) }
+  
   for (body in removedStatic.values) {
     bulletState.dynamicsWorld.removeCollisionObject(body)
   }
