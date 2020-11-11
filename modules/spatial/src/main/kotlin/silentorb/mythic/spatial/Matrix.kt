@@ -718,6 +718,13 @@ data class Matrix(
   fun translation(): Vector3 =
       Vector3(m30, m31, m32)
 
+  fun rotation(): Vector3 =
+      Vector3(
+          Math.atan2(m12.toDouble(), m22.toDouble()).toFloat(),
+          Math.atan2((-m02).toDouble(), Math.sqrt((m12 * m12 + m22 * m22).toDouble()).toFloat().toDouble()).toFloat(),
+          Math.atan2(m01.toDouble(), m00.toDouble()).toFloat(),
+      )
+
   fun translation(x: Float, y: Float, z: Float): Matrix {
     return identityOrThis().copy(
         m30 = x,

@@ -76,21 +76,6 @@ fun transformPoint(transform: Matrix, dimensions: Vector2, offset: Vector2): Scr
   Vector2(sample.x + 1f, 1f - sample.y) / 2f * dimensions + offset
 }
 
-tailrec fun gatherChildren(graph: Graph, nodes: Set<Key>, accumulator: Set<Key> = setOf()): Set<Key> {
-  val next = nodes
-      .flatMap { node ->
-        graph.filter { it.property == Properties.parent && it.target == node }
-      }
-      .map { it.source }
-      .toSet()
-
-  val nextAccumulator = accumulator + nodes
-  return if (next.none())
-    nextAccumulator
-  else
-    gatherChildren(graph, next, nextAccumulator)
-}
-
 fun sceneFileNameWithoutExtension(fileName: String): String =
     fileName.replace(sceneFileExtension, "")
 
@@ -122,7 +107,7 @@ tailrec fun getGraphDependencies(
               listOf()
             else
               graph
-                  .filter { it.property == Properties.type }
+                  .filter { it.property == Properties.instance }
                   .map { it.target as Key }
           }
           .toSet()

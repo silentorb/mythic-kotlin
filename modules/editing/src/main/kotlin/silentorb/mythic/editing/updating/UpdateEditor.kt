@@ -2,7 +2,7 @@ package silentorb.mythic.editing.updating
 
 import silentorb.mythic.editing.*
 import silentorb.mythic.ent.Graph
-import silentorb.mythic.ent.getTripleKeys
+import silentorb.mythic.ent.getGraphKeys
 import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.haft.getMouseOffset
 import silentorb.mythic.happenings.Commands
@@ -17,7 +17,7 @@ fun updateNodeSelection(editor: Editor, nextGraph: Graph?) = handleCommands<Node
     when (command.type) {
       EditorCommands.setNodeSelection -> command.value as NodeSelection
       EditorCommands.addNode, EditorCommands.renameNode -> {
-        val newNodes = getTripleKeys(nextGraph) - getTripleKeys(graph)
+        val newNodes = getGraphKeys(nextGraph) - getGraphKeys(graph)
         if (newNodes.any())
           newNodes
         else
@@ -25,7 +25,7 @@ fun updateNodeSelection(editor: Editor, nextGraph: Graph?) = handleCommands<Node
       }
 
       EditorCommands.deleteNode -> {
-        val deletedNodes = getTripleKeys(graph) - getTripleKeys(nextGraph)
+        val deletedNodes = getGraphKeys(graph) - getGraphKeys(nextGraph)
         if (deletedNodes.any()) {
           val firstRemainingParent = graph.firstOrNull {
             deletedNodes.contains(it.source) && it.property == Properties.parent && !deletedNodes.contains(it.target)

@@ -6,7 +6,7 @@ import silentorb.mythic.editing.components.getSelectionCommands
 import silentorb.mythic.editing.components.newTreeFlags
 import silentorb.mythic.editing.components.panelBackground
 import silentorb.mythic.ent.Graph
-import silentorb.mythic.ent.getTripleKeys
+import silentorb.mythic.ent.getGraphKeys
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 
@@ -40,7 +40,7 @@ fun renderTree(editor: Editor, graph: Graph?): Commands {
 
   val commands = if (graph != null) {
     val tree = getSceneTree(graph)
-    val rootNodes = getTripleKeys(graph)
+    val rootNodes = getGraphKeys(graph)
         .plus(tree.values)
         .minus(tree.keys)
     assert(rootNodes.size == 1)

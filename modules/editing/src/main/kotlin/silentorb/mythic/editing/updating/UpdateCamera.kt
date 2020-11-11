@@ -1,7 +1,7 @@
 package silentorb.mythic.editing.updating
 
 import silentorb.mythic.editing.*
-import silentorb.mythic.ent.spatial.getTransform
+import silentorb.mythic.ent.scenery.getTransform
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.scenery.ProjectionType
 import silentorb.mythic.spatial.Vector2

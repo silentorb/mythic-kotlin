@@ -23,11 +23,11 @@ fun newSerialElementData(graph: Graph): SerialElementData {
   val tree = getSceneTree(graph)
   return SerialElementData(
       parents = tree,
-      meshes = groupProperty<String>(Properties.mesh)(graph),
-      textures = groupProperty<String>(Properties.texture)(graph),
-      translation = groupProperty<Vector3>(Properties.translation)(graph),
-      rotation = groupProperty<Vector3>(Properties.rotation)(graph),
-      scale = groupProperty<Vector3>(Properties.scale)(graph),
+      meshes = mapByProperty(graph, Properties.mesh),
+      textures = mapByProperty(graph, Properties.texture),
+      translation = mapByProperty(graph, Properties.translation),
+      rotation = mapByProperty(graph, Properties.rotation),
+      scale = mapByProperty(graph, Properties.scale),
   )
 }
 
@@ -51,7 +51,7 @@ fun getTransform(data: SerialElementData, node: Key): Matrix {
 
 fun nodesToElements(meshes: ModelMeshMap, selection: NodeSelection, graphs: GraphLibrary, graph: Graph): List<ElementGroup> {
   val tree = getSceneTree(graph)
-  val nodes = getTripleKeys(graph)
+  val nodes = getGraphKeys(graph)
       .plus(tree.values)
 
   return nodes.flatMap { node -> nodeToElements(meshes, selection, graphs, graph, node) }
@@ -60,7 +60,7 @@ fun nodesToElements(meshes: ModelMeshMap, selection: NodeSelection, graphs: Grap
 fun nodeToElements(meshes: ModelMeshMap, selection: NodeSelection, graphs: GraphLibrary, graph: Graph, node: Key): List<ElementGroup> {
   val isSelected = selection.contains(node)
   val mesh = getValue<Key>(graph, node, Properties.mesh)
-  val type = getValue<Key>(graph, node, Properties.type)
+  val type = getValue<Key>(graph, node, Properties.instance)
   val text3d = getValue<String>(graph, node, Properties.text3d)
   val light = getValue<String>(graph, node, Properties.light)
   val collisionShape = if (isSelected)
@@ -73,7 +73,7 @@ fun nodeToElements(meshes: ModelMeshMap, selection: NodeSelection, graphs: Graph
     if (subGraph == null || subGraph == graph)
       listOf()
     else {
-      val instanceTransform = silentorb.mythic.ent.spatial.getTransform(graph, node)
+      val instanceTransform = silentorb.mythic.ent.scenery.getTransform(graph, node)
       nodesToElements(meshes, selection, graphs, subGraph)
           .map { group ->
             group.copy(
@@ -93,7 +93,7 @@ fun nodeToElements(meshes: ModelMeshMap, selection: NodeSelection, graphs: Graph
   } else if (mesh == null && text3d == null && light == null && collisionShape == null)
     listOf()
   else {
-    val transform = silentorb.mythic.ent.spatial.getTransform(graph, node)
+    val transform = silentorb.mythic.ent.scenery.getTransform(graph, node)
     val meshElements = if (mesh != null) {
       val texture = getValue<Key>(graph, node, Properties.texture)
       val material = if (texture != null)

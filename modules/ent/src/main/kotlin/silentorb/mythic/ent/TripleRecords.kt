@@ -10,6 +10,7 @@ data class Entry(
 
 typealias Graph = Set<Entry>
 typealias GraphLibrary = Map<String, Graph>
+typealias ListGraph = List<Entry>
 
 typealias LooseGraph = Collection<Entry>
 
@@ -19,18 +20,18 @@ data class GraphFile(
     val graph: List<List<Any>>
 )
 
-fun getTripleKeys(graph: LooseGraph) =
+fun getGraphKeys(graph: LooseGraph) =
     graph
         .map { it.source }
         .toSet()
 
-inline fun <reified T> groupProperty(relationship: Key, graph: LooseGraph): Map<Key, T> =
+inline fun <reified T> filterByProperty(graph: LooseGraph, relationship: Key): ListGraph =
     graph.filter { it.property == relationship && it.target is T }
-        .associate { it.source to it.target as T }
 
-inline fun <reified T> groupProperty(relationship: Key): (Graph) -> Map<Key, T> = { graph ->
-  groupProperty(relationship, graph)
-}
+inline fun <reified T> mapByProperty(graph: LooseGraph, relationship: Key): Map<Key, T> =
+    graph
+        .filter { it.property == relationship && it.target is T }
+        .associate { it.source to it.target as T }
 
 fun getProperties(graph: LooseGraph, key: String): Graph =
     graph

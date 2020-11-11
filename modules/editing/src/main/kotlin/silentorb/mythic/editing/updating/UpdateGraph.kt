@@ -4,8 +4,9 @@ import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.nameText
 import silentorb.mythic.ent.Entry
 import silentorb.mythic.ent.Graph
-import silentorb.mythic.ent.getTripleKeys
+import silentorb.mythic.ent.getGraphKeys
 import silentorb.mythic.ent.replaceValues
+import silentorb.mythic.ent.scenery.gatherChildren
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.scenery.Properties
 
@@ -18,7 +19,7 @@ fun onGraphEditingCommand(commandType: Any, transform: EditorGraphTransform): Gr
     }
 
 fun uniqueNodeName(graph: Graph, name: String): String {
-  val keys = getTripleKeys(graph)
+  val keys = getGraphKeys(graph)
   return if (!keys.contains(name))
     name
   else {
