@@ -8,7 +8,7 @@ import silentorb.mythic.ent.getGraphKeys
 import silentorb.mythic.ent.replaceValues
 import silentorb.mythic.ent.scenery.gatherChildren
 import silentorb.mythic.happenings.Commands
-import silentorb.mythic.scenery.Properties
+import silentorb.mythic.scenery.SceneProperties
 
 fun onGraphEditingCommand(commandType: Any, transform: EditorGraphTransform): GraphEditCommandsHandler =
     { editor, commandTypes, graph ->
@@ -47,7 +47,7 @@ val onAddNode = onGraphEditingCommand(EditorCommands.addNode) { editor, graph ->
   else {
     val selected = state.nodeSelection.first()
     val key = nameText.get()
-    graph + Entry(key, Properties.parent, selected)
+    graph + Entry(key, SceneProperties.parent, selected)
   }
 }
 

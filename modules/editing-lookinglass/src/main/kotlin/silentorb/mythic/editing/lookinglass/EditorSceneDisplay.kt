@@ -22,11 +22,11 @@ fun newSerialElementData(graph: Graph): SerialElementData {
   val tree = getSceneTree(graph)
   return SerialElementData(
       parents = tree,
-      meshes = mapByProperty(graph, Properties.mesh),
-      textures = mapByProperty(graph, Properties.texture),
-      translation = mapByProperty(graph, Properties.translation),
-      rotation = mapByProperty(graph, Properties.rotation),
-      scale = mapByProperty(graph, Properties.scale),
+      meshes = mapByProperty(graph, SceneProperties.mesh),
+      textures = mapByProperty(graph, SceneProperties.texture),
+      translation = mapByProperty(graph, SceneProperties.translation),
+      rotation = mapByProperty(graph, SceneProperties.rotation),
+      scale = mapByProperty(graph, SceneProperties.scale),
   )
 }
 

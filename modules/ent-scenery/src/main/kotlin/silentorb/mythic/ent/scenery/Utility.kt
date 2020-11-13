@@ -2,16 +2,16 @@ package silentorb.mythic.ent.scenery
 
 import silentorb.mythic.ent.*
 import silentorb.mythic.scenery.Box
-import silentorb.mythic.scenery.Properties
+import silentorb.mythic.scenery.SceneProperties
 import silentorb.mythic.scenery.Shape
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 
 fun getTransform(graph: Graph, node: Key): Matrix {
-  val translation = getValue<Vector3>(graph, node, Properties.translation) ?: Vector3.zero
-  val rotation = getValue<Vector3>(graph, node, Properties.rotation) ?: Vector3.zero
-  val scale = getValue<Vector3>(graph, node, Properties.scale) ?: Vector3.unit
+  val translation = getValue<Vector3>(graph, node, SceneProperties.translation) ?: Vector3.zero
+  val rotation = getValue<Vector3>(graph, node, SceneProperties.rotation) ?: Vector3.zero
+  val scale = getValue<Vector3>(graph, node, SceneProperties.scale) ?: Vector3.unit
   val localTransform = Matrix.identity
       .translate(translation)
       .rotateZ(rotation.z)
@@ -19,7 +19,7 @@ fun getTransform(graph: Graph, node: Key): Matrix {
       .rotateX(rotation.x)
       .scale(scale)
 
-  val parent = getValue<Key>(graph, node, Properties.parent)
+  val parent = getValue<Key>(graph, node, SceneProperties.parent)
   return if (parent != null)
     getTransform(graph, parent) * localTransform
   else
@@ -29,7 +29,7 @@ fun getTransform(graph: Graph, node: Key): Matrix {
 tailrec fun gatherChildren(graph: Graph, nodes: Set<Key>, accumulator: Set<Key> = setOf()): Set<Key> {
   val next = nodes
       .flatMap { node ->
-        graph.filter { it.property == Properties.parent && it.target == node }
+        graph.filter { it.property == SceneProperties.parent && it.target == node }
       }
       .map { it.source }
       .toSet()
@@ -45,7 +45,7 @@ fun renameNode(graph: Graph, previous: Key, next: Key): Graph =
     graph.map {
       if (it.source == previous)
         it.copy(source = next)
-      else if (it.property == Properties.parent && it.target == previous)
+      else if (it.property == SceneProperties.parent && it.target == previous)
         it.copy(target = next)
       else
         it
@@ -61,7 +61,7 @@ fun transposeNamespace(graph: Graph, parent: Key): Graph {
 
 fun getGraphRoots(graph: LooseGraph): Set<Key> =
     getGraphKeys(graph)
-        .filter { key -> graph.none { it.source == key && it.property == Properties.parent } }
+        .filter { key -> graph.none { it.source == key && it.property == SceneProperties.parent } }
         .toSet()
 
 fun expandInstance(graphs: GraphLibrary, key: Key, target: Key): LooseGraph {
@@ -73,7 +73,7 @@ fun expandInstance(graphs: GraphLibrary, key: Key, target: Key): LooseGraph {
     val expanded = expandInstances(graphs, transposed)
     val roots = getGraphRoots(transposed)
     assert(roots.any())
-    expanded + roots.map { root -> Entry(root, Properties.parent, key) }
+    expanded + roots.map { root -> Entry(root, SceneProperties.parent, key) }
   }
 }
 
@@ -87,18 +87,18 @@ fun expandInstances(graphs: GraphLibrary, instances: LooseGraph, accumulator: Gr
     }
 
 fun expandInstances(graphs: GraphLibrary, graph: Graph): Graph {
-  val instances = filterByProperty<Key>(graph, Properties.instance)
+  val instances = filterByProperty<Key>(graph, SceneProperties.instance)
       .filter { graphs.containsKey(it.target) }
 
   return expandInstances(graphs, instances, graph)
 }
 
 fun getShape(meshShapeMap: Map<Key, Shape>, graph: Graph, node: Key): Shape? {
-  val shapeType = getValue<Key>(graph, node, Properties.collisionShape)
+  val shapeType = getValue<Key>(graph, node, SceneProperties.collisionShape)
   return if (shapeType == null)
     null
   else {
-    val mesh = getValue<Key>(graph, node, Properties.mesh)
+    val mesh = getValue<Key>(graph, node, SceneProperties.mesh)
     val meshBounds = meshShapeMap[mesh]
     val transform = getTransform(graph, node)
     return meshBounds ?: Box(transform.getScale())
@@ -132,4 +132,4 @@ fun arrayToHexColorString(values: FloatArray): String {
 }
 
 fun getSceneTree(graph: Graph): Map<Key, Key> =
-    mapByProperty(graph, Properties.parent)
+    mapByProperty(graph, SceneProperties.parent)

@@ -134,7 +134,7 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
         Pair(key, bulletBody)
       }
 
-  val collisionShapes = graph.filter { it.property == Properties.collisionShape }
+  val collisionShapes = graph.filter { it.property == SceneProperties.collisionShape }
   val newStaticBodies = collisionShapes
       .filter { (node) ->
         !deck.dynamicBodies.containsKey(node) && !bulletState.staticBodies.containsKey(node)

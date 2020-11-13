@@ -8,7 +8,7 @@ import silentorb.mythic.lookinglass.MeshElement
 import silentorb.mythic.lookinglass.TextBillboard
 import silentorb.mythic.scenery.Light
 import silentorb.mythic.scenery.LightType
-import silentorb.mythic.scenery.Properties
+import silentorb.mythic.scenery.SceneProperties
 import silentorb.mythic.scenery.Shape
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
@@ -24,12 +24,12 @@ fun nodesToElements(meshesShapes: Map<String, Shape>, selection: Set<Key>, graph
 
 fun nodeToElements(meshesShapes: Map<String, Shape>, selection: Set<Key>, graphs: GraphLibrary, graph: Graph, node: Key): List<ElementGroup> {
   val isSelected = selection.contains(node)
-  val mesh = getValue<Key>(graph, node, Properties.mesh)
-  val type = getValue<Key>(graph, node, Properties.instance)
-  val text3d = getValue<String>(graph, node, Properties.text3d)
-  val light = getValue<String>(graph, node, Properties.light)
+  val mesh = getValue<Key>(graph, node, SceneProperties.mesh)
+  val type = getValue<Key>(graph, node, SceneProperties.instance)
+  val text3d = getValue<String>(graph, node, SceneProperties.text3d)
+  val light = getValue<String>(graph, node, SceneProperties.light)
   val collisionShape = if (isSelected)
-    getValue<String>(graph, node, Properties.collisionShape)
+    getValue<String>(graph, node, SceneProperties.collisionShape)
   else
     null
 
@@ -60,7 +60,7 @@ fun nodeToElements(meshesShapes: Map<String, Shape>, selection: Set<Key>, graphs
   else {
     val transform = getTransform(graph, node)
     val meshElements = if (mesh != null) {
-      val texture = getValue<Key>(graph, node, Properties.texture)
+      val texture = getValue<Key>(graph, node, SceneProperties.texture)
       val material = if (texture != null)
         Material(texture = texture, shading = true)
       else
@@ -108,10 +108,10 @@ fun nodeToElements(meshesShapes: Map<String, Shape>, selection: Set<Key>, graphs
       listOf(
           Light(
               type = LightType.valueOf(light),
-              range = getValue<Float>(graph, node, Properties.range) ?: 1f,
+              range = getValue<Float>(graph, node, SceneProperties.range) ?: 1f,
               offset = transform.translation(),
               direction = Vector3.unit,
-              color = hexColorStringToVector4(getValue<String>(graph, node, Properties.rgba) ?: "#ffffffff"),
+              color = hexColorStringToVector4(getValue<String>(graph, node, SceneProperties.rgba) ?: "#ffffffff"),
           )
       )
     else

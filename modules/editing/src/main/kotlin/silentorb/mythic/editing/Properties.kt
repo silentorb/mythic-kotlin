@@ -4,7 +4,7 @@ import silentorb.mythic.editing.components.*
 import silentorb.mythic.editing.panels.getAvailableTypes
 import silentorb.mythic.ent.*
 import silentorb.mythic.scenery.LightType
-import silentorb.mythic.scenery.Properties
+import silentorb.mythic.scenery.SceneProperties
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.toList
 
@@ -28,73 +28,73 @@ val floatSerialization = Serialization(
 )
 
 fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
-    Properties.mesh to PropertyDefinition(
+    SceneProperties.mesh to PropertyDefinition(
         displayName = "Mesh",
         widget = dropDownWidget { it.enumerations.meshes },
         defaultValue = { editor -> editor.enumerations.meshes.firstOrNull() },
     ),
-    Properties.texture to PropertyDefinition(
+    SceneProperties.texture to PropertyDefinition(
         displayName = "Texture",
         widget = dropDownWidget { it.enumerations.textures },
-        dependencies = setOf(Properties.mesh),
+        dependencies = setOf(SceneProperties.mesh),
         defaultValue = { editor -> editor.enumerations.textures.firstOrNull() },
     ),
-    Properties.instance to PropertyDefinition(
+    SceneProperties.instance to PropertyDefinition(
         displayName = "Type",
         widget = dropDownWidget(::getAvailableTypes),
         defaultValue = { editor -> getAvailableTypes(editor).firstOrNull() },
     ),
-    Properties.text3d to PropertyDefinition(
+    SceneProperties.text3d to PropertyDefinition(
         displayName = "3D Text",
         widget = propertyTextField,
         defaultValue = { editor -> getAvailableTypes(editor).firstOrNull() },
     ),
-    Properties.translation to PropertyDefinition(
+    SceneProperties.translation to PropertyDefinition(
         displayName = "Translation",
         serialization = vector3Serialization,
         widget = propertySpatialWidget,
         defaultValue = { Vector3.zero },
     ),
-    Properties.rotation to PropertyDefinition(
+    SceneProperties.rotation to PropertyDefinition(
         displayName = "Rotation",
         serialization = vector3Serialization,
         widget = propertySpatialWidget,
         defaultValue = { Vector3.zero },
     ),
-    Properties.scale to PropertyDefinition(
+    SceneProperties.scale to PropertyDefinition(
         displayName = "Scale",
         serialization = vector3Serialization,
         widget = propertySpatialWidget,
         defaultValue = { Vector3.unit },
     ),
-    Properties.rgba to PropertyDefinition(
+    SceneProperties.rgba to PropertyDefinition(
         displayName = "Color",
         widget = propertyRgbaField,
         defaultValue = { "#ffffffff" },
     ),
-    Properties.range to PropertyDefinition(
+    SceneProperties.range to PropertyDefinition(
         displayName = "Range",
         serialization = floatSerialization,
         widget = propertyDecimalTextField,
         defaultValue = { 1f },
     ),
-    Properties.light to PropertyDefinition(
+    SceneProperties.light to PropertyDefinition(
         displayName = "Light",
         widget = dropDownWidget { LightType.values().map { it.name } },
-        dependencies = setOf(Properties.rgba, Properties.range),
+        dependencies = setOf(SceneProperties.rgba, SceneProperties.range),
         defaultValue = { "point" },
     ),
-    Properties.collisionShape to PropertyDefinition(
+    SceneProperties.collisionShape to PropertyDefinition(
         displayName = "Collision Shape",
         widget = dropDownWidget { CollisionShape.values().map { it.name } },
         defaultValue = { CollisionShape.box.name }
     ),
-    Properties.collisionGroups to PropertyDefinition(
+    SceneProperties.collisionGroups to PropertyDefinition(
         displayName = "Collision Group",
         widget = propertyBitmaskField,
         defaultValue = { 0 },
     ),
-    Properties.collisionMask to PropertyDefinition(
+    SceneProperties.collisionMask to PropertyDefinition(
         displayName = "Collision Mask",
         widget = propertyBitmaskField,
         defaultValue = { 0 },

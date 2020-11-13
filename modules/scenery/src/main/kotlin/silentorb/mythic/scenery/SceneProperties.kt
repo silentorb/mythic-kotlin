@@ -1,6 +1,8 @@
 package silentorb.mythic.scenery
 
-object Properties {
+import silentorb.mythic.ent.PropertyInfo
+
+object SceneProperties {
   const val parent = "parent"
   const val translation = "translation"
   const val rotation = "rotation"
@@ -17,3 +19,10 @@ object Properties {
   const val collisionGroups = "collisionGroups"
   const val collisionMask = "collisionMask"
 }
+
+val scenePropertiesInfo = mapOf(
+    SceneProperties.attribute to PropertyInfo(
+        manyToMany = true,
+        type = String,
+    )
+)

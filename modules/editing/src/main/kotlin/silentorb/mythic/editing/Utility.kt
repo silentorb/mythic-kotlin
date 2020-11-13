@@ -7,7 +7,7 @@ import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.GraphLibrary
 import silentorb.mythic.ent.Key
-import silentorb.mythic.scenery.Properties
+import silentorb.mythic.scenery.SceneProperties
 import silentorb.mythic.spatial.*
 
 fun getActiveEditorGraph(editor: Editor): Graph? =
@@ -107,7 +107,7 @@ tailrec fun getGraphDependencies(
               listOf()
             else
               graph
-                  .filter { it.property == Properties.instance }
+                  .filter { it.property == SceneProperties.instance }
                   .map { it.target as Key }
           }
           .toSet()

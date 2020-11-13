@@ -6,7 +6,7 @@ import silentorb.mythic.editing.components.*
 import silentorb.mythic.ent.*
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
-import silentorb.mythic.scenery.Properties
+import silentorb.mythic.scenery.SceneProperties
 
 fun getAvailableTypes(editor: Editor): List<Key> =
     getSceneFiles(editor)
@@ -50,7 +50,7 @@ fun addPropertiesDropDown(editor: Editor, availableDefinitions: PropertyDefiniti
     }
     for (attribute in availableAttributes) {
       if (ImGui.selectable(attribute)) {
-        commands = commands.plus(Command(EditorCommands.setGraphValue, value = Entry(node, Properties.attribute, attribute)))
+        commands = commands.plus(Command(EditorCommands.setGraphValue, value = Entry(node, SceneProperties.attribute, attribute)))
       }
     }
     if (commands.none()) {
@@ -76,7 +76,7 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): Commands {
       ImGui.text(node)
       ImGui.separator()
       val availableDefinitions = definitions.minus(entries.map { it.property })
-      val attributes = getPropertyValues<Key>(graph, node, Properties.attribute)
+      val attributes = getPropertyValues<Key>(graph, node, SceneProperties.attribute)
       if (availableDefinitions.any()) {
         commands = commands + addPropertiesDropDown(editor, availableDefinitions, attributes, entries, node)
       }
@@ -86,7 +86,7 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): Commands {
         ImGui.text(attribute)
         ImGui.sameLine()
         if (ImGui.smallButton("x##attribute-$attribute")) {
-          commands = commands.plus(Command(EditorCommands.removeGraphValue, value = Entry(node, Properties.attribute, attribute)))
+          commands = commands.plus(Command(EditorCommands.removeGraphValue, value = Entry(node, SceneProperties.attribute, attribute)))
         }
       }
 

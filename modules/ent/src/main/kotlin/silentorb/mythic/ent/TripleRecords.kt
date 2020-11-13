@@ -14,6 +14,13 @@ typealias ListGraph = List<Entry>
 
 typealias LooseGraph = Collection<Entry>
 
+data class PropertyInfo(
+    val manyToMany: Boolean = false,
+    val type: Any? = null
+)
+
+typealias PropertySchema = Map<String, PropertyInfo>
+
 fun newGraph(): Graph = setOf()
 
 data class GraphFile(

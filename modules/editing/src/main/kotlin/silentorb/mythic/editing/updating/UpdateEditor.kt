@@ -8,7 +8,7 @@ import silentorb.mythic.haft.getMouseOffset
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.happenings.handleCommands
 import silentorb.mythic.happenings.onSetCommand
-import silentorb.mythic.scenery.Properties
+import silentorb.mythic.scenery.SceneProperties
 import silentorb.mythic.spatial.Vector2
 
 fun updateNodeSelection(editor: Editor, nextGraph: Graph?) = handleCommands<NodeSelection> { command, selection ->
@@ -28,7 +28,7 @@ fun updateNodeSelection(editor: Editor, nextGraph: Graph?) = handleCommands<Node
         val deletedNodes = getGraphKeys(graph) - getGraphKeys(nextGraph)
         if (deletedNodes.any()) {
           val firstRemainingParent = graph.firstOrNull {
-            deletedNodes.contains(it.source) && it.property == Properties.parent && !deletedNodes.contains(it.target)
+            deletedNodes.contains(it.source) && it.property == SceneProperties.parent && !deletedNodes.contains(it.target)
           }?.target as String?
           if (firstRemainingParent != null)
             setOf(firstRemainingParent)
