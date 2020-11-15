@@ -1,6 +1,7 @@
 package silentorb.mythic.editing.panels
 
 import imgui.ImGui
+import imgui.flag.ImGuiWindowFlags
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.*
 import silentorb.mythic.ent.Graph
@@ -15,8 +16,9 @@ fun nodeTreeMenus(getShortcut: GetShortcut): Commands =
             MenuItem("Add Node", EditorCommands.addNodeWithNameDialog),
             MenuItem("Rename Node", EditorCommands.renameNodeWithNameDialog),
             MenuItem("Delete Node", EditorCommands.deleteNode),
-            MenuItem("Copy Node", EditorCommands.addNodeWithNameDialog),
-            MenuItem("Paste Node", EditorCommands.addNodeWithNameDialog),
+            MenuItem("Copy Node", EditorCommands.copyNode),
+            MenuItem("Paste Node", EditorCommands.pasteNode),
+            MenuItem("Duplicate Node", EditorCommands.duplicateNode),
         ))
     ))
 
@@ -40,7 +42,7 @@ fun renderTree(tree: SceneTree, id: String, selection: NodeSelection): Commands 
 }
 
 fun renderTree(editor: Editor, graph: Graph?): Commands {
-  ImGui.begin("Node Tree")
+  ImGui.begin("Node Tree", ImGuiWindowFlags.MenuBar)
   panelBackground()
   val menuCommands = nodeTreeMenus(getShortcutForContext(editor.bindings, Contexts.nodes))
 

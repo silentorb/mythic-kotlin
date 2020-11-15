@@ -3,6 +3,7 @@ package silentorb.mythic.editing.updating
 import silentorb.mythic.editing.*
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.getGraphKeys
+import silentorb.mythic.ent.scenery.gatherChildren
 import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.haft.getMouseOffset
 import silentorb.mythic.happenings.Commands
@@ -16,7 +17,7 @@ fun updateNodeSelection(editor: Editor, nextGraph: Graph?) = handleCommands<Node
   if (graph != null && nextGraph != null) {
     when (command.type) {
       EditorCommands.setNodeSelection -> command.value as NodeSelection
-      EditorCommands.addNode, EditorCommands.renameNode -> {
+      EditorCommands.addNode, EditorCommands.renameNode, EditorCommands.duplicateNode, EditorCommands.pasteNode -> {
         val newNodes = getGraphKeys(nextGraph) - getGraphKeys(graph)
         if (newNodes.any())
           newNodes
@@ -51,6 +52,31 @@ val updateFileSelection = handleCommands<NodeSelection> { command, selection ->
   }
 }
 
+fun gatherSelectionHierarchy(graph: Graph, selection: NodeSelection): Graph {
+  val selectionAndChildren = gatherChildren(graph, selection)
+  return graph
+      .filter {
+        selectionAndChildren.contains(it.source) &&
+            !(it.property == SceneProperties.parent && !selection.contains(it.target))
+      }
+      .toSet()
+}
+
+fun updateClipboard(editor: Editor) = handleCommands<Graph?> { command, clipboard ->
+  when (command.type) {
+    EditorCommands.copyNode -> {
+      val selection = editor.state.nodeSelection
+      val graph = getActiveEditorGraph(editor)
+      if (graph == null)
+        clipboard
+      else {
+        gatherSelectionHierarchy(graph, selection)
+      }
+    }
+    else -> clipboard
+  }
+}
+
 fun updateEditorState(commands: Commands, editor: Editor, graph: Graph?, mouseOffset: Vector2): EditorState {
   val state = editor.state
   val cameras = state.cameras
@@ -78,8 +104,14 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
     null
   else if (editor.staging != null)
     editor.graph
-  else
-    updateSceneGraph(commands, editor)
+  else {
+    val activeGraph = getActiveEditorGraph(editor)
+    if (activeGraph == null)
+      activeGraph
+    else
+      updateSceneGraph(editor)(commands, activeGraph)
+  }
+
 
   val nextOperation = updateOperation(commandTypes, editor)
   val nextStaging = updateStaging(editor, previousMousePosition, mouseOffset, commandTypes, nextOperation)
@@ -92,6 +124,7 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
       graphLibrary = updateSceneCaching(editor),
       viewportBoundsMap = onSetCommand(commands, EditorCommands.setViewportBounds, editor.viewportBoundsMap),
       fileItems = updateProject(commands, editor),
+      clipboard = updateClipboard(editor)(commands, editor.clipboard),
 //      history = appendHistory(editor.history, nextGraph),
   )
 }

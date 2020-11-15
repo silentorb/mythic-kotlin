@@ -45,6 +45,7 @@ fun defaultEditorMenuKeystrokes(): KeystrokeBindings = mapOf(
     ContextCommand(Contexts.nodes, EditorCommands.deleteNode) to "Del",
     ContextCommand(Contexts.nodes, EditorCommands.copyNode) to "Ctrl+C",
     ContextCommand(Contexts.nodes, EditorCommands.pasteNode) to "Ctrl+V",
+    ContextCommand(Contexts.nodes, EditorCommands.duplicateNode) to "Ctrl+D",
 
     ContextCommand(Contexts.project, EditorCommands.newFileWithNameDialog) to "Ctrl+N",
     ContextCommand(Contexts.project, EditorCommands.newFolderWithNameDialog) to "Ctrl+Alt+N",

@@ -1,114 +1,95 @@
 package silentorb.mythic.editing.updating
 
-import silentorb.mythic.editing.*
+import silentorb.mythic.editing.Editor
+import silentorb.mythic.editing.EditorCommands
+import silentorb.mythic.editing.GraphHistory
 import silentorb.mythic.editing.components.nameText
-import silentorb.mythic.ent.Entry
-import silentorb.mythic.ent.Graph
-import silentorb.mythic.ent.getGraphKeys
-import silentorb.mythic.ent.replaceValues
+import silentorb.mythic.ent.*
 import silentorb.mythic.ent.scenery.gatherChildren
-import silentorb.mythic.happenings.Commands
+import silentorb.mythic.ent.scenery.getGraphRoots
+import silentorb.mythic.happenings.handleCommands
 import silentorb.mythic.scenery.SceneProperties
 
-fun onGraphEditingCommand(commandType: Any, transform: EditorGraphTransform): GraphEditCommandsHandler =
-    { editor, commandTypes, graph ->
-      if (commandTypes.contains(commandType))
-        transform(editor, graph)
-      else
-        graph
-    }
-
-fun uniqueNodeName(graph: Graph, name: String): String {
-  val keys = getGraphKeys(graph)
-  return if (!keys.contains(name))
-    name
-  else {
-    val numberPattern = Regex("^\\d+$")
-    val takenNumbers = keys
-        .mapNotNull { id ->
-          if (id.substring(0, name.length) == name) {
-            val numberText = id.substring(name.length)
-            if (numberText.matches(numberPattern))
-              numberText.toInt()
-            else
-              null
-          } else
-            null
-        }
-    val number = (takenNumbers.maxOrNull() ?: 0) + 1
-    "$name$number"
-  }
-}
-
-val onAddNode = onGraphEditingCommand(EditorCommands.addNode) { editor, graph ->
-  val state = editor.state
-  if (state.nodeSelection.size != 1)
+fun duplicateNode(graph: Graph, node: Key): Graph {
+  val parent = getValue<String>(graph, node, SceneProperties.parent)
+  return if (parent == null)
     graph
   else {
-    val selected = state.nodeSelection.first()
-    val key = nameText.get()
-    graph + Entry(key, SceneProperties.parent, selected)
+    val selected = gatherSelectionHierarchy(graph, setOf(node)) +
+        Entry(node, SceneProperties.parent, parent)
+
+    mergeGraphsWithRenaming(graph, selected)
   }
 }
 
-val onRenameNode = onGraphEditingCommand(EditorCommands.renameNode) { editor, graph ->
-  val state = editor.state
-  if (state.nodeSelection.size != 1)
-    graph
-  else {
-    val selected = state.nodeSelection.first()
-    val key = nameText.get()
-    graph.map {
-      if (it.source == selected)
-        it.copy(source = key)
-      else if (it.target == selected)
-        it.copy(target = key)
-      else
-        it
-    }
-  }
-      .toSet()
-}
-
-val onDeleteNode = onGraphEditingCommand(EditorCommands.deleteNode) { editor, graph ->
+fun updateSceneGraph(editor: Editor) = handleCommands<Graph> { command, graph ->
   val state = editor.state
   val selection = state.nodeSelection
-  val selectionAndChildren = gatherChildren(graph, selection)
-  graph
-      .filter { !selectionAndChildren.contains(it.source) }
-      .toSet()
-}
 
-fun updateSceneGraph(commands: Commands, editor: Editor): Graph? {
-  val commandTypes = commands.map { it.type }
-  val initialGraph = getActiveEditorGraph(editor)
-  return if (initialGraph == null)
-    null
-  else {
-    val graph2 = listOf(
-        onAddNode,
-        onDeleteNode,
-        onRenameNode,
-    )
-        .fold(initialGraph) { graph, handler ->
-          handler(editor, commandTypes, graph)
-        }
+  when (command.type) {
 
-    val (replacements, additions) = commands
-        .filter { it.type == EditorCommands.setGraphValue }
-        .map { it.value as Entry }
-        .partition { editor.enumerations.propertyDefinitions[it.property]?.single ?: false }
+    EditorCommands.addNode -> {
+      if (state.nodeSelection.size != 1)
+        graph
+      else {
+        val selected = state.nodeSelection.first()
+        val key = nameText.get()
+        graph + Entry(key, SceneProperties.parent, selected)
+      }
+    }
 
-    val graphRemovals = commands
-        .filter { it.type == EditorCommands.removeGraphValue }
-        .map { it.value as Entry }
+    EditorCommands.pasteNode -> {
+      val clipboard = editor.clipboard
+      if (state.nodeSelection.size != 1 || clipboard == null)
+        graph
+      else {
+        val selected = state.nodeSelection.first()
+        val roots = getGraphRoots(clipboard)
+        val glue = roots.map { Entry(it, SceneProperties.parent, selected) }
+        mergeGraphsWithRenaming(graph, clipboard) + glue
+      }
+    }
 
-    val graph3 = if (replacements.any())
-      replaceValues(graph2, replacements)
-    else
-      graph2
+    EditorCommands.duplicateNode -> {
+      if (state.nodeSelection.size != 1)
+        graph
+      else {
+        state.nodeSelection
+            .fold(graph, ::duplicateNode)
+      }
+    }
 
-    graph3 + additions - graphRemovals
+    EditorCommands.renameNode -> {
+      if (state.nodeSelection.size != 1)
+        graph
+      else {
+        val selected = state.nodeSelection.first()
+        val key = nameText.get()
+        renameNode(graph, selected, key)
+      }
+    }
+
+    EditorCommands.deleteNode -> {
+      val selectionAndChildren = gatherChildren(graph, selection)
+      graph
+          .filter { !selectionAndChildren.contains(it.source) }
+          .toSet()
+    }
+
+    EditorCommands.setGraphValue -> {
+      val newEntry = command.value as Entry
+      if (editor.enumerations.propertyDefinitions[newEntry.property]?.single == true)
+        replaceValues(graph, listOf(newEntry))
+      else
+        graph + listOf(newEntry)
+    }
+
+    EditorCommands.removeGraphValue -> {
+      val entry = command.value as Entry
+      graph - listOf(entry)
+    }
+
+    else -> graph
   }
 }
 

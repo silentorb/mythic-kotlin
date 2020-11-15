@@ -8,6 +8,7 @@ object EditorCommands {
   val deleteNode = "deleteNode"
   val copyNode = "copyNode"
   val pasteNode = "pasteNode"
+  val duplicateNode = "duplicateNode"
 
   val assignMesh = "assignMesh"
   val assignTexture = "assignTexture"
