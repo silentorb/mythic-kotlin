@@ -81,8 +81,9 @@ fun defineEditorGui(editor: Editor): Commands {
   renderReady = true
   imGuiGlfw!!.newFrame()
   ImGui.newFrame()
-
+  updateModifierKeyStates()
   activeInputType = null
+
   return drawEditor(editor)
 }
 

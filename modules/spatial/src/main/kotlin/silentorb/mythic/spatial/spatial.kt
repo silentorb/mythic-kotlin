@@ -410,6 +410,20 @@ fun radiansToDegrees(radians: Float): Float =
 fun degreesToRadians(degrees: Float): Float =
     degrees * Pi / 180f
 
+fun radiansToDegrees(value: Vector3): Vector3 =
+   Vector3(
+       radiansToDegrees(value.x),
+       radiansToDegrees(value.y),
+       radiansToDegrees(value.z)
+   )
+
+fun degreesToRadians(value: Vector3): Vector3 =
+    Vector3(
+        degreesToRadians(value.x),
+        degreesToRadians(value.y),
+        degreesToRadians(value.z)
+    )
+
 fun getAngleCourse(source: Float, destination: Float): Float {
   val full = Pi * 2
   val a = normalizeRadialAngle(source)

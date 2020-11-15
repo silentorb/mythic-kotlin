@@ -2,14 +2,23 @@ package silentorb.mythic.editing.panels
 
 import imgui.ImGui
 import silentorb.mythic.editing.*
-import silentorb.mythic.editing.components.getSelectionCommands
-import silentorb.mythic.editing.components.newTreeFlags
-import silentorb.mythic.editing.components.panelBackground
+import silentorb.mythic.editing.components.*
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.getGraphKeys
 import silentorb.mythic.ent.scenery.getSceneTree
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
+
+fun nodeTreeMenus(getShortcut: GetShortcut): Commands =
+    drawMenuBar(getShortcut, listOf(
+        MenuItem("Edit", items = listOf(
+            MenuItem("Add Node", EditorCommands.addNodeWithNameDialog),
+            MenuItem("Rename Node", EditorCommands.renameNodeWithNameDialog),
+            MenuItem("Delete Node", EditorCommands.deleteNode),
+            MenuItem("Copy Node", EditorCommands.addNodeWithNameDialog),
+            MenuItem("Paste Node", EditorCommands.addNodeWithNameDialog),
+        ))
+    ))
 
 fun renderTree(tree: SceneTree, id: String, selection: NodeSelection): Commands {
   val selected = selection.contains(id)
@@ -33,6 +42,7 @@ fun renderTree(tree: SceneTree, id: String, selection: NodeSelection): Commands 
 fun renderTree(editor: Editor, graph: Graph?): Commands {
   ImGui.begin("Node Tree")
   panelBackground()
+  val menuCommands = nodeTreeMenus(getShortcutForContext(editor.bindings, Contexts.nodes))
 
   if (editor.state.graph != null) {
     ImGui.text(editor.state.graph)
@@ -52,5 +62,5 @@ fun renderTree(editor: Editor, graph: Graph?): Commands {
 
   ImGui.end()
 
-  return commands
+  return commands + menuCommands
 }

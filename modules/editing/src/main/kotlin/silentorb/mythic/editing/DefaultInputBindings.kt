@@ -38,3 +38,23 @@ fun defaultEditorBindings(): Bindings =
     createBindings(DeviceIndexes.keyboard, defaultKeyboardBindings()) +
         createBindings(DeviceIndexes.gamepad, defaultGamepadBindings()) +
         createBindings(DeviceIndexes.mouse, defaultMouseBindings())
+
+fun defaultEditorMenuKeystrokes(): KeystrokeBindings = mapOf(
+    ContextCommand(Contexts.nodes, EditorCommands.addNodeWithNameDialog) to "Ctrl+A",
+    ContextCommand(Contexts.nodes, EditorCommands.renameNodeWithNameDialog) to "Ctrl+R",
+    ContextCommand(Contexts.nodes, EditorCommands.deleteNode) to "Del",
+    ContextCommand(Contexts.nodes, EditorCommands.copyNode) to "Ctrl+C",
+    ContextCommand(Contexts.nodes, EditorCommands.pasteNode) to "Ctrl+V",
+
+    ContextCommand(Contexts.project, EditorCommands.newFileWithNameDialog) to "Ctrl+N",
+    ContextCommand(Contexts.project, EditorCommands.newFolderWithNameDialog) to "Ctrl+Alt+N",
+
+    ContextCommand(Contexts.viewport, EditorCommands.viewFront) to "$keypadKey 1",
+    ContextCommand(Contexts.viewport, EditorCommands.viewBack) to "Ctrl+$keypadKey 1",
+    ContextCommand(Contexts.viewport, EditorCommands.viewRight) to "$keypadKey 3",
+    ContextCommand(Contexts.viewport, EditorCommands.viewLeft) to "Ctrl+$keypadKey 3",
+    ContextCommand(Contexts.viewport, EditorCommands.viewTop) to "$keypadKey 7",
+    ContextCommand(Contexts.viewport, EditorCommands.viewBottom) to "Ctrl+$keypadKey 7",
+    ContextCommand(Contexts.viewport, EditorCommands.toggleProjectionMode) to "$keypadKey 5",
+    ContextCommand(Contexts.viewport, EditorCommands.centerOnSelection) to numpadPeriodKey,
+)

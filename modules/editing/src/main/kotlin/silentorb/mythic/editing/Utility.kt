@@ -18,14 +18,24 @@ fun defaultEditorState() =
         cameras = mapOf(defaultViewportId to CameraRig(location = Vector3(-10f, 0f, 0f))),
     )
 
+private var modifierStateCtrl: Boolean = false
+private var modifierStateShift: Boolean = false
+private var modifierStateAlt: Boolean = false
+
+fun updateModifierKeyStates() {
+  modifierStateCtrl = ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL)
+  modifierStateShift = ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_SHIFT)
+  modifierStateAlt = ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_ALT) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_ALT)
+}
+
 fun isCtrlDown(): Boolean =
-    ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL)
+    modifierStateCtrl
 
 fun isAltDown(): Boolean =
-    ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_ALT) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_ALT)
+    modifierStateAlt
 
 fun isShiftDown(): Boolean =
-    ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_SHIFT)
+    modifierStateShift
 
 fun mapKey(key: String): Int =
     when {

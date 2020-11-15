@@ -1,54 +1,66 @@
 package silentorb.mythic.editing.components
 
 import imgui.ImGui
-import silentorb.mythic.editing.MenuItem
-import silentorb.mythic.editing.isShortcutPressed
+import silentorb.mythic.editing.*
 import silentorb.mythic.happenings.Command
 
-fun pollMenuItem(item: MenuItem): List<Command> =
-    if (item.shortcut != null && item.command != null && isShortcutPressed(item.shortcut))
-      listOf(Command(type = item.command))
+fun pollMenuItem(getShortcut: GetShortcut): (MenuItem) -> List<Command> = { item ->
+  val command = item.command
+  val shortcut = if (command!= null) getShortcut(command) else null
+  if (shortcut != null && command != null && isShortcutPressed(shortcut))
+    listOf(Command(type = command))
+  else
+    listOf()
+}
+
+fun pollMenuItems(getShortcut: GetShortcut): (List<MenuItem>) -> List<Command> = { items ->
+  items.flatMap(pollMenuItem(getShortcut))
+}
+
+fun pollMenu(getShortcut: GetShortcut): (MenuItem) -> List<Command> = { item ->
+  pollMenuItems(getShortcut)(item.items ?: listOf())
+}
+
+fun drawMenuItem(getShortcut: GetShortcut): (MenuItem) -> List<Command> = { item ->
+  val command = item.command
+  val shortcut = if (command != null) getShortcut(command) else null
+  if (ImGui.menuItem(item.label, shortcut) || shortcut != null && isShortcutPressed(shortcut)) {
+    if (command != null)
+      listOf(Command(type = command))
     else
       listOf()
+  } else
+    listOf()
+}
 
-fun pollMenuItems(items: List<MenuItem>): List<Command> =
-    items.flatMap(::pollMenuItem)
+fun drawMenuItems(getShortcut: GetShortcut, items: List<MenuItem>): List<Command> =
+    items.flatMap(drawMenuItem(getShortcut))
 
-fun pollMenu(item: MenuItem): List<Command> =
-    pollMenuItems(item.items ?: listOf())
+fun drawMenu(getShortcut: GetShortcut): (MenuItem) -> List<Command> = { item ->
+  if (ImGui.beginMenu(item.label)) {
+    val result = drawMenuItems(getShortcut, item.items ?: listOf())
+    ImGui.endMenu()
+    result
+  } else
+    pollMenuItems(getShortcut)(item.items ?: listOf())
+}
 
-fun drawMenuItem(item: MenuItem): List<Command> =
-    if (ImGui.menuItem(item.label, item.shortcut) || item.shortcut != null && isShortcutPressed(item.shortcut)) {
-      if (item.command != null)
-        listOf(Command(type = item.command))
-      else
-        listOf()
-    } else
-      listOf()
-
-fun drawMenuItems(items: List<MenuItem>): List<Command> =
-    items.flatMap(::drawMenuItem)
-
-fun drawMenu(item: MenuItem): List<Command> =
-    if (ImGui.beginMenu(item.label)) {
-      val result = drawMenuItems(item.items ?: listOf())
-      ImGui.endMenu()
-      result
-    } else
-      pollMenuItems(item.items ?: listOf())
-
-fun drawMainMenuBar(items: List<MenuItem>): List<Command> =
+fun drawMainMenuBar(getShortcut: GetShortcut, items: List<MenuItem>): List<Command> =
     if (ImGui.beginMainMenuBar()) {
-      val result = items.flatMap(::drawMenu)
+      val result = items.flatMap(drawMenu(getShortcut))
       ImGui.endMainMenuBar()
       result
     } else
-      items.flatMap(::pollMenu)
+      items.flatMap(pollMenu(getShortcut))
 
-fun drawMenuBar(items: List<MenuItem>): List<Command> =
+fun drawMenuBar(getShortcut: GetShortcut, items: List<MenuItem>): List<Command> =
     if (ImGui.beginMenuBar()) {
-      val result = items.flatMap(::drawMenu)
+      val result = items.flatMap(drawMenu(getShortcut))
       ImGui.endMenuBar()
       result
     } else
-      items.flatMap(::pollMenu)
+      items.flatMap(pollMenu(getShortcut))
+
+fun getShortcutForContext(bindings: KeystrokeBindings, context: String): GetShortcut = { command ->
+  bindings[ContextCommand(context, command)]
+}

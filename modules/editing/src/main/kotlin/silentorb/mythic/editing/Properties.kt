@@ -58,7 +58,7 @@ fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
     SceneProperties.rotation to PropertyDefinition(
         displayName = "Rotation",
         serialization = vector3Serialization,
-        widget = propertySpatialWidget,
+        widget = propertyRotationWidget,
         defaultValue = { Vector3.zero },
     ),
     SceneProperties.scale to PropertyDefinition(

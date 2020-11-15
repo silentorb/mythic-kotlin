@@ -49,6 +49,15 @@ data class Option(
 typealias Options = List<Option>
 typealias GraphHistory = List<Graph>
 
+data class ContextCommand(
+    val panel: String,
+    val command: String
+)
+
+typealias KeystrokeBindings = Map<ContextCommand, String>
+
+typealias GetShortcut = (String) -> String?
+
 // Persistent State
 data class EditorState(
     val graph: String? = null,
@@ -70,12 +79,14 @@ data class Editor(
     val state: EditorState = EditorState(),
     val staging: Graph? = null,
     val graph: Graph? = null,
+    val clipboard: Graph? = null,
 //    val history: GraphHistory = listOf(),
     val operation: Operation? = null,
     val enumerations: EditorEnumerations,
     val fileItems: FileItems,
     val graphLibrary: GraphLibrary = mapOf(),
     val viewportBoundsMap: Map<Key, Vector4i> = mapOf(),
+    val bindings: KeystrokeBindings = defaultEditorMenuKeystrokes(),
 )
 
 const val keypadKey = "Numpad"
@@ -83,8 +94,7 @@ const val numpadPeriodKey = "$keypadKey ."
 
 data class MenuItem(
     val label: String,
-    val shortcut: String? = null,
-    val command: Any? = null,
+    val command: String? = null,
     val items: List<MenuItem>? = null
 )
 
@@ -93,4 +103,12 @@ enum class CollisionShape {
   composite,
   cylinder,
   mesh,
+}
+
+object Contexts {
+  const val global = "global"
+  const val nodes = "nodes"
+  const val project = "project"
+  const val viewport = "viewport"
+  const val properties = "properties"
 }

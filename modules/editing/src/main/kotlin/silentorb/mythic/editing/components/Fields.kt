@@ -9,6 +9,8 @@ import silentorb.mythic.ent.Key
 import silentorb.mythic.ent.scenery.arrayToHexColorString
 import silentorb.mythic.ent.scenery.hexColorStringToVector4
 import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.degreesToRadians
+import silentorb.mythic.spatial.radiansToDegrees
 import silentorb.mythic.spatial.toList
 
 fun dropDownWidget(options: List<Key>, entry: Entry): String {
@@ -118,6 +120,13 @@ fun spatialWidget(entry: Entry): Vector3 {
 }
 
 val propertySpatialWidget: PropertyWidget = { _, entry -> spatialWidget(entry) }
+
+fun rotationWidget(entry: Entry): Vector3 {
+  val result = spatialWidget(entry.copy(target = radiansToDegrees(entry.target as Vector3)))
+  return degreesToRadians(result)
+}
+
+val propertyRotationWidget: PropertyWidget = { _, entry -> rotationWidget(entry) }
 
 fun bitmaskField(entry: Entry): Int {
   return 0

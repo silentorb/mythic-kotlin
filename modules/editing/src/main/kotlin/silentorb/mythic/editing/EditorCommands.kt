@@ -6,6 +6,9 @@ object EditorCommands {
   val renameNode = "renameNode"
   val renameNodeWithNameDialog = "renameNodeWithNameDialog"
   val deleteNode = "deleteNode"
+  val copyNode = "copyNode"
+  val pasteNode = "pasteNode"
+
   val assignMesh = "assignMesh"
   val assignTexture = "assignTexture"
   val setGraphValue = "setGraphValue"

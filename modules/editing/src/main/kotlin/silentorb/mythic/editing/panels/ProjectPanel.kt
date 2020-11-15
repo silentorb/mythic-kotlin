@@ -4,18 +4,15 @@ import imgui.ImGui
 import imgui.flag.ImGuiMouseButton
 import imgui.flag.ImGuiWindowFlags
 import silentorb.mythic.editing.*
-import silentorb.mythic.editing.components.drawMenuBar
-import silentorb.mythic.editing.components.getSelectionCommands
-import silentorb.mythic.editing.components.newTreeFlags
-import silentorb.mythic.editing.components.panelBackground
+import silentorb.mythic.editing.components.*
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 
-fun projectMenus(): Commands =
-    drawMenuBar(listOf(
+fun projectMenus(getShortcut: GetShortcut): Commands =
+    drawMenuBar(getShortcut, listOf(
         MenuItem("File", items = listOf(
-            MenuItem("New File", "Ctrl+N", EditorCommands.newFileWithNameDialog),
-            MenuItem("New Folder", "Ctrl+Alt+N", EditorCommands.newFolderWithNameDialog),
+            MenuItem("New File", EditorCommands.newFileWithNameDialog),
+            MenuItem("New Folder", EditorCommands.newFolderWithNameDialog),
         ))
     ))
 
@@ -34,7 +31,7 @@ fun renderProjectTree(items: Collection<FileItem>, item: FileItem, selection: No
 
   val childCommands = mutableListOf<Command>()
   if (isOpen) {
-    for (child in children) {
+    for (child in children.sortedBy { it.name }) {
       childCommands += renderProjectTree(items, child, selection)
     }
     ImGui.treePop()
@@ -46,7 +43,7 @@ fun renderProjectTree(items: Collection<FileItem>, item: FileItem, selection: No
 fun renderProject(editor: Editor): Commands {
   ImGui.begin("Project", ImGuiWindowFlags.MenuBar)
   panelBackground()
-  val menuCommands = projectMenus()
+  val menuCommands = projectMenus(getShortcutForContext(editor.bindings, Contexts.project))
 
   val items = editor.fileItems.values
   val root = items.firstOrNull { it.parent == null }
