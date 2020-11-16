@@ -1,10 +1,13 @@
 package silentorb.mythic.editing.lookinglass
 
+import silentorb.mythic.drawing.flipViewport
 import silentorb.mythic.editing.*
+import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.*
 import silentorb.mythic.ent.scenery.getSceneTree
 import silentorb.mythic.ent.scenery.nodesToElements
 import silentorb.mythic.lookinglass.*
+import silentorb.mythic.platforming.WindowInfo
 import silentorb.mythic.scenery.*
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
@@ -65,7 +68,7 @@ fun sceneFromEditorGraph(meshShapes: Map<String, Shape>, editor: Editor, lightin
 
   val layers = listOf(
       SceneLayer(
-          elements = nodesToElements(meshShapes, editor.state.nodeSelection, editor.graphLibrary, graph),
+          elements = nodesToElements(meshShapes, editor.graphLibrary, graph),
           useDepth = true
       ),
   )
@@ -81,4 +84,21 @@ fun sceneFromEditorGraph(meshShapes: Map<String, Shape>, editor: Editor, lightin
       layers = layers,
       filters = listOf()
   )
+}
+
+
+fun renderEditor(renderer: Renderer, windowInfo: WindowInfo, editor: Editor, lightingConfig: LightingConfig) {
+  prepareRender(renderer, windowInfo)
+  val viewport = editor.viewportBoundsMap.values.firstOrNull()
+  if (viewport != null) {
+    val adjustedViewport = flipViewport(windowInfo.dimensions.y, viewport)
+    val scene = sceneFromEditorGraph(getMeshShapes(renderer), editor, lightingConfig, defaultViewportId)
+    val sceneRenderer = createSceneRenderer(renderer, scene, adjustedViewport)
+    val filters = prepareRender(sceneRenderer, scene)
+    renderSceneLayers(sceneRenderer, sceneRenderer.camera, scene.layers)
+    renderEditorSelection(editor, sceneRenderer)
+    applyFilters(sceneRenderer, filters)
+  }
+  renderEditorGui()
+  finishRender(renderer, windowInfo)
 }

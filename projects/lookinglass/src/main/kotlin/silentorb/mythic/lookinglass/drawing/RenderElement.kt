@@ -59,17 +59,20 @@ fun armatureTransforms(armature: Armature, group: ElementGroup): List<Matrix> =
       transformAnimatedSkeleton(armature.bones, animations)
     }
 
-fun getElementTransform(element: MeshElement, primitive: Primitive, transforms: List<Matrix>?): Matrix {
+fun getElementTransform(elementTransform: Matrix, primitive: Primitive, transforms: List<Matrix>?): Matrix {
   if (primitive.name == "pumpkin-head") {
     val k = 0
   }
   return if (primitive.transform != null)
-    element.transform * primitive.transform
+    elementTransform * primitive.transform
   else if (primitive.parentBone != null && transforms != null)
-    element.transform * transforms[primitive.parentBone] * Matrix.identity.rotateX(-Pi / 2f)
+    elementTransform * transforms[primitive.parentBone] * Matrix.identity.rotateX(-Pi / 2f)
   else
-    element.transform
+    elementTransform
 }
+
+fun getElementTransform(element: MeshElement, primitive: Primitive, transforms: List<Matrix>?): Matrix =
+    getElementTransform(element.transform, primitive, transforms)
 
 private fun useMesh(meshes: ModelMeshMap, MeshName: MeshName, action: (ModelMesh) -> Unit) {
   val mesh = meshes[MeshName]
@@ -80,18 +83,22 @@ private fun useMesh(meshes: ModelMeshMap, MeshName: MeshName, action: (ModelMesh
   }
 }
 
-fun renderMeshElement(renderer: SceneRenderer, element: MeshElement, armature: Armature? = null, transforms: List<Matrix>? = null) {
+fun renderMeshElement(renderer: SceneRenderer, mesh: String, transform: Matrix, material: Material, armature: Armature? = null, transforms: List<Matrix>? = null) {
   val meshes = renderer.meshes
-  useMesh(meshes, element.mesh) { mesh ->
+  useMesh(meshes, mesh) { mesh ->
     if (mesh.sampledModel == null) {
       for (primitive in mesh.primitives) {
-        val transform = getElementTransform(element, primitive, transforms)
-        val materal = element.material ?: primitive.material
+        val transform = getElementTransform(transform, primitive, transforms)
+        val materal = material ?: primitive.material
         val isAnimated = armature != null && primitive.isAnimated
         renderElement(renderer, primitive, materal, transform, isAnimated)
       }
     }
   }
+}
+
+fun renderMeshElement(renderer: SceneRenderer, element: MeshElement, armature: Armature? = null, transforms: List<Matrix>? = null) {
+  renderMeshElement(renderer, element.mesh, element.transform, element.material!!, armature, transforms)
 }
 
 fun renderElementGroup(renderer: SceneRenderer, camera: Camera, group: ElementGroup) {

@@ -52,6 +52,13 @@ fun prepareRender(renderer: SceneRenderer, filters: List<ScreenFilter>) {
 //    glow.operations.clearScreen()
 }
 
+fun prepareRender(renderer: SceneRenderer, scene: GameScene): List<ScreenFilter> {
+  val filters = getDisplayConfigFilters(renderer.renderer.options).plus(scene.filters)
+  prepareRender(renderer, filters)
+  globalState.lineThickness = 2f
+  return filters
+}
+
 fun applyFilters(renderer: SceneRenderer, filters: List<ScreenFilter>) {
   globalState.cullFaces = false
   globalState.viewport = renderer.viewport

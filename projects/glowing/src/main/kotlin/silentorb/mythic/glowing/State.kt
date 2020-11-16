@@ -187,6 +187,47 @@ class State {
       }
     }
 
+  var stencilTest: Boolean = false
+    set(value) {
+      if (field != value) {
+        field = value
+        setEnabled(GL_STENCIL_TEST, value)
+      }
+    }
+
+  var stencilWrite: Boolean = false
+    set(value) {
+      if (field != value) {
+        field = value
+        val mask = if (field) 0xFF else 0x00
+        glStencilMask(mask)
+      }
+    }
+
+  var stenciloperation0: Int = GL_KEEP
+    set(value) {
+      if (field != value) {
+        field = value
+        glStencilOp(stenciloperation0, stenciloperation1, stenciloperation2)
+      }
+    }
+
+  var stenciloperation1: Int = GL_KEEP
+    set(value) {
+      if (field != value) {
+        field = value
+        glStencilOp(stenciloperation0, stenciloperation1, stenciloperation2)
+      }
+    }
+
+  var stenciloperation2: Int = GL_KEEP
+    set(value) {
+      if (field != value) {
+        field = value
+        glStencilOp(stenciloperation0, stenciloperation1, stenciloperation2)
+      }
+    }
+
   var cullFaces: Boolean = false
     set(value) {
       if (field != value) {

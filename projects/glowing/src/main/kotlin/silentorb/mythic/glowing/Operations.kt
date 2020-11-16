@@ -1,6 +1,9 @@
 package silentorb.mythic.glowing
 
 import org.lwjgl.opengl.GL11.*
+import org.lwjgl.opengl.GL20
+import org.lwjgl.opengl.GL20.glDrawBuffers
+import org.lwjgl.opengl.GL30
 
 class Operations {
 
@@ -15,4 +18,14 @@ class Operations {
 
 fun clearDepth() {
   glClear(GL_DEPTH_BUFFER_BIT)
+}
+
+fun clearStencil() {
+  glClear(GL_STENCIL_BUFFER_BIT)
+}
+
+fun withoutFrontDrawing(action: () -> Unit) {
+  glColorMask(false, false, false, false)
+  action()
+  glColorMask(true, true, true, true)
 }

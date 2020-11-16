@@ -128,6 +128,18 @@ fun createSceneRenderer(renderer: Renderer, scene: Scene, viewport: Vector4i): S
   return SceneRenderer(viewport, renderer, scene.camera, cameraEffectsData)
 }
 
+fun gatherSceneLights(meshes: ModelMeshMap, scene: GameScene): List<Light> {
+  return scene.main.lights
+//      .plus(gatherChildLights(meshes, scene.opaqueElementGroups))
+}
+
+fun createSceneRenderer(renderer: Renderer, scene: GameScene, viewport: Vector4i): SceneRenderer {
+  val minimalScene = scene.main.copy(
+      lights = gatherSceneLights(renderer.meshes, scene)
+  )
+  return createSceneRenderer(renderer, minimalScene, viewport)
+}
+
 fun prepareRender(renderer: Renderer, windowInfo: WindowInfo) {
   if (renderer.multisampler != null) {
     renderer.multisampler.framebuffer.activateDraw()

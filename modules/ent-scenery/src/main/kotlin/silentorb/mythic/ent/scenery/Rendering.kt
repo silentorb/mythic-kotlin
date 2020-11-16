@@ -14,16 +14,21 @@ import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.typography.IndexedTextStyle
 
-fun nodesToElements(meshesShapes: Map<String, Shape>, selection: Set<Key>, graphs: GraphLibrary, graph: Graph): List<ElementGroup> {
+fun nodesToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph: Graph): List<ElementGroup> {
   val tree = getSceneTree(graph)
   val nodes = getGraphKeys(graph)
       .plus(tree.values)
 
-  return nodes.flatMap { node -> nodeToElements(meshesShapes, selection, graphs, graph, node) }
+  return nodes.flatMap { node -> nodeToElements(meshesShapes, graphs, graph, node) }
 }
 
-fun nodeToElements(meshesShapes: Map<String, Shape>, selection: Set<Key>, graphs: GraphLibrary, graph: Graph, node: Key): List<ElementGroup> {
-  val isSelected = selection.contains(node)
+fun getGraphElementMaterial(graph: Graph, node: Key): Material {
+  val texture = getValue<Key>(graph, node, SceneProperties.texture)
+  return Material(texture = texture, shading = true)
+}
+
+fun nodeToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph: Graph, node: Key): List<ElementGroup> {
+  val isSelected = false
   val mesh = getValue<Key>(graph, node, SceneProperties.mesh)
   val type = getValue<Key>(graph, node, SceneProperties.instance)
   val text3d = getValue<String>(graph, node, SceneProperties.text3d)
@@ -38,8 +43,8 @@ fun nodeToElements(meshesShapes: Map<String, Shape>, selection: Set<Key>, graphs
     if (subGraph == null || subGraph == graph)
       listOf()
     else {
-      val instanceTransform = silentorb.mythic.ent.scenery.getTransform(graph, node)
-      nodesToElements(meshesShapes, selection, graphs, subGraph)
+      val instanceTransform = getTransform(graph, node)
+      nodesToElements(meshesShapes, graphs, subGraph)
           .map { group ->
             group.copy(
                 meshes = group.meshes.map { meshElement ->
@@ -60,11 +65,7 @@ fun nodeToElements(meshesShapes: Map<String, Shape>, selection: Set<Key>, graphs
   else {
     val transform = getTransform(graph, node)
     val meshElements = if (mesh != null) {
-      val texture = getValue<Key>(graph, node, SceneProperties.texture)
-      val material = if (texture != null)
-        Material(texture = texture, shading = true)
-      else
-        null
+      val material = getGraphElementMaterial(graph, node)
 
       listOf(
           MeshElement(
