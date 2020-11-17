@@ -43,7 +43,7 @@ fun nodeToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph
     if (subGraph == null || subGraph == graph)
       listOf()
     else {
-      val instanceTransform = getTransform(graph, node)
+      val instanceTransform = getNodeTransform(graph, node)
       nodesToElements(meshesShapes, graphs, subGraph)
           .map { group ->
             group.copy(
@@ -63,7 +63,7 @@ fun nodeToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph
   } else if (mesh == null && text3d == null && light == null && collisionShape == null)
     listOf()
   else {
-    val transform = getTransform(graph, node)
+    val transform = getNodeTransform(graph, node)
     val meshElements = if (mesh != null) {
       val material = getGraphElementMaterial(graph, node)
 

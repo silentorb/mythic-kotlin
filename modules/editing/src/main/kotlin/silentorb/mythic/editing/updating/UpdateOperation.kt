@@ -5,7 +5,7 @@ import silentorb.mythic.ent.Entry
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.getValue
 import silentorb.mythic.ent.replaceValues
-import silentorb.mythic.ent.scenery.getTransform
+import silentorb.mythic.ent.scenery.getNodeTransform
 import silentorb.mythic.scenery.SceneProperties
 import silentorb.mythic.spatial.*
 
@@ -83,7 +83,7 @@ fun mouseTransform(property: String, handler: MouseTransformHandler): (Vector2, 
           val viewTransform = createViewMatrix(camera.location, camera.orientation)
           val data = editor.operation!!.data as SpatialTransformState
           val newEntries = selection.map { node ->
-            val globalObjectLocation = getTransform(graph, node).translation()
+            val globalObjectLocation = getNodeTransform(graph, node).translation()
             val distance = globalObjectLocation.distance(camera.location)
             val mouseStart = previousMousePosition - viewport.xy().toVector2()
             val cameraTransform = createProjectionMatrix(camera, viewport.zw(), distance) * viewTransform
@@ -115,7 +115,7 @@ fun updateTranslation(previousMousePosition: Vector2, mouseOffset: Vector2, edit
         val data = editor.operation!!.data as SpatialTransformState
         val newEntries = selection.map { node ->
           val value = getValue<Vector3>(graph, node, SceneProperties.translation) ?: Vector3.zero
-          val globalObjectTransform = getTransform(graph, node)
+          val globalObjectTransform = getNodeTransform(graph, node)
           val globalObjectLocation = globalObjectTransform.translation()
           val distance = globalObjectLocation.distance(camera.location)
           val mouseStart = previousMousePosition - viewport.xy().toVector2()
@@ -153,7 +153,7 @@ fun updateRotation(previousMousePosition: Vector2, mouseOffset: Vector2, editor:
       val viewTransform = createViewMatrix(camera.location, camera.orientation)
       val data = editor.operation!!.data as SpatialTransformState
       val newEntries = selection.map { node ->
-        val objectCenter = getTransform(graph, node).translation()
+        val objectCenter = getNodeTransform(graph, node).translation()
         val mouseStart = previousMousePosition - viewport.xy().toVector2()
         val cameraTransform = createProjectionMatrix(camera, viewport.zw()) * viewTransform
         val center = transformPoint(cameraTransform, viewport.zw().toVector2(), Vector2.zero)(objectCenter)
@@ -204,7 +204,7 @@ fun updateScaling(previousMousePosition: Vector2, mouseOffset: Vector2, editor: 
         val viewTransform = createViewMatrix(camera.location, camera.orientation)
         val data = editor.operation!!.data as SpatialTransformState
         val newEntries = selection.map { node ->
-          val objectCenter = getTransform(graph, node).translation()
+          val objectCenter = getNodeTransform(graph, node).translation()
           val mouseStart = previousMousePosition - viewport.xy().toVector2()
           val cameraTransform = createProjectionMatrix(camera, viewport.zw()) * viewTransform
           val center = transformPoint(cameraTransform, viewport.zw().toVector2(), Vector2.zero)(objectCenter)

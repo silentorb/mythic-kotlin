@@ -1,6 +1,8 @@
 package silentorb.mythic.lookinglass
 
+import silentorb.mythic.glowing.globalState
 import silentorb.mythic.scenery.Shape
+import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector4i
 import silentorb.mythic.spatial.radiansToDegrees
 import kotlin.math.abs
@@ -20,3 +22,6 @@ fun getMeshShapes(renderer: Renderer): Map<String, Shape> =
     renderer.meshes
         .filterValues { it.bounds != null }
         .mapValues { it.value.bounds!! }
+
+fun flipY(height: Int, value: Int): Int =
+    height - value

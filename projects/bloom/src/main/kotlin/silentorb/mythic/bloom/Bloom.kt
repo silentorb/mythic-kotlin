@@ -2,7 +2,7 @@ package silentorb.mythic.bloom
 
 import org.lwjgl.opengl.GL11
 import silentorb.mythic.drawing.Canvas
-import silentorb.mythic.glowing.cropStack
+import silentorb.mythic.glowing.withCropping
 import silentorb.mythic.glowing.debugMarkPass
 import silentorb.mythic.glowing.getGLBounds
 import silentorb.mythic.glowing.globalState
@@ -89,7 +89,7 @@ fun renderBox(canvas: Canvas, box: Box, offset: Vector2i, debug: Boolean = false
 
   if (getAttributeBoolean(box, clipBoundsKey)) {
     val viewport = canvas.flipViewport(toVector4i(Bounds(position = offset, dimensions = box.dimensions)))
-    cropStack(viewport) {
+    withCropping(viewport) {
       renderChildren()
     }
   } else

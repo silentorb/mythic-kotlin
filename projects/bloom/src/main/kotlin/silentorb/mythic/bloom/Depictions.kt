@@ -2,7 +2,7 @@ package silentorb.mythic.bloom
 
 import silentorb.mythic.drawing.Canvas
 import silentorb.mythic.drawing.globalFonts
-import silentorb.mythic.glowing.cropStack
+import silentorb.mythic.glowing.withCropping
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.spatial.toVector2i
@@ -28,7 +28,7 @@ fun label(style: IndexedTextStyle, content: String): Box {
 
 fun clipBox(bounds: Bounds, depiction: Depiction): Depiction = { b, c ->
   val viewport = c.flipViewport(toVector4i(bounds))
-  cropStack(viewport) {
+  withCropping(viewport) {
     depiction(b, c)
   }
 }

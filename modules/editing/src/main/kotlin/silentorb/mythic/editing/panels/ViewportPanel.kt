@@ -50,7 +50,7 @@ fun drawViewportPanel(editor: Editor): Commands {
       mousePosition.x < viewport.z &&
       mousePosition.y < viewport.w
   )
-    listOf(Command(EditorCommands.startNodeSelect, Vector2i(mousePosition.x - viewport.x)))
+    listOf(Command(EditorCommands.startNodeSelect, mousePosition))
   else
     listOf()
 

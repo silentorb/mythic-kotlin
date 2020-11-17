@@ -3,7 +3,7 @@ package silentorb.mythic.editing
 import imgui.ImColor
 import imgui.ImDrawList
 import imgui.ImGui
-import silentorb.mythic.ent.scenery.getTransform
+import silentorb.mythic.ent.scenery.getNodeTransform
 import silentorb.mythic.spatial.*
 
 typealias ScreenTransform = (Vector3) -> Vector2
@@ -38,7 +38,7 @@ fun drawSelectedObjectAnnotations(editor: Editor, viewport: Vector4i, camera: Ca
     val cameraTransform = createProjectionMatrix(camera, dimensions) * viewTransform
     val offset = viewport.xy()
     val transform = transformPoint(cameraTransform, dimensions.toVector2(), offset.toVector2())
-    val location = getTransform(graph, node).translation()
+    val location = getNodeTransform(graph, node).translation()
 
     if (data != null && data is SpatialTransformState) {
       val axisList = data.axis

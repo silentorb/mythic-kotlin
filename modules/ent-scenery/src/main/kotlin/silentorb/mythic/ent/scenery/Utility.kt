@@ -8,7 +8,7 @@ import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 
-fun getTransform(graph: Graph, node: Key): Matrix {
+fun getNodeTransform(graph: Graph, node: Key): Matrix {
   val translation = getValue<Vector3>(graph, node, SceneProperties.translation) ?: Vector3.zero
   val rotation = getValue<Vector3>(graph, node, SceneProperties.rotation) ?: Vector3.zero
   val scale = getValue<Vector3>(graph, node, SceneProperties.scale) ?: Vector3.unit
@@ -21,7 +21,7 @@ fun getTransform(graph: Graph, node: Key): Matrix {
 
   val parent = getValue<Key>(graph, node, SceneProperties.parent)
   return if (parent != null)
-    getTransform(graph, parent) * localTransform
+    getNodeTransform(graph, parent) * localTransform
   else
     localTransform
 }
@@ -100,7 +100,7 @@ fun getShape(meshShapeMap: Map<Key, Shape>, graph: Graph, node: Key): Shape? {
   else {
     val mesh = getValue<Key>(graph, node, SceneProperties.mesh)
     val meshBounds = meshShapeMap[mesh]
-    val transform = getTransform(graph, node)
+    val transform = getNodeTransform(graph, node)
     return meshBounds ?: Box(transform.getScale())
   }
 }

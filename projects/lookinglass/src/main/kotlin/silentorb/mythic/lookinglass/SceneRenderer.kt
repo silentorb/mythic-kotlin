@@ -7,6 +7,7 @@ import silentorb.mythic.glowing.OffscreenBuffer
 import silentorb.mythic.glowing.globalState
 import silentorb.mythic.lookinglass.shading.*
 import silentorb.mythic.lookinglass.texturing.DynamicTextureLibrary
+import silentorb.mythic.platforming.WindowInfo
 import silentorb.mythic.scenery.ArmatureName
 import silentorb.mythic.scenery.Camera
 import silentorb.mythic.spatial.*
@@ -16,7 +17,8 @@ data class SceneRenderer(
     val viewport: Vector4i,
     val renderer: Renderer,
     val camera: Camera,
-    val cameraEffectsData: CameraEffectsData
+    val cameraEffectsData: CameraEffectsData,
+    val windowInfo: WindowInfo
 ) {
 
   val effects: Shaders

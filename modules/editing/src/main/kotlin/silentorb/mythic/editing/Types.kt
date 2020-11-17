@@ -75,9 +75,15 @@ data class EditorEnumerations(
     val collisionGroups: List<Key> = listOf(),
 )
 
+// Even if this only ever has one field, it's useful to wrap it to have a distinction between
+// no response and a response where there was no matching object
+data class SelectionQueryResponse(
+    val selectedObject: Key? = null,
+)
+
 data class SelectionQuery(
     val position: Vector2i,
-    val result: Key? = null,
+    val response: SelectionQueryResponse? = null,
 )
 
 data class Editor(

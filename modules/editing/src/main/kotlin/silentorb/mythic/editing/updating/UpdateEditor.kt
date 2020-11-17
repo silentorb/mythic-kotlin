@@ -103,7 +103,7 @@ fun updateSelectionQuery(editor: Editor, commands: Commands): SelectionQuery? {
     SelectionQuery(
         position = selectionCommand.value as Vector2i
     )
-  else if (previousSelectionQuery != null && previousSelectionQuery.result == null)
+  else if (previousSelectionQuery != null && previousSelectionQuery.response == null)
     previousSelectionQuery // Still waiting for a response from the rendering code
   else
     null
@@ -150,9 +150,9 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
 }
 
 fun getQuerySelectionCommands(editor: Editor): Commands {
-  val queryResult = editor.selectionQuery?.result
-  return if (queryResult != null)
-    listOf(Command(EditorCommands.setNodeSelection, queryResult))
+  val queryResponse = editor.selectionQuery?.response
+  return if (queryResponse != null)
+    listOf(Command(EditorCommands.setNodeSelection, setOfNotNull(queryResponse.selectedObject)))
   else
     listOf()
 }

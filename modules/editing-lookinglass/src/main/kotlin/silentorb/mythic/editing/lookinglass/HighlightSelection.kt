@@ -1,6 +1,7 @@
 package silentorb.mythic.editing.lookinglass
 
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL30
 import silentorb.mythic.editing.Editor
 import silentorb.mythic.editing.getActiveEditorGraph
@@ -25,8 +26,8 @@ fun renderEditorSelection(editor: Editor, sceneRenderer: SceneRenderer) {
     for (node in selection) {
       val mesh = getValue<Key>(graph, node, SceneProperties.mesh)
       if (mesh != null) {
-        val transform = silentorb.mythic.ent.scenery.getTransform(graph, node)
-        val flatMaterial = Material(
+        val transform = silentorb.mythic.ent.scenery.getNodeTransform(graph, node)
+        val material = Material(
             shading = false,
             color = selectionColor,
         )
@@ -35,25 +36,25 @@ fun renderEditorSelection(editor: Editor, sceneRenderer: SceneRenderer) {
         val offset = viewport.xy()
         val dimensions = viewport.zw()
 
-        GL30.glStencilMask(0xFF)
+        glStencilMask(0xFF)
         clearStencil()
         globalState.stencilTest = true
 
-        GL30.glStencilFunc(GL30.GL_ALWAYS, 1, 0xFF)
-        GL30.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_INCR)
-        GL30.glStencilMask(0xFF)
+        glStencilFunc(GL_ALWAYS, 1, 0xFF)
+        glStencilOp(GL_KEEP, GL_KEEP, GL_INCR)
+        glStencilMask(0xFF)
         withoutFrontDrawing {
-          renderMeshElement(sceneRenderer, mesh, transform, flatMaterial)
+          renderMeshElement(sceneRenderer, mesh, transform, material)
         }
 
-        GL30.glStencilMask(0x00)
-        GL30.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
-        GL30.glStencilFunc(GL30.GL_EQUAL, 0, 0xFF)
+        glStencilMask(0x00)
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
+        glStencilFunc(GL_EQUAL, 0, 0xFF)
 
         for (y in -1..1 step 2) {
           for (x in -1..1 step 2) {
             globalState.viewport = Vector4i(offset.x + x, offset.y + y, dimensions.x, dimensions.y)
-            renderMeshElement(sceneRenderer, mesh, transform, flatMaterial)
+            renderMeshElement(sceneRenderer, mesh, transform, material)
           }
         }
         globalState.depthEnabled = true

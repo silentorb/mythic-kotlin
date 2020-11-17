@@ -24,8 +24,9 @@ fun clearStencil() {
   glClear(GL_STENCIL_BUFFER_BIT)
 }
 
-fun withoutFrontDrawing(action: () -> Unit) {
+fun <T> withoutFrontDrawing(action: () -> T): T {
   glColorMask(false, false, false, false)
-  action()
+  val result = action()
   glColorMask(true, true, true, true)
+  return result
 }

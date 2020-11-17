@@ -1,7 +1,7 @@
 package silentorb.mythic.editing.updating
 
 import silentorb.mythic.editing.*
-import silentorb.mythic.ent.scenery.getTransform
+import silentorb.mythic.ent.scenery.getNodeTransform
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.scenery.ProjectionType
 import silentorb.mythic.spatial.Vector2
@@ -30,7 +30,7 @@ fun centerOnSelection(editor: Editor, camera: CameraRig): CameraRig {
   val selection = editor.state.nodeSelection
   val graph = getActiveEditorGraph(editor)
   return if (selection.any() && graph != null){
-    val nodeLocation = getTransform(graph, selection.first()).translation()
+    val nodeLocation = getNodeTransform(graph, selection.first()).translation()
     val pivot = getCameraPivot(camera)
     val pivotToCameraOffset = camera.location - pivot
     val nextLocation = nodeLocation + pivotToCameraOffset

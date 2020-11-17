@@ -193,7 +193,7 @@ class Canvas(
   fun drawText(position: Vector2i, style: IndexedTextStyle, content: String) =
       drawText(position.toVector2(), style, content)
 
-  fun crop(value: Vector4i, action: () -> Unit) = cropStack(value, action)
+  fun crop(value: Vector4i, action: () -> Unit) = withCropping(value, action)
 
   fun flipViewport(value: Vector4i): Vector4i =
       flipViewport(viewportDimensions.y.toInt(), value)

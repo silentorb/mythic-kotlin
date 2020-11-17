@@ -121,11 +121,11 @@ fun updateShaders(renderer: Renderer, lightingConfig: LightingConfig, lights: Li
   renderer.uniformBuffers.scene.load(createSceneBuffer(effectsData))
 }
 
-fun createSceneRenderer(renderer: Renderer, scene: Scene, viewport: Vector4i): SceneRenderer {
+fun createSceneRenderer(renderer: Renderer, windowInfo: WindowInfo, scene: Scene, viewport: Vector4i): SceneRenderer {
   val dimensions = Vector2i(viewport.z, viewport.w)
   val cameraEffectsData = createCameraEffectsData(dimensions, scene.camera)
   updateShaders(renderer, scene.lightingConfig, scene.lights, dimensions, cameraEffectsData)
-  return SceneRenderer(viewport, renderer, scene.camera, cameraEffectsData)
+  return SceneRenderer(viewport, renderer, scene.camera, cameraEffectsData, windowInfo)
 }
 
 fun gatherSceneLights(meshes: ModelMeshMap, scene: GameScene): List<Light> {
@@ -133,11 +133,11 @@ fun gatherSceneLights(meshes: ModelMeshMap, scene: GameScene): List<Light> {
 //      .plus(gatherChildLights(meshes, scene.opaqueElementGroups))
 }
 
-fun createSceneRenderer(renderer: Renderer, scene: GameScene, viewport: Vector4i): SceneRenderer {
+fun createSceneRenderer(renderer: Renderer, windowInfo: WindowInfo, scene: GameScene, viewport: Vector4i): SceneRenderer {
   val minimalScene = scene.main.copy(
       lights = gatherSceneLights(renderer.meshes, scene)
   )
-  return createSceneRenderer(renderer, minimalScene, viewport)
+  return createSceneRenderer(renderer, windowInfo, minimalScene, viewport)
 }
 
 fun prepareRender(renderer: Renderer, windowInfo: WindowInfo) {

@@ -8,7 +8,7 @@ import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState
 import silentorb.mythic.ent.Id
 import silentorb.mythic.ent.Table
 import silentorb.mythic.ent.scenery.getShape
-import silentorb.mythic.ent.scenery.getTransform
+import silentorb.mythic.ent.scenery.getNodeTransform
 import silentorb.mythic.sculpting.ImmutableFace
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Pi
@@ -144,7 +144,7 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
         if (shapeDefinition == null)
           null
         else {
-          val transform = getTransform(graph, node)
+          val transform = getNodeTransform(graph, node)
           val shape = createCollisionShape(shapeDefinition, transform.getScale())
           val groups = 1
           val mask = 2 or 4
