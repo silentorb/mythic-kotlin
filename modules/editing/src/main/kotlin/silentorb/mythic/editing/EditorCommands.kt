@@ -9,9 +9,8 @@ object EditorCommands {
   val copyNode = "copyNode"
   val pasteNode = "pasteNode"
   val duplicateNode = "duplicateNode"
+  val startNodeSelect = " startNodeSelect"
 
-  val assignMesh = "assignMesh"
-  val assignTexture = "assignTexture"
   val setGraphValue = "setGraphValue"
   val removeGraphValue = "removeGraphValue"
   val setActiveGraph = "setActiveGraph"

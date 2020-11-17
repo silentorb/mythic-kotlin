@@ -86,19 +86,28 @@ fun sceneFromEditorGraph(meshShapes: Map<String, Shape>, editor: Editor, lightin
   )
 }
 
-
-fun renderEditor(renderer: Renderer, windowInfo: WindowInfo, editor: Editor, lightingConfig: LightingConfig) {
+fun renderEditor(renderer: Renderer, windowInfo: WindowInfo, editor: Editor, lightingConfig: LightingConfig): SelectionQuery? {
   prepareRender(renderer, windowInfo)
   val viewport = editor.viewportBoundsMap.values.firstOrNull()
-  if (viewport != null) {
+  val selectionQuery = if (viewport != null) {
     val adjustedViewport = flipViewport(windowInfo.dimensions.y, viewport)
     val scene = sceneFromEditorGraph(getMeshShapes(renderer), editor, lightingConfig, defaultViewportId)
     val sceneRenderer = createSceneRenderer(renderer, scene, adjustedViewport)
+    val selectionQuery = if (editor.selectionQuery != null) {
+      renderer.glow.operations.clearScreen()
+
+      null
+    } else
+      null
     val filters = prepareRender(sceneRenderer, scene)
     renderSceneLayers(sceneRenderer, sceneRenderer.camera, scene.layers)
     renderEditorSelection(editor, sceneRenderer)
     applyFilters(sceneRenderer, filters)
-  }
+    selectionQuery
+  } else
+    null
+
   renderEditorGui()
   finishRender(renderer, windowInfo)
+  return selectionQuery
 }

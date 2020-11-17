@@ -4,6 +4,7 @@ import silentorb.mythic.ent.Entry
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.GraphLibrary
 import silentorb.mythic.ent.Key
+import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector4i
 import java.nio.file.Path
 
@@ -74,6 +75,11 @@ data class EditorEnumerations(
     val collisionGroups: List<Key> = listOf(),
 )
 
+data class SelectionQuery(
+    val position: Vector2i,
+    val result: Key? = null,
+)
+
 data class Editor(
     val projectPath: Path,
     val state: EditorState = EditorState(),
@@ -87,6 +93,7 @@ data class Editor(
     val graphLibrary: GraphLibrary = mapOf(),
     val viewportBoundsMap: Map<Key, Vector4i> = mapOf(),
     val bindings: KeystrokeBindings = defaultEditorMenuKeystrokes(),
+    val selectionQuery: SelectionQuery? = null,
 )
 
 const val keypadKey = "Numpad"

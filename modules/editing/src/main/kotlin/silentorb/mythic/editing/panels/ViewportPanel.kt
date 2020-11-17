@@ -1,12 +1,15 @@
 package silentorb.mythic.editing.panels
 
 import imgui.ImGui
+import imgui.ImVec2
+import imgui.flag.ImGuiMouseButton
 import imgui.flag.ImGuiWindowFlags
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.drawMenuBar
 import silentorb.mythic.editing.components.getShortcutForContext
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
+import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector4i
 
 const val defaultViewportId = "viewport"
@@ -32,11 +35,29 @@ fun drawViewportPanel(editor: Editor): Commands {
       ImGui.getWindowPosX().toInt(), ImGui.getWindowPosY().toInt(),
       ImGui.getWindowSizeX().toInt(), ImGui.getWindowSizeY().toInt()
   )
-  ImGui.end()
 
+  val mousePositionReference = ImVec2()
+  ImGui.getMousePos(mousePositionReference)
+  val mousePosition = Vector2i(
+      mousePositionReference.x.toInt() - viewport.x,
+      mousePositionReference.y.toInt() - viewport.y
+  )
+
+  val clickCommands = if (
+      ImGui.isMouseClicked(ImGuiMouseButton.Left) &&
+      mousePosition.x > 0 &&
+      mousePosition.y > 0 &&
+      mousePosition.x < viewport.z &&
+      mousePosition.y < viewport.w
+  )
+    listOf(Command(EditorCommands.startNodeSelect, Vector2i(mousePosition.x - viewport.x)))
+  else
+    listOf()
+
+  ImGui.end()
   val viewportCommands = if (viewport != editor.viewportBoundsMap[defaultViewportId])
     listOf(Command(EditorCommands.setViewportBounds, mapOf(defaultViewportId to viewport)))
   else
     listOf()
-  return viewportCommands + menuCommands
+  return viewportCommands + menuCommands + clickCommands
 }

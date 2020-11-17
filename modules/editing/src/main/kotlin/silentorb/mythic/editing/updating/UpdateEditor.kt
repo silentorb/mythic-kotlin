@@ -6,11 +6,13 @@ import silentorb.mythic.ent.getGraphKeys
 import silentorb.mythic.ent.scenery.gatherChildren
 import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.haft.getMouseOffset
+import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.happenings.handleCommands
 import silentorb.mythic.happenings.onSetCommand
 import silentorb.mythic.scenery.SceneProperties
 import silentorb.mythic.spatial.Vector2
+import silentorb.mythic.spatial.Vector2i
 
 fun updateNodeSelection(editor: Editor, nextGraph: Graph?) = handleCommands<NodeSelection> { command, selection ->
   val graph = editor.graph
@@ -94,9 +96,22 @@ fun updateEditorState(commands: Commands, editor: Editor, graph: Graph?, mouseOf
   )
 }
 
-fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector2, commands: Commands, editor: Editor): Editor {
+fun updateSelectionQuery(editor: Editor, commands: Commands): SelectionQuery? {
+  val selectionCommand = commands.firstOrNull { it.type == EditorCommands.startNodeSelect }
+  val previousSelectionQuery = editor.selectionQuery
+  return if (selectionCommand != null)
+    SelectionQuery(
+        position = selectionCommand.value as Vector2i
+    )
+  else if (previousSelectionQuery != null && previousSelectionQuery.result == null)
+    previousSelectionQuery // Still waiting for a response from the rendering code
+  else
+    null
+}
+
+fun getNextGraph(editor: Editor, commands: Commands): Graph? {
   val commandTypes = commands.map { it.type }
-  val nextGraph = if (commandTypes.contains(EditorCommands.setActiveGraph)) {
+  return if (commandTypes.contains(EditorCommands.setActiveGraph)) {
     editor.graphLibrary[commands.first { it.type == EditorCommands.setActiveGraph }.value]
   } else if (commandTypes.contains(EditorCommands.commitOperation) && editor.staging != null)
     editor.staging
@@ -111,11 +126,15 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
     else
       updateSceneGraph(editor)(commands, activeGraph)
   }
+}
 
-
+fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector2, commands: Commands, editor: Editor): Editor {
+  val commandTypes = commands.map { it.type }
+  val nextGraph = getNextGraph(editor, commands)
   val nextOperation = updateOperation(commandTypes, editor)
   val nextStaging = updateStaging(editor, previousMousePosition, mouseOffset, commandTypes, nextOperation)
   val nextState = updateEditorState(commands, editor, nextGraph, mouseOffset)
+
   return editor.copy(
       state = nextState,
       operation = nextOperation,
@@ -126,14 +145,23 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
       fileItems = updateProject(commands, editor),
       clipboard = updateClipboard(editor)(commands, editor.clipboard),
 //      history = appendHistory(editor.history, nextGraph),
+      selectionQuery = updateSelectionQuery(editor, commands),
   )
+}
+
+fun getQuerySelectionCommands(editor: Editor): Commands {
+  val queryResult = editor.selectionQuery?.result
+  return if (queryResult != null)
+    listOf(Command(EditorCommands.setNodeSelection, queryResult))
+  else
+    listOf()
 }
 
 fun updateEditor(deviceStates: List<InputDeviceState>, editor: Editor): Editor {
   val externalCommands = if (isCtrlDown() || isAltDown() || isShiftDown())
     listOf()
   else
-    mapCommands(defaultEditorBindings(), deviceStates)
+    mapCommands(defaultEditorBindings(), deviceStates) + getQuerySelectionCommands(editor)
 
   val guiCommands = defineEditorGui(editor)
   return if (isImGuiFieldActive())
