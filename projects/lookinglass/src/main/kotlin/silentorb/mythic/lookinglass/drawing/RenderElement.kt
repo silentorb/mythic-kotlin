@@ -31,7 +31,7 @@ fun renderElement(renderer: SceneRenderer, primitive: Primitive, material: Mater
   )
   val effect = renderer.getShader(primitive.mesh.vertexSchema, ShaderFeatureConfig(
       skeleton = isAnimated,
-      texture = texture != null && primitive.mesh.vertexSchema.attributes.any {it.name == "uv"},
+      texture = texture != null && primitive.mesh.vertexSchema.attributes.any { it.name == "uv" },
       shading = material.shading,
       colored = primitive.material.coloredVertices || material.coloredVertices
   ))
@@ -83,7 +83,7 @@ private fun useMesh(meshes: ModelMeshMap, MeshName: MeshName, action: (ModelMesh
   }
 }
 
-fun renderMeshElement(renderer: SceneRenderer, mesh: String, transform: Matrix, material: Material, armature: Armature? = null, transforms: List<Matrix>? = null) {
+fun renderMeshElement(renderer: SceneRenderer, mesh: String, transform: Matrix, material: Material?, armature: Armature? = null, transforms: List<Matrix>? = null) {
   val meshes = renderer.meshes
   useMesh(meshes, mesh) { mesh ->
     if (mesh.sampledModel == null) {
@@ -98,7 +98,7 @@ fun renderMeshElement(renderer: SceneRenderer, mesh: String, transform: Matrix, 
 }
 
 fun renderMeshElement(renderer: SceneRenderer, element: MeshElement, armature: Armature? = null, transforms: List<Matrix>? = null) {
-  renderMeshElement(renderer, element.mesh, element.transform, element.material!!, armature, transforms)
+  renderMeshElement(renderer, element.mesh, element.transform, element.material, armature, transforms)
 }
 
 fun renderElementGroup(renderer: SceneRenderer, camera: Camera, group: ElementGroup) {

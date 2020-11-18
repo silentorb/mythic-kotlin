@@ -93,6 +93,9 @@ fun expandInstances(graphs: GraphLibrary, graph: Graph): Graph {
   return expandInstances(graphs, instances, graph)
 }
 
+fun expandInstances(graphs: GraphLibrary, name: String): Graph =
+    expandInstances(graphs, graphs[name]!!)
+
 fun getShape(meshShapeMap: Map<Key, Shape>, graph: Graph, node: Key): Shape? {
   val shapeType = getValue<Key>(graph, node, SceneProperties.collisionShape)
   return if (shapeType == null)

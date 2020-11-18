@@ -22,9 +22,12 @@ fun nodesToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, grap
   return nodes.flatMap { node -> nodeToElements(meshesShapes, graphs, graph, node) }
 }
 
-fun getGraphElementMaterial(graph: Graph, node: Key): Material {
+fun getGraphElementMaterial(graph: Graph, node: Key): Material? {
   val texture = getValue<Key>(graph, node, SceneProperties.texture)
-  return Material(texture = texture, shading = true)
+  return if (texture != null)
+    Material(texture = texture, shading = true)
+  else
+    null
 }
 
 fun nodeToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph: Graph, node: Key): List<ElementGroup> {
@@ -49,6 +52,7 @@ fun nodeToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph
             group.copy(
                 meshes = group.meshes.map { meshElement ->
                   meshElement.copy(
+                      // TODO: For some reason the matrix integration is needing to be backwards from the highlight pass
                       transform = instanceTransform * meshElement.transform
                   )
                 },

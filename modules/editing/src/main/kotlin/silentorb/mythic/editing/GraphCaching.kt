@@ -2,6 +2,21 @@ package silentorb.mythic.editing
 
 import silentorb.mythic.ent.GraphLibrary
 
+fun loadImmediateDependencies(editor: Editor, library: GraphLibrary, graphId: String): GraphLibrary {
+  val dependencies = getGraphDependencies(library, setOf(graphId)).plus(graphId) - library.keys
+  return dependencies
+      .associateWith { loadGraph(editor, it) }
+      .filter { it.value != null } as GraphLibrary
+}
+
+tailrec fun loadAllDependencies(editor: Editor, graphId: String, accumulator: GraphLibrary = editor.graphLibrary): GraphLibrary {
+  val loaded = loadImmediateDependencies(editor, accumulator, graphId)
+  return if (loaded.none())
+    accumulator
+  else
+    loadAllDependencies(editor, graphId, accumulator + loaded)
+}
+
 fun updateSceneCaching(editor: Editor): GraphLibrary {
   val graph = getActiveEditorGraph(editor)
   val library = editor.graphLibrary
@@ -22,12 +37,8 @@ fun updateSceneCaching(editor: Editor): GraphLibrary {
     else
       mapOf()
 
-    val dependencies = getGraphDependencies(library, setOf(graphId)) - library.keys
-    val loaded = dependencies
-        .associateWith { loadGraph(editor, it) }
-        .filter { it.value != null } as GraphLibrary
+    loadAllDependencies(editor, graphId, library) + update
 
-    library + update + loaded
   } else
     library
 }

@@ -3,16 +3,16 @@ package silentorb.mythic.editing.lookinglass
 import silentorb.mythic.drawing.flipViewport
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.panels.defaultViewportId
-import silentorb.mythic.ent.*
+import silentorb.mythic.ent.Graph
+import silentorb.mythic.ent.Key
+import silentorb.mythic.ent.mapByProperty
+import silentorb.mythic.ent.newGraph
 import silentorb.mythic.ent.scenery.getSceneTree
 import silentorb.mythic.ent.scenery.nodesToElements
-import silentorb.mythic.glowing.clearDepth
 import silentorb.mythic.lookinglass.*
 import silentorb.mythic.platforming.WindowInfo
 import silentorb.mythic.scenery.*
-import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
-import silentorb.mythic.spatial.Vector4i
 
 data class SerialElementData(
     val parents: SceneTree,
@@ -34,24 +34,6 @@ fun newSerialElementData(graph: Graph): SerialElementData {
       scale = mapByProperty(graph, SceneProperties.scale),
   )
 }
-
-//fun getTransform(data: SerialElementData, node: Key): Matrix {
-//  val translation = data.translation[node] ?: Vector3.zero
-//  val rotation = data.rotation[node] ?: Vector3.zero
-//  val scale = data.scale[node] ?: Vector3.unit
-//  val localTransform = Matrix.identity
-//      .translate(translation)
-//      .rotateZ(rotation.z)
-//      .rotateY(rotation.y)
-//      .rotateX(rotation.x)
-//      .scale(scale)
-//
-//  val parent = data.parents[node]
-//  return if (parent != null)
-//    getTransform(data, parent) * localTransform
-//  else
-//    localTransform
-//}
 
 fun cameraRigToCamera(camera: CameraRig): Camera =
     Camera(
@@ -99,7 +81,7 @@ fun renderEditor(renderer: Renderer, windowInfo: WindowInfo, editor: Editor, lig
     val graph = getActiveEditorGraph(editor)
     val filters = prepareRender(sceneRenderer, scene)
     val nextSelectionQuery = if (previousSelectionQuery != null && graph != null) {
-      val selectedObject = plumbPixelDepth(sceneRenderer, previousSelectionQuery, graph)
+      val selectedObject = plumbPixelDepth(sceneRenderer, editor, previousSelectionQuery, graph)
       previousSelectionQuery.copy(
           response = SelectionQueryResponse(
               selectedObject = selectedObject

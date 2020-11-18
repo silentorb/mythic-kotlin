@@ -99,7 +99,7 @@ fun updateEditorState(commands: Commands, editor: Editor, graph: Graph?, mouseOf
 fun updateSelectionQuery(editor: Editor, commands: Commands): SelectionQuery? {
   val selectionCommand = commands.firstOrNull { it.type == EditorCommands.startNodeSelect }
   val previousSelectionQuery = editor.selectionQuery
-  return if (selectionCommand != null)
+  return if (selectionCommand != null && commands.none { it.type == EditorCommands.commitOperation })
     SelectionQuery(
         position = selectionCommand.value as Vector2i
     )
