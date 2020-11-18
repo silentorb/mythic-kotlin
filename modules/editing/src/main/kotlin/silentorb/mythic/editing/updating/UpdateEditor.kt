@@ -15,7 +15,7 @@ import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector2i
 
 fun updateNodeSelection(editor: Editor, nextGraph: Graph?) = handleCommands<NodeSelection> { command, selection ->
-  val graph = editor.graph
+  val graph = getActiveEditorGraph(editor)
   if (graph != null && nextGraph != null) {
     when (command.type) {
       EditorCommands.setNodeSelection -> command.value as NodeSelection
@@ -40,6 +40,9 @@ fun updateNodeSelection(editor: Editor, nextGraph: Graph?) = handleCommands<Node
         } else
           selection
       }
+
+      EditorCommands.undo -> getPreviousSnapshot(editor)?.nodeSelection ?: selection
+      EditorCommands.redo -> getNextSnapshot(editor)?.nodeSelection ?: selection
 
       else -> selection
     }
@@ -118,7 +121,7 @@ fun getNextGraph(editor: Editor, commands: Commands): Graph? {
   else if (!editor.graphLibrary.containsKey(editor.state.graph))
     null
   else if (editor.staging != null)
-    editor.graph
+    getLatestGraph(editor)
   else {
     val activeGraph = getActiveEditorGraph(editor)
     if (activeGraph == null)
@@ -134,17 +137,18 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
   val nextOperation = updateOperation(commandTypes, editor)
   val nextStaging = updateStaging(editor, previousMousePosition, mouseOffset, commandTypes, nextOperation)
   val nextState = updateEditorState(commands, editor, nextGraph, mouseOffset)
+  val nextHistory = updateHistory(nextGraph, nextState.nodeSelection, editor.state.graph, commands, editor.maxHistory, editor.history)
 
   return editor.copy(
       state = nextState,
       operation = nextOperation,
       staging = nextStaging,
-      graph = nextGraph,
       graphLibrary = updateSceneCaching(editor),
       viewportBoundsMap = onSetCommand(commands, EditorCommands.setViewportBounds, editor.viewportBoundsMap),
       fileItems = updateProject(commands, editor),
       clipboard = updateClipboard(editor)(commands, editor.clipboard),
 //      history = appendHistory(editor.history, nextGraph),
+      history = nextHistory,
       selectionQuery = updateSelectionQuery(editor, commands),
   )
 }

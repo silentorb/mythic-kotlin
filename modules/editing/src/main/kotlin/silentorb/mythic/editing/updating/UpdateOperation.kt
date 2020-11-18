@@ -244,6 +244,6 @@ fun updateStaging(editor: Editor, previousMousePosition: Vector2, mouseOffset: V
     if (nextOperation == null || commandTypes.contains(EditorCommands.cancelOperation))
       null
     else if (editor.staging == null || editor.operation != nextOperation)
-      editor.graph
+      getLatestGraph(editor)
     else
       updateStaging(editor, previousMousePosition, mouseOffset, commandTypes)

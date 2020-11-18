@@ -10,22 +10,44 @@ import silentorb.mythic.ent.Key
 import silentorb.mythic.scenery.SceneProperties
 import silentorb.mythic.spatial.*
 
+fun getLatestSnapshot(editor: Editor): Snapshot? =
+    editor.history[editor.state.graph]?.pastAndPresent?.lastOrNull()
+
+fun getPreviousSnapshot(editor: Editor): Snapshot? =
+    editor.history[editor.state.graph]?.pastAndPresent?.dropLast(1)?.lastOrNull()
+
+fun getNextSnapshot(editor: Editor): Snapshot? =
+    editor.history[editor.state.graph]?.future?.firstOrNull()
+
+fun getLatestGraph(editor: Editor): Graph? =
+    getLatestSnapshot(editor)?.graph
+
 fun getActiveEditorGraph(editor: Editor): Graph? =
-    editor.staging ?: editor.graph ?: editor.graphLibrary[editor.state.graph]
+    editor.staging ?: getLatestGraph(editor) ?: editor.graphLibrary[editor.state.graph]
 
 fun defaultEditorState() =
     EditorState(
         cameras = mapOf(defaultViewportId to CameraRig(location = Vector3(-10f, 0f, 0f))),
     )
 
+object ModifierKeys {
+  const val ctrl = 1
+  const val alt = 2
+  const val shift = 4
+}
+
 private var modifierStateCtrl: Boolean = false
 private var modifierStateShift: Boolean = false
 private var modifierStateAlt: Boolean = false
+private var modifierStateComposite: Int = 0
 
 fun updateModifierKeyStates() {
   modifierStateCtrl = ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL)
   modifierStateShift = ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_SHIFT)
   modifierStateAlt = ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_ALT) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_ALT)
+  modifierStateComposite = (if (modifierStateCtrl) ModifierKeys.ctrl else 0) +
+      (if (modifierStateShift) ModifierKeys.shift else 0) +
+      (if (modifierStateAlt) ModifierKeys.alt else 0)
 }
 
 fun isCtrlDown(): Boolean =
@@ -37,6 +59,9 @@ fun isAltDown(): Boolean =
 fun isShiftDown(): Boolean =
     modifierStateShift
 
+fun getCompositeModifierKeys(): Int =
+    modifierStateComposite
+
 fun mapKey(key: String): Int =
     when {
       key.length == 1 -> key.first().toInt()
@@ -47,25 +72,28 @@ fun mapKey(key: String): Int =
       else -> throw Error("Keystroke type yet supported: $key")
     }
 
+// Eventually this workflow could be optimized so that shortcuts are translated entirely to single integers
+// then those values can be directly compared or even used as keys in a map.
+// Also, the shortcut key code is no longer as tightly coupled to menus and could be handled more
+// cleanly outside of them.
 fun isShortcutPressed(shortcut: String): Boolean {
   val parts = shortcut.split("+")
   val key = parts.last()
-  val leftModifiers = parts.dropLast(1)
+  val requiredModifiers = parts.dropLast(1)
       .map { modifierName ->
         when (modifierName) {
-          "Ctrl" -> GLFW.GLFW_KEY_LEFT_CONTROL
-          "Shift" -> GLFW.GLFW_KEY_LEFT_SHIFT
-          "Alt" -> GLFW.GLFW_KEY_LEFT_ALT
+          "Ctrl" -> ModifierKeys.ctrl
+          "Shift" -> ModifierKeys.shift
+          "Alt" -> ModifierKeys.alt
           else -> throw Error("Not supported")
         }
       }
+      .fold(0) { a, b -> a or b }
 
   val keyIndex = mapKey(key)
 
   val isKeyPressed = ImGui.isKeyPressed(keyIndex)
-  val modifiersArePressed = leftModifiers.all { leftModifier ->
-    ImGui.isKeyDown(leftModifier) || ImGui.isKeyDown(leftModifier + 4)
-  }
+  val modifiersArePressed = requiredModifiers == getCompositeModifierKeys()
   return isKeyPressed && modifiersArePressed
 }
 

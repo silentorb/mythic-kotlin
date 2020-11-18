@@ -26,7 +26,6 @@ data class Serialization(
 )
 
 typealias DefaultValueSource = (Editor) -> Any?
-typealias OptionsSource = (Editor) -> List<Key>
 typealias PropertyWidget = (Editor, Entry) -> Any
 
 data class PropertyDefinition(
@@ -39,16 +38,14 @@ data class PropertyDefinition(
 )
 
 typealias PropertyDefinitions = Map<Key, PropertyDefinition>
-
 typealias NodeSelection = Set<Key>
 
-data class Option(
-    val label: String,
-    val value: String,
+data class Snapshot(
+    val graph: Graph,
+    val nodeSelection: NodeSelection,
 )
 
-typealias Options = List<Option>
-typealias GraphHistory = List<Graph>
+typealias GraphHistory = List<Snapshot>
 
 data class ContextCommand(
     val panel: String,
@@ -86,13 +83,19 @@ data class SelectionQuery(
     val response: SelectionQueryResponse? = null,
 )
 
+data class EditHistory(
+    val pastAndPresent: GraphHistory = listOf(),
+    val future: GraphHistory = listOf(),
+)
+
+typealias HistoryMap = Map<String, EditHistory>
+
 data class Editor(
     val projectPath: Path,
     val state: EditorState = EditorState(),
     val staging: Graph? = null,
-    val graph: Graph? = null,
     val clipboard: Graph? = null,
-//    val history: GraphHistory = listOf(),
+    val history: HistoryMap = mapOf(),
     val operation: Operation? = null,
     val enumerations: EditorEnumerations,
     val fileItems: FileItems,
@@ -100,6 +103,7 @@ data class Editor(
     val viewportBoundsMap: Map<Key, Vector4i> = mapOf(),
     val bindings: KeystrokeBindings = defaultEditorMenuKeystrokes(),
     val selectionQuery: SelectionQuery? = null,
+    val maxHistory: Int = 20,
 )
 
 const val keypadKey = "Numpad"

@@ -47,4 +47,7 @@ object EditorCommands {
   val renameFileWithNameDialog = "renameFileWithNameDialog"
   val renameFolder = "renameFolder"
   val renameFolderWithNameDialog = "renameFolderWithNameDialog"
+
+  val undo = "undo"
+  val redo = "redo"
 }
