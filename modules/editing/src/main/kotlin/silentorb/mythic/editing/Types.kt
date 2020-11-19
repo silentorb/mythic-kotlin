@@ -56,10 +56,20 @@ typealias KeystrokeBindings = Map<ContextCommand, String>
 
 typealias GetShortcut = (String) -> String?
 
+enum class RenderingMode{
+    full,
+    wireframe,
+}
+
+data class ViewportState(
+    val camera: CameraRig,
+    val renderingMode: RenderingMode = RenderingMode.full,
+)
+
 // Persistent State
 data class EditorState(
     val graph: String? = null,
-    val cameras: Map<Key, CameraRig> = mapOf(),
+    val viewports: Map<Key, ViewportState> = defaultViewports(),
     val nodeSelection: NodeSelection = setOf(),
     val fileSelection: Set<String> = setOf(),
 )

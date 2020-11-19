@@ -59,6 +59,10 @@ fun defaultEditorMenuKeystrokes(): KeystrokeBindings = mapOf(
     ContextCommand(Contexts.viewport, EditorCommands.toggleProjectionMode) to "$keypadKey 5",
     ContextCommand(Contexts.viewport, EditorCommands.centerOnSelection) to numpadPeriodKey,
 
+    // These will probably need modifier keys eventually
+    ContextCommand(Contexts.viewport, EditorCommands.renderingModeWireframe) to "2",
+    ContextCommand(Contexts.viewport, EditorCommands.renderingModeFull) to "3",
+
     ContextCommand(Contexts.global, EditorCommands.undo) to "Ctrl+Z",
     ContextCommand(Contexts.global, EditorCommands.redo) to "Ctrl+Shift+Z",
 )

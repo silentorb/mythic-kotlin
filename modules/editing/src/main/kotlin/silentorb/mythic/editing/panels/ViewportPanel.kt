@@ -25,6 +25,8 @@ fun viewportMenus(getShortcut: GetShortcut): Commands =
             MenuItem("View Bottom", EditorCommands.viewBottom),
             MenuItem("Toggle Projection", EditorCommands.toggleProjectionMode),
             MenuItem("Center on Selection", EditorCommands.centerOnSelection),
+            MenuItem("Draw Wireframe", EditorCommands.renderingModeWireframe),
+            MenuItem("Draw Full", EditorCommands.renderingModeFull),
         ))
     ))
 

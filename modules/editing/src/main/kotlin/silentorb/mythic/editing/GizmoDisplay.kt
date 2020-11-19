@@ -103,7 +103,7 @@ fun drawEditor3dElements(editor: Editor, viewport: Vector4i, camera: CameraRig) 
 
 fun drawEditor3dElements(editor: Editor) {
   for ((key, viewport) in editor.viewportBoundsMap) {
-    val camera = editor.state.cameras[key]
+    val camera = getEditorCamera(editor, key)
     if (camera != null) {
       drawEditor3dElements(editor, viewport, camera)
     }

@@ -9,10 +9,12 @@ import silentorb.mythic.ent.mapByProperty
 import silentorb.mythic.ent.newGraph
 import silentorb.mythic.ent.scenery.getSceneTree
 import silentorb.mythic.ent.scenery.nodesToElements
+import silentorb.mythic.glowing.DrawMethod
 import silentorb.mythic.lookinglass.*
 import silentorb.mythic.platforming.WindowInfo
 import silentorb.mythic.scenery.*
 import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.Vector4
 
 data class SerialElementData(
     val parents: SceneTree,
@@ -48,11 +50,33 @@ fun cameraRigToCamera(camera: CameraRig): Camera =
 
 fun sceneFromEditorGraph(meshShapes: Map<String, Shape>, editor: Editor, lightingConfig: LightingConfig, viewport: Key): GameScene {
   val graph = getActiveEditorGraph(editor) ?: newGraph()
-  val camera = cameraRigToCamera(editor.state.cameras[viewport] ?: CameraRig())
+  val viewportState = getEditorViewport(editor, viewport)
+  val camera = cameraRigToCamera(getEditorCamera(editor, viewport) ?: CameraRig())
+
+  val initialElements = nodesToElements(meshShapes, editor.graphLibrary, graph)
+  val elements = if (viewportState?.renderingMode == RenderingMode.wireframe) {
+    val wireframeMaterial = Material(
+        shading = false,
+        color = Vector4(0.9f),
+        drawMethod = DrawMethod.lineLoop,
+    )
+    initialElements
+        .map { elementGroup ->
+          elementGroup.copy(
+              meshes = elementGroup.meshes
+                  .map { meshElement ->
+                    meshElement.copy(
+                        material = wireframeMaterial,
+                    )
+                  }
+          )
+        }
+  } else
+    initialElements
 
   val layers = listOf(
       SceneLayer(
-          elements = nodesToElements(meshShapes, editor.graphLibrary, graph),
+          elements = elements,
           useDepth = true
       ),
   )

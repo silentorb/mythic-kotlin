@@ -82,18 +82,33 @@ fun updateClipboard(editor: Editor) = handleCommands<Graph?> { command, clipboar
   }
 }
 
+val updateRenderingMode = handleCommands<RenderingMode> { command, renderingMode ->
+  when (command.type) {
+    EditorCommands.renderingModeFull -> RenderingMode.full
+    EditorCommands.renderingModeWireframe -> RenderingMode.wireframe
+    else -> renderingMode
+  }
+}
+
+fun updateViewport(editor: Editor, commands: Commands, mouseOffset: Vector2, viewport: ViewportState): ViewportState {
+  return viewport.copy(
+      camera = updateCamera(editor, mouseOffset, commands, viewport.camera),
+      renderingMode = updateRenderingMode(commands, viewport.renderingMode)
+  )
+}
+
 fun updateEditorState(commands: Commands, editor: Editor, graph: Graph?, mouseOffset: Vector2): EditorState {
   val state = editor.state
-  val cameras = state.cameras
-      .mapValues { (_, camera) ->
-        updateCamera(editor, mouseOffset, commands, camera)
+  val cameras = state.viewports
+      .mapValues { (_, viewport) ->
+        updateViewport(editor, commands, mouseOffset, viewport)
       }
 
   val nextNodeSelection = updateNodeSelection(editor, graph)(commands, state.nodeSelection)
 
   return state.copy(
       graph = onSetCommand(commands, EditorCommands.setActiveGraph, state.graph),
-      cameras = cameras,
+      viewports = cameras,
       nodeSelection = nextNodeSelection,
       fileSelection = updateFileSelection(commands, state.fileSelection)
   )

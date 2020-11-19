@@ -75,7 +75,7 @@ fun mouseTransform(property: String, handler: MouseTransformHandler): (Vector2, 
         val viewportPair = editor.viewportBoundsMap.entries.firstOrNull { (_, viewport) ->
           isInBounds(previousMousePosition.toVector2i(), viewport)
         }
-        val camera = editor.state.cameras[viewportPair?.key]
+        val camera = getEditorCamera(editor, viewportPair?.key)
         if (viewportPair == null || camera == null)
           graph
         else {
@@ -106,7 +106,7 @@ fun updateTranslation(previousMousePosition: Vector2, mouseOffset: Vector2, edit
       val viewportPair = editor.viewportBoundsMap.entries.firstOrNull { (_, viewport) ->
         isInBounds(previousMousePosition.toVector2i(), viewport)
       }
-      val camera = editor.state.cameras[viewportPair?.key]
+      val camera = getEditorCamera(editor, viewportPair?.key)
       if (viewportPair == null || camera == null)
         graph
       else {
@@ -119,12 +119,12 @@ fun updateTranslation(previousMousePosition: Vector2, mouseOffset: Vector2, edit
           val globalObjectLocation = globalObjectTransform.translation()
           val distance = globalObjectLocation.distance(camera.location)
           val mouseStart = previousMousePosition - viewport.xy().toVector2()
-          val cameraTransform = createPerspectiveMatrix(viewport.zw(), 45f, 0.01f, distance) * viewTransform
+          val cameraTransform = createProjectionMatrix(camera, viewport.zw(), distance) * viewTransform
           val start = unproject(cameraTransform, viewport.toVector4(), mouseStart, 1f)
           val end = unproject(cameraTransform, viewport.toVector4(), mouseStart + mouseOffset, 1f)
           val offset = end - start
           val finalOffset = if (data.axis.any())
-            offset * Vector3(axisMask(data.axis))
+            (offset * Vector3(axisMask(data.axis))).normalize() * offset.length()
           else
             offset
 
@@ -145,7 +145,7 @@ fun updateRotation(previousMousePosition: Vector2, mouseOffset: Vector2, editor:
     val viewportPair = editor.viewportBoundsMap.entries.firstOrNull { (_, viewport) ->
       isInBounds(previousMousePosition.toVector2i(), viewport)
     }
-    val camera = editor.state.cameras[viewportPair?.key]
+    val camera = getEditorCamera(editor, viewportPair?.key)
     if (viewportPair == null || camera == null)
       graph
     else {
@@ -196,7 +196,7 @@ fun updateScaling(previousMousePosition: Vector2, mouseOffset: Vector2, editor: 
       val viewportPair = editor.viewportBoundsMap.entries.firstOrNull { (_, viewport) ->
         isInBounds(previousMousePosition.toVector2i(), viewport)
       }
-      val camera = editor.state.cameras[viewportPair?.key]
+      val camera = getEditorCamera(editor, viewportPair?.key)
       if (viewportPair == null || camera == null)
         graph
       else {

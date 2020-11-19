@@ -7,6 +7,7 @@ import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.GraphLibrary
 import silentorb.mythic.ent.Key
+import silentorb.mythic.scenery.ProjectionType
 import silentorb.mythic.scenery.SceneProperties
 import silentorb.mythic.spatial.*
 
@@ -22,12 +23,25 @@ fun getNextSnapshot(editor: Editor): Snapshot? =
 fun getLatestGraph(editor: Editor): Graph? =
     getLatestSnapshot(editor)?.graph
 
+fun getEditorViewport(editor: Editor, viewport: Key?): ViewportState? =
+    editor.state.viewports[viewport]
+
+fun getEditorCamera(editor: Editor, viewport: Key?): CameraRig? =
+    editor.state.viewports[viewport]?.camera
+
 fun getActiveEditorGraph(editor: Editor): Graph? =
     editor.staging ?: getLatestGraph(editor) ?: editor.graphLibrary[editor.state.graph]
 
+fun defaultViewports() =
+    mapOf(
+        defaultViewportId to ViewportState(
+            camera = CameraRig(location = Vector3(-10f, 0f, 0f)),
+        )
+    )
+
 fun defaultEditorState() =
     EditorState(
-        cameras = mapOf(defaultViewportId to CameraRig(location = Vector3(-10f, 0f, 0f))),
+        viewports = defaultViewports(),
     )
 
 object ModifierKeys {
@@ -155,3 +169,9 @@ tailrec fun getGraphDependencies(
 
       getGraphDependencies(graphLibrary, nextGraphs, nextAccumulator)
     }
+
+fun createProjectionMatrix(camera: CameraRig, dimensions: Vector2i, distance: Float = 1000f): Matrix =
+    if (camera.projection == ProjectionType.perspective)
+      createPerspectiveMatrix(dimensions, 45f, 0.01f, distance)
+    else
+      createOrthographicMatrix(dimensions, getOrthoZoom(camera), 0.01f, distance)
