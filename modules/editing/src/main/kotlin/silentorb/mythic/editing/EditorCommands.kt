@@ -52,4 +52,6 @@ object EditorCommands {
 
   val undo = "undo"
   val redo = "redo"
+
+  val playScene = "playScene"
 }

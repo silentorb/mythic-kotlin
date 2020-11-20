@@ -113,6 +113,7 @@ fun renderEditor(renderer: Renderer, windowInfo: WindowInfo, editor: Editor, lig
       )
     } else
       null
+
     renderSceneLayers(sceneRenderer, sceneRenderer.camera, scene.layers)
     renderEditorSelection(editor, sceneRenderer)
     applyFilters(sceneRenderer, filters)

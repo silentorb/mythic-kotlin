@@ -176,17 +176,20 @@ fun getQuerySelectionCommands(editor: Editor): Commands {
     listOf()
 }
 
-fun updateEditor(deviceStates: List<InputDeviceState>, editor: Editor): Editor {
+fun prepareEditorUpdate(deviceStates: List<InputDeviceState>, editor: Editor): Commands {
   val externalCommands = if (isCtrlDown() || isAltDown() || isShiftDown())
     listOf()
   else
     mapCommands(defaultEditorBindings(), deviceStates) + getQuerySelectionCommands(editor)
 
   val guiCommands = defineEditorGui(editor)
+  return externalCommands + guiCommands
+}
+
+fun updateEditor(deviceStates: List<InputDeviceState>, commands: Commands, editor: Editor): Editor {
   return if (isImGuiFieldActive())
     editor
   else {
-    val commands = externalCommands + guiCommands
     val previousMousePosition = deviceStates.dropLast(1).last().mousePosition
     updateEditorFromCommands(previousMousePosition, getMouseOffset(deviceStates), commands, editor)
   }

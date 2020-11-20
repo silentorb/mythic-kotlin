@@ -65,4 +65,5 @@ fun defaultEditorMenuKeystrokes(): KeystrokeBindings = mapOf(
 
     ContextCommand(Contexts.global, EditorCommands.undo) to "Ctrl+Z",
     ContextCommand(Contexts.global, EditorCommands.redo) to "Ctrl+Shift+Z",
+    ContextCommand(Contexts.global, EditorCommands.playScene) to "F5",
 )
