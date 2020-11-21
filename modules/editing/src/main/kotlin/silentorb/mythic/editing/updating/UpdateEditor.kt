@@ -13,6 +13,7 @@ import silentorb.mythic.happenings.onSetCommand
 import silentorb.mythic.scenery.SceneProperties
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector2i
+import silentorb.mythic.spatial.toVector2i
 
 fun updateNodeSelection(editor: Editor, nextGraph: Graph?) = handleCommands<NodeSelection> { command, selection ->
   val graph = getActiveEditorGraph(editor)
@@ -90,18 +91,24 @@ val updateRenderingMode = handleCommands<RenderingMode> { command, renderingMode
   }
 }
 
-fun updateViewport(editor: Editor, commands: Commands, mouseOffset: Vector2, viewport: ViewportState): ViewportState {
+fun updateViewport(editor: Editor, commands: Commands, mouseOffset: Vector2, viewport: ViewportState, isInBounds: Boolean): ViewportState {
   return viewport.copy(
-      camera = updateCamera(editor, mouseOffset, commands, viewport.camera),
+      camera = updateCamera(editor, mouseOffset, commands, viewport.camera, isInBounds),
       renderingMode = updateRenderingMode(commands, viewport.renderingMode)
   )
 }
 
-fun updateEditorState(commands: Commands, editor: Editor, graph: Graph?, mouseOffset: Vector2): EditorState {
+fun updateEditorState(commands: Commands, editor: Editor, graph: Graph?, mousePosition: Vector2i, mouseOffset: Vector2): EditorState {
   val state = editor.state
   val cameras = state.viewports
-      .mapValues { (_, viewport) ->
-        updateViewport(editor, commands, mouseOffset, viewport)
+      .mapValues { (key, viewport) ->
+        val bounds = editor.viewportBoundsMap[key]
+        val isInBounds = if (bounds == null)
+          false
+        else
+          isInBounds(mousePosition, bounds)
+
+        updateViewport(editor, commands, mouseOffset, viewport, isInBounds)
       }
 
   val nextNodeSelection = updateNodeSelection(editor, graph)(commands, state.nodeSelection)
@@ -151,7 +158,8 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
   val nextGraph = getNextGraph(editor, commands)
   val nextOperation = updateOperation(commandTypes, editor)
   val nextStaging = updateStaging(editor, previousMousePosition, mouseOffset, commandTypes, nextOperation)
-  val nextState = updateEditorState(commands, editor, nextGraph, mouseOffset)
+  val mousePosition = (previousMousePosition + mouseOffset).toVector2i()
+  val nextState = updateEditorState(commands, editor, nextGraph, mousePosition, mouseOffset)
   val nextHistory = updateHistory(nextGraph, nextState.nodeSelection, editor.state.graph, commands, editor.maxHistory, editor.history)
 
   return editor.copy(

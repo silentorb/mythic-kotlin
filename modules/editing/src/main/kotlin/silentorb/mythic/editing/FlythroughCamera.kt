@@ -29,7 +29,7 @@ fun getCameraPivot(camera: CameraRig): Vector3 {
 }
 
 fun getCameraLookat(camera: CameraRig): Vector3 =
-  camera.orientation.transform(Vector3(1f, 0f, 0f))
+    camera.orientation.transform(Vector3(1f, 0f, 0f))
 
 fun updateCameraOrbiting(mouseOffset: Vector2, camera: CameraRig): CameraRig {
   return if (mouseOffset == Vector2.zero)
@@ -84,12 +84,12 @@ fun zoomCamera(camera: CameraRig, newPivotDistance: Float): CameraRig {
 fun getOrthoZoom(camera: CameraRig): Float =
     camera.pivotDistance * 0.45f
 
-fun updateFlyThroughCamera(mouseOffset: Vector2, commands: List<Command>, camera: CameraRig): CameraRig {
+fun updateFlyThroughCamera(mouseOffset: Vector2, commands: List<Command>, camera: CameraRig, isInBounds: Boolean): CameraRig {
   return when {
-    commands.any { it.type == EditorCommands.zoomIn } -> zoomCamera(camera, camera.pivotDistance * 0.7f)
-    commands.any { it.type == EditorCommands.zoomOut } -> zoomCamera(camera, camera.pivotDistance * 1.3f + 0.1f)
-    isAltDown() -> updateCameraOrbiting(mouseOffset, camera)
-    isShiftDown() -> updateCameraPanning(mouseOffset, camera)
+    commands.any { it.type == EditorCommands.zoomIn } && isInBounds -> zoomCamera(camera, camera.pivotDistance * 0.7f)
+    commands.any { it.type == EditorCommands.zoomOut } && isInBounds -> zoomCamera(camera, camera.pivotDistance * 1.3f + 0.1f)
+    isAltDown() && isInBounds -> updateCameraOrbiting(mouseOffset, camera)
+    isShiftDown() && isInBounds -> updateCameraPanning(mouseOffset, camera)
     else -> {
       val lookVelocity = updateLookVelocityFirstPerson(commands, defaultLookMomentumAxis(), camera.lookVelocity)
       val rotation = updateFirstPersonFacingRotation(camera.rotation, null, lookVelocity, simulationDelta)

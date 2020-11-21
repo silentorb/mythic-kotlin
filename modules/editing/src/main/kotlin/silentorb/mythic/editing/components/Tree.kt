@@ -6,18 +6,19 @@ import silentorb.mythic.ent.Key
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 
-fun newTreeFlags(selected: Boolean, hasChildren: Boolean): Int {
+fun leafFlags(hasChildren: Boolean): Int =
+    if (hasChildren)
+      ImGuiTreeNodeFlags.None
+    else
+      ImGuiTreeNodeFlags.Leaf
+
+fun newTreeFlags(selected: Boolean): Int {
   val selectionFlags = if (selected)
     ImGuiTreeNodeFlags.Selected
   else
     ImGuiTreeNodeFlags.None
 
-  val leafFlags = if (hasChildren)
-    ImGuiTreeNodeFlags.None
-  else
-    ImGuiTreeNodeFlags.Leaf
-
-  return selectionFlags or leafFlags or
+  return selectionFlags or
       ImGuiTreeNodeFlags.OpenOnArrow or
       ImGuiTreeNodeFlags.OpenOnDoubleClick or
       ImGuiTreeNodeFlags.DefaultOpen or

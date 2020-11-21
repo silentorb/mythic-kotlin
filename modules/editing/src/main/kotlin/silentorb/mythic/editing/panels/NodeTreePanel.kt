@@ -25,7 +25,7 @@ fun nodeTreeMenus(getShortcut: GetShortcut): Commands =
 fun renderTree(tree: SceneTree, id: String, selection: NodeSelection): Commands {
   val selected = selection.contains(id)
   val children = tree.filter { it.value == id }
-  val flags = newTreeFlags(selected, children.any())
+  val flags = newTreeFlags(selected) or leafFlags(children.any())
 
   val isOpen = ImGui.treeNodeEx("Tree-$id", flags, id)
   val selectionCommands = getSelectionCommands(EditorCommands.setNodeSelection, selection, id)

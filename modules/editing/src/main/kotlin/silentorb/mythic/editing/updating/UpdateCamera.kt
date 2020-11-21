@@ -61,7 +61,7 @@ fun applyCameraPresets(editor: Editor, commands: List<Command>, camera: CameraRi
         .mapNotNull { applyCameraPresets(editor, it.type, camera) }
         .firstOrNull()
 
-fun updateCamera(editor: Editor, mouseOffset: Vector2, commands: List<Command>, camera: CameraRig): CameraRig {
+fun updateCamera(editor: Editor, mouseOffset: Vector2, commands: List<Command>, camera: CameraRig, isInBounds: Boolean): CameraRig {
   return applyCameraPresets(editor, commands, camera)
-      ?: updateFlyThroughCamera(mouseOffset, commands, camera)
+      ?: updateFlyThroughCamera(mouseOffset, commands, camera, isInBounds)
 }

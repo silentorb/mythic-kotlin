@@ -18,6 +18,10 @@ data class Typeface(
     val size: Float
 )
 
+object DragPayloadTypes {
+  const val fileItem = "fileItem"
+}
+
 typealias SerializationMethod = (Any) -> Any
 
 data class Serialization(

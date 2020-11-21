@@ -45,7 +45,6 @@ fun mapKey(key: String): Int =
       key == "Del" -> GLFW.GLFW_KEY_DELETE
       key == numpadPeriodKey -> GLFW.GLFW_KEY_KP_DECIMAL
       functionKeyPattern.matches(key) -> {
-        println()
         GLFW.GLFW_KEY_F1 + functionKeyPattern.matchEntire(key)!!.groups.last()!!.value.toInt() - 1
       }
       key.contains(keypadKey) -> key.last().toInt() - '0'.toInt() + GLFW.GLFW_KEY_KP_0

@@ -1,7 +1,9 @@
 package silentorb.mythic.editing.panels
 
 import imgui.ImGui
+import imgui.flag.ImGuiDragDropFlags
 import imgui.flag.ImGuiMouseButton
+import imgui.flag.ImGuiTreeNodeFlags
 import imgui.flag.ImGuiWindowFlags
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.*
@@ -20,9 +22,30 @@ fun renderProjectTree(items: Collection<FileItem>, item: FileItem, selection: No
   val id = item.fullPath
   val selected = selection.contains(id)
   val children = items.filter { it.parent == id }
-  val flags = newTreeFlags(selected, children.any())
+  val flags = newTreeFlags(selected) or
+      when {
+        item.type == FileItemType.file -> ImGuiTreeNodeFlags.Leaf
+        children.none() -> ImGuiTreeNodeFlags.Bullet
+        else -> ImGuiTreeNodeFlags.None
+      }
 
   val isOpen = ImGui.treeNodeEx("File-Tree-$id", flags, item.name)
+  val dragCommands = if (item.parent != null && ImGui.beginDragDropSource()) {
+    ImGui.setDragDropPayloadObject(DragPayloadTypes.fileItem, item.fullPath)
+    ImGui.text(item.name)
+    ImGui.endDragDropSource()
+    listOf()
+  } else if (ImGui.beginDragDropTarget()) {
+    val payload = ImGui.acceptDragDropPayloadObject(DragPayloadTypes.fileItem)
+    if (payload != null) {
+      listOf(Command(EditorCommands.moveFileItem, payload to item.fullPath))
+    }
+    else
+      listOf()
+  }
+  else
+    listOf()
+
   val selectionCommands = getSelectionCommands(EditorCommands.setFileSelection, selection, id)
   val activateCommands: Commands = if (ImGui.isItemClicked(ImGuiMouseButton.Left) && ImGui.isMouseDoubleClicked(ImGuiMouseButton.Left))
     listOf(Command(EditorCommands.setActiveGraph, value = sceneFileNameWithoutExtension(item.name)))
@@ -37,7 +60,7 @@ fun renderProjectTree(items: Collection<FileItem>, item: FileItem, selection: No
     ImGui.treePop()
   }
 
-  return selectionCommands + activateCommands + childCommands
+  return selectionCommands + activateCommands + childCommands + dragCommands
 }
 
 fun renderProject(editor: Editor): Commands {

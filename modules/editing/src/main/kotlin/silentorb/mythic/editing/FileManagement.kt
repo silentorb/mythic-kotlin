@@ -30,3 +30,26 @@ fun newFileItem(fullPath: String, type: FileItemType): FileItem {
       type = type,
   )
 }
+
+fun copyRecursive(original: FileItems, item: FileItem, newParent: String): FileItems {
+  val nextItem = item.copy(
+      parent = newParent,
+      fullPath = newParent + "/" + item.name
+  )
+  return original
+      .filterValues { it.parent == item.fullPath }
+      .map { child ->
+        copyRecursive(original, child.value, nextItem.fullPath)
+      }
+      .fold(mapOf<String, FileItem>()) { a, b -> a + b }
+      .plus(nextItem.fullPath to nextItem)
+}
+
+fun selectRecursive(items: FileItems, fullPath: String): Set<String> {
+  return setOf(fullPath) +
+      items
+          .filterValues { it.parent == fullPath }
+          .flatMap { child ->
+            selectRecursive(items, child.key)
+          }
+}
