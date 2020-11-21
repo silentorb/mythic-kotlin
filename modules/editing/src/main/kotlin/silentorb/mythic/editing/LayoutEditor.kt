@@ -6,9 +6,10 @@ import silentorb.mythic.editing.panels.drawPropertiesPanel
 import silentorb.mythic.editing.panels.drawViewportPanel
 import silentorb.mythic.editing.panels.renderProject
 import silentorb.mythic.editing.panels.renderTree
+import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.happenings.Commands
 
-fun drawEditor(editor: Editor): Commands {
+fun drawEditor(editor: Editor, deviceStates: List<InputDeviceState>): Commands {
   val graph = getActiveEditorGraph(editor)
   val menuCommands = mainMenus(getShortcutForContext(editor.bindings, Contexts.global))
 
@@ -17,12 +18,20 @@ fun drawEditor(editor: Editor): Commands {
 
   drawEditor3dElements(editor)
 
-  val menuAndPanelCommands = menuCommands +
-      renderTree(editor, graph) +
-      renderProject(editor) +
-      drawPropertiesPanel(editor, graph) +
-      getImGuiCommands(editor) +
-      drawViewportPanel(editor)
+  val panelResponses =
+      listOf(
+          renderTree(editor, graph),
+          renderProject(editor),
+          drawPropertiesPanel(editor, graph),
+          drawViewportPanel(editor),
+      )
+
+  val panelMenuCommands = panelResponses.flatMap { it.second }
+  val context = panelResponses.fold(Contexts.global) { a, b -> b.first ?: a }
+
+  val shortcutCommands = getShortcutCommands(editor.bindings, context, deviceStates)
+
+  val menuAndPanelCommands = menuCommands + panelMenuCommands + shortcutCommands
 
   val dialogCommands = listOf(
       newNodeNameDialog,
@@ -32,5 +41,6 @@ fun drawEditor(editor: Editor): Commands {
   )
       .flatMap { it(menuAndPanelCommands) }
 
-  return menuAndPanelCommands + dialogCommands
+
+  return menuAndPanelCommands + dialogCommands + getImGuiCommands(editor)
 }

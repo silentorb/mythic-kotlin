@@ -50,6 +50,7 @@ object EditorCommands {
   val renameFolder = "renameFolder"
   val renameFolderWithNameDialog = "renameFolderWithNameDialog"
   val moveFileItem = "moveFileItem"
+  val deleteFileItem ="deleteFileItem"
 
   val undo = "undo"
   val redo = "redo"

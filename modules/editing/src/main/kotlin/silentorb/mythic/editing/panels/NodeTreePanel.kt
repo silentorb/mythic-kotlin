@@ -41,28 +41,23 @@ fun renderTree(tree: SceneTree, id: String, selection: NodeSelection): Commands 
   return selectionCommands + childCommands
 }
 
-fun renderTree(editor: Editor, graph: Graph?): Commands {
-  ImGui.begin("Node Tree", ImGuiWindowFlags.MenuBar)
-  panelBackground()
-  val menuCommands = nodeTreeMenus(getShortcutForContext(editor.bindings, Contexts.nodes))
+fun renderTree(editor: Editor, graph: Graph?): PanelResponse =
+    panel(editor, "Node Tree", Contexts.nodes, ::nodeTreeMenus) {
+      panelBackground()
 
-  if (editor.state.graph != null) {
-    ImGui.text(editor.state.graph)
-    ImGui.separator()
-  }
+      if (editor.state.graph != null) {
+        ImGui.text(editor.state.graph)
+        ImGui.separator()
+      }
 
-  val commands = if (graph != null) {
-    val tree = getSceneTree(graph)
-    val rootNodes = getGraphKeys(graph)
-        .plus(tree.values)
-        .minus(tree.keys)
-    assert(rootNodes.size == 1)
-    val rootId = rootNodes.first()
-    renderTree(tree, rootId, editor.state.nodeSelection)
-  } else
-    listOf()
-
-  ImGui.end()
-
-  return commands + menuCommands
-}
+      if (graph != null) {
+        val tree = getSceneTree(graph)
+        val rootNodes = getGraphKeys(graph)
+            .plus(tree.values)
+            .minus(tree.keys)
+        assert(rootNodes.size == 1)
+        val rootId = rootNodes.first()
+        renderTree(tree, rootId, editor.state.nodeSelection)
+      } else
+        listOf()
+    }

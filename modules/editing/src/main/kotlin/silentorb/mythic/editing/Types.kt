@@ -4,6 +4,7 @@ import silentorb.mythic.ent.Entry
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.GraphLibrary
 import silentorb.mythic.ent.Key
+import silentorb.mythic.happenings.Commands
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector4i
 import java.nio.file.Path
@@ -11,6 +12,8 @@ import java.nio.file.Path
 const val sceneFileExtension = ".scene"
 
 typealias SceneTree = Map<Key, Key>
+typealias MenuDefinition = (GetShortcut) -> Commands
+typealias PanelResponse = Pair<String?, Commands>
 
 data class Typeface(
     val name: String,
@@ -18,8 +21,9 @@ data class Typeface(
     val size: Float
 )
 
-object DragPayloadTypes {
-  const val fileItem = "fileItem"
+object DraggingTypes {
+  const val file = "file"
+  const val folder = "folder"
 }
 
 typealias SerializationMethod = (Any) -> Any
@@ -52,17 +56,18 @@ data class Snapshot(
 typealias GraphHistory = List<Snapshot>
 
 data class ContextCommand(
-    val panel: String,
+    val context: String,
     val command: String
 )
 
 typealias KeystrokeBindings = Map<ContextCommand, String>
+typealias CompressedKeystrokeBindings = Map<Int, List<ContextCommand>>
 
 typealias GetShortcut = (String) -> String?
 
-enum class RenderingMode{
-    full,
-    wireframe,
+enum class RenderingMode {
+  full,
+  wireframe,
 }
 
 data class ViewportState(

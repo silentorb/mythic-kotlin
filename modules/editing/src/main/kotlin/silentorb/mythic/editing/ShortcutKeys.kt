@@ -3,11 +3,18 @@ package silentorb.mythic.editing
 import imgui.ImGui
 import imgui.flag.ImGuiKey
 import org.lwjgl.glfw.GLFW
+import org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT
+import silentorb.mythic.ent.singleValueCache
+import silentorb.mythic.haft.InputDeviceState
+import silentorb.mythic.happenings.Command
+import silentorb.mythic.happenings.Commands
+import silentorb.mythic.platforming.InputEvent
+import silentorb.mythic.platforming.keyboardDeviceIndex
 
 object ModifierKeys {
-  const val ctrl = 1
-  const val alt = 2
-  const val shift = 4
+  const val ctrl = 1 shl 10
+  const val alt = 1 shl 11
+  const val shift = 1 shl 12
 }
 
 private var modifierStateCtrl: Boolean = false
@@ -51,11 +58,7 @@ fun mapKey(key: String): Int =
       else -> throw Error("Keystroke type yet supported: $key")
     }
 
-// Eventually this workflow could be optimized so that shortcuts are translated entirely to single integers
-// then those values can be directly compared or even used as keys in a map.
-// Also, the shortcut key code is no longer as tightly coupled to menus and could be handled more
-// cleanly outside of them.
-fun isShortcutPressed(shortcut: String): Boolean {
+fun compressShortcut(shortcut: String): Int {
   val parts = shortcut.split("+")
   val key = parts.last()
   val requiredModifiers = parts.dropLast(1)
@@ -70,11 +73,66 @@ fun isShortcutPressed(shortcut: String): Boolean {
       .fold(0) { a, b -> a or b }
 
   val keyIndex = mapKey(key)
-
-  val isKeyPressed = ImGui.isKeyPressed(keyIndex)
-  val modifiersArePressed = requiredModifiers == getCompositeModifierKeys()
-  return isKeyPressed && modifiersArePressed
+  return keyIndex or requiredModifiers
 }
+
+fun compressBindings(bindings: KeystrokeBindings): CompressedKeystrokeBindings =
+    bindings
+        .entries
+        .groupBy { it.value }
+        .mapValues { group ->
+          group.value.map { (contextCommand, _) ->
+            contextCommand
+          }
+        }
+        .mapKeys { compressShortcut(it.key) }
 
 fun isEscapePressed(): Boolean =
     ImGui.isKeyPressed(ImGui.getKeyIndex(ImGuiKey.Escape))
+
+fun getKeypresses(deviceStates: List<InputDeviceState>): List<InputEvent> =
+    if (deviceStates.size < 2)
+      listOf()
+    else {
+      val (previous, next) = deviceStates.takeLast(2)
+      previous.events
+          .filter { event ->
+            event.device == keyboardDeviceIndex &&
+                next.events.none { it.device == keyboardDeviceIndex && it.index == event.index }
+          }
+    }
+
+fun getPressedShortcut(keyPresses: List<InputEvent>): Int? {
+  val key = keyPresses.firstOrNull()
+  return if (key == null)
+    null
+  else {
+    key.index or getCompositeModifierKeys()
+  }
+}
+
+val getCompressedBindings = singleValueCache(::compressBindings)
+
+fun getShortcutCommands(bindings: KeystrokeBindings, context: String, deviceStates: List<InputDeviceState>): Commands {
+  val keyPresses = getKeypresses(deviceStates)
+      .filter { it.index < GLFW_KEY_LEFT_SHIFT }
+
+  val compressedBindings = getCompressedBindings(bindings)
+  val combo = getPressedShortcut(keyPresses)
+  val options = compressedBindings[combo]
+  val commandType = if (options != null && options.any()) {
+    val option = if (options.size == 1)
+      options.first()
+    else
+      options.firstOrNull { it.context == context }
+
+    option?.command
+  }
+  else
+    null
+
+  return if (commandType != null)
+    listOf(Command(commandType))
+  else
+    listOf()
+}

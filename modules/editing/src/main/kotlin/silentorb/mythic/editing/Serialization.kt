@@ -130,7 +130,7 @@ fun loadProjectTree(rootPath: Path, rootName: String): FileItems {
     val relativePath = rootPath.relativize(filePath)
     val path = relativePath.toString().replace("\\", "/")
     val type = if (File(filePath.toString()).isDirectory)
-      FileItemType.directory
+      FileItemType.folder
     else
       FileItemType.file
 

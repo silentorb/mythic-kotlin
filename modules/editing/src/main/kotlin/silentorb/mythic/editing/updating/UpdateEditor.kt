@@ -190,7 +190,7 @@ fun prepareEditorUpdate(deviceStates: List<InputDeviceState>, editor: Editor): C
   else
     mapCommands(defaultEditorBindings(), deviceStates) + getQuerySelectionCommands(editor)
 
-  val guiCommands = defineEditorGui(editor)
+  val guiCommands = defineEditorGui(editor, deviceStates)
   return externalCommands + guiCommands
 }
 

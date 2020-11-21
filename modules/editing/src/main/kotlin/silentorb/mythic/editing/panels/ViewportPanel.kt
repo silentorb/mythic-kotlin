@@ -7,6 +7,7 @@ import imgui.flag.ImGuiWindowFlags
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.drawMenuBar
 import silentorb.mythic.editing.components.getShortcutForContext
+import silentorb.mythic.editing.components.panel
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.spatial.Vector2i
@@ -30,36 +31,35 @@ fun viewportMenus(getShortcut: GetShortcut): Commands =
         ))
     ))
 
-fun drawViewportPanel(editor: Editor): Commands {
-  ImGui.begin("Viewport", ImGuiWindowFlags.MenuBar or ImGuiWindowFlags.NoBackground)
-  val menuCommands = viewportMenus(getShortcutForContext(editor.bindings, Contexts.viewport))
-  val viewport = Vector4i(
-      ImGui.getWindowPosX().toInt(), ImGui.getWindowPosY().toInt(),
-      ImGui.getWindowSizeX().toInt(), ImGui.getWindowSizeY().toInt()
-  )
+fun drawViewportPanel(editor: Editor): PanelResponse =
+    panel(editor, "Viewport", Contexts.viewport, ::viewportMenus, ImGuiWindowFlags.NoBackground) {
+      val viewport = Vector4i(
+          ImGui.getWindowPosX().toInt(), ImGui.getWindowPosY().toInt(),
+          ImGui.getWindowSizeX().toInt(), ImGui.getWindowSizeY().toInt()
+      )
 
-  val mousePositionReference = ImVec2()
-  ImGui.getMousePos(mousePositionReference)
-  val mousePosition = Vector2i(
-      mousePositionReference.x.toInt() - viewport.x,
-      mousePositionReference.y.toInt() - viewport.y
-  )
+      val mousePositionReference = ImVec2()
+      ImGui.getMousePos(mousePositionReference)
+      val mousePosition = Vector2i(
+          mousePositionReference.x.toInt() - viewport.x,
+          mousePositionReference.y.toInt() - viewport.y
+      )
 
-  val clickCommands = if (
-      ImGui.isMouseClicked(ImGuiMouseButton.Left) &&
-      mousePosition.x > 0 &&
-      mousePosition.y > 0 &&
-      mousePosition.x < viewport.z &&
-      mousePosition.y < viewport.w
-  )
-    listOf(Command(EditorCommands.startNodeSelect, mousePosition))
-  else
-    listOf()
+      val clickCommands = if (
+          ImGui.isMouseClicked(ImGuiMouseButton.Left) &&
+          mousePosition.x > 0 &&
+          mousePosition.y > 0 &&
+          mousePosition.x < viewport.z &&
+          mousePosition.y < viewport.w
+      )
+        listOf(Command(EditorCommands.startNodeSelect, mousePosition))
+      else
+        listOf()
 
-  ImGui.end()
-  val viewportCommands = if (viewport != editor.viewportBoundsMap[defaultViewportId])
-    listOf(Command(EditorCommands.setViewportBounds, mapOf(defaultViewportId to viewport)))
-  else
-    listOf()
-  return viewportCommands + menuCommands + clickCommands
-}
+      val viewportCommands = if (viewport != editor.viewportBoundsMap[defaultViewportId])
+        listOf(Command(EditorCommands.setViewportBounds, mapOf(defaultViewportId to viewport)))
+      else
+        listOf()
+
+      viewportCommands + clickCommands
+    }

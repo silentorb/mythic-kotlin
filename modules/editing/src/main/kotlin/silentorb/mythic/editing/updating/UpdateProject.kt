@@ -49,7 +49,16 @@ fun handleProjectCommands(editor: Editor) = handleCommands<FileItems> { command,
         val fullPath = selected.fullPath + "/" + name
         val absolutePath = resolveProjectFilePath(editor, fullPath)
         File(absolutePath).mkdir()
-        newFileItem(FileItemType.directory, selected.fullPath, name, items)
+        newFileItem(FileItemType.folder, selected.fullPath, name, items)
+      }
+    }
+    EditorCommands.deleteFileItem -> {
+      val selected = getSelectedFileItem(editor)
+      if (selected == null)
+        items
+      else {
+        Files.deleteIfExists(Paths.get(resolveProjectFilePath(editor, selected.fullPath)))
+        items - selected.fullPath
       }
     }
     EditorCommands.moveFileItem -> {

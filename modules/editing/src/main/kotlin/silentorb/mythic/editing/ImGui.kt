@@ -5,6 +5,7 @@ import imgui.ImGui
 import imgui.flag.ImGuiConfigFlags
 import imgui.gl3.ImGuiImplGl3
 import imgui.glfw.ImGuiImplGlfw
+import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.happenings.Commands
 
 private var imguiInitialized: Boolean = false
@@ -71,7 +72,7 @@ fun ensureImGuiIsInitialized(fonts: List<Typeface>, window: Long) {
   }
 }
 
-fun defineEditorGui(editor: Editor): Commands {
+fun defineEditorGui(editor: Editor, deviceStates: List<InputDeviceState>): Commands {
   if (!imguiInitialized)
     return listOf()
 
@@ -84,7 +85,7 @@ fun defineEditorGui(editor: Editor): Commands {
   updateModifierKeyStates()
   activeInputType = null
 
-  return drawEditor(editor)
+  return drawEditor(editor, deviceStates)
 }
 
 fun renderEditorGui() {

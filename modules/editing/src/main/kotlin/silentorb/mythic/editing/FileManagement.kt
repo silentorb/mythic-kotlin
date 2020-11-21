@@ -1,7 +1,7 @@
 package silentorb.mythic.editing
 
 enum class FileItemType {
-  directory,
+  folder,
   file,
 }
 
@@ -53,3 +53,11 @@ fun selectRecursive(items: FileItems, fullPath: String): Set<String> {
             selectRecursive(items, child.key)
           }
 }
+
+fun isDerivativePath(shorter: String, longer: String): Boolean =
+    shorter.length <= longer.length && longer.substring(0, shorter.length) == shorter
+
+fun isParent(parent: String, child: String): Boolean =
+    parent.length + 2 < child.length &&
+        child.substring(0, parent.length + 1) == "$parent/" &&
+        !child.substring(parent.length + 1).contains('/')

@@ -1,7 +1,6 @@
 package silentorb.mythic.editing.panels
 
 import imgui.ImGui
-import imgui.flag.ImGuiDragDropFlags
 import imgui.flag.ImGuiMouseButton
 import imgui.flag.ImGuiTreeNodeFlags
 import imgui.flag.ImGuiWindowFlags
@@ -18,6 +17,12 @@ fun projectMenus(getShortcut: GetShortcut): Commands =
         ))
     ))
 
+fun getDragType(type: FileItemType): String =
+    if (type == FileItemType.file)
+      DraggingTypes.file
+    else
+      DraggingTypes.folder
+
 fun renderProjectTree(items: Collection<FileItem>, item: FileItem, selection: NodeSelection): Commands {
   val id = item.fullPath
   val selected = selection.contains(id)
@@ -30,20 +35,27 @@ fun renderProjectTree(items: Collection<FileItem>, item: FileItem, selection: No
       }
 
   val isOpen = ImGui.treeNodeEx("File-Tree-$id", flags, item.name)
-  val dragCommands = if (item.parent != null && ImGui.beginDragDropSource()) {
-    ImGui.setDragDropPayloadObject(DragPayloadTypes.fileItem, item.fullPath)
-    ImGui.text(item.name)
-    ImGui.endDragDropSource()
-    listOf()
-  } else if (ImGui.beginDragDropTarget()) {
-    val payload = ImGui.acceptDragDropPayloadObject(DragPayloadTypes.fileItem)
-    if (payload != null) {
-      listOf(Command(EditorCommands.moveFileItem, payload to item.fullPath))
+  if (item.parent != null) {
+    dragSource(getDragType(item.type), item.fullPath) {
+      ImGui.text(item.name)
     }
-    else
-      listOf()
   }
-  else
+
+  val dragCommands = if (item.type == FileItemType.folder) {
+    val onDrag = DragTarget({ payload ->
+      val sourcePath = payload as? String
+      if (sourcePath == null)
+        false
+      else
+        !isDerivativePath(sourcePath, item.fullPath) && !isParent(item.fullPath, sourcePath)
+    }) { payload ->
+      Command(EditorCommands.moveFileItem, payload to item.fullPath)
+    }
+    dragTargets(mapOf(
+        DraggingTypes.file to onDrag,
+        DraggingTypes.folder to onDrag,
+    ))
+  } else
     listOf()
 
   val selectionCommands = getSelectionCommands(EditorCommands.setFileSelection, selection, id)
@@ -63,19 +75,13 @@ fun renderProjectTree(items: Collection<FileItem>, item: FileItem, selection: No
   return selectionCommands + activateCommands + childCommands + dragCommands
 }
 
-fun renderProject(editor: Editor): Commands {
-  ImGui.begin("Project", ImGuiWindowFlags.MenuBar)
-  panelBackground()
-  val menuCommands = projectMenus(getShortcutForContext(editor.bindings, Contexts.project))
-
-  val items = editor.fileItems.values
-  val root = items.firstOrNull { it.parent == null }
-  val commands = if (root == null)
-    listOf()
-  else
-    renderProjectTree(items, root, editor.state.fileSelection)
-
-  ImGui.end()
-
-  return menuCommands + commands
-}
+fun renderProject(editor: Editor): PanelResponse =
+    panel(editor, "Project", Contexts.project, ::projectMenus) {
+      panelBackground()
+      val items = editor.fileItems.values
+      val root = items.firstOrNull { it.parent == null }
+      if (root == null)
+        listOf()
+      else
+        renderProjectTree(items, root, editor.state.fileSelection)
+    }

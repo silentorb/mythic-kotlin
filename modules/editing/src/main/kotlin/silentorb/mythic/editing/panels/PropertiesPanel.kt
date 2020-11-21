@@ -2,7 +2,8 @@ package silentorb.mythic.editing.panels
 
 import imgui.ImGui
 import silentorb.mythic.editing.*
-import silentorb.mythic.editing.components.*
+import silentorb.mythic.editing.components.panel
+import silentorb.mythic.editing.components.panelBackground
 import silentorb.mythic.ent.*
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
@@ -61,60 +62,56 @@ fun addPropertiesDropDown(editor: Editor, availableDefinitions: PropertyDefiniti
   return commands
 }
 
-fun drawPropertiesPanel(editor: Editor, graph: Graph?): Commands {
-  ImGui.begin("Properties")
-  panelBackground()
+fun drawPropertiesPanel(editor: Editor, graph: Graph?): PanelResponse =
+    panel(editor, "Properties", Contexts.properties, null) {
+      panelBackground()
 
-  val result = if (graph != null) {
-    var commands: Commands = listOf()
-    val selection = editor.state.nodeSelection
-    if (selection.size == 1) {
-      val node = selection.first()
-      val definitions = editor.enumerations.propertyDefinitions
-      val entries = getProperties(graph, node)
+      if (graph != null) {
+        var commands: Commands = listOf()
+        val selection = editor.state.nodeSelection
+        if (selection.size == 1) {
+          val node = selection.first()
+          val definitions = editor.enumerations.propertyDefinitions
+          val entries = getProperties(graph, node)
 
-      ImGui.text(node)
-      ImGui.separator()
-      val availableDefinitions = definitions.minus(entries.map { it.property })
-      val attributes = getPropertyValues<Key>(graph, node, SceneProperties.attribute)
-      if (availableDefinitions.any()) {
-        commands = commands + addPropertiesDropDown(editor, availableDefinitions, attributes, entries, node)
-      }
-
-      ImGui.separator()
-      for (attribute in attributes) {
-        ImGui.text(attribute)
-        ImGui.sameLine()
-        if (ImGui.smallButton("x##attribute-$attribute")) {
-          commands = commands.plus(Command(EditorCommands.removeGraphValue, value = Entry(node, SceneProperties.attribute, attribute)))
-        }
-      }
-
-      for ((property, definition) in definitions) {
-        val entry = entries.firstOrNull { it.property == property }
-        if (entry != null) {
+          ImGui.text(node)
           ImGui.separator()
-          val nextValue = if (definition.widget != null) {
-            ImGui.text(definition.displayName)
-            ImGui.sameLine()
-            if (ImGui.smallButton("x##property-${entry.target}")) {
-              commands = commands.plus(Command(EditorCommands.removeGraphValue, value = entry))
-            }
-            drawFormField(editor, definition, entry)
-          } else
-            entry.target
+          val availableDefinitions = definitions.minus(entries.map { it.property })
+          val attributes = getPropertyValues<Key>(graph, node, SceneProperties.attribute)
+          if (availableDefinitions.any()) {
+            commands = commands + addPropertiesDropDown(editor, availableDefinitions, attributes, entries, node)
+          }
 
-          if (nextValue != entry.target) {
-            commands = commands.plus(Command(EditorCommands.setGraphValue, value = Entry(node, property, nextValue)))
+          ImGui.separator()
+          for (attribute in attributes) {
+            ImGui.text(attribute)
+            ImGui.sameLine()
+            if (ImGui.smallButton("x##attribute-$attribute")) {
+              commands = commands.plus(Command(EditorCommands.removeGraphValue, value = Entry(node, SceneProperties.attribute, attribute)))
+            }
+          }
+
+          for ((property, definition) in definitions) {
+            val entry = entries.firstOrNull { it.property == property }
+            if (entry != null) {
+              ImGui.separator()
+              val nextValue = if (definition.widget != null) {
+                ImGui.text(definition.displayName)
+                ImGui.sameLine()
+                if (ImGui.smallButton("x##property-${entry.target}")) {
+                  commands = commands.plus(Command(EditorCommands.removeGraphValue, value = entry))
+                }
+                drawFormField(editor, definition, entry)
+              } else
+                entry.target
+
+              if (nextValue != entry.target) {
+                commands = commands.plus(Command(EditorCommands.setGraphValue, value = Entry(node, property, nextValue)))
+              }
+            }
           }
         }
-      }
+        commands
+      } else
+        listOf<Command>()
     }
-    commands
-  } else
-    listOf<Command>()
-
-  ImGui.end()
-
-  return result
-}
