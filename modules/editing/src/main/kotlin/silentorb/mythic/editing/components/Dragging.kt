@@ -4,7 +4,7 @@ import imgui.ImGui
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 
-typealias DragHandler = (Any) -> Command
+typealias DragHandler = (Any) -> Commands
 typealias DragCondition = (Any) -> Boolean
 
 data class DragTarget(
@@ -42,6 +42,7 @@ fun dragTargets(typeMap: DragTargets): Commands =
                 null
             }
           }
+          .flatten()
 
       ImGui.endDragDropTarget()
       result

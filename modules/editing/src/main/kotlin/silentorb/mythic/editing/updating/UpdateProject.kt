@@ -28,6 +28,7 @@ fun newFileItem(type: FileItemType, parentPath: String, name: String, items: Fil
 
 fun handleProjectCommands(editor: Editor) = handleCommands<FileItems> { command, items ->
   when (command.type) {
+
     EditorCommands.newFile -> {
       val selected = getSelectedFileItem(editor)
       if (selected == null)
@@ -40,6 +41,7 @@ fun handleProjectCommands(editor: Editor) = handleCommands<FileItems> { command,
         newFileItem(FileItemType.file, selected.fullPath, name, items)
       }
     }
+
     EditorCommands.newFolder -> {
       val selected = getSelectedFileItem(editor)
       if (selected == null)
@@ -52,6 +54,7 @@ fun handleProjectCommands(editor: Editor) = handleCommands<FileItems> { command,
         newFileItem(FileItemType.folder, selected.fullPath, name, items)
       }
     }
+
     EditorCommands.deleteFileItem -> {
       val selected = getSelectedFileItem(editor)
       if (selected == null)
@@ -61,6 +64,7 @@ fun handleProjectCommands(editor: Editor) = handleCommands<FileItems> { command,
         items - selected.fullPath
       }
     }
+
     EditorCommands.moveFileItem -> {
       val (source, target) = command.value as Pair<String, String>
       val previous = items[source]
@@ -76,6 +80,7 @@ fun handleProjectCommands(editor: Editor) = handleCommands<FileItems> { command,
         items + copied - deleted
       }
     }
+
     else -> items
   }
 }

@@ -160,7 +160,7 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
   val nextStaging = updateStaging(editor, previousMousePosition, mouseOffset, commandTypes, nextOperation)
   val mousePosition = (previousMousePosition + mouseOffset).toVector2i()
   val nextState = updateEditorState(commands, editor, nextGraph, mousePosition, mouseOffset)
-  val nextHistory = updateHistory(nextGraph, nextState.nodeSelection, editor.state.graph, commands, editor.maxHistory, editor.history)
+  val nextHistory = updateHistory(nextGraph, nextState.nodeSelection, nextState.graph, commands, editor.maxHistory, editor.history)
 
   return editor.copy(
       state = nextState,

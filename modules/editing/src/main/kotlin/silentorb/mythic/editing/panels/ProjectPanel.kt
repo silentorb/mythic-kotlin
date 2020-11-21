@@ -3,7 +3,6 @@ package silentorb.mythic.editing.panels
 import imgui.ImGui
 import imgui.flag.ImGuiMouseButton
 import imgui.flag.ImGuiTreeNodeFlags
-import imgui.flag.ImGuiWindowFlags
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.*
 import silentorb.mythic.happenings.Command
@@ -35,21 +34,22 @@ fun renderProjectTree(items: Collection<FileItem>, item: FileItem, selection: No
       }
 
   val isOpen = ImGui.treeNodeEx("File-Tree-$id", flags, item.name)
+
   if (item.parent != null) {
-    dragSource(getDragType(item.type), item.fullPath) {
+    dragSource(getDragType(item.type), item) {
       ImGui.text(item.name)
     }
   }
 
   val dragCommands = if (item.type == FileItemType.folder) {
     val onDrag = DragTarget({ payload ->
-      val sourcePath = payload as? String
-      if (sourcePath == null)
+      val source = payload as? FileItem
+      if (source == null)
         false
       else
-        !isDerivativePath(sourcePath, item.fullPath) && !isParent(item.fullPath, sourcePath)
+        !isDerivativePath(source.fullPath, item.fullPath) && item.fullPath != source.parent
     }) { payload ->
-      Command(EditorCommands.moveFileItem, payload to item.fullPath)
+      listOf(Command(EditorCommands.moveFileItem, (payload as FileItem).fullPath to item.fullPath))
     }
     dragTargets(mapOf(
         DraggingTypes.file to onDrag,
