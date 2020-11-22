@@ -63,6 +63,11 @@ fun replaceValues(graph: LooseGraph, additional: LooseGraph): Graph =
 fun firstOrNullWithAttribute(graph: LooseGraph, attribute: String) =
     graph.firstOrNull { it.property == "attribute" && it.target == attribute }?.target as Key?
 
+fun filterByAttribute(graph: LooseGraph, attribute: String) =
+    graph
+        .filter { it.property == "attribute" && it.target == attribute }
+        .map { it.source }
+
 fun renameNode(graph: Graph, previous: Key, next: Key): Graph =
     graph.map {
       when {
