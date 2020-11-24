@@ -23,7 +23,7 @@ fun nodesToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, grap
 }
 
 fun getGraphElementMaterial(graph: Graph, node: Key): Material? {
-  val texture = getValue<Key>(graph, node, SceneProperties.texture)
+  val texture = getGraphValue<Key>(graph, node, SceneProperties.texture)
   return if (texture != null)
     Material(texture = texture, shading = true)
   else
@@ -32,12 +32,12 @@ fun getGraphElementMaterial(graph: Graph, node: Key): Material? {
 
 fun nodeToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph: Graph, node: Key): List<ElementGroup> {
   val isSelected = false
-  val mesh = getValue<Key>(graph, node, SceneProperties.mesh)
-  val type = getValue<Key>(graph, node, SceneProperties.instance)
-  val text3d = getValue<String>(graph, node, SceneProperties.text3d)
-  val light = getValue<String>(graph, node, SceneProperties.light)
+  val mesh = getGraphValue<Key>(graph, node, SceneProperties.mesh)
+  val type = getGraphValue<Key>(graph, node, SceneProperties.instance)
+  val text3d = getGraphValue<String>(graph, node, SceneProperties.text3d)
+  val light = getGraphValue<String>(graph, node, SceneProperties.light)
   val collisionShape = if (isSelected)
-    getValue<String>(graph, node, SceneProperties.collisionShape)
+    getGraphValue<String>(graph, node, SceneProperties.collisionShape)
   else
     null
 
@@ -113,10 +113,10 @@ fun nodeToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph
       listOf(
           Light(
               type = LightType.valueOf(light),
-              range = getValue<Float>(graph, node, SceneProperties.range) ?: 1f,
+              range = getGraphValue<Float>(graph, node, SceneProperties.range) ?: 1f,
               offset = transform.translation(),
               direction = Vector3.unit,
-              color = hexColorStringToVector4(getValue<String>(graph, node, SceneProperties.rgba) ?: "#ffffffff"),
+              color = hexColorStringToVector4(getGraphValue<String>(graph, node, SceneProperties.rgba) ?: "#ffffffff"),
           )
       )
     else

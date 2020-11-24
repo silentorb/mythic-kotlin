@@ -27,6 +27,8 @@ val floatSerialization = Serialization(
     save = { it }
 )
 
+val collisionGroupWidget: PropertyWidget = labeledDropDownWidget { it.enumerations.collisionPresets }
+
 fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
     SceneProperties.mesh to PropertyDefinition(
         displayName = "Mesh",
@@ -87,16 +89,17 @@ fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
     SceneProperties.collisionShape to PropertyDefinition(
         displayName = "Collision Shape",
         widget = dropDownWidget { CollisionShape.values().map { it.name } },
+        dependencies = setOf(SceneProperties.collisionGroups, SceneProperties.collisionMask),
         defaultValue = { CollisionShape.box.name }
     ),
     SceneProperties.collisionGroups to PropertyDefinition(
         displayName = "Collision Group",
-        widget = propertyBitmaskField,
+        widget = collisionGroupWidget,
         defaultValue = { 0 },
     ),
     SceneProperties.collisionMask to PropertyDefinition(
         displayName = "Collision Mask",
-        widget = propertyBitmaskField,
+        widget = collisionGroupWidget,
         defaultValue = { 0 },
     ),
 )

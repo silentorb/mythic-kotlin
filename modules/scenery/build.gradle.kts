@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
   implementation(kotlin("stdlib-jdk8"))
+  api("silentorb.mythic:ent")
   api("silentorb.mythic:spatial")
 }
 

@@ -7,8 +7,11 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState
 import silentorb.mythic.ent.Id
 import silentorb.mythic.ent.Table
+import silentorb.mythic.ent.getGraphValue
+import silentorb.mythic.ent.scenery.getNodeScale
 import silentorb.mythic.ent.scenery.getShape
 import silentorb.mythic.ent.scenery.getNodeTransform
+import silentorb.mythic.ent.scenery.getNodeTransformWithoutScale
 import silentorb.mythic.sculpting.ImmutableFace
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Pi
@@ -93,6 +96,21 @@ fun createGhostBody(transform: Matrix, shape: btCollisionShape): btCollisionObje
   return btBody
 }
 
+fun initializeHinge(bulletState: BulletState, bulletBody: btRigidBody, hingeInfo: HingeConstraint, body: Body) {
+  val hinge = btHingeConstraint(bulletBody, toGdxVector3(hingeInfo.pivot * body.scale), toGdxVector3(hingeInfo.axis), true)
+//          hinge.enableAngularMotor(true, 1f, 1f)
+//          hinge.setLimit(-Pi * 0.2f, Pi  * 0.2f)
+  val offset = Pi / 2f
+//          hinge.setLimit(-Pi * 0.2f - offset, Pi  * 0.2f - offset)
+  hinge.setLimit(-Pi, Pi)
+  val j = hinge.hingeAngle
+
+  bulletState.dynamicsWorld.addConstraint(hinge)
+  hinge.setDbgDrawSize(5f)
+//          bulletBody.setAngularVelocity(GdxVector3(0f, 0f, 1f))
+
+}
+
 fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
   val deck = world.deck
   val graph = world.graph
@@ -109,24 +127,13 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
         val bulletBody = createBulletDynamicObject(body, dynamicBody, shape, hingeInfo != null)
 
         if (hingeInfo != null) {
-          val hinge = btHingeConstraint(bulletBody, toGdxVector3(hingeInfo.pivot * body.scale), toGdxVector3(hingeInfo.axis), true)
-//          hinge.enableAngularMotor(true, 1f, 1f)
-//          hinge.setLimit(-Pi * 0.2f, Pi  * 0.2f)
-          val offset = Pi / 2f
-//          hinge.setLimit(-Pi * 0.2f - offset, Pi  * 0.2f - offset)
-          hinge.setLimit(-Pi, Pi)
-          val j = hinge.hingeAngle
-
-          bulletState.dynamicsWorld.addConstraint(hinge)
-          hinge.setDbgDrawSize(5f)
-//          bulletBody.setAngularVelocity(GdxVector3(0f, 0f, 1f))
-
+          initializeHinge(bulletState, bulletBody, hingeInfo, body)
         }
         bulletBody.userData = key
         bulletBody.linearVelocity = toGdxVector3(body.velocity)
         bulletState.dynamicsWorld.addRigidBody(bulletBody, collisionObject.groups, collisionObject.mask)
 
-        // Per-object bullet gravity needs to be set after the body is added to the world or the gravity is ignore.
+        // Per-object bullet gravity needs to be set after the body is added to the world or the gravity is ignored.
         // (Either a design flaw or bug...)
         if (!dynamicBody.gravity)
           bulletBody.gravity = toGdxVector3(Vector3.zero)
@@ -144,10 +151,11 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
         if (shapeDefinition == null)
           null
         else {
-          val transform = getNodeTransform(graph, node)
-          val shape = createCollisionShape(shapeDefinition, transform.getScale())
-          val groups = 1
-          val mask = 2 or 4
+          val transform = getNodeTransformWithoutScale(graph, node)
+          val scale = getNodeScale(graph, node)
+          val shape = createCollisionShape(shapeDefinition, scale)
+          val groups = getGraphValue<Int>(graph, node, SceneProperties.collisionGroups) ?: 1
+          val mask = getGraphValue<Int>(graph, node, SceneProperties.collisionMask) ?: 2 or 4
           val isSolid = true
           val collisionObject = if (isSolid)
             createStaticBody(transform, shape)
@@ -180,7 +188,7 @@ fun syncRemovedBodies(world: PhysicsWorld, bulletState: BulletState) {
 
   val removedStatic = bulletState.staticBodies
       .filterValues { it.userData is Id && !world.deck.bodies.containsKey(it.userData) }
-  
+
   for (body in removedStatic.values) {
     bulletState.dynamicsWorld.removeCollisionObject(body)
   }

@@ -32,10 +32,35 @@ fun dropDownWidget(options: List<Key>, entry: Entry): String {
   return nextValue
 }
 
+fun <T> labeledDropDownWidget(options: Map<T, String>, entry: Entry): T {
+  val value = entry.target as T
+  var nextValue = value
+  ImGui.pushID(entry.property)
+  val label = options[value] ?: "[Unknown]"
+  if (ImGui.beginCombo("", label)) {
+    for (option in options) {
+      if (ImGui.selectable(option.value)) {
+        nextValue = option.key
+      }
+    }
+    if (nextValue == value) {
+      activeInputType = InputType.dropdown
+    }
+    ImGui.endCombo()
+  }
+  ImGui.popID()
+  return nextValue
+}
+
 typealias EditorOptionsSource = (Editor) -> List<Key>
+typealias LabeledEditorOptionsSource<T> = (Editor) -> Map<T, Key>
 
 fun dropDownWidget(options: EditorOptionsSource): PropertyWidget = { editor, entry ->
   dropDownWidget(options(editor), entry)
+}
+
+fun <T> labeledDropDownWidget(options: LabeledEditorOptionsSource<T>): PropertyWidget = { editor, entry ->
+  labeledDropDownWidget(options(editor), entry) as Any
 }
 
 val activeInputTextValue = ImString()

@@ -50,7 +50,7 @@ fun <T> getPropertyValues(graph: LooseGraph, key: String, property: Key): List<T
         .filter { it.source == key && it.property == property }
         .map { it.target as T }
 
-inline fun <reified T> getValue(graph: LooseGraph, key: String, property: Key): T? =
+inline fun <reified T> getGraphValue(graph: LooseGraph, key: String, property: Key): T? =
     graph.firstOrNull { it.source == key && it.property == property }?.target as T?
 
 fun replaceValues(graph: LooseGraph, additional: LooseGraph): Graph =

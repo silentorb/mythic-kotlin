@@ -2,7 +2,6 @@ package silentorb.mythic.editing.updating
 
 import silentorb.mythic.editing.Editor
 import silentorb.mythic.editing.EditorCommands
-import silentorb.mythic.editing.GraphHistory
 import silentorb.mythic.editing.components.nameText
 import silentorb.mythic.ent.*
 import silentorb.mythic.ent.scenery.gatherChildren
@@ -11,7 +10,7 @@ import silentorb.mythic.happenings.handleCommands
 import silentorb.mythic.scenery.SceneProperties
 
 fun duplicateNode(graph: Graph, node: Key): Graph {
-  val parent = getValue<String>(graph, node, SceneProperties.parent)
+  val parent = getGraphValue<String>(graph, node, SceneProperties.parent)
   return if (parent == null)
     graph
   else {

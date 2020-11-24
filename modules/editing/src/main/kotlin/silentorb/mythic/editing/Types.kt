@@ -88,7 +88,7 @@ data class EditorEnumerations(
     val attributes: List<Key> = listOf(),
     val textures: List<Key> = listOf(),
     val meshes: List<Key> = listOf(),
-    val collisionGroups: List<Key> = listOf(),
+    val collisionPresets: Map<Int, String> = mapOf(),
 )
 
 // Even if this only ever has one field, it's useful to wrap it to have a distinction between

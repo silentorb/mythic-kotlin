@@ -26,12 +26,15 @@ fun firstRayHit(dynamicsWorld: btDiscreteDynamicsWorld, start: Vector3, end: Vec
   val result = if (hasHit) {
     val collisionObject = callback.collisionObject
     val collisionObjectId = collisionObject.userData
-    val hitPoint = com.badlogic.gdx.math.Vector3()
-    callback.getHitPointWorld(hitPoint)
-    RayCastResult(
-        collisionObject = collisionObjectId,
-        hitPoint = toVector3(hitPoint)
-    )
+    if (collisionObjectId != null) {
+      val hitPoint = com.badlogic.gdx.math.Vector3()
+      callback.getHitPointWorld(hitPoint)
+      RayCastResult(
+          collisionObject = collisionObjectId,
+          hitPoint = toVector3(hitPoint)
+      )
+    } else
+      null
   } else
     null
 

@@ -8,18 +8,36 @@ import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 
-fun getNodeTransform(graph: Graph, node: Key): Matrix {
-  val translation = getValue<Vector3>(graph, node, SceneProperties.translation) ?: Vector3.zero
-  val rotation = getValue<Vector3>(graph, node, SceneProperties.rotation) ?: Vector3.zero
-  val scale = getValue<Vector3>(graph, node, SceneProperties.scale) ?: Vector3.unit
-  val localTransform = Matrix.identity
+fun getTranslationRotationMatrix(graph: Graph, node: Key): Matrix {
+  val translation = getGraphValue<Vector3>(graph, node, SceneProperties.translation) ?: Vector3.zero
+  val rotation = getGraphValue<Vector3>(graph, node, SceneProperties.rotation) ?: Vector3.zero
+  return Matrix.identity
       .translate(translation)
       .rotateZ(rotation.z)
       .rotateY(rotation.y)
       .rotateX(rotation.x)
+}
+
+fun getNodeScale(graph: Graph, node: Key): Vector3 =
+    getGraphValue<Vector3>(graph, node, SceneProperties.scale) ?: Vector3.unit
+
+fun getNodeTransform(graph: Graph, node: Key): Matrix {
+  val scale = getNodeScale(graph, node)
+  val localTransform = getTranslationRotationMatrix(graph, node)
       .scale(scale)
 
-  val parent = getValue<Key>(graph, node, SceneProperties.parent)
+  val parent = getGraphValue<Key>(graph, node, SceneProperties.parent)
+  return if (parent != null)
+    getNodeTransform(graph, parent) * localTransform
+  else
+    localTransform
+}
+
+// Still applies scaling of parent objects, just not the local scale
+fun getNodeTransformWithoutScale(graph: Graph, node: Key): Matrix {
+  val localTransform = getTranslationRotationMatrix(graph, node)
+
+  val parent = getGraphValue<Key>(graph, node, SceneProperties.parent)
   return if (parent != null)
     getNodeTransform(graph, parent) * localTransform
   else
@@ -97,14 +115,13 @@ fun expandInstances(graphs: GraphLibrary, name: String): Graph =
     expandInstances(graphs, graphs[name]!!)
 
 fun getShape(meshShapeMap: Map<Key, Shape>, graph: Graph, node: Key): Shape? {
-  val shapeType = getValue<Key>(graph, node, SceneProperties.collisionShape)
+  val shapeType = getGraphValue<Key>(graph, node, SceneProperties.collisionShape)
   return if (shapeType == null)
     null
   else {
-    val mesh = getValue<Key>(graph, node, SceneProperties.mesh)
+    val mesh = getGraphValue<Key>(graph, node, SceneProperties.mesh)
     val meshBounds = meshShapeMap[mesh]
-    val transform = getNodeTransform(graph, node)
-    return meshBounds ?: Box(transform.getScale())
+    return meshBounds ?: Box(Vector3.unit / 2f)
   }
 }
 
