@@ -30,6 +30,28 @@ fun getGraphElementMaterial(graph: Graph, node: Key): Material? {
     null
 }
 
+fun instanceToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph: Graph, node: Key, subGraph: Graph): List<ElementGroup> {
+  val instanceTransform = getNodeTransform(graph, node)
+  return nodesToElements(meshesShapes, graphs, subGraph)
+      .map { group ->
+        group.copy(
+            meshes = group.meshes
+                .map { meshElement ->
+                  meshElement.copy(
+                      // TODO: For some reason the matrix integration is needing to be backwards from the highlight pass
+                      transform = instanceTransform * meshElement.transform
+                  )
+                },
+            textBillboards = group.textBillboards
+                .map { textBillboard ->
+                  textBillboard.copy(
+                      position = instanceTransform.translation() + textBillboard.position
+                  )
+                }
+        )
+      }
+}
+
 fun nodeToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph: Graph, node: Key): List<ElementGroup> {
   val isSelected = false
   val mesh = getGraphValue<Key>(graph, node, SceneProperties.mesh)
@@ -41,35 +63,29 @@ fun nodeToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph
   else
     null
 
-  return if (type != null) {
-    val subGraph = graphs[type]
-    if (subGraph == null || subGraph == graph)
-      listOf()
-    else {
-      val instanceTransform = getNodeTransform(graph, node)
-      nodesToElements(meshesShapes, graphs, subGraph)
-          .map { group ->
-            group.copy(
-                meshes = group.meshes.map { meshElement ->
-                  meshElement.copy(
-                      // TODO: For some reason the matrix integration is needing to be backwards from the highlight pass
-                      transform = instanceTransform * meshElement.transform
-                  )
-                },
-                textBillboards = group.textBillboards.map { textBillboard ->
-                  textBillboard.copy(
-                      position = instanceTransform.translation() + textBillboard.position
-                  )
-                }
-            )
-          }
-    }
-  } else if (mesh == null && text3d == null && light == null && collisionShape == null)
+  val subGraph = graphs[type]
+
+  val instancedElements = if (subGraph != null && subGraph != graph)
+    instanceToElements(meshesShapes, graphs, graph, node, subGraph)
+  else
+    listOf()
+
+  val localElements = if (mesh == null && text3d == null && light == null && collisionShape == null)
     listOf()
   else {
-    val transform = getNodeTransform(graph, node)
+    val inheritedProperties = if (subGraph != null && subGraph != graph) {
+      val subgraphRoot = getGraphRoots(subGraph).first()
+      subGraph
+          .filter { it.source == subgraphRoot }
+          .map { it.copy(source = node) }
+          .toSet()
+    } else
+      setOf()
+
+    val combinedGraph = inheritedProperties + graph
+    val transform = getNodeTransform(combinedGraph, node)
     val meshElements = if (mesh != null) {
-      val material = getGraphElementMaterial(graph, node)
+      val material = getGraphElementMaterial(combinedGraph, node)
 
       listOf(
           MeshElement(
@@ -130,4 +146,5 @@ fun nodeToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph
         )
     )
   }
+  return localElements + instancedElements
 }

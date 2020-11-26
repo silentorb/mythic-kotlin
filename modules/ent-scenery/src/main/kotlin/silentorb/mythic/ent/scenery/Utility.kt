@@ -87,11 +87,16 @@ fun expandInstance(graphs: GraphLibrary, key: Key, target: Key): LooseGraph {
   return if (definition == null)
     setOf()
   else {
-    val transposed = transposeNamespace(definition, key)
+    val roots = getGraphRoots(definition)
+    val (rootEntries, withoutRoots) = definition
+        .partition { roots.contains(it.source) }
+
+    val inheritedProperties = rootEntries.map { it.copy(source = key) }
+    val transposed = transposeNamespace(withoutRoots.toSet(), key)
     val expanded = expandInstances(graphs, transposed)
-    val roots = getGraphRoots(transposed)
-    assert(roots.any())
-    expanded + roots.map { root -> Entry(root, SceneProperties.parent, key) }
+    val newRoots = filterByPropertyValue(transposed, SceneProperties.parent, roots.first())
+    assert(newRoots.any())
+    inheritedProperties + expanded - newRoots + newRoots.map { root -> root.copy(target = key) }
   }
 }
 
@@ -101,7 +106,9 @@ fun expandInstances(graphs: GraphLibrary, instances: LooseGraph, accumulator: Gr
     else {
       val (key, _, target) = instances.first()
       val additions = expandInstance(graphs, key, target as Key)
-      expandInstances(graphs, instances.drop(1), accumulator + additions)
+      // Make sure accumulator is added to additions and not the other way around
+      // so that local properties override inherited properties
+      expandInstances(graphs, instances.drop(1), additions.toSet() + accumulator)
     }
 
 fun expandInstances(graphs: GraphLibrary, graph: Graph): Graph {

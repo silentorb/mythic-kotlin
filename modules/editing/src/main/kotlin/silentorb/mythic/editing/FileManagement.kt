@@ -61,3 +61,9 @@ fun isParent(parent: String, child: String): Boolean =
     parent.length + 2 < child.length &&
         child.substring(0, parent.length + 1) == "$parent/" &&
         !child.substring(parent.length + 1).contains('/')
+
+fun getBaseName(path: String): String =
+    path.split('/').last()
+
+fun getParentPath(path: String): String =
+    path.split('/').dropLast(1).joinToString("/")

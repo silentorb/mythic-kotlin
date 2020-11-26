@@ -9,10 +9,19 @@ import silentorb.mythic.happenings.Commands
 
 var nameText = ImString()
 
-fun nameDialog(title: String, triggerCommand: Any, nextCommand: Any, initialValue: () -> String): (Commands) -> Commands = { commands ->
+typealias DialogCommandsEmitter = (String) -> Commands
+
+fun emitDialogCommand(nextCommand: Any): DialogCommandsEmitter = { text ->
+  listOf(Command(nextCommand, text))
+}
+
+fun nameDialog(title: String, triggerCommand: Any, nextCommands: DialogCommandsEmitter, initialValue: () -> String?): (Commands) -> Commands = { commands ->
   if (commands.any { it.type == triggerCommand } && !ImGui.isPopupOpen(title)) {
-    nameText.set(initialValue())
-    ImGui.openPopup(title)
+    val value = initialValue()
+    if (value != null) {
+      nameText.set(initialValue())
+      ImGui.openPopup(title)
+    }
   }
 
   ImGui.setNextItemWidth(100f)
@@ -29,7 +38,7 @@ fun nameDialog(title: String, triggerCommand: Any, nextCommand: Any, initialValu
     val result = if (ImGui.button("OK") || pressedEnter) {
       ImGui.closeCurrentPopup()
       activeInputType = null
-      listOf(Command(nextCommand, nameText.get()))
+      nextCommands(nameText.get())
     } else
       listOf()
     ImGui.endPopup()
@@ -41,25 +50,39 @@ fun nameDialog(title: String, triggerCommand: Any, nextCommand: Any, initialValu
 val newNodeNameDialog = nameDialog(
     "New Node",
     EditorCommands.addNodeWithNameDialog,
-    EditorCommands.addNode
+    emitDialogCommand(EditorCommands.addNode)
 ) { "" }
 
 fun renameNodeDialog(editor: Editor) = nameDialog(
     "Rename Node",
     EditorCommands.renameNodeWithNameDialog,
-    EditorCommands.renameNode
+    emitDialogCommand(EditorCommands.renameNode)
 ) {
-  editor.state.nodeSelection.firstOrNull() ?: ""
+  editor.state.nodeSelection.firstOrNull()
 }
 
 val newFileNameDialog = nameDialog(
     "New File",
     EditorCommands.newFileWithNameDialog,
-    EditorCommands.newFile
+    emitDialogCommand(EditorCommands.newFile)
 ) { "" }
 
 val newFolderNameDialog = nameDialog(
     "New Folder",
     EditorCommands.newFolderWithNameDialog,
-    EditorCommands.newFolder
+    emitDialogCommand(EditorCommands.newFolder)
 ) { "" }
+
+fun renameFileItemDialog(editor: Editor) = nameDialog(
+    "Rename",
+    EditorCommands.renameFileItemWithNameDialog,
+    { text ->
+      val selected = editor.fileItems[editor.state.fileSelection.firstOrNull()]
+      if (selected == null)
+        listOf()
+      else
+        listOf(Command(EditorCommands.moveFileItem, selected.fullPath to (selected.parent + "/" + text)))
+    }
+) {
+  editor.fileItems[editor.state.fileSelection.firstOrNull()]?.name
+}

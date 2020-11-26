@@ -3,6 +3,7 @@ package silentorb.mythic.editing.updating
 import silentorb.mythic.editing.Editor
 import silentorb.mythic.editing.EditorCommands
 import silentorb.mythic.editing.components.nameText
+import silentorb.mythic.editing.getBaseName
 import silentorb.mythic.ent.*
 import silentorb.mythic.ent.scenery.gatherChildren
 import silentorb.mythic.ent.scenery.getGraphRoots
@@ -65,6 +66,25 @@ fun updateSceneGraph(editor: Editor) = handleCommands<Graph> { command, graph ->
         val selected = state.nodeSelection.first()
         val key = nameText.get()
         renameNode(graph, selected, key)
+      }
+    }
+
+    EditorCommands.moveFileItem -> {
+      val selected = getSelectedFileItem(editor)
+      val (from, to) = command.value as Pair<String, String>
+      val previous = getBaseName(from).split('.').first()
+      val next = getBaseName(to).split('.').first()
+      if (selected == null || previous == next)
+        graph
+      else {
+        graph
+            .map { entry ->
+              if (entry.property == SceneProperties.instance && entry.target == previous)
+                entry.copy(target = next)
+              else
+                entry
+            }
+            .toSet()
       }
     }
 

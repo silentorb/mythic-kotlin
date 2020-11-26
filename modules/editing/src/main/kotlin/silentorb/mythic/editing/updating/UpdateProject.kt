@@ -71,11 +71,11 @@ fun handleProjectCommands(editor: Editor) = handleCommands<FileItems> { command,
       if (previous == null)
         items
       else {
-        val copied = copyRecursive(items, previous, target)
+        val copied = copyRecursive(items, previous, getParentPath(target))
         val deleted = selectRecursive(items, previous.fullPath)
         Files.move(
             Paths.get(resolveProjectFilePath(editor, source)),
-            Paths.get(resolveProjectFilePath(editor, target + "/" + previous.name))
+            Paths.get(resolveProjectFilePath(editor, target))
         )
         items + copied - deleted
       }

@@ -49,7 +49,9 @@ fun renderProjectTree(items: Collection<FileItem>, item: FileItem, selection: No
       else
         !isDerivativePath(source.fullPath, item.fullPath) && item.fullPath != source.parent
     }) { payload ->
-      listOf(Command(EditorCommands.moveFileItem, (payload as FileItem).fullPath to item.fullPath))
+      val source = (payload as FileItem).fullPath
+      val destination = item.fullPath + "/" + getBaseName(source)
+      listOf(Command(EditorCommands.moveFileItem, source to destination))
     }
     dragTargets(mapOf(
         DraggingTypes.file to onDrag,

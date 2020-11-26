@@ -36,6 +36,7 @@ fun drawEditor(editor: Editor, deviceStates: List<InputDeviceState>): Commands {
   val dialogCommands = listOf(
       newNodeNameDialog,
       renameNodeDialog(editor),
+      renameFileItemDialog(editor),
       newFileNameDialog,
       newFolderNameDialog
   )

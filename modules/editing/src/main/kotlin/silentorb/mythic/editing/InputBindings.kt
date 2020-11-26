@@ -50,6 +50,7 @@ fun defaultEditorMenuKeystrokes(): KeystrokeBindings = mapOf(
     ContextCommand(Contexts.project, EditorCommands.newFileWithNameDialog) to "Ctrl+N",
     ContextCommand(Contexts.project, EditorCommands.newFolderWithNameDialog) to "Ctrl+Shift+N",
     ContextCommand(Contexts.project, EditorCommands.deleteFileItem) to "Del",
+    ContextCommand(Contexts.project, EditorCommands.renameFileItemWithNameDialog) to "Ctrl+R",
 
     ContextCommand(Contexts.viewport, EditorCommands.viewFront) to "$keypadKey 1",
     ContextCommand(Contexts.viewport, EditorCommands.viewBack) to "Ctrl+$keypadKey 1",

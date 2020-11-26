@@ -35,6 +35,9 @@ fun getGraphKeys(graph: LooseGraph) =
 inline fun <reified T> filterByProperty(graph: LooseGraph, relationship: Key): ListGraph =
     graph.filter { it.property == relationship && it.target is T }
 
+inline fun <reified T> filterByPropertyValue(graph: LooseGraph, relationship: Key, value: T): ListGraph =
+    graph.filter { it.property == relationship && it.target == value }
+
 inline fun <reified T> mapByProperty(graph: LooseGraph, relationship: Key): Map<Key, T> =
     graph
         .filter { it.property == relationship && it.target is T }
