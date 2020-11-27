@@ -26,10 +26,7 @@ fun drawFormField(editor: Editor, definition: PropertyDefinition, entry: Entry):
 fun addPropertiesDropDown(editor: Editor, availableDefinitions: PropertyDefinitions, attributes: List<Key>, entries: Graph, node: Key): Commands {
   var commands: Commands = listOf()
   if (ImGui.beginCombo("Add Property", "")) {
-    val allAttributes = editor.enumerations.attributes
-    val availableAttributes = allAttributes - attributes
-
-    for ((property, definition) in availableDefinitions) {
+    for ((property, definition) in availableDefinitions.entries.sortedBy { it.value.displayName }) {
       if (ImGui.selectable(definition.displayName)) {
         val target = definition.defaultValue?.invoke(editor) ?: ""
         val missingDependencies = definition.dependencies - entries.map { it.property }
@@ -49,9 +46,20 @@ fun addPropertiesDropDown(editor: Editor, availableDefinitions: PropertyDefiniti
         commands = commands.plus(addPropertyCommands)
       }
     }
-    for (attribute in availableAttributes) {
+    if (commands.none()) {
+      activeInputType = InputType.dropdown
+    }
+    ImGui.endCombo()
+  }
+
+  if (ImGui.beginCombo("Add Type", "")) {
+    val allAttributes = editor.enumerations.attributes
+    val allTypes = getAvailableTypes(editor)
+    val availableAttributes = allAttributes + allTypes - attributes - node
+
+    for (attribute in availableAttributes.sorted()) {
       if (ImGui.selectable(attribute)) {
-        commands = commands.plus(Command(EditorCommands.setGraphValue, value = Entry(node, SceneProperties.attribute, attribute)))
+        commands = commands.plus(Command(EditorCommands.setGraphValue, value = Entry(node, SceneProperties.instance, attribute)))
       }
     }
     if (commands.none()) {
@@ -59,6 +67,7 @@ fun addPropertiesDropDown(editor: Editor, availableDefinitions: PropertyDefiniti
     }
     ImGui.endCombo()
   }
+
   return commands
 }
 
@@ -77,17 +86,17 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): PanelResponse =
           ImGui.text(node)
           ImGui.separator()
           val availableDefinitions = definitions.minus(entries.map { it.property })
-          val attributes = getPropertyValues<Key>(graph, node, SceneProperties.attribute)
+          val union = getPropertyValues<Key>(graph, node, SceneProperties.instance)
           if (availableDefinitions.any()) {
-            commands = commands + addPropertiesDropDown(editor, availableDefinitions, attributes, entries, node)
+            commands = commands + addPropertiesDropDown(editor, availableDefinitions, union, entries, node)
           }
 
           ImGui.separator()
-          for (attribute in attributes) {
+          for (attribute in union) {
             ImGui.text(attribute)
             ImGui.sameLine()
             if (ImGui.smallButton("x##attribute-$attribute")) {
-              commands = commands.plus(Command(EditorCommands.removeGraphValue, value = Entry(node, SceneProperties.attribute, attribute)))
+              commands = commands.plus(Command(EditorCommands.removeGraphValue, value = Entry(node, SceneProperties.instance, attribute)))
             }
           }
 

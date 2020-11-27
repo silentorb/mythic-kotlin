@@ -18,7 +18,7 @@ fun dropDownWidget(options: List<Key>, entry: Entry): String {
   var nextValue = value
   ImGui.pushID(entry.property)
   if (ImGui.beginCombo("", value)) {
-    for (option in options) {
+    for (option in options.sorted()) {
       if (ImGui.selectable(option)) {
         nextValue = option
       }
@@ -38,7 +38,7 @@ fun <T> labeledDropDownWidget(options: Map<T, String>, entry: Entry): T {
   ImGui.pushID(entry.property)
   val label = options[value] ?: "[Unknown]"
   if (ImGui.beginCombo("", label)) {
-    for (option in options) {
+    for (option in options.entries.sortedBy { it.value }) {
       if (ImGui.selectable(option.value)) {
         nextValue = option.key
       }

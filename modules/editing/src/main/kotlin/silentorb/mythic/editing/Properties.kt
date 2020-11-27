@@ -41,11 +41,6 @@ fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
         dependencies = setOf(SceneProperties.mesh),
         defaultValue = { editor -> editor.enumerations.textures.firstOrNull() },
     ),
-    SceneProperties.instance to PropertyDefinition(
-        displayName = "Type",
-        widget = dropDownWidget(::getAvailableTypes),
-        defaultValue = { editor -> getAvailableTypes(editor).firstOrNull() },
-    ),
     SceneProperties.text3d to PropertyDefinition(
         displayName = "3D Text",
         widget = propertyTextField,

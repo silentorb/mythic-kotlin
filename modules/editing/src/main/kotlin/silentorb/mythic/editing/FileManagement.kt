@@ -31,15 +31,12 @@ fun newFileItem(fullPath: String, type: FileItemType): FileItem {
   )
 }
 
-fun copyRecursive(original: FileItems, item: FileItem, newParent: String): FileItems {
-  val nextItem = item.copy(
-      parent = newParent,
-      fullPath = newParent + "/" + item.name
-  )
+fun copyRecursive(original: FileItems, item: FileItem, nextPath: String): FileItems {
+  val nextItem = newFileItem(nextPath, item.type)
   return original
       .filterValues { it.parent == item.fullPath }
       .map { child ->
-        copyRecursive(original, child.value, nextItem.fullPath)
+        copyRecursive(original, child.value, nextItem.fullPath + "/" + child.value.name)
       }
       .fold(mapOf<String, FileItem>()) { a, b -> a + b }
       .plus(nextItem.fullPath to nextItem)

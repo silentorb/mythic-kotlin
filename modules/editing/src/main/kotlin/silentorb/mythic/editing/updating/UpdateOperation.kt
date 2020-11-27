@@ -169,7 +169,7 @@ fun updateRotation(previousMousePosition: Vector2, mouseOffset: Vector2, editor:
           val cameraTransform = createProjectionMatrix(camera, viewport.zw()) * viewTransform
           val center = transformPoint(cameraTransform, viewport.zw().toVector2(), Vector2.zero)(objectCenter)
           val angle = getAngle(mouseStart - center, mouseStart + mouseOffset - center)
-          println(" $mouseOffset ${mouseStart - center} ${mouseStart + mouseOffset - center} $angle")
+//          println(" $mouseOffset ${mouseStart - center} ${mouseStart + mouseOffset - center} $angle")
           val value = getGraphValue<Vector3>(graph, node, SceneProperties.rotation) ?: Vector3.zero
           val lookat = getCameraLookat(camera)
           val offsetOrientation = Quaternion().rotateAxis(angle, lookat)

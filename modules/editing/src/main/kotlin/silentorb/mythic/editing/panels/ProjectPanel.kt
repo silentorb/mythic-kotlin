@@ -13,6 +13,7 @@ fun projectMenus(getShortcut: GetShortcut): Commands =
         MenuItem("File", items = listOf(
             MenuItem("New File", EditorCommands.newFileWithNameDialog),
             MenuItem("New Folder", EditorCommands.newFolderWithNameDialog),
+            MenuItem("Rename", EditorCommands.renameFileItemWithNameDialog),
         ))
     ))
 
