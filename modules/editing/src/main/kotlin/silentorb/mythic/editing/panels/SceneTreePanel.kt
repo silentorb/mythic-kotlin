@@ -48,7 +48,7 @@ fun renderTree(graph: Graph, tree: SceneTree, node: String, selection: NodeSelec
           val key = uniqueNodeName(getGraphKeys(graph), typeName)
           listOf(
               Command(EditorCommands.setGraphValue, Entry(key, SceneProperties.parent, node)),
-              Command(EditorCommands.setGraphValue, Entry(key, SceneProperties.instance, typeName)),
+              Command(EditorCommands.setGraphValue, Entry(key, SceneProperties.type, typeName)),
           )
         }
       }

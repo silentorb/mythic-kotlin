@@ -12,30 +12,38 @@ data class DeckReflection<Deck : Any, Hand : Any>(
     val deckConstructor: KFunction<Deck>,
     val deckProperties: List<KProperty1<Deck, *>>,
     val handType: KClass<Hand>,
-    val handProperties: List<KProperty1<Hand, *>?>
+    val handProperties: List<KProperty1<Hand, *>?>,
+    val blacklist: List<Any>,
 )
 
-fun <Deck : Any, Hand : Any> newDeckReflection(deckType: KClass<Deck>, handType: KClass<Hand>): DeckReflection<Deck, Hand> {
+fun <Deck : Any, Hand : Any> newDeckReflection(deckType: KClass<Deck>, handType: KClass<Hand>, blacklist: List<Pair<String, Any>> = listOf()): DeckReflection<Deck, Hand> {
   val deckConstructor = deckType.constructors.first()
-  val deckProperties = deckConstructor.parameters
+  val blacklistKeys = blacklist.map { it.first }
+  val parameters = deckConstructor.parameters
+      .filter { p -> !blacklistKeys.contains(p.name) }
+
+  val deckProperties = parameters
       .map { p -> deckType.memberProperties.first { it.name == p.name } }
-  val handProperties = deckConstructor.parameters
+
+  val handProperties = parameters
       .map { p ->
         handType.memberProperties.firstOrNull {
           it.returnType.jvmErasure.jvmName == p.type.arguments[1].type!!.jvmErasure.jvmName
         }
       }
+
   return DeckReflection(
       deckType = deckType,
       deckConstructor = deckConstructor,
       deckProperties = deckProperties,
       handType = handType,
-      handProperties = handProperties
+      handProperties = handProperties,
+      blacklist = blacklist.map { it.second }
   )
 }
 
-fun <Deck> newReflectedDeck(deckConstructor: KFunction<Deck>, args: List<Table<Any>> = listOf()): Deck =
-    deckConstructor.call(*args.toTypedArray())
+fun <Deck : Any, Hand : Any> newReflectedDeck(deckReflection: DeckReflection<Deck, Hand>, args: List<Any> = listOf()): Deck =
+    deckReflection.deckConstructor.call(*args.plus(deckReflection.blacklist).toTypedArray())
 
 fun <Deck : Any, Hand : Any> genericRemoveEntities(deckReflection: DeckReflection<Deck, Hand>): (Set<Id>) -> (Deck) -> Deck =
     { removeIds ->
@@ -45,7 +53,7 @@ fun <Deck : Any, Hand : Any> genericRemoveEntities(deckReflection: DeckReflectio
           val value = property.get(deck) as Table<Any>
           value.filterKeys(isActive)
         }
-        newReflectedDeck(deckReflection.deckConstructor, deletions)
+        newReflectedDeck(deckReflection, deletions)
       }
     }
 
@@ -55,7 +63,7 @@ fun <Deck : Any, Hand : Any> genericMergeDecks(deckReflection: DeckReflection<De
     val b = property.get(second) as Table<Any>
     a.plus(b)
   }
-  newReflectedDeck(deckReflection.deckConstructor, additions)
+  newReflectedDeck(deckReflection, additions)
 }
 
 fun <T : WithId> nullableList(entity: T?): Table<T> =
@@ -76,7 +84,7 @@ fun <Deck : Any, Hand : Any> genericHandToDeck(deckReflection: DeckReflection<De
         val value = property?.get(hand)
         nullableList(id, value)
       }
-  newReflectedDeck(deckReflection.deckConstructor, additions)
+  newReflectedDeck(deckReflection, additions)
 }
 
 fun <Deck : Any, Hand : Any> genericHandToDeckWithIdSource(deckReflection: DeckReflection<Deck, Hand>): (IdSource, Hand) -> Deck = { nextId, hand ->
@@ -86,7 +94,7 @@ fun <Deck : Any, Hand : Any> genericHandToDeckWithIdSource(deckReflection: DeckR
         val value = property?.get(hand)
         nullableList(id, value)
       }
-  val deck = newReflectedDeck(deckReflection.deckConstructor, additions)
+  val deck = newReflectedDeck(deckReflection, additions)
   deck
 }
 
@@ -101,7 +109,7 @@ fun <Deck : Any, Hand : Any> genericIdHandsToDeck(deckReflection: DeckReflection
             null
         }.associate { it }
       }
-  val deck = newReflectedDeck(deckReflection.deckConstructor, additions)
+  val deck = newReflectedDeck(deckReflection, additions)
   deck
 }
 

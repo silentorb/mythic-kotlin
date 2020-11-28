@@ -59,7 +59,7 @@ fun addPropertiesDropDown(editor: Editor, availableDefinitions: PropertyDefiniti
 
     for (attribute in availableAttributes.sorted()) {
       if (ImGui.selectable(attribute)) {
-        commands = commands.plus(Command(EditorCommands.setGraphValue, value = Entry(node, SceneProperties.instance, attribute)))
+        commands = commands.plus(Command(EditorCommands.setGraphValue, value = Entry(node, SceneProperties.type, attribute)))
       }
     }
     if (commands.none()) {
@@ -86,7 +86,7 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): PanelResponse =
           ImGui.text(node)
           ImGui.separator()
           val availableDefinitions = definitions.minus(entries.map { it.property })
-          val union = getPropertyValues<Key>(graph, node, SceneProperties.instance)
+          val union = getPropertyValues<Key>(graph, node, SceneProperties.type)
           if (availableDefinitions.any()) {
             commands = commands + addPropertiesDropDown(editor, availableDefinitions, union, entries, node)
           }
@@ -96,7 +96,7 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): PanelResponse =
             ImGui.text(attribute)
             ImGui.sameLine()
             if (ImGui.smallButton("x##attribute-$attribute")) {
-              commands = commands.plus(Command(EditorCommands.removeGraphValue, value = Entry(node, SceneProperties.instance, attribute)))
+              commands = commands.plus(Command(EditorCommands.removeGraphValue, value = Entry(node, SceneProperties.type, attribute)))
             }
           }
 

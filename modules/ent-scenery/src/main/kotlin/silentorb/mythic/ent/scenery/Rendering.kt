@@ -55,7 +55,7 @@ fun instanceToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, g
 fun nodeToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph: Graph, node: Key): List<ElementGroup> {
   val isSelected = false
   val mesh = getGraphValue<Key>(graph, node, SceneProperties.mesh)
-  val type = getGraphValue<Key>(graph, node, SceneProperties.instance)
+  val type = getGraphValue<Key>(graph, node, SceneProperties.type)
   val text3d = getGraphValue<String>(graph, node, SceneProperties.text3d)
   val light = getGraphValue<String>(graph, node, SceneProperties.light)
   val collisionShape = if (isSelected)

@@ -9,7 +9,7 @@ object SceneProperties {
   const val scale = "scale"
   const val mesh = "mesh"
   const val texture = "texture"
-  const val instance = "instance"
+  const val type = "type"
   const val text3d = "text3d"
   const val light = "light"
   const val rgba = "rgba"

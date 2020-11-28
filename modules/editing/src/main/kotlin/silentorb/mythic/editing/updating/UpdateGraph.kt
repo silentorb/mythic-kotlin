@@ -79,7 +79,7 @@ fun updateSceneGraph(editor: Editor) = handleCommands<Graph> { command, graph ->
       else {
         graph
             .map { entry ->
-              if (entry.property == SceneProperties.instance && entry.target == previous)
+              if (entry.property == SceneProperties.type && entry.target == previous)
                 entry.copy(target = next)
               else
                 entry

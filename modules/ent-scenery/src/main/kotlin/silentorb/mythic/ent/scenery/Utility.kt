@@ -116,7 +116,7 @@ fun expandInstances(graphs: GraphLibrary, instances: LooseGraph, accumulator: Gr
     }
 
 fun expandInstances(graphs: GraphLibrary, graph: Graph): Graph {
-  val instances = filterByProperty<Key>(graph, SceneProperties.instance)
+  val instances = filterByProperty<Key>(graph, SceneProperties.type)
       .filter { graphs.containsKey(it.target) }
 
   return expandInstances(graphs, instances, graph)

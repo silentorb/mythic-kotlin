@@ -86,7 +86,7 @@ tailrec fun getGraphDependencies(
               listOf()
             else
               graph
-                  .filter { it.property == SceneProperties.instance }
+                  .filter { it.property == SceneProperties.type }
                   .map { it.target as Key }
           }
           .toSet()

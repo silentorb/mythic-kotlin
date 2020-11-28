@@ -2,17 +2,22 @@ package silentorb.mythic.ent
 
 typealias Key = String
 
-data class Entry(
-    val source: Key,
+data class GenericEntry<T>(
+    val source: T,
     val property: Key,
     val target: Any
 )
 
+typealias Entry = GenericEntry<String>
+
 typealias Graph = Set<Entry>
 typealias GraphLibrary = Map<String, Graph>
 typealias ListGraph = List<Entry>
+typealias AnyEntry = GenericEntry<Any>
+typealias AnyGraph = Set<AnyEntry>
 
 typealias LooseGraph = Collection<Entry>
+typealias GenericGraph<T> = Collection<GenericEntry<T>>
 
 data class PropertyInfo(
     val manyToMany: Boolean = false,
@@ -64,11 +69,11 @@ fun replaceValues(graph: LooseGraph, additional: LooseGraph): Graph =
         .toSet()
 
 fun firstOrNullWithAttribute(graph: LooseGraph, attribute: String) =
-    graph.firstOrNull { it.property == "attribute" && it.target == attribute }?.target as Key?
+    graph.firstOrNull { it.property == "type" && it.target == attribute }?.target as Key?
 
-fun filterByAttribute(graph: LooseGraph, attribute: String) =
+fun <T> filterByAttribute(graph: GenericGraph<T>, attribute: String): List<T> =
     graph
-        .filter { it.property == "attribute" && it.target == attribute }
+        .filter { it.property == "type" && it.target == attribute }
         .map { it.source }
 
 fun renameNode(graph: Graph, previous: Key, next: Key): Graph =
