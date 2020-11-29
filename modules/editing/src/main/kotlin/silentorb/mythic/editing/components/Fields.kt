@@ -120,7 +120,15 @@ fun decimalTextField(entry: Entry): Float {
   return result.toFloatOrNull() ?: value
 }
 
+fun integerTextField(entry: Entry): Int {
+  val value = entry.target as Int
+  val owner = "${entry.source}.${entry.property}"
+  val result = textField(owner, value.toString(), ImGuiInputTextFlags.CharsDecimal)
+  return result.toIntOrNull() ?: value
+}
+
 val propertyDecimalTextField: PropertyWidget = { _, entry -> decimalTextField(entry) }
+val propertyIntegerTextField: PropertyWidget = { _, entry -> integerTextField(entry) }
 
 fun axisInput(owner: String, label: String, value: Float): Float {
   val flags = ImGuiInputTextFlags.CharsDecimal or ImGuiInputTextFlags.AutoSelectAll

@@ -69,11 +69,6 @@ fun renderTree(editor: Editor, graph: Graph?): PanelResponse =
     panel(editor, "Node Tree", Contexts.nodes, ::nodeTreeMenus) {
       panelBackground()
 
-      if (editor.state.graph != null) {
-        ImGui.text(editor.state.graph)
-        ImGui.separator()
-      }
-
       if (graph != null) {
         val tree = getSceneTree(graph)
         val rootNodes = getGraphKeys(graph)

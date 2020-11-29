@@ -17,4 +17,5 @@ object SceneProperties {
   const val collisionShape = "collisionShape"
   const val collisionGroups = "collisionGroups"
   const val collisionMask = "collisionMask"
+  const val value = "value"
 }

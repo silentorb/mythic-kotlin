@@ -27,6 +27,13 @@ val floatSerialization = Serialization(
     save = { it }
 )
 
+val intSerialization = Serialization(
+    load = {
+      val value = it as Number
+      value.toInt()
+    },
+    save = { it }
+)
 val collisionGroupWidget: PropertyWidget = labeledDropDownWidget { it.enumerations.collisionPresets }
 
 fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
@@ -96,5 +103,11 @@ fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
         displayName = "Collision Mask",
         widget = collisionGroupWidget,
         defaultValue = { 0 },
+    ),
+    SceneProperties.value to PropertyDefinition(
+        displayName = "Value",
+        serialization = intSerialization,
+        widget = propertyIntegerTextField,
+        defaultValue = { 0f },
     ),
 )

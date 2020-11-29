@@ -34,10 +34,11 @@ fun handleProjectCommands(editor: Editor) = handleCommands<FileItems> { command,
       if (selected == null)
         items
       else {
-        val name = (command.value as String) + sceneFileExtension
+        val key = command.value as String
+        val name = key + sceneFileExtension
         val fullPath = selected.fullPath + "/" + name
         val absolutePath = resolveProjectFilePath(editor, fullPath)
-        File(absolutePath).writeText("{\"graph\":[[\"root\",\"\",\"\"]]}\n")
+        File(absolutePath).writeText("{\"graph\":[[\"$key\",\"\",\"\"]]}\n")
         newFileItem(FileItemType.file, selected.fullPath, name, items)
       }
     }

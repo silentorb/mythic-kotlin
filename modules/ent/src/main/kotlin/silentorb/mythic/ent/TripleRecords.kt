@@ -15,8 +15,10 @@ typealias GraphLibrary = Map<String, Graph>
 typealias ListGraph = List<Entry>
 typealias AnyEntry = GenericEntry<Any>
 typealias AnyGraph = Set<AnyEntry>
+typealias GraphStores = Map<String, GraphStore>
 
 typealias LooseGraph = Collection<Entry>
+
 typealias GenericGraph<T> = Collection<GenericEntry<T>>
 
 data class PropertyInfo(
