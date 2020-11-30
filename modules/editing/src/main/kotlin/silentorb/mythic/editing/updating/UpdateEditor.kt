@@ -59,7 +59,7 @@ val updateFileSelection = handleCommands<NodeSelection> { command, selection ->
 }
 
 fun gatherSelectionHierarchy(graph: Graph, selection: NodeSelection): Graph {
-  val selectionAndChildren = gatherChildren(graph, selection)
+  val selectionAndChildren = selection + gatherChildren(graph, selection)
   return graph
       .filter {
         selectionAndChildren.contains(it.source) &&
@@ -76,7 +76,12 @@ fun updateClipboard(editor: Editor) = handleCommands<Graph?> { command, clipboar
       if (graph == null)
         clipboard
       else {
-        gatherSelectionHierarchy(graph, selection)
+        val duplicated = gatherSelectionHierarchy(graph, selection)
+        val keys = getGraphKeys(duplicated)
+        val oldParentReferences = duplicated
+            .filter { entry -> entry.property == SceneProperties.parent && !keys.contains(entry.target) }
+
+        duplicated - oldParentReferences
       }
     }
     else -> clipboard

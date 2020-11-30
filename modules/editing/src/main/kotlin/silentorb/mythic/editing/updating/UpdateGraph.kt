@@ -46,7 +46,8 @@ fun updateSceneGraph(editor: Editor) = handleCommands<Graph> { command, graph ->
         val selected = state.nodeSelection.first()
         val roots = getGraphRoots(clipboard)
         val glue = roots.map { Entry(it, SceneProperties.parent, selected) }
-        mergeGraphsWithRenaming(graph, clipboard) + glue
+        val result = mergeGraphsWithRenaming(graph, clipboard) + glue
+        result
       }
     }
 
