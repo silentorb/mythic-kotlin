@@ -95,10 +95,10 @@ fun getKeypresses(deviceStates: List<InputDeviceState>): List<InputEvent> =
       listOf()
     else {
       val (previous, next) = deviceStates.takeLast(2)
-      previous.events
+      next.events
           .filter { event ->
             event.device == keyboardDeviceIndex &&
-                next.events.none { it.device == keyboardDeviceIndex && it.index == event.index }
+                previous.events.none { it.device == keyboardDeviceIndex && it.index == event.index }
           }
     }
 
@@ -119,20 +119,23 @@ fun getShortcutCommands(bindings: KeystrokeBindings, context: String, deviceStat
 
   val compressedBindings = getCompressedBindings(bindings)
   val combo = getPressedShortcut(keyPresses)
-  val options = compressedBindings[combo]
-  val commandType = if (options != null && options.any()) {
-    val option = if (options.size == 1)
-      options.first()
-    else
-      options.firstOrNull { it.context == context }
-
-    option?.command
-  }
-  else
-    null
-
-  return if (commandType != null)
-    listOf(Command(commandType))
-  else
+  return if (combo == null)
     listOf()
+  else {
+    val options = compressedBindings[combo]
+    val commandType = if (options != null && options.any()) {
+      val option = if (options.size == 1)
+        options.first()
+      else
+        options.firstOrNull { it.context == context }
+
+      option?.command
+    } else
+      null
+
+    return if (commandType != null)
+      listOf(Command(commandType))
+    else
+      listOf()
+  }
 }

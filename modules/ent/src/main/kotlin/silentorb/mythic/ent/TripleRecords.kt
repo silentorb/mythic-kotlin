@@ -8,6 +8,11 @@ data class GenericEntry<T>(
     val target: Any
 )
 
+data class ContextKey(
+    val context: Any,
+    val name: Any
+)
+
 typealias Entry = GenericEntry<String>
 
 typealias Graph = Set<Entry>

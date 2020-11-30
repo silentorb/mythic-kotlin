@@ -66,38 +66,6 @@ fun <Deck : Any, Hand : Any> genericMergeDecks(deckReflection: DeckReflection<De
   newReflectedDeck(deckReflection, additions)
 }
 
-fun <T : WithId> nullableList(entity: T?): Table<T> =
-    if (entity == null)
-      mapOf()
-    else
-      mapOf(entity.id to entity)
-
-fun <T> nullableList(id: Id, entity: T?): Table<T> =
-    if (entity == null)
-      mapOf()
-    else
-      mapOf(id to entity)
-
-fun <Deck : Any, Hand : Any> genericHandToDeck(deckReflection: DeckReflection<Deck, Hand>): (Id, Hand) -> Deck = { id, hand ->
-  val additions = deckReflection.handProperties
-      .map { property ->
-        val value = property?.get(hand)
-        nullableList(id, value)
-      }
-  newReflectedDeck(deckReflection, additions)
-}
-
-fun <Deck : Any, Hand : Any> genericHandToDeckWithIdSource(deckReflection: DeckReflection<Deck, Hand>): (IdSource, Hand) -> Deck = { nextId, hand ->
-  val id = nextId()
-  val additions = deckReflection.handProperties
-      .map { property ->
-        val value = property?.get(hand)
-        nullableList(id, value)
-      }
-  val deck = newReflectedDeck(deckReflection, additions)
-  deck
-}
-
 fun <Deck : Any, Hand : Any> genericIdHandsToDeck(deckReflection: DeckReflection<Deck, Hand>): (List<GenericIdHand<Hand>>) -> Deck = { hands ->
   val additions = deckReflection.handProperties
       .map { property ->
@@ -111,8 +79,4 @@ fun <Deck : Any, Hand : Any> genericIdHandsToDeck(deckReflection: DeckReflection
       }
   val deck = newReflectedDeck(deckReflection, additions)
   deck
-}
-
-fun <Deck : Any, Hand : Any> genericAllHandsOnDeck(deckReflection: DeckReflection<Deck, Hand>): (List<Hand>, IdSource, Deck) -> Deck = { hands, nextId, deck ->
-  hands.fold(deck, { d, h -> genericMergeDecks(deckReflection)(d, genericHandToDeckWithIdSource(deckReflection)(nextId, h)) })
 }
