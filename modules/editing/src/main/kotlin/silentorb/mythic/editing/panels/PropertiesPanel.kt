@@ -77,7 +77,7 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): PanelResponse =
 
       if (graph != null) {
         var commands: Commands = listOf()
-        val selection = editor.state.nodeSelection
+        val selection = getNodeSelection(editor)
         if (selection.size == 1) {
           val node = selection.first()
           val definitions = editor.enumerations.propertyDefinitions

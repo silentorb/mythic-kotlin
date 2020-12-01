@@ -4,6 +4,7 @@ import silentorb.mythic.ent.Entry
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.GraphLibrary
 import silentorb.mythic.ent.Key
+import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector4i
@@ -75,11 +76,17 @@ data class ViewportState(
     val renderingMode: RenderingMode = RenderingMode.full,
 )
 
+data class SceneState(
+    val viewports: Map<Key, ViewportState> = defaultViewports(),
+    val nodeSelection: NodeSelection = setOf(),
+)
+
+typealias SceneStates = Map<Key, SceneState>
+
 // Persistent State
 data class EditorState(
     val graph: String? = null,
-    val viewports: Map<Key, ViewportState> = defaultViewports(),
-    val nodeSelection: NodeSelection = setOf(),
+    val sceneStates: SceneStates = mapOf(),
     val fileSelection: Set<String> = setOf(),
 )
 
@@ -99,6 +106,7 @@ data class SelectionQueryResponse(
 
 data class SelectionQuery(
     val position: Vector2i,
+    val command: Command?,
     val response: SelectionQueryResponse? = null,
 )
 
@@ -122,7 +130,7 @@ data class Editor(
     val viewportBoundsMap: Map<Key, Vector4i> = mapOf(),
     val bindings: KeystrokeBindings = defaultEditorMenuKeystrokes(),
     val selectionQuery: SelectionQuery? = null,
-    val maxHistory: Int = 20,
+    val maxHistory: Int = 30,
 )
 
 const val keypadKey = "Numpad"

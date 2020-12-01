@@ -27,7 +27,7 @@ fun drawAxisRails(axis: Axis, origin: Vector3, transform: ScreenTransform, drawL
 }
 
 fun drawSelectedObjectAnnotations(editor: Editor, viewport: Vector4i, camera: CameraRig, drawList: ImDrawList) {
-  val selection = editor.state.nodeSelection
+  val selection = getNodeSelection(editor)
   val graph = getActiveEditorGraph(editor)
   val operation = editor.operation
   val data = operation?.data

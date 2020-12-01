@@ -3,6 +3,7 @@ package silentorb.mythic.editing.lookinglass
 import org.lwjgl.opengl.GL11.*
 import silentorb.mythic.editing.Editor
 import silentorb.mythic.editing.getActiveEditorGraph
+import silentorb.mythic.editing.getNodeSelection
 import silentorb.mythic.glowing.clearStencil
 import silentorb.mythic.glowing.globalState
 import silentorb.mythic.glowing.withoutFrontDrawing
@@ -14,7 +15,7 @@ import silentorb.mythic.spatial.Vector4i
 val selectionColor = Vector4(0.9f, 0.9f, 0.4f, 1f)
 
 fun renderEditorSelection(editor: Editor, sceneRenderer: SceneRenderer) {
-  val selection = editor.state.nodeSelection
+  val selection = getNodeSelection(editor)
   val graph = getActiveEditorGraph(editor)
   if (graph != null) {
     for (node in selection) {

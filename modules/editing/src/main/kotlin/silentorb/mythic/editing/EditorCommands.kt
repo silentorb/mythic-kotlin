@@ -10,6 +10,7 @@ object EditorCommands {
   val pasteNode = "pasteNode"
   val duplicateNode = "duplicateNode"
   val startNodeSelect = " startNodeSelect"
+  val startNodeDrillDown = " startNodeDrillDown"
 
   val setGraphValue = "setGraphValue"
   val removeGraphValue = "removeGraphValue"
@@ -52,5 +53,6 @@ object EditorCommands {
   val undo = "undo"
   val redo = "redo"
 
+  val playGame = "playGame"
   val playScene = "playScene"
 }

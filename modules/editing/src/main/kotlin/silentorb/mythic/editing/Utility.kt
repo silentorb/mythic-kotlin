@@ -20,11 +20,28 @@ fun getNextSnapshot(editor: Editor): Snapshot? =
 fun getLatestGraph(editor: Editor): Graph? =
     getLatestSnapshot(editor)?.graph
 
-fun getEditorViewport(editor: Editor, viewport: Key?): ViewportState? =
-    editor.state.viewports[viewport]
+fun getSceneState(editor: Editor): SceneState? =
+    editor.state.sceneStates[editor.state.graph]
+
+fun getViewports(editor: Editor) =
+    getSceneState(editor)?.viewports
+
+fun getEditorViewport(editor: Editor, viewport: Key?): ViewportState? {
+  val viewports = getViewports(editor)
+  return if (viewports != null)
+    viewports[viewport]
+  else
+    null
+}
+
+fun getNodeSelection(editor: Editor): NodeSelection =
+    getSceneState(editor)?.nodeSelection ?: setOf()
+
+fun getNodeSelection(state: EditorState): NodeSelection =
+    state.sceneStates[state.graph]?.nodeSelection ?: setOf()
 
 fun getEditorCamera(editor: Editor, viewport: Key?): CameraRig? =
-    editor.state.viewports[viewport]?.camera
+    getEditorViewport(editor, viewport)?.camera
 
 fun getActiveEditorGraph(editor: Editor): Graph? =
     editor.staging ?: getLatestGraph(editor) ?: editor.graphLibrary[editor.state.graph]
@@ -37,9 +54,7 @@ fun defaultViewports() =
     )
 
 fun defaultEditorState() =
-    EditorState(
-        viewports = defaultViewports(),
-    )
+    EditorState()
 
 fun axisMask(axis: Set<Axis>): List<Float> =
     (0 until 3).map { index ->

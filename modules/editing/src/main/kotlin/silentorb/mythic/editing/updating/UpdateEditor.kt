@@ -15,42 +15,6 @@ import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.toVector2i
 
-fun updateNodeSelection(editor: Editor, nextGraph: Graph?) = handleCommands<NodeSelection> { command, selection ->
-  val graph = getActiveEditorGraph(editor)
-  if (graph != null && nextGraph != null) {
-    when (command.type) {
-      EditorCommands.setNodeSelection -> command.value as NodeSelection
-      EditorCommands.addNode, EditorCommands.renameNode, EditorCommands.duplicateNode, EditorCommands.pasteNode -> {
-        val newNodes = getGraphKeys(nextGraph) - getGraphKeys(graph)
-        if (newNodes.any())
-          newNodes
-        else
-          selection
-      }
-
-      EditorCommands.deleteNode -> {
-        val deletedNodes = getGraphKeys(graph) - getGraphKeys(nextGraph)
-        if (deletedNodes.any()) {
-          val firstRemainingParent = graph.firstOrNull {
-            deletedNodes.contains(it.source) && it.property == SceneProperties.parent && !deletedNodes.contains(it.target)
-          }?.target as String?
-          if (firstRemainingParent != null)
-            setOf(firstRemainingParent)
-          else
-            selection
-        } else
-          selection
-      }
-
-      EditorCommands.undo -> getPreviousSnapshot(editor)?.nodeSelection ?: selection
-      EditorCommands.redo -> getNextSnapshot(editor)?.nodeSelection ?: selection
-
-      else -> selection
-    }
-  } else
-    selection
-}
-
 val updateFileSelection = handleCommands<NodeSelection> { command, selection ->
   when (command.type) {
     EditorCommands.setFileSelection -> command.value as NodeSelection
@@ -71,7 +35,7 @@ fun gatherSelectionHierarchy(graph: Graph, selection: NodeSelection): Graph {
 fun updateClipboard(editor: Editor) = handleCommands<Graph?> { command, clipboard ->
   when (command.type) {
     EditorCommands.copyNode -> {
-      val selection = editor.state.nodeSelection
+      val selection = getNodeSelection(editor)
       val graph = getActiveEditorGraph(editor)
       if (graph == null)
         clipboard
@@ -103,35 +67,49 @@ fun updateViewport(editor: Editor, commands: Commands, mouseOffset: Vector2, vie
   )
 }
 
+fun updateSceneStates(commands: Commands, editor: Editor, graph: Graph?, mousePosition: Vector2i, mouseOffset: Vector2): SceneStates =
+    if (graph == null)
+      editor.state.sceneStates
+    else {
+      val graphId = editor.state.graph!!
+      val viewports = (getViewports(editor) ?: defaultViewports())
+          .mapValues { (key, viewport) ->
+            val bounds = editor.viewportBoundsMap[key]
+            val isInBounds = if (bounds == null)
+              false
+            else
+              isInBounds(mousePosition, bounds)
+
+            updateViewport(editor, commands, mouseOffset, viewport, isInBounds)
+          }
+
+      val nextNodeSelection = updateNodeSelection(editor, graph)(commands, getNodeSelection(editor))
+      val previous = editor.state.sceneStates[graphId] ?: SceneState()
+      val next = previous.copy(
+          viewports = viewports,
+          nodeSelection = nextNodeSelection,
+      )
+      editor.state.sceneStates + (graphId to next)
+    }
+
 fun updateEditorState(commands: Commands, editor: Editor, graph: Graph?, mousePosition: Vector2i, mouseOffset: Vector2): EditorState {
   val state = editor.state
-  val cameras = state.viewports
-      .mapValues { (key, viewport) ->
-        val bounds = editor.viewportBoundsMap[key]
-        val isInBounds = if (bounds == null)
-          false
-        else
-          isInBounds(mousePosition, bounds)
-
-        updateViewport(editor, commands, mouseOffset, viewport, isInBounds)
-      }
-
-  val nextNodeSelection = updateNodeSelection(editor, graph)(commands, state.nodeSelection)
-
   return state.copy(
       graph = onSetCommand(commands, EditorCommands.setActiveGraph, state.graph),
-      viewports = cameras,
-      nodeSelection = nextNodeSelection,
+      sceneStates = updateSceneStates(commands, editor, graph, mousePosition, mouseOffset),
       fileSelection = updateFileSelection(commands, state.fileSelection)
   )
 }
 
 fun updateSelectionQuery(editor: Editor, commands: Commands): SelectionQuery? {
-  val selectionCommand = commands.firstOrNull { it.type == EditorCommands.startNodeSelect }
+  val selectionCommand = commands
+      .firstOrNull { it.type == EditorCommands.startNodeSelect || it.type == EditorCommands.startNodeDrillDown }
+
   val previousSelectionQuery = editor.selectionQuery
   return if (selectionCommand != null && commands.none { it.type == EditorCommands.commitOperation })
     SelectionQuery(
-        position = selectionCommand.value as Vector2i
+        position = selectionCommand.value as Vector2i,
+        command = selectionCommand
     )
   else if (previousSelectionQuery != null && previousSelectionQuery.response == null)
     previousSelectionQuery // Still waiting for a response from the rendering code
@@ -165,7 +143,7 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
   val nextStaging = updateStaging(editor, previousMousePosition, mouseOffset, commandTypes, nextOperation)
   val mousePosition = (previousMousePosition + mouseOffset).toVector2i()
   val nextState = updateEditorState(commands, editor, nextGraph, mousePosition, mouseOffset)
-  val nextHistory = updateHistory(nextGraph, nextState.nodeSelection, nextState.graph, commands, editor.maxHistory, editor.history)
+  val nextHistory = updateHistory(nextGraph, getNodeSelection(nextState), nextState.graph, commands, editor.maxHistory, editor.history)
 
   return editor.copy(
       state = nextState,
@@ -175,16 +153,19 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
       viewportBoundsMap = onSetCommand(commands, EditorCommands.setViewportBounds, editor.viewportBoundsMap),
       fileItems = updateProject(commands, editor),
       clipboard = updateClipboard(editor)(commands, editor.clipboard),
-//      history = appendHistory(editor.history, nextGraph),
       history = nextHistory,
       selectionQuery = updateSelectionQuery(editor, commands),
   )
 }
 
 fun getQuerySelectionCommands(editor: Editor): Commands {
-  val queryResponse = editor.selectionQuery?.response
-  return if (queryResponse != null)
-    listOf(Command(EditorCommands.setNodeSelection, setOfNotNull(queryResponse.selectedObject)))
+  val request = editor.selectionQuery
+  val response = request?.response
+  return if (request != null && response != null)
+    if (request.command?.type == EditorCommands.startNodeDrillDown)
+      listOf(Command(EditorCommands.setActiveGraph, response.selectedObject))
+    else
+      listOf(Command(EditorCommands.setNodeSelection, setOfNotNull(response.selectedObject)))
   else
     listOf()
 }

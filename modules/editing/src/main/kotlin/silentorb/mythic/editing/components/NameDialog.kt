@@ -58,7 +58,7 @@ fun renameNodeDialog(editor: Editor) = nameDialog(
     EditorCommands.renameNodeWithNameDialog,
     emitDialogCommand(EditorCommands.renameNode)
 ) {
-  editor.state.nodeSelection.firstOrNull()
+  getNodeSelection(editor).firstOrNull()
 }
 
 val newFileNameDialog = nameDialog(

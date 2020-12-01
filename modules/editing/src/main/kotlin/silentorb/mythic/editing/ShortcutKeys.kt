@@ -21,14 +21,23 @@ private var modifierStateCtrl: Boolean = false
 private var modifierStateShift: Boolean = false
 private var modifierStateAlt: Boolean = false
 private var modifierStateComposite: Int = 0
+private val mouseButtonState: MutableList<Boolean> = MutableList(3) { false }
+private var doubleClickState: Boolean = false
 
 fun updateModifierKeyStates() {
   modifierStateCtrl = ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL)
   modifierStateShift = ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_SHIFT)
   modifierStateAlt = ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_ALT) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_ALT)
-  modifierStateComposite = (if (modifierStateCtrl) ModifierKeys.ctrl else 0) +
-      (if (modifierStateShift) ModifierKeys.shift else 0) +
-      (if (modifierStateAlt) ModifierKeys.alt else 0)
+  modifierStateComposite =
+      (if (modifierStateCtrl) ModifierKeys.ctrl else 0) +
+          (if (modifierStateShift) ModifierKeys.shift else 0) +
+          (if (modifierStateAlt) ModifierKeys.alt else 0)
+
+  for (i in 0 until 3) {
+    mouseButtonState[i] = ImGui.isMouseDown(i)
+  }
+
+  doubleClickState = ImGui.isMouseDoubleClicked(0)
 }
 
 fun isCtrlDown(): Boolean =
@@ -42,6 +51,12 @@ fun isShiftDown(): Boolean =
 
 fun getCompositeModifierKeys(): Int =
     modifierStateComposite
+
+fun isMouseDown(index: Int): Boolean =
+    mouseButtonState[index]
+
+fun isDoubleClick(): Boolean =
+    doubleClickState
 
 val functionKeyPattern = Regex("^F(\\d\\d?)$")
 

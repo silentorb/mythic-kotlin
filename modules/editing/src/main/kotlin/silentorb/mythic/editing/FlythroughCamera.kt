@@ -88,8 +88,8 @@ fun updateFlyThroughCamera(mouseOffset: Vector2, commands: List<Command>, camera
   return when {
     commands.any { it.type == EditorCommands.zoomIn } && isInBounds -> zoomCamera(camera, camera.pivotDistance * 0.7f)
     commands.any { it.type == EditorCommands.zoomOut } && isInBounds -> zoomCamera(camera, camera.pivotDistance * 1.3f + 0.1f)
-    isAltDown() && isInBounds -> updateCameraOrbiting(mouseOffset, camera)
-    isShiftDown() && isInBounds -> updateCameraPanning(mouseOffset, camera)
+    isMouseDown(1) && isInBounds && isShiftDown() -> updateCameraPanning(mouseOffset, camera)
+    isMouseDown(1) && isInBounds -> updateCameraOrbiting(mouseOffset, camera)
     else -> {
       val lookVelocity = updateLookVelocityFirstPerson(commands, defaultLookMomentumAxis(), camera.lookVelocity)
       val rotation = updateFirstPersonFacingRotation(camera.rotation, null, lookVelocity, simulationDelta)

@@ -45,16 +45,18 @@ fun drawViewportPanel(editor: Editor): PanelResponse =
           mousePositionReference.y.toInt() - viewport.y
       )
 
-      val clickCommands = if (
-          ImGui.isMouseClicked(ImGuiMouseButton.Left) &&
-          mousePosition.x > 0 &&
+      val isInBounds = mousePosition.x > 0 &&
           mousePosition.y > 0 &&
           mousePosition.x < viewport.z &&
           mousePosition.y < viewport.w
-      )
-        listOf(Command(EditorCommands.startNodeSelect, mousePosition))
-      else
-        listOf()
+
+      val clickCommands =
+          if (ImGui.isMouseDoubleClicked(ImGuiMouseButton.Left) && isInBounds)
+            listOf(Command(EditorCommands.startNodeDrillDown, mousePosition))
+          else if (ImGui.isMouseClicked(ImGuiMouseButton.Left) && isInBounds)
+            listOf(Command(EditorCommands.startNodeSelect, mousePosition))
+          else
+            listOf()
 
       val viewportCommands = if (viewport != editor.viewportBoundsMap[defaultViewportId])
         listOf(Command(EditorCommands.setViewportBounds, mapOf(defaultViewportId to viewport)))

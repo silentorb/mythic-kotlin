@@ -12,6 +12,7 @@ fun mainMenus(getShortcut: GetShortcut): Commands =
             MenuItem("Redo", EditorCommands.redo),
         )),
         MenuItem("Game", items = listOf(
+            MenuItem("Play Game", EditorCommands.playGame),
             MenuItem("Play Scene", EditorCommands.playScene),
         )),
     ))

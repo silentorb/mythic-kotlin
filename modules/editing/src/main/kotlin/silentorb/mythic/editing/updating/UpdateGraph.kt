@@ -4,6 +4,7 @@ import silentorb.mythic.editing.Editor
 import silentorb.mythic.editing.EditorCommands
 import silentorb.mythic.editing.components.nameText
 import silentorb.mythic.editing.getBaseName
+import silentorb.mythic.editing.getNodeSelection
 import silentorb.mythic.ent.*
 import silentorb.mythic.ent.scenery.gatherChildren
 import silentorb.mythic.ent.scenery.getGraphRoots
@@ -23,16 +24,15 @@ fun duplicateNode(graph: Graph, node: Key): Graph {
 }
 
 fun updateSceneGraph(editor: Editor) = handleCommands<Graph> { command, graph ->
-  val state = editor.state
-  val selection = state.nodeSelection
+  val selection = getNodeSelection(editor)
 
   when (command.type) {
 
     EditorCommands.addNode -> {
-      if (state.nodeSelection.size != 1)
+      if (selection.size != 1)
         graph
       else {
-        val selected = state.nodeSelection.first()
+        val selected = selection.first()
         val key = nameText.get()
         graph + Entry(key, SceneProperties.parent, selected)
       }
@@ -40,10 +40,10 @@ fun updateSceneGraph(editor: Editor) = handleCommands<Graph> { command, graph ->
 
     EditorCommands.pasteNode -> {
       val clipboard = editor.clipboard
-      if (state.nodeSelection.size != 1 || clipboard == null)
+      if (selection.size != 1 || clipboard == null)
         graph
       else {
-        val selected = state.nodeSelection.first()
+        val selected = selection.first()
         val roots = getGraphRoots(clipboard)
         val glue = roots.map { Entry(it, SceneProperties.parent, selected) }
         val result = mergeGraphsWithRenaming(graph, clipboard) + glue
@@ -52,19 +52,19 @@ fun updateSceneGraph(editor: Editor) = handleCommands<Graph> { command, graph ->
     }
 
     EditorCommands.duplicateNode -> {
-      if (state.nodeSelection.size != 1)
+      if (selection.size != 1)
         graph
       else {
-        state.nodeSelection
+        selection
             .fold(graph, ::duplicateNode)
       }
     }
 
     EditorCommands.renameNode -> {
-      if (state.nodeSelection.size != 1)
+      if (selection.size != 1)
         graph
       else {
-        val selected = state.nodeSelection.first()
+        val selected = selection.first()
         val key = nameText.get()
         renameNode(graph, selected, key)
       }

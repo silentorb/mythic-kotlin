@@ -76,7 +76,7 @@ fun renderTree(editor: Editor, graph: Graph?): PanelResponse =
             .minus(tree.keys)
         assert(rootNodes.size == 1)
         val rootId = rootNodes.first()
-        renderTree(graph, tree, rootId, editor.state.nodeSelection)
+        renderTree(graph, tree, rootId, getNodeSelection(editor))
       } else
         listOf()
     }
