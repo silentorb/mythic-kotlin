@@ -1,13 +1,10 @@
 package silentorb.mythic.desktop
 
-import silentorb.mythic.platforming.InputEvent
-import silentorb.mythic.platforming.PlatformInput
-import silentorb.mythic.platforming.keyboardDeviceIndex
-import silentorb.mythic.platforming.mouseDeviceIndex
 import silentorb.mythic.spatial.Vector2
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWScrollCallback
 import silentorb.mythic.haft.*
+import silentorb.mythic.platforming.*
 
 val GamepadIndices = GLFW_JOYSTICK_1..GLFW_JOYSTICK_LAST
 
@@ -58,7 +55,7 @@ fun getKeyboardEvents(window: Long): List<InputEvent> {
   return keyboardKeys.mapNotNull { key ->
     if (glfwGetKey(window, key) == GLFW_PRESS)
       InputEvent(
-          device = keyboardDeviceIndex,
+          device = Devices.keyboard,
           index = key,
           value = 1f
       )
@@ -74,7 +71,7 @@ fun getGamepadEvents(): List<InputEvent> {
       val value = gamepadInputSource(gamepad, button)
       if (value != 0f)
         InputEvent(
-            device = gamepad + 2,
+            device = gamepad + Devices.gamepadFirst,
             index = button,
             value = value
         )
@@ -121,7 +118,7 @@ fun getMouseEvents(window: Long): List<InputEvent> {
         val value = getValue(button)
         if (value != 0f)
           InputEvent(
-              device = mouseDeviceIndex,
+              device = Devices.mouse,
               index = button,
               value = value
           )

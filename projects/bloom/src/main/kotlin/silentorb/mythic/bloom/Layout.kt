@@ -5,36 +5,7 @@ import kotlin.math.max
 
 typealias BloomKey = String
 
-fun clippedDimensions(parent: Vector2i, childPosition: Vector2i, childDimensions: Vector2i): Vector2i {
-  return if (childPosition.x + childDimensions.x > parent.x ||
-      childPosition.y + childDimensions.y > parent.y)
-    Vector2i(
-        x = Math.min(childDimensions.x, parent.x - childPosition.x),
-        y = Math.min(childDimensions.y, parent.y - childPosition.y)
-    )
-  else
-    childDimensions
-}
-
-fun moveBounds(offset: Vector2i, container: Vector2i): (Bounds) -> Bounds = { child ->
-  val newPosition = child.position + offset
-  val newDimensions = clippedDimensions(container, newPosition, child.dimensions)
-
-  child.copy(
-      position = newPosition,
-      dimensions = newDimensions
-  )
-}
-
-typealias Positioner = (Vector2i) -> Int
-
-typealias PlanePositioner = (PlaneMap) -> Positioner
-
-typealias ReversePositioner = (Vector2i, Vector2i) -> Int
-
 typealias Aligner = (Int, Int) -> Int
-
-typealias ReversePlanePositioner = (PlaneMap) -> ReversePositioner
 
 val centered: Aligner = { parent, child ->
   max(0, (parent - child) / 2)
@@ -44,11 +15,15 @@ val justifiedStart: Aligner = { _, _ ->
   0
 }
 
+val justifiedEnd: Aligner = { parent, child ->
+  parent - child
+}
+
 fun percentage(value: Float): Aligner = { parent, _ ->
   (parent.toFloat() * value).toInt()
 }
 
-fun axisMargin(plane: Plane, all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): (LengthFlower) -> LengthFlower = { child ->
+fun marginSingle(plane: Plane, all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): (LengthFlower) -> LengthFlower = { child ->
   { length ->
     val sizeOffset = Vector2i(left + right, top + bottom)
     val relativeSizeOffset = plane(sizeOffset)
@@ -62,13 +37,6 @@ fun axisMargin(plane: Plane, all: Int = 0, left: Int = all, top: Int = all, bott
             )
         )
     )
-  }
-}
-
-fun lengthToFlower(plane: Plane): (LengthFlower) -> Flower = { lengthFlower ->
-  { dimensions ->
-    val length = plane(dimensions).x
-    lengthFlower(length)
   }
 }
 
@@ -96,30 +64,39 @@ fun centered(box: Box): Flower = { dimensions ->
   )
 }
 
-fun alignToLengthFlower(aligner: Aligner): (Plane) -> (Box) -> LengthFlower = { plane ->
-  { box ->
-    { length ->
-      val relativeBoxDimensions = plane(box.dimensions)
-      val offset = plane(
-          Vector2i(
-              aligner(length, relativeBoxDimensions.x),
-              relativeBoxDimensions.y
-          )
+fun alignSingle(aligner: Aligner, plane: Plane, lengthFlower: LengthFlower): Flower = { dimensions ->
+  val parent = plane(dimensions)
+  val box = lengthFlower(parent.y)
+  val child = plane(box.dimensions)
+  val offset = plane(
+      Vector2i(
+          aligner(parent.x, child.x),
+          0
       )
+  )
 
-      // Currently doesn't support negative numbers
-      assert(offset.x >= 0)
-      assert(offset.y >= 0)
-
-      Box(
-          dimensions = box.dimensions + offset,
-          boxes = listOf(OffsetBox(box, offset))
-      )
-    }
-  }
+  Box(
+      dimensions = dimensions,
+      boxes = listOf(OffsetBox(box, offset))
+  )
 }
 
-fun align(horizontal: Aligner, vertical: Aligner, flower: Flower): Flower =
+fun alignSingle(aligner: Aligner, plane: Plane, box: Box): LengthFlower = { length ->
+  val child = plane(box.dimensions)
+  val offset = plane(
+      Vector2i(
+          aligner(length, child.x),
+          0
+      )
+  )
+
+  Box(
+      dimensions = plane(Vector2i(length, child.y)),
+      boxes = listOf(OffsetBox(box, offset))
+  )
+}
+
+fun alignBoth(horizontal: Aligner, vertical: Aligner, flower: Flower): Flower =
     { dimensions ->
       val box = flower(dimensions)
       val offset = Vector2i(
@@ -137,27 +114,8 @@ fun align(horizontal: Aligner, vertical: Aligner, flower: Flower): Flower =
       )
     }
 
-fun align(horizontal: Aligner, vertical: Aligner, box: Box): Flower =
-    align(horizontal, vertical, box.asFlower())
+fun alignBoth(horizontal: Aligner, vertical: Aligner, box: Box): Flower =
+    alignBoth(horizontal, vertical, box.toFlower())
 
-val centeredAxis = alignToLengthFlower(centered)
-
-fun percentageAxis(plane: Plane, value: Float) = alignToLengthFlower(percentage(value))(plane)
-
-val reverseJustifiedStart: ReversePlanePositioner = { plane ->
-  { _, _ ->
-    0
-  }
-}
-
-val reverseJustifiedEnd: ReversePlanePositioner = { plane ->
-  { parent, child ->
-    plane.x(parent) - plane.x(child)
-  }
-}
-
-fun fixedReverse(value: Int): ReversePlanePositioner = { plane ->
-  { _, _ ->
-    value
-  }
-}
+fun alignBoth(both: Aligner, box: Box): Flower =
+    alignBoth(both, both, box)

@@ -38,16 +38,3 @@ fun isClick() = isClick(0)
 
 fun isClickInside(bounds: Bounds, inputState: HistoricalInputState) =
     isClick()(inputState) && isInBounds(inputState.current.mousePosition, bounds)
-
-fun onClickPersisted(key: String, logicModule: LogicModuleOld): LogicModuleOld = { bundle ->
-  val visibleBounds = bundle.visibleBounds
-  if (visibleBounds != null && isClickInside(visibleBounds, bundle.state.input))
-    logicModule(bundle)
-  else {
-    val flowerState = bundle.state.resourceBag[key]
-    if (flowerState != null)
-      mapOf(key to flowerState)
-    else
-      null
-  }
-}

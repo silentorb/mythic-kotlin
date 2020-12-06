@@ -27,17 +27,6 @@ data class LogicBundle(
     val visibleBounds: Bounds? // Null means the box is completely clipped and not visible
 )
 
-typealias LogicModuleOld = (LogicBundle) -> StateBagMods
-
-typealias LogicModuleTransform = (LogicModuleOld) -> LogicModuleOld
-
-fun logicWrapper(wrapper: (LogicBundle, StateBagMods) -> StateBagMods): LogicModuleTransform = { logicModule ->
-  { bundle ->
-    val result = logicModule(bundle)
-    wrapper(bundle, result)
-  }
-}
-
 fun visibleBounds(box: OffsetBox): Bounds? =
     box.bounds
 

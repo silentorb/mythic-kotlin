@@ -1,4 +1,7 @@
-package silentorb.mythic.bloom
+package silentorb.mythic.bloom.old
+
+import silentorb.mythic.bloom.BloomKey
+import silentorb.mythic.bloom.existingOrNewState
 
 typealias GenericIdSelector<T> = (T) -> BloomKey
 

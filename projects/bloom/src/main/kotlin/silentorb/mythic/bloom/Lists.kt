@@ -70,63 +70,6 @@ fun breadthList(plane: Plane, spacing: Int = 0): (List<LengthFlower>) -> LengthF
 fun horizontalList(spacing: Int = 0): SimpleBoxContainer =
     boxList(horizontalPlane, spacing)
 
-//fun verticalList(spacing: Int = 0, name: String = "verticalList"): (List<Box>) -> Box =
-//    boxList(verticalPlane, spacing, name)
-
-enum class FlexType {
-  stretch,
-  fixed,
-}
-
-//interface FlexItem
-//
-//data class BoxFlexItem(
-//    val box: Box
-//) : FlexItem
-//
-//data class FlowerFlexItem(
-//    val flower: Flower
-//) : FlexItem
-//
-//fun flex(box: Box): FlexItem =
-//    BoxFlexItem(box)
-//
-//fun flex(flower: Flower): FlexItem =
-//    FlowerFlexItem(flower)
-
-//fun flexList(plane: Plane, spacing: Int = 0, name: String = "flexList"): (List<FlexItem>) -> Flower = { items ->
-//  { dimensions ->
-//    val relativeBounds = plane(dimensions)
-//    val totalLength = relativeBounds.x
-//    val breadth = relativeBounds.y
-//    val inputBoxes = items.mapNotNull { (it as? BoxFlexItem)?.box }
-//    val fixedLength = inputBoxes.sumBy { plane(it.bounds.dimensions).x }
-////    val fixedBreadth = inputBoxes.sumBy { plane(it.bounds.dimensions).y }
-//    val totalSpacing = spacing * (items.size - 1)
-//    val reserved = fixedLength + totalSpacing
-//    val remaining = totalLength - reserved
-//    val stretchCount = items.size - inputBoxes.size
-//    val stretchRation = remaining / stretchCount
-//    val stretchItemBounds = plane(Vector2i(stretchRation, breadth))
-//
-//    val boxes = items.map { item ->
-//      when (item) {
-//        is BoxFlexItem -> item.box
-//        is FlowerFlexItem -> item.flower(stretchItemBounds)
-//        else -> throw Error()
-//      }
-//    }
-//    val arrangedBoxes = arrangeListItems(plane, spacing, boxes)
-//    Box(
-//        name = name,
-//        bounds = Bounds(
-//            dimensions = dimensions
-//        ),
-//        boxes = arrangedBoxes
-//    )
-//  }
-//}
-
 interface FlexItem {
   fun getBox(length: Int, breadth: Int): Box
   fun getBoxOrNull(): Box?

@@ -8,6 +8,8 @@ val emptyBox = Box(
     dimensions = Vector2i()
 )
 
+val emptyFlower: Flower = { emptyBox }
+
 fun compose(flowers: List<Flower>): Flower = { dimensions ->
   Box(
       dimensions = dimensions,
@@ -31,20 +33,18 @@ fun compose(vararg boxes: Box): Box =
 infix fun Flower.plusFlower(second: Flower): Flower =
     compose(this, second)
 
-fun depictBehind2(depiction: Depiction): (Flower) -> Flower = { flower ->
-  { dimensions ->
-    val box = flower(dimensions)
-    val boxDepiction = box.depiction
-    box.copy(
-        depiction = { b, c ->
-          depiction(b, c)
-          if (boxDepiction != null)
-            boxDepiction(b, c)
-        }
-    )
-  }
+fun <T> depictBehind(depiction: Depiction, flower: BoxSource<T>): BoxSource<T> = { dimensions ->
+  val box = flower(dimensions)
+  val boxDepiction = box.depiction
+  box.copy(
+      depiction = { b, c ->
+        depiction(b, c)
+        if (boxDepiction != null)
+          boxDepiction(b, c)
+      }
+  )
 }
 
-infix fun Flower.depictBehind(depiction: Depiction): Flower =
-    depictBehind2(depiction)(this)
+inline infix fun <reified T> BoxSource<T>.depictBehind(noinline depiction: Depiction): BoxSource<T> =
+    depictBehind(depiction, this)
 

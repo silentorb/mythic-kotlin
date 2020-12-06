@@ -8,8 +8,9 @@ import silentorb.mythic.ent.singleValueCache
 import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
+import silentorb.mythic.platforming.Devices
 import silentorb.mythic.platforming.InputEvent
-import silentorb.mythic.platforming.keyboardDeviceIndex
+import silentorb.mythic.platforming.Devices.keyboard
 
 object ModifierKeys {
   const val ctrl = 1 shl 10
@@ -112,8 +113,8 @@ fun getKeypresses(deviceStates: List<InputDeviceState>): List<InputEvent> =
       val (previous, next) = deviceStates.takeLast(2)
       next.events
           .filter { event ->
-            event.device == keyboardDeviceIndex &&
-                previous.events.none { it.device == keyboardDeviceIndex && it.index == event.index }
+            event.device == Devices.keyboard &&
+                previous.events.none { it.device == Devices.keyboard && it.index == event.index }
           }
     }
 

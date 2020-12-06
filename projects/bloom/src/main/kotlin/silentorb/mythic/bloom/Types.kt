@@ -25,7 +25,7 @@ data class Box(
           attributes = this.attributes + attributes
       )
 
-  fun asFlower(): Flower = { this }
+  fun toFlower(): Flower = { this }
 }
 
 data class OffsetBox(
@@ -44,3 +44,4 @@ typealias Seed = Vector2i
 typealias Flower = (Seed) -> Box
 typealias WildFlower = (Box) -> Box
 typealias LengthFlower = (Int) -> Box
+typealias BoxSource<T> = (T) -> Box

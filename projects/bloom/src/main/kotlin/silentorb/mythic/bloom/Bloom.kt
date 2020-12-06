@@ -33,17 +33,6 @@ typealias Depiction = (Bounds, Canvas) -> Unit
 typealias StateBag = Map<String, Any>
 typealias StateBagMods = StateBag?
 
-fun crop(bounds: Bounds, canvas: Canvas, action: () -> Unit) = canvas.crop(toVector4i(bounds), action)
-
-fun centeredPosition(boundsLength: Int, length: Int): Int =
-    (boundsLength - length) / 2
-
-fun centeredPosition(plane: Plane, bounds: Vector2i, length: Int?): Int =
-    if (length == null)
-      0
-    else
-      centeredPosition(plane(bounds).x, length)
-
 fun drawBorder(bounds: Bounds, canvas: Canvas, color: Vector4, thickness: Float = 1f) {
   canvas.drawSquare(bounds.position.toVector2(), bounds.dimensions.toVector2(), canvas.outline(color, thickness))
 }

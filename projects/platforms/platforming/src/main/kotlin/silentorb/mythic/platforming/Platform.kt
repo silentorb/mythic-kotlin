@@ -14,9 +14,11 @@ data class InputEvent(
     val value: Float
 )
 
-const val keyboardDeviceIndex = 0
-const val mouseDeviceIndex = 1
-const val generalGamepadDeviceIndex = 2
+object Devices {
+  const val keyboard = 0
+  const val mouse = 1
+  const val gamepadFirst = 2
+}
 
 interface PlatformInput {
   fun update()
