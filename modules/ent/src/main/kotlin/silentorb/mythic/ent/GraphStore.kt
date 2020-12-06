@@ -14,9 +14,9 @@ interface GraphStore {
   fun toCollection(): Collection<AnyEntry>
 
   operator fun plus(value: AnyEntry): GraphStore
-  operator fun plus(value: Collection<AnyEntry>): GraphStore
+  operator fun plus(value: AnyGraph): GraphStore
   operator fun minus(value: AnyEntry): GraphStore
-  operator fun minus(value: Collection<AnyEntry>): GraphStore
+  operator fun minus(value: AnyGraph): GraphStore
 }
 
 operator fun GraphStore.plus(value: GraphStore): GraphStore =

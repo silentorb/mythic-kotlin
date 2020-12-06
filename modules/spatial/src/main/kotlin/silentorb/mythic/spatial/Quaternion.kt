@@ -607,8 +607,8 @@ data class Quaternion(
    * the matrix whose rotational component is used to set this quaternion
    * @return this
    */
-  fun fromUnnormalized(mat: Matrix4dc): Quaternion {
-    fromUnnormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
+  fun fromUnnormalized(mat: Matrix): Quaternion {
+    fromUnnormalized(mat.m00, mat.m01, mat.m02, mat.m10, mat.m11, mat.m12, mat.m20, mat.m21, mat.m22)
     return this
   }
 
@@ -622,8 +622,8 @@ data class Quaternion(
    * the matrix whose rotational component is used to set this quaternion
    * @return this
    */
-  fun fromNormalized(mat: Matrix4dc): Quaternion {
-    fromNormalized(mat.m00(), mat.m01(), mat.m02(), mat.m10(), mat.m11(), mat.m12(), mat.m20(), mat.m21(), mat.m22())
+  fun fromNormalized(mat: Matrix): Quaternion {
+    fromNormalized(mat.m00, mat.m01, mat.m02, mat.m10, mat.m11, mat.m12, mat.m20, mat.m21, mat.m22)
     return this
   }
 

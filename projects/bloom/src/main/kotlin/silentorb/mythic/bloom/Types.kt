@@ -24,6 +24,8 @@ data class Box(
       this.copy(
           attributes = this.attributes + attributes
       )
+
+  fun asFlower(): Flower = { this }
 }
 
 data class OffsetBox(

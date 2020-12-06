@@ -43,3 +43,5 @@ data class SimpleGraphStore(
   override fun minus(value: Collection<AnyEntry>): GraphStore =
       this.copy(collection = collection - value)
 }
+
+val emptyGraphStore = SimpleGraphStore()

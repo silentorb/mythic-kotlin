@@ -18,33 +18,10 @@ private val _zero = Vector2i()
  * @author Kai Burjack
  * @author Hans Uhlig
  */
-class Vector2i {
-
-  /**
-   * The x component of the vector.
-   */
-  var x: Int = 0
-  /**
-   * The y component of the vector.
-   */
-  var y: Int = 0
-
-  /**
-   * Create a new [Vector2i] and initialize its components to zero.
-   */
-  constructor() {}
-
-  /**
-   * Create a new [Vector2i] and initialize both of its components with
-   * the given value.
-   *
-   * @param s
-   * the value of both components
-   */
-  constructor(s: Int) {
-    this.x = s
-    this.y = s
-  }
+data class Vector2i(
+    var x: Int = 0,
+    var y: Int = x
+) {
 
   /**
    * Create a new [Vector2i] and initialize its components to the given values.
@@ -54,10 +31,6 @@ class Vector2i {
    * @param y
    * the y component
    */
-  constructor(x: Int, y: Int) {
-    this.x = x
-    this.y = y
-  }
 
   private fun thisOrNew(): Vector2i {
     return this

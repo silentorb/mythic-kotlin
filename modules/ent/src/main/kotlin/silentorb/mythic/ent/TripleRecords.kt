@@ -19,7 +19,7 @@ typealias Graph = Set<Entry>
 typealias GraphLibrary = Map<String, Graph>
 typealias ListGraph = List<Entry>
 typealias AnyEntry = GenericEntry<Any>
-typealias AnyGraph = Set<AnyEntry>
+typealias AnyGraph = Collection<AnyEntry>
 typealias GraphStores = Map<String, GraphStore>
 
 typealias LooseGraph = Collection<Entry>

@@ -44,6 +44,17 @@ fun getNodeTransformWithoutScale(graph: Graph, node: Key): Matrix {
     localTransform
 }
 
+fun toSpatialEntries(matrix: Matrix, node: Key): AnyGraph {
+  val translation = matrix.translation()
+  val rotation = matrix.rotation()
+  val scale = matrix.getScale()
+  return setOfNotNull(
+      if (translation != Vector3.zero) AnyEntry(node, SceneProperties.translation, translation) else null,
+      if (rotation != Vector3.zero) AnyEntry(node, SceneProperties.rotation, rotation) else null,
+      if (scale != Vector3.unit) AnyEntry(node, SceneProperties.scale, scale) else null,
+  )
+}
+
 tailrec fun gatherChildren(graph: Graph, nodes: Set<Key>, accumulator: Set<Key> = setOf()): Set<Key> {
   val next = nodes
       .flatMap { node ->
