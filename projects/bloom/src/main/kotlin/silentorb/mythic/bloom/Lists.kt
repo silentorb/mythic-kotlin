@@ -1,6 +1,7 @@
 package silentorb.mythic.bloom
 
 import silentorb.mythic.spatial.Vector2i
+import kotlin.math.max
 
 typealias SimpleBoxContainer = (List<Box>) -> Box
 
@@ -17,6 +18,9 @@ tailrec fun arrangeListItems(plane: Plane, spacing: Int, boxes: List<Box>, lengt
 fun getListLength(plane: Plane, boxes: List<OffsetBox>): Int =
     boxes.maxOfOrNull { plane(it.offset + it.dimensions).x } ?: 0
 
+fun getListBreadth2(plane: Plane, boxes: List<OffsetBox>): Int =
+    boxes.maxOfOrNull { plane(it.offset + it.dimensions).y } ?: 0
+
 fun getListBreadth(plane: Plane, boxes: List<DimensionBox>): Int =
     boxes.maxOfOrNull { plane(it.dimensions).y } ?: 0
 
@@ -25,7 +29,7 @@ fun boxList(plane: Plane, spacing: Int, vararg children: Box): Box {
   val length = getListLength(plane, boxes)
   val breadth = getListBreadth(plane, boxes.map { it.child })
 
- return Box(
+  return Box(
       name = "list",
       dimensions = plane(Vector2i(length, breadth)),
       boxes = boxes
@@ -52,18 +56,20 @@ fun alignListItems(plane: Plane, align: Aligner): (Box) -> Box = { box ->
   )
 }
 
-fun breadthList(plane: Plane, spacing: Int = 0): (List<LengthFlower>) -> LengthFlower = { children ->
+fun breadthList(plane: Plane, spacing: Int = 0, fitChildren: Boolean = true): (List<LengthFlower>) -> LengthFlower = { children ->
   { breadth ->
     val initialBoxes = children.map { it(breadth) }
     val boxes = arrangeListItems(plane, spacing, initialBoxes)
     val length = getListLength(plane, boxes)
-//    val breadth = getListBreadth(plane, boxes)
-
-    Box(
-        name = "list",
-        dimensions = plane(Vector2i(length, breadth)),
-        boxes = boxes
-    )
+    val childrenBreadth = getListBreadth2(plane, boxes)
+    if (fitChildren && childrenBreadth > breadth)
+      breadthList(plane, spacing, false)(children)(childrenBreadth)
+    else
+      Box(
+          name = "list",
+          dimensions = plane(Vector2i(length, breadth)),
+          boxes = boxes
+      )
   }
 }
 
@@ -111,19 +117,19 @@ fun flexList(plane: Plane, spacing: Int = 0): (List<FlexItem>) -> LengthFlower =
     if (inputBoxes.size == children.size)
       boxList(plane, spacing)(inputBoxes)
     else {
-      val totalLength = length
       val fixedLength = inputBoxes.sumBy { plane(it.dimensions).x }
       val breadth = inputBoxes.sumBy { plane(it.dimensions).y }
       val totalSpacing = spacing * (children.size - 1)
       val reserved = fixedLength + totalSpacing
-      val remaining = totalLength - reserved
+      val remaining = length - reserved
       val stretchCount = children.size - inputBoxes.size
       val stretchRation = remaining / stretchCount
       val boxes = children.map { it.getBox(stretchRation, breadth) }
       val arrangedBoxes = arrangeListItems(plane, spacing, boxes)
+      val finalLength = max(length, reserved)
       Box(
           name = "flexList",
-          dimensions = plane(Vector2i(length, breadth)),
+          dimensions = plane(Vector2i(finalLength, breadth)),
           boxes = arrangedBoxes
       )
     }

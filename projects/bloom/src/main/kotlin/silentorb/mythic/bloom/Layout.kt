@@ -90,8 +90,9 @@ fun alignSingle(aligner: Aligner, plane: Plane, box: Box): LengthFlower = { leng
       )
   )
 
+  val finalLength = max(length, child.x + plane(offset).x)
   Box(
-      dimensions = plane(Vector2i(length, child.y)),
+      dimensions = plane(Vector2i(finalLength, child.y)),
       boxes = listOf(OffsetBox(box, offset))
   )
 }

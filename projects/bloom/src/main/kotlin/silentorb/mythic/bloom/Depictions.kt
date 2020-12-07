@@ -35,5 +35,5 @@ fun clipBox(bounds: Bounds, depiction: Depiction): Depiction = { b, c ->
 
 fun solidBackground(backgroundColor: Vector4): Depiction = { b: Bounds, canvas: Canvas ->
   drawFill(b, canvas, backgroundColor)
-  drawBorder(b, canvas, Vector4(0f, 0f, 0f, 1f))
+  drawBorder(b, canvas, Vector4(0f, 0f, 0f, 1f), 2f)
 }
