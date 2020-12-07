@@ -66,11 +66,6 @@ class FlexibleFace(
     get() = edges.map { it.first }
 //  get() = edges.flatMap { it.vertices }.distinct()
 
-  init {
-    if (debugIndex == 500L) {
-      val k = 0
-    }
-  }
   val vertices: List<Vector3m>
     get() = edges.map { it.first }
 

@@ -32,8 +32,8 @@ fun boxList(plane: Plane, spacing: Int, vararg children: Box): Box {
   )
 }
 
-fun boxList(plane: Plane, vararg children: Box) =
-    boxList(plane, 0, *children)
+fun boxList2(plane: Plane, spacing: Int = 0, vararg children: Box) =
+    boxList(plane, spacing, *children)
 
 fun boxList(plane: Plane, spacing: Int = 0): SimpleBoxContainer = { children ->
   boxList(plane, spacing, *children.toTypedArray())
