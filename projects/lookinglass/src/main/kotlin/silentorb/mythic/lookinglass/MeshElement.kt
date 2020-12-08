@@ -1,6 +1,7 @@
 package silentorb.mythic.lookinglass
 
 import silentorb.mythic.breeze.AnimationName
+import silentorb.mythic.ent.Id
 import silentorb.mythic.scenery.MeshName
 import silentorb.mythic.scenery.TextureName
 import silentorb.mythic.spatial.Matrix
@@ -17,7 +18,7 @@ data class ElementAnimation(
 )
 
 data class MeshElement(
-    val id: Long = 1L,
+    val id: Id = 1,
     val mesh: MeshName,
     val transform: Matrix = Matrix.identity,
     val location: Vector3 = Vector3.zero,

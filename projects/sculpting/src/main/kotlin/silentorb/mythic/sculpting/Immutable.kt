@@ -141,7 +141,7 @@ data class ImmutableMesh(
   val distinctVertices: Vertices
     get() = distinctVertices(redundantVertices)
 
-  fun createFace(nextEdgeId: IdSource, id: Long, vertices: List<Vector3>): ImmutableFace {
+  fun createFace(nextEdgeId: IdSource, id: Id, vertices: List<Vector3>): ImmutableFace {
     if (id == 41L) {
       val k = 0
     }
@@ -154,7 +154,7 @@ data class ImmutableMesh(
     return face
   }
 
-  fun createStitchedFace(nextEdgeId: IdSource, id: Long, vertices: List<Vector3>): ImmutableFace {
+  fun createStitchedFace(nextEdgeId: IdSource, id: Id, vertices: List<Vector3>): ImmutableFace {
     if (id == 98L) {
       val k = 0
     }
