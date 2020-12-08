@@ -54,8 +54,9 @@ fun addPropertiesDropDown(editor: Editor, availableDefinitions: PropertyDefiniti
 
   if (ImGui.beginCombo("Add Type", "")) {
     val allAttributes = editor.enumerations.attributes
-    val allTypes = getAvailableTypes(editor)
-    val availableAttributes = allAttributes + allTypes - attributes - node
+    val libraryAttributes = editor.graphLibrary.keys
+    val allTypes = (allAttributes + getAvailableTypes(editor) + libraryAttributes).distinct()
+    val availableAttributes = allTypes - attributes // - node
 
     for (attribute in availableAttributes.sorted()) {
       if (ImGui.selectable(attribute)) {
