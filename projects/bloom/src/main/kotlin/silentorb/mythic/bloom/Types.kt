@@ -1,5 +1,7 @@
 package silentorb.mythic.bloom
 
+import silentorb.mythic.haft.InputDeviceState
+import silentorb.mythic.happenings.Commands
 import silentorb.mythic.spatial.Vector2i
 
 const val clipBoundsKey = "silentorb.bloom.clipBoxKey"
@@ -10,13 +12,27 @@ interface DimensionBox {
 
 interface AttributeHolder {
   val attributes: Map<String, Any?>
+  val handler: InputHandler?
 }
+
+data class Input(
+    val commands: Commands,
+    val mousePosition: Vector2i,
+)
+
+typealias InputHandler = (Input, Bounds) -> Commands
+
+fun combineHandlers(vararg handlers: InputHandler): InputHandler =
+    { input, bounds ->
+      handlers.flatMap { it(input, bounds) }
+    }
 
 data class Box(
     val name: String = "",
     override val dimensions: Vector2i,
     val boxes: List<OffsetBox> = listOf(),
     val depiction: Depiction? = null,
+    override val handler: InputHandler? = null,
     override val attributes: Map<String, Any?> = mapOf()
 ) : DimensionBox, AttributeHolder {
 
@@ -24,6 +40,17 @@ data class Box(
       this.copy(
           attributes = this.attributes + attributes
       )
+
+  infix fun handle(handler: InputHandler): Box {
+    val nextHandler = if (this.handler != null)
+      combineHandlers(this.handler, handler)
+    else
+      handler
+
+    return this.copy(
+        handler = nextHandler
+    )
+  }
 
   fun toFlower(): Flower = { this }
 }
@@ -37,6 +64,7 @@ data class OffsetBox(
   val boxes: List<OffsetBox> get() = child.boxes
   val depiction: Depiction? get() = child.depiction
   override val attributes: Map<String, Any?> get() = child.attributes
+  override val handler: InputHandler? get() = child.handler
   val bounds: Bounds get() = Bounds(position = offset, dimensions = dimensions)
 }
 

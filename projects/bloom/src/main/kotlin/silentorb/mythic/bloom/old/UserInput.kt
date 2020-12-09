@@ -1,5 +1,6 @@
-package silentorb.mythic.bloom
+package silentorb.mythic.bloom.old
 
+import silentorb.mythic.bloom.Bounds
 import silentorb.mythic.spatial.Vector2i
 
 enum class ButtonState {

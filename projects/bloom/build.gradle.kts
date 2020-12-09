@@ -4,4 +4,4 @@ dependencies {
     api("silentorb.mythic:ent")
 }
 
-requires(project, "spatial", "drawing")
+requires(project, "spatial", "drawing", "haft")

@@ -31,3 +31,7 @@ fun applyMouseMovement(device: Int, mouseOffset: Vector2): List<InputEvent> =
         applyMouseAxis(device, mouseOffset.x, MouseMovementRight, MouseMovementLeft, 1f),
         applyMouseAxis(device, mouseOffset.y, MouseMovementDown, MouseMovementUp, 1f)
     )
+
+enum class HaftCommand {
+  leftMouseClick
+}

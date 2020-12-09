@@ -1,5 +1,6 @@
-package silentorb.mythic.bloom
+package silentorb.mythic.bloom.old
 
+import silentorb.mythic.bloom.*
 import silentorb.mythic.ent.firstNotNull
 import silentorb.mythic.spatial.Vector2i
 
@@ -64,7 +65,7 @@ fun isInBounds(position: Vector2i, box: OffsetBox): Boolean {
 }
 
 fun hasAttributes(box: AttributeHolder): Boolean =
-    box.attributes.any()
+    box.attributes.any() || box.handler != null
 
 inline fun <reified T> getAttributeValue(box: AttributeHolder, key: String): T? {
   val value = box.attributes[key]

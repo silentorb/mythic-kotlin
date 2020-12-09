@@ -33,16 +33,19 @@ fun compose(vararg boxes: Box): Box =
 infix fun Flower.plusFlower(second: Flower): Flower =
     compose(this, second)
 
-fun <T> depictBehind(depiction: Depiction, flower: BoxSource<T>): BoxSource<T> = { dimensions ->
-  val box = flower(dimensions)
-  val boxDepiction = box.depiction
-  box.copy(
+infix fun Box.depictBehind(depiction: Depiction): Box {
+  val boxDepiction = this.depiction
+  return this.copy(
       depiction = { b, c ->
         depiction(b, c)
         if (boxDepiction != null)
           boxDepiction(b, c)
       }
   )
+}
+
+fun <T> depictBehind(depiction: Depiction, flower: BoxSource<T>): BoxSource<T> = { dimensions ->
+  flower(dimensions) depictBehind depiction
 }
 
 inline infix fun <reified T> BoxSource<T>.depictBehind(noinline depiction: Depiction): BoxSource<T> =

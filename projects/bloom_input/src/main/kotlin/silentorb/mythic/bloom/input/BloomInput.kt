@@ -1,7 +1,7 @@
 package silentorb.mythic.bloom.input
 
-import silentorb.mythic.bloom.ButtonState
-import silentorb.mythic.bloom.InputState
+import silentorb.mythic.bloom.old.ButtonState
+import silentorb.mythic.bloom.old.InputState
 import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.platforming.Devices
 import silentorb.mythic.spatial.toVector2i

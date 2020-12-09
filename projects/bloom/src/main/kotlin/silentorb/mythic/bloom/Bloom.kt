@@ -1,6 +1,7 @@
 package silentorb.mythic.bloom
 
 import org.lwjgl.opengl.GL11
+import silentorb.mythic.bloom.old.getAttributeBoolean
 import silentorb.mythic.drawing.Canvas
 import silentorb.mythic.glowing.withCropping
 import silentorb.mythic.glowing.debugMarkPass
