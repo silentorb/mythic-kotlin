@@ -1,6 +1,7 @@
 package silentorb.mythic.scenery
 
 import silentorb.mythic.ent.PropertyInfo
+import silentorb.mythic.ent.PropertySchema
 
 object SceneProperties {
   const val parent = "parent"
@@ -19,3 +20,9 @@ object SceneProperties {
   const val collisionMask = "collisionMask"
   const val value = "value"
 }
+
+fun scenePropertiesSchema(): PropertySchema = mapOf(
+    SceneProperties.type to PropertyInfo(
+        manyToMany = true,
+    )
+)

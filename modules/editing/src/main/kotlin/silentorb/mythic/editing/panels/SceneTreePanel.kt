@@ -3,11 +3,8 @@ package silentorb.mythic.editing.panels
 import imgui.ImGui
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.*
-import silentorb.mythic.ent.Entry
-import silentorb.mythic.ent.Graph
-import silentorb.mythic.ent.getGraphKeys
+import silentorb.mythic.ent.*
 import silentorb.mythic.ent.scenery.getSceneTree
-import silentorb.mythic.ent.uniqueNodeName
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.scenery.SceneProperties
@@ -24,6 +21,33 @@ fun nodeTreeMenus(getShortcut: GetShortcut): Commands =
         ))
     ))
 
+fun sceneTreeDragSource(graph: Graph, node: Key): Commands =
+    dragTargets(mapOf(
+        DraggingTypes.file to DragTarget({ payload ->
+          val sourcePath = payload as? FileItem
+          if (sourcePath == null)
+            false
+          else
+            sourcePath.type == FileItemType.file
+        }) { payload ->
+          val source = payload as FileItem
+          val typeName = source.name.split(".").first()
+          val key = uniqueNodeName(getGraphKeys(graph), typeName)
+          listOf(
+              Command(EditorCommands.setGraphValue, Entry(key, SceneProperties.parent, node)),
+              Command(EditorCommands.setGraphValue, Entry(key, SceneProperties.type, typeName)),
+          )
+        },
+        DraggingTypes.node to DragTarget({ payload ->
+          payload is Key && payload != node
+        }) { payload ->
+          val source = payload as Key
+          listOf(
+              Command(EditorCommands.setGraphValue, Entry(source, SceneProperties.parent, node)),
+          )
+        }
+    ))
+
 fun renderTree(graph: Graph, tree: SceneTree, node: String, selection: NodeSelection): Commands {
   val selected = selection.contains(node)
   val children = tree.filter { it.value == node }
@@ -31,28 +55,15 @@ fun renderTree(graph: Graph, tree: SceneTree, node: String, selection: NodeSelec
 
   val isOpen = ImGui.treeNodeEx("Tree-$node", flags, node)
   val selectionCommands = getSelectionCommands(EditorCommands.setNodeSelection, selection, node)
+  val hasParent = tree.containsKey(node)
 
-  val dragCommands = dragTargets(mapOf(
-      DraggingTypes.file to DragTarget({ payload ->
-        val sourcePath = payload as? FileItem
-        if (sourcePath == null)
-          false
-        else
-          sourcePath.type == FileItemType.file
-      }) { payload ->
-        val source = payload as? FileItem
-        if (source == null)
-          listOf()
-        else {
-          val typeName = source.name.split(".").first()
-          val key = uniqueNodeName(getGraphKeys(graph), typeName)
-          listOf(
-              Command(EditorCommands.setGraphValue, Entry(key, SceneProperties.parent, node)),
-              Command(EditorCommands.setGraphValue, Entry(key, SceneProperties.type, typeName)),
-          )
-        }
-      }
-  ))
+  if (hasParent) {
+    dragSource(DraggingTypes.node, node) {
+      ImGui.text(node)
+    }
+  }
+
+  val dragCommands = sceneTreeDragSource(graph, node)
 
   val childCommands = mutableListOf<Command>()
   if (isOpen) {

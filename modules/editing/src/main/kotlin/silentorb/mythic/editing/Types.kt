@@ -1,9 +1,6 @@
 package silentorb.mythic.editing
 
-import silentorb.mythic.ent.Entry
-import silentorb.mythic.ent.Graph
-import silentorb.mythic.ent.GraphLibrary
-import silentorb.mythic.ent.Key
+import silentorb.mythic.ent.*
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.spatial.Vector2i
@@ -25,6 +22,7 @@ data class Typeface(
 object DraggingTypes {
   const val file = "file"
   const val folder = "folder"
+  const val node = "node"
 }
 
 typealias SerializationMethod = (Any) -> Any
@@ -43,7 +41,6 @@ data class PropertyDefinition(
     val widget: PropertyWidget?,
     val dependencies: Set<Key> = setOf(),
     val defaultValue: DefaultValueSource? = null,
-    val single: Boolean = true,
 )
 
 typealias PropertyDefinitions = Map<Key, PropertyDefinition>
@@ -92,6 +89,7 @@ data class EditorState(
 
 data class EditorEnumerations(
     val propertyDefinitions: PropertyDefinitions,
+    val schema: PropertySchema = mapOf(),
     val attributes: List<Key> = listOf(),
     val textures: List<Key> = listOf(),
     val meshes: List<Key> = listOf(),

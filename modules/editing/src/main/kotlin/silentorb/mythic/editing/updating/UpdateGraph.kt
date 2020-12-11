@@ -98,10 +98,10 @@ fun updateSceneGraph(editor: Editor) = handleCommands<Graph> { command, graph ->
 
     EditorCommands.setGraphValue -> {
       val newEntry = command.value as Entry
-      if (editor.enumerations.propertyDefinitions[newEntry.property]?.single == true)
-        replaceValues(graph, listOf(newEntry))
+      if (editor.enumerations.schema[newEntry.property]?.manyToMany == true)
+        graph + newEntry
       else
-        graph + listOf(newEntry)
+        replaceValues(graph, listOf(newEntry))
     }
 
     EditorCommands.removeGraphValue -> {
