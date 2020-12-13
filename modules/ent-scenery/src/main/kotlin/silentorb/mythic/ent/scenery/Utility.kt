@@ -70,6 +70,9 @@ tailrec fun gatherChildren(graph: Graph, nodes: Set<Key>, accumulator: Set<Key> 
     gatherChildren(graph, next, nextAccumulator)
 }
 
+fun gatherChildren(graph: Graph, node: Key): Set<Key> =
+    gatherChildren(graph, setOf(node))
+
 fun renameNode(graph: Graph, previous: Key, next: Key): Graph =
     graph.map {
       if (it.source == previous)
@@ -175,3 +178,11 @@ fun arrayToHexColorString(values: FloatArray): String {
 
 fun getSceneTree(graph: Graph): Map<Key, Key> =
     mapByProperty(graph, SceneProperties.parent)
+
+fun firstOrNullWithAttribute(graph: LooseGraph, attribute: String) =
+    graph.firstOrNull { it.property == SceneProperties.type && it.target == attribute }?.target as Key?
+
+fun <T> filterByAttribute(graph: GenericGraph<T>, attribute: String): List<T> =
+    graph
+        .filter { it.property == SceneProperties.type && it.target == attribute }
+        .map { it.source }

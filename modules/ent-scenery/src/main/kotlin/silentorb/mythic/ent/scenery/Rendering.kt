@@ -45,7 +45,7 @@ fun instanceToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, g
             textBillboards = group.textBillboards
                 .map { textBillboard ->
                   textBillboard.copy(
-                      position = instanceTransform.translation() + textBillboard.position
+                      position = instanceTransform.translate(textBillboard.position).translation()
                   )
                 }
         )

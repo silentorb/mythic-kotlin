@@ -63,6 +63,7 @@ fun createBulletDynamicObject(body: Body, dynamicBody: DynamicBody, shape: btCol
   val btBody = btRigidBody(rbInfo)
   btBody.activationState = CollisionConstants.DISABLE_DEACTIVATION
   btBody.friction = dynamicBody.friction
+  rbInfo.dispose()
   return btBody
 }
 

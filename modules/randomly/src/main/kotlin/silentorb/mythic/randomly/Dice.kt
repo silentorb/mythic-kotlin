@@ -40,7 +40,7 @@ class Dice(val seed: Long? = null) {
       set.toList()[random.nextInt(set.size)] // TODO: Optimize away the toList call
   }
 
-  fun <T> take(list: List<T>, count: Int): List<T> {
+  fun <T> take(list: Collection<T>, count: Int): List<T> {
     assert(count <= list.size)
     val result = mutableListOf<T>()
     val options = list.toMutableList()
@@ -52,20 +52,20 @@ class Dice(val seed: Long? = null) {
     return result
   }
 
-  fun <T> take(list: Set<T>, count: Int): Set<T> {
-    assert(count <= list.size)
-    if (count == 0)
-      return setOf()
-
-    val result = mutableSetOf<T>()
-    val options = list.toMutableList()
-    for (i in 1..count) {
-      val item = takeOne(options)
-      options.remove(item)
-      result.add(item)
-    }
-    return result
-  }
+//  fun <T> take(list: Set<T>, count: Int): Set<T> {
+//    assert(count <= list.size)
+//    if (count == 0)
+//      return setOf()
+//
+//    val result = mutableSetOf<T>()
+//    val options = list.toMutableList()
+//    for (i in 1..count) {
+//      val item = takeOne(options)
+//      options.remove(item)
+//      result.add(item)
+//    }
+//    return result
+//  }
 
   fun getBoolean(): Boolean = getInt(0, 1) == 1
 

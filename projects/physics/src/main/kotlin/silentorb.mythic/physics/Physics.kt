@@ -3,13 +3,14 @@ package silentorb.mythic.physics
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.physics.bullet.Bullet
 import com.badlogic.gdx.physics.bullet.collision.*
+import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver
+import silentorb.mythic.debugging.getDebugBoolean
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Id
 import silentorb.mythic.ent.Table
-import silentorb.mythic.happenings.GameEvent
 import silentorb.mythic.scenery.Shape
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
@@ -23,7 +24,13 @@ data class BulletState(
     var dynamicBodies: Map<Id, btRigidBody>,
     var staticBodies: Map<Any, btCollisionObject>,
 //    var collisionObjectMap: Map<Int, Id>,
-    var isMapSynced: Boolean = false
+    var isMapSynced: Boolean = false,
+
+    // The following are not directly used but are stored here to prevent premature garbage collection
+    var collisionConfig: btCollisionConfiguration,
+    var dispatcher: btCollisionDispatcher,
+    var broadphase: btDbvtBroadphase,
+    var solver: btConstraintSolver,
 )
 
 fun toGdxVector3(vector: Vector3) = GdxVector3(vector.x, vector.y, vector.z)
@@ -60,19 +67,22 @@ fun staticGravity() = GdxVector3(0f, 0f, -10f)
 
 fun newBulletState(): BulletState {
   if (!isBulletInitialized) {
-    Bullet.init()
+    // The LibGDX error logging does not work here because LibGDX logging requires initializing the heavy and monolithic
+    // LibGDX app, but it can still be useful to enable because it will throw catchable errors before the native
+    // Bullet code crashes
+    Bullet.init(false, getDebugBoolean("LIBGDX_BULLET_PHYSICS_DEBUGGING"))
     isBulletInitialized = true
   }
 
   val collisionConfig = btDefaultCollisionConfiguration()
 
-  ///use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
+  // Use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
   val dispatcher = btCollisionDispatcher(collisionConfig)
 
-  ///btDbvtBroadphase is a good general purpose broadphase. You can also try out btAxis3Sweep.
+  // btDbvtBroadphase is a good general purpose broadphase. You can also try out btAxis3Sweep.
   val broadphase = btDbvtBroadphase()
 
-  ///the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
+  // Tthe default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
   val solver = btSequentialImpulseConstraintSolver()
 
   val dynamicsWorld = btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig)
@@ -81,7 +91,11 @@ fun newBulletState(): BulletState {
   return BulletState(
       dynamicsWorld = dynamicsWorld,
       dynamicBodies = mapOf(),
-      staticBodies = mapOf()
+      staticBodies = mapOf(),
+      collisionConfig = collisionConfig,
+      dispatcher = dispatcher,
+      broadphase = broadphase,
+      solver = solver,
   )
 }
 

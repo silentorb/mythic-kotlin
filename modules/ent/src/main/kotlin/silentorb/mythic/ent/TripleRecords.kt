@@ -47,6 +47,9 @@ fun getGraphKeys(graph: LooseGraph) =
 inline fun <reified T> filterByProperty(graph: LooseGraph, relationship: Key): ListGraph =
     graph.filter { it.property == relationship && it.target is T }
 
+fun filterByProperty2(graph: LooseGraph, relationship: Key): ListGraph =
+    graph.filter { it.property == relationship }
+
 inline fun <reified T> filterByPropertyValue(graph: LooseGraph, relationship: Key, value: T): ListGraph =
     graph.filter { it.property == relationship && it.target == value }
 
@@ -74,14 +77,6 @@ fun replaceValues(graph: LooseGraph, additional: LooseGraph): Graph =
     }
         .plus(additional)
         .toSet()
-
-fun firstOrNullWithAttribute(graph: LooseGraph, attribute: String) =
-    graph.firstOrNull { it.property == "type" && it.target == attribute }?.target as Key?
-
-fun <T> filterByAttribute(graph: GenericGraph<T>, attribute: String): List<T> =
-    graph
-        .filter { it.property == "type" && it.target == attribute }
-        .map { it.source }
 
 fun renameNode(graph: Graph, previous: Key, next: Key): Graph =
     graph.map {
