@@ -6,7 +6,7 @@ import silentorb.mythic.haft.*
 
 fun defaultGamepadBindings() = mapOf(
     GAMEPAD_AXIS_LEFT_UP to CameramanCommands.moveForward,
-    GAMEPAD_AXIS_LEFT_DOWN to CameramanCommands.moveBackwards,
+    GAMEPAD_AXIS_LEFT_DOWN to CameramanCommands.moveBackward,
     GAMEPAD_AXIS_LEFT_LEFT to CameramanCommands.moveLeft,
     GAMEPAD_AXIS_LEFT_RIGHT to CameramanCommands.moveRight,
 

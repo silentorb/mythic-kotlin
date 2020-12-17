@@ -9,7 +9,7 @@ object CameramanCommands {
   const val lookDown = "lookDown"
 
   const val moveForward = "moveForward"
-  const val moveBackwards = "moveBackwards"
+  const val moveBackward = "moveBackwards"
   const val moveLeft = "moveLeft"
   const val moveRight = "moveRight"
   const val moveUp = "moveUp"
@@ -20,7 +20,7 @@ val playerMoveMap = mapOf(
     CameramanCommands.moveLeft to Vector3(0f, 1f, 0f),
     CameramanCommands.moveRight to Vector3(0f, -1f, 0f),
     CameramanCommands.moveForward to Vector3(1f, 0f, 0f),
-    CameramanCommands.moveBackwards to Vector3(-1f, 0f, 0f),
+    CameramanCommands.moveBackward to Vector3(-1f, 0f, 0f),
     CameramanCommands.moveUp to Vector3(0f, 0f, 1f),
     CameramanCommands.moveDown to Vector3(0f, 0f, -1f),
 )
