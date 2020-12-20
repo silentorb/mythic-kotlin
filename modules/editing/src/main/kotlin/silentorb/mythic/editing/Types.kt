@@ -64,13 +64,14 @@ typealias CompressedKeystrokeBindings = Map<Int, List<ContextCommand>>
 typealias GetShortcut = (String) -> String?
 
 enum class RenderingMode {
-  full,
+  flat,
+  lit,
   wireframe,
 }
 
 data class ViewportState(
     val camera: CameraRig,
-    val renderingMode: RenderingMode = RenderingMode.full,
+    val renderingMode: RenderingMode = RenderingMode.lit,
 )
 
 data class SceneState(

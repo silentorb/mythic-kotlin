@@ -6,7 +6,6 @@ import imgui.flag.ImGuiMouseButton
 import imgui.flag.ImGuiWindowFlags
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.drawMenuBar
-import silentorb.mythic.editing.components.getShortcutForContext
 import silentorb.mythic.editing.components.panel
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
@@ -27,7 +26,8 @@ fun viewportMenus(getShortcut: GetShortcut): Commands =
             MenuItem("Toggle Projection", EditorCommands.toggleProjectionMode),
             MenuItem("Center on Selection", EditorCommands.centerOnSelection),
             MenuItem("Draw Wireframe", EditorCommands.renderingModeWireframe),
-            MenuItem("Draw Full", EditorCommands.renderingModeFull),
+            MenuItem("Draw Flat", EditorCommands.renderingModeFlat),
+            MenuItem("Draw Lit", EditorCommands.renderingModeLit),
         ))
     ))
 

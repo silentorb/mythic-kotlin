@@ -54,7 +54,8 @@ fun updateClipboard(editor: Editor) = handleCommands<Graph?> { command, clipboar
 
 val updateRenderingMode = handleCommands<RenderingMode> { command, renderingMode ->
   when (command.type) {
-    EditorCommands.renderingModeFull -> RenderingMode.full
+    EditorCommands.renderingModeFlat -> RenderingMode.flat
+    EditorCommands.renderingModeLit -> RenderingMode.lit
     EditorCommands.renderingModeWireframe -> RenderingMode.wireframe
     else -> renderingMode
   }

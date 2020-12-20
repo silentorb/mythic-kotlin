@@ -40,7 +40,8 @@ object EditorCommands {
   val toggleProjectionMode = "toggleProjectionMode"
   val centerOnSelection = "centerOnSelection"
   val renderingModeWireframe = "renderingModeWireframe"
-  val renderingModeFull = "renderingModeFull"
+  val renderingModeFlat = "renderingModeFlat"
+  val renderingModeLit = "renderingModeLit"
 
   val newFile = "newFile"
   val newFileWithNameDialog = "newFileWithNameDialog"
