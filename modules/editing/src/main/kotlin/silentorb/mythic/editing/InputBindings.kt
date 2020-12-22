@@ -59,7 +59,7 @@ fun defaultEditorMenuKeystrokes(): KeystrokeBindings = mapOf(
     ContextCommand(Contexts.viewport, EditorCommands.viewTop) to "$keypadKey 7",
     ContextCommand(Contexts.viewport, EditorCommands.viewBottom) to "Ctrl+$keypadKey 7",
     ContextCommand(Contexts.viewport, EditorCommands.toggleProjectionMode) to "$keypadKey 5",
-    ContextCommand(Contexts.viewport, EditorCommands.centerOnSelection) to numpadPeriodKey,
+    ContextCommand(Contexts.viewport, EditorCommands.centerOnSelection) to "F",
 
     // These will probably need modifier keys eventually
     ContextCommand(Contexts.viewport, EditorCommands.renderingModeWireframe) to "1",

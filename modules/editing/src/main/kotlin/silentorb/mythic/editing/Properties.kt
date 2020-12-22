@@ -91,7 +91,7 @@ fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
     SceneProperties.collisionShape to PropertyDefinition(
         displayName = "Collision Shape",
         widget = dropDownWidget { CollisionShape.values().map { it.name } },
-        dependencies = setOf(SceneProperties.collisionGroups, SceneProperties.collisionMask),
+//        dependencies = setOf(SceneProperties.collisionGroups, SceneProperties.collisionMask),
         defaultValue = { CollisionShape.box.name }
     ),
     SceneProperties.collisionGroups to PropertyDefinition(

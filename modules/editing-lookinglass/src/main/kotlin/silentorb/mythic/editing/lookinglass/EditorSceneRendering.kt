@@ -47,14 +47,13 @@ fun cameraRigToCamera(camera: CameraRig): Camera =
         ,
         orientation = camera.orientation,
         angleOrZoom = if (camera.projection == ProjectionType.perspective)
-          45f
+          70f
         else
           getOrthoZoom(camera),
     )
 
 fun sceneFromEditorGraph(meshShapes: Map<String, Shape>, editor: Editor, lightingConfig: LightingConfig, viewport: Key): GameScene {
   val graph = getActiveEditorGraph(editor) ?: newGraph()
-  val viewportState = getEditorViewport(editor, viewport)
   val camera = cameraRigToCamera(getEditorCamera(editor, viewport) ?: CameraRig())
 
   val initialElements = nodesToElements(meshShapes, editor.graphLibrary, graph)
