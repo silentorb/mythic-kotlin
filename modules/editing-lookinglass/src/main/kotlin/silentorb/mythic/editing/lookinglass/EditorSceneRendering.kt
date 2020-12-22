@@ -58,7 +58,7 @@ fun sceneFromEditorGraph(meshShapes: Map<String, Shape>, editor: Editor, lightin
   val camera = cameraRigToCamera(getEditorCamera(editor, viewport) ?: CameraRig())
 
   val initialElements = nodesToElements(meshShapes, editor.graphLibrary, graph)
-  val elements = if (viewportState?.renderingMode == RenderingMode.wireframe) {
+  val elements = if (getRenderingMode(editor) == RenderingMode.wireframe) {
     val wireframeMaterial = Material(
         shading = false,
         color = Vector4(0.9f),

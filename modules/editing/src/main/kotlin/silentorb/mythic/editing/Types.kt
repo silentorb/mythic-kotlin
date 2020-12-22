@@ -71,7 +71,6 @@ enum class RenderingMode {
 
 data class ViewportState(
     val camera: CameraRig,
-    val renderingMode: RenderingMode = RenderingMode.lit,
 )
 
 data class SceneState(
@@ -85,6 +84,7 @@ typealias SceneStates = Map<Key, SceneState>
 data class EditorState(
     val graph: String? = null,
     val sceneStates: SceneStates = mapOf(),
+    val renderingModes: Map<Key, RenderingMode> = mapOf(),
     val fileSelection: Set<String> = setOf(),
 )
 

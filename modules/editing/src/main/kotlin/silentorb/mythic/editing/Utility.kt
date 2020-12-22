@@ -26,6 +26,9 @@ fun getSceneState(editor: Editor): SceneState? =
 fun getViewports(editor: Editor) =
     getSceneState(editor)?.viewports
 
+fun getRenderingMode(editor: Editor, viewport: Key = defaultViewportId): RenderingMode =
+    editor.state.renderingModes[viewport] ?: RenderingMode.lit
+
 fun getEditorViewport(editor: Editor, viewport: Key?): ViewportState? {
   val viewports = getViewports(editor)
   return if (viewports != null)

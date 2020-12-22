@@ -1,6 +1,7 @@
 package silentorb.mythic.editing.updating
 
 import silentorb.mythic.editing.*
+import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.getGraphKeys
 import silentorb.mythic.ent.scenery.gatherChildren
@@ -64,7 +65,6 @@ val updateRenderingMode = handleCommands<RenderingMode> { command, renderingMode
 fun updateViewport(editor: Editor, commands: Commands, mouseOffset: Vector2, viewport: ViewportState, isInBounds: Boolean): ViewportState {
   return viewport.copy(
       camera = updateCamera(editor, mouseOffset, commands, viewport.camera, isInBounds),
-      renderingMode = updateRenderingMode(commands, viewport.renderingMode)
   )
 }
 
@@ -95,10 +95,12 @@ fun updateSceneStates(commands: Commands, editor: Editor, graph: Graph?, mousePo
 
 fun updateEditorState(commands: Commands, editor: Editor, graph: Graph?, mousePosition: Vector2i, mouseOffset: Vector2): EditorState {
   val state = editor.state
+  val renderingMode = updateRenderingMode(commands, getRenderingMode(editor))
   return state.copy(
       graph = onSetCommand(commands, EditorCommands.setActiveGraph, state.graph),
       sceneStates = updateSceneStates(commands, editor, graph, mousePosition, mouseOffset),
-      fileSelection = updateFileSelection(commands, state.fileSelection)
+      fileSelection = updateFileSelection(commands, state.fileSelection),
+      renderingModes = state.renderingModes + (defaultViewportId to renderingMode)
   )
 }
 
