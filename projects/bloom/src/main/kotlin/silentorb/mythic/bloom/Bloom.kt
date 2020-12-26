@@ -86,6 +86,11 @@ fun renderBox(canvas: Canvas, box: Box, offset: Vector2i, debug: Boolean = false
     renderChildren()
 }
 
+fun enableBloomBlending() {
+  globalState.blendEnabled = true
+  globalState.blendFunction = Pair(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+}
+
 fun renderLayout(box: Box, canvas: Canvas, debug: Boolean = false) {
   val current = getGLBounds(GL11.GL_VIEWPORT)
   if (current.z == 0)
@@ -93,8 +98,6 @@ fun renderLayout(box: Box, canvas: Canvas, debug: Boolean = false) {
 
   debugMarkPass(debug, "Bloom GUI Pass") {
     globalState.depthEnabled = false
-    globalState.blendEnabled = true
-    globalState.blendFunction = Pair(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
     renderBox(canvas, box, Vector2i.zero)
   }
 }
