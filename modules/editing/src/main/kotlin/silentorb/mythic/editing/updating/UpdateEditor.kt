@@ -185,7 +185,11 @@ fun prepareEditorUpdate(deviceStates: List<InputDeviceState>, editor: Editor): C
     mapCommands(defaultEditorBindings(), deviceStates) + getQuerySelectionCommands(editor)
 
   val guiCommands = defineEditorGui(editor, deviceStates)
-  return externalCommands + guiCommands
+  return if (editor.flyThrough)
+    externalCommands + guiCommands
+        .filter { it.type == EditorCommands.toggleFlythroughMode }
+  else
+    externalCommands + guiCommands
 }
 
 fun updateEditor(deviceStates: List<InputDeviceState>, commands: Commands, editor: Editor): Editor {
@@ -195,7 +199,7 @@ fun updateEditor(deviceStates: List<InputDeviceState>, commands: Commands, edito
     val previousMousePosition = deviceStates.dropLast(1).last().mousePosition
     val mouseOffset = getMouseOffset(deviceStates)
     val additionalFlythroughCommands = if (editor.flyThrough)
-      flyThroughKeyboardCommands(deviceStates, mouseOffset)
+      flyThroughKeyboardCommands(deviceStates)
     else
       listOf()
 

@@ -5,10 +5,7 @@ import silentorb.mythic.cameraman.*
 import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.scenery.ProjectionType
-import silentorb.mythic.spatial.Quaternion
-import silentorb.mythic.spatial.Vector2
-import silentorb.mythic.spatial.Vector3
-import silentorb.mythic.spatial.getYawAndPitch
+import silentorb.mythic.spatial.*
 
 const val simulationFps = 60
 const val simulationDelta = 1f / simulationFps.toFloat()
@@ -88,23 +85,10 @@ fun zoomCamera(camera: CameraRig, newPivotDistance: Float): CameraRig {
 fun getOrthoZoom(camera: CameraRig): Float =
     camera.pivotDistance * 0.45f
 
-fun flyThroughKeyboardCommands(deviceStates:List<InputDeviceState>, mouseOffset: Vector2): List<Command> {
-  val horizontalScale = 10f
-  val verticalScale = 10f
-  val lookCommands = listOfNotNull(
-      if (mouseOffset.x < 0f) Command(CameramanCommands.lookLeft, -mouseOffset.x * horizontalScale) else null,
-      if (mouseOffset.x > 0f) Command(CameramanCommands.lookRight, mouseOffset.x * horizontalScale) else null,
-      if (mouseOffset.y < 0f) Command(CameramanCommands.lookUp, -mouseOffset.y * verticalScale) else null,
-      if (mouseOffset.y > 0f) Command(CameramanCommands.lookDown, mouseOffset.y * verticalScale) else null,
-  )
-  if (lookCommands.any()){
-    val k = 0
-    println(lookCommands)
-  }
-  return lookCommands + mapCommands(keyboardFlyThroughBindings(), deviceStates)
-}
+fun flyThroughKeyboardCommands(deviceStates: List<InputDeviceState>): List<Command> =
+    mapCommands(keyboardFlyThroughBindings(), deviceStates)
 
-fun updateFlyThroughCamera(mouseOffset: Vector2, commands: List<Command>, camera: CameraRig, isInBounds: Boolean): CameraRig {
+fun updateFlyThroughCamera(mouseOffset: Vector2, commands: List<Command>, camera: CameraRig, isInBounds: Boolean, lookOffset: Vector2): CameraRig {
   return when {
     commands.any { it.type == EditorCommands.zoomIn } && isInBounds -> zoomCamera(camera, camera.pivotDistance * 0.7f)
     commands.any { it.type == EditorCommands.zoomOut } && isInBounds -> zoomCamera(camera, camera.pivotDistance * 1.3f + 0.1f)
@@ -112,19 +96,19 @@ fun updateFlyThroughCamera(mouseOffset: Vector2, commands: List<Command>, camera
     isMouseDown(1) && isInBounds -> updateCameraOrbiting(mouseOffset, camera)
     else -> {
       val lookVelocity = updateLookVelocityFirstPerson(commands, defaultLookMomentumAxis(), camera.lookVelocity)
-      val rotation = updateFirstPersonFacingRotation(camera.rotation, null, lookVelocity, simulationDelta)
+      val rotation = updateFirstPersonFacingRotation(camera.rotation, lookOffset, lookVelocity, simulationDelta)
 
       val movementVector = characterMovementVector(commands, camera.orientation)
       val movementOffset = if (movementVector != null)
-        movementVector * 12f * simulationDelta
+        movementVector * 13f * simulationDelta
       else
         Vector3.zero
 
-      val zSpeed = 15f
+      val zSpeed = 13f
       val zOffset = if (commands.any { it.type == CameramanCommands.moveUp }) {
-        Vector3(0f, 0f, -zSpeed * simulationDelta)
-      } else if (commands.any { it.type == CameramanCommands.moveDown }) {
         Vector3(0f, 0f, zSpeed * simulationDelta)
+      } else if (commands.any { it.type == CameramanCommands.moveDown }) {
+        Vector3(0f, 0f, -zSpeed * simulationDelta)
       } else
         Vector3.zero
 

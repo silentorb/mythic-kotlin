@@ -1,12 +1,14 @@
 package silentorb.mythic.editing.updating
 
 import silentorb.mythic.editing.*
+import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.scenery.getNodeTransform
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.scenery.ProjectionType
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.getYawAndPitch
+import silentorb.mythic.spatial.toVector2
 
 fun applyCameraPreset(camera: CameraRig, lookat: Vector3): CameraRig {
   val pivot = getCameraPivot(camera)
@@ -62,6 +64,11 @@ fun applyCameraPresets(editor: Editor, commands: List<Command>, camera: CameraRi
         .firstOrNull()
 
 fun updateCamera(editor: Editor, mouseOffset: Vector2, commands: List<Command>, camera: CameraRig, isInBounds: Boolean): CameraRig {
+  val lookOffset = if (editor.flyThrough && mouseOffset != Vector2.zero)
+    -mouseOffset * 4f / (editor.viewportBoundsMap[defaultViewportId]?.zw()?.toVector2() ?: Vector2.zero)
+  else
+    Vector2.zero
+
   return applyCameraPresets(editor, commands, camera)
-      ?: updateFlyThroughCamera(mouseOffset, commands, camera, isInBounds)
+      ?: updateFlyThroughCamera(mouseOffset, commands, camera, isInBounds, lookOffset)
 }
