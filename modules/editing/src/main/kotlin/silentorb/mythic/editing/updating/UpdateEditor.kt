@@ -147,6 +147,10 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
   val mousePosition = (previousMousePosition + mouseOffset).toVector2i()
   val nextState = updateEditorState(commands, editor, nextGraph, mousePosition, mouseOffset)
   val nextHistory = updateHistory(nextGraph, getNodeSelection(nextState), nextState.graph, commands, editor.maxHistory, editor.history)
+  val flyThrough = if (commands.any { it.type == EditorCommands.toggleFlythroughMode })
+    !editor.flyThrough
+  else
+    editor.flyThrough
 
   return editor.copy(
       state = nextState,
@@ -158,6 +162,7 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
       clipboard = updateClipboard(editor)(commands, editor.clipboard),
       history = nextHistory,
       selectionQuery = updateSelectionQuery(editor, commands),
+      flyThrough = flyThrough,
   )
 }
 
@@ -188,6 +193,12 @@ fun updateEditor(deviceStates: List<InputDeviceState>, commands: Commands, edito
     editor
   else {
     val previousMousePosition = deviceStates.dropLast(1).last().mousePosition
-    updateEditorFromCommands(previousMousePosition, getMouseOffset(deviceStates), commands, editor)
+    val mouseOffset = getMouseOffset(deviceStates)
+    val additionalFlythroughCommands = if (editor.flyThrough)
+      flyThroughKeyboardCommands(deviceStates, mouseOffset)
+    else
+      listOf()
+
+    updateEditorFromCommands(previousMousePosition, mouseOffset, commands + additionalFlythroughCommands, editor)
   }
 }

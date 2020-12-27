@@ -42,13 +42,14 @@ object EditorCommands {
   val renderingModeWireframe = "renderingModeWireframe"
   val renderingModeFlat = "renderingModeFlat"
   val renderingModeLit = "renderingModeLit"
+  val toggleFlythroughMode = "toggleFlythroughMode"
 
   val newFile = "newFile"
   val newFileWithNameDialog = "newFileWithNameDialog"
   val newFolder = "newFolder"
   val newFolderWithNameDialog = "newFolderWithNameDialog"
   val moveFileItem = "moveFileItem"
-  val deleteFileItem ="deleteFileItem"
+  val deleteFileItem = "deleteFileItem"
   val renameFileItemWithNameDialog = "renameFileItemWithNameDialog"
 
   val undo = "undo"

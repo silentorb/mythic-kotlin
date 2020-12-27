@@ -29,6 +29,19 @@ fun defaultKeyboardBindings() = mapOf(
     GLFW.GLFW_KEY_ESCAPE to EditorCommands.cancelOperation,
 )
 
+fun keyboardFlyThroughBindings() =
+    createBindings(DeviceIndexes.keyboard,
+        mapOf(
+            GLFW.GLFW_KEY_W to CameramanCommands.moveForward,
+            GLFW.GLFW_KEY_S to CameramanCommands.moveBackward,
+            GLFW.GLFW_KEY_A to CameramanCommands.moveLeft,
+            GLFW.GLFW_KEY_D to CameramanCommands.moveRight,
+
+            GLFW.GLFW_KEY_Q to CameramanCommands.moveUp,
+            GLFW.GLFW_KEY_E to CameramanCommands.moveDown,
+        )
+    )
+
 fun defaultMouseBindings() = mapOf(
     MOUSE_SCROLL_DOWN to EditorCommands.zoomOut,
     MOUSE_SCROLL_UP to EditorCommands.zoomIn,
@@ -60,6 +73,7 @@ fun defaultEditorMenuKeystrokes(): KeystrokeBindings = mapOf(
     ContextCommand(Contexts.viewport, EditorCommands.viewBottom) to "Ctrl+$keypadKey 7",
     ContextCommand(Contexts.viewport, EditorCommands.toggleProjectionMode) to "$keypadKey 5",
     ContextCommand(Contexts.viewport, EditorCommands.centerOnSelection) to "F",
+    ContextCommand(Contexts.viewport, EditorCommands.toggleFlythroughMode) to "Shift+F",
 
     // These will probably need modifier keys eventually
     ContextCommand(Contexts.viewport, EditorCommands.renderingModeWireframe) to "1",

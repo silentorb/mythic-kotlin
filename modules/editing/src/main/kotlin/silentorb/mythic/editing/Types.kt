@@ -130,6 +130,7 @@ data class Editor(
     val bindings: KeystrokeBindings = defaultEditorMenuKeystrokes(),
     val selectionQuery: SelectionQuery? = null,
     val maxHistory: Int = 30,
+    val flyThrough: Boolean = false,
 )
 
 const val keypadKey = "Numpad"

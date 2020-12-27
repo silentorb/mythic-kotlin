@@ -2,9 +2,13 @@ package silentorb.mythic.editing
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import silentorb.mythic.cameraman.*
+import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.scenery.ProjectionType
-import silentorb.mythic.spatial.*
+import silentorb.mythic.spatial.Quaternion
+import silentorb.mythic.spatial.Vector2
+import silentorb.mythic.spatial.Vector3
+import silentorb.mythic.spatial.getYawAndPitch
 
 const val simulationFps = 60
 const val simulationDelta = 1f / simulationFps.toFloat()
@@ -83,6 +87,22 @@ fun zoomCamera(camera: CameraRig, newPivotDistance: Float): CameraRig {
 
 fun getOrthoZoom(camera: CameraRig): Float =
     camera.pivotDistance * 0.45f
+
+fun flyThroughKeyboardCommands(deviceStates:List<InputDeviceState>, mouseOffset: Vector2): List<Command> {
+  val horizontalScale = 10f
+  val verticalScale = 10f
+  val lookCommands = listOfNotNull(
+      if (mouseOffset.x < 0f) Command(CameramanCommands.lookLeft, -mouseOffset.x * horizontalScale) else null,
+      if (mouseOffset.x > 0f) Command(CameramanCommands.lookRight, mouseOffset.x * horizontalScale) else null,
+      if (mouseOffset.y < 0f) Command(CameramanCommands.lookUp, -mouseOffset.y * verticalScale) else null,
+      if (mouseOffset.y > 0f) Command(CameramanCommands.lookDown, mouseOffset.y * verticalScale) else null,
+  )
+  if (lookCommands.any()){
+    val k = 0
+    println(lookCommands)
+  }
+  return lookCommands + mapCommands(keyboardFlyThroughBindings(), deviceStates)
+}
 
 fun updateFlyThroughCamera(mouseOffset: Vector2, commands: List<Command>, camera: CameraRig, isInBounds: Boolean): CameraRig {
   return when {

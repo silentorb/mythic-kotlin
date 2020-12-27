@@ -29,7 +29,7 @@ fun characterLookForce(turnSpeed: Vector2, commands: Commands): Vector2 =
     applyLookForce(lookMap, turnSpeed, commands)
 
 fun applyLookForce(momentumAxis: MomentumAxis, commands: Commands): Vector2 {
-  val offset3 = joinInputVector(commands, lookMap)
+  val offset3 = joinInputVector(commands, lookMap, 100f)
   return if (offset3 != null) {
     val offset2 = Vector2(offset3.z, offset3.y)
     offset2 * Vector2(momentumAxis.horizontal.maxVelocity, momentumAxis.vertical.maxVelocity)
