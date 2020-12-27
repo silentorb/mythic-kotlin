@@ -199,7 +199,7 @@ fun updateEditor(deviceStates: List<InputDeviceState>, commands: Commands, edito
     val previousMousePosition = deviceStates.dropLast(1).last().mousePosition
     val mouseOffset = getMouseOffset(deviceStates)
     val additionalFlythroughCommands = if (editor.flyThrough)
-      flyThroughKeyboardCommands(deviceStates)
+      flyThroughModeCommands(deviceStates)
     else
       listOf()
 

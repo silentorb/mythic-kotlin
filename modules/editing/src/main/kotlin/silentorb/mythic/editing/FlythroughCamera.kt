@@ -2,7 +2,9 @@ package silentorb.mythic.editing
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import silentorb.mythic.cameraman.*
+import silentorb.mythic.haft.DeviceIndexes
 import silentorb.mythic.haft.InputDeviceState
+import silentorb.mythic.haft.mapInputToCommands
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.scenery.ProjectionType
 import silentorb.mythic.spatial.*
@@ -85,8 +87,14 @@ fun zoomCamera(camera: CameraRig, newPivotDistance: Float): CameraRig {
 fun getOrthoZoom(camera: CameraRig): Float =
     camera.pivotDistance * 0.45f
 
-fun flyThroughKeyboardCommands(deviceStates: List<InputDeviceState>): List<Command> =
-    mapCommands(keyboardFlyThroughBindings(), deviceStates)
+fun flyThroughModeCommands(deviceStates: List<InputDeviceState>): List<Command> =
+    mapInputToCommands(setOf(EditorCommands.toggleFlythroughMode), keyboardFlyThroughBindings(), deviceStates) +
+        listOfNotNull(
+            if (deviceStates.lastOrNull()?.events?.any { it.device == DeviceIndexes.mouse } == true)
+              Command(EditorCommands.toggleFlythroughMode)
+            else
+              null
+        )
 
 fun updateFlyThroughCamera(mouseOffset: Vector2, commands: List<Command>, camera: CameraRig, isInBounds: Boolean, lookOffset: Vector2): CameraRig {
   return when {

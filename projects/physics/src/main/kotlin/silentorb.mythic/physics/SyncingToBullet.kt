@@ -20,10 +20,14 @@ import silentorb.mythic.spatial.getCenter
 import silentorb.mythic.scenery.*
 
 // TODO: Cache the usage of this function
-fun createBulletStaticMesh(vertices: List<Vector3>): btBvhTriangleMeshShape {
+fun createBulletStaticMesh(vertices: List<Vector3>, scale: Vector3 = Vector3.unit): btBvhTriangleMeshShape {
   val triangleMesh = btTriangleMesh()
   for (i in vertices.indices step 3) {
-    triangleMesh.addTriangle(toGdxVector3(vertices[i]), toGdxVector3(vertices[i + 1]), toGdxVector3(vertices[i + 2]))
+    triangleMesh.addTriangle(
+        toGdxVector3(vertices[i] * scale),
+        toGdxVector3(vertices[i + 1] * scale),
+        toGdxVector3(vertices[i + 2] * scale)
+    )
   }
   return btBvhTriangleMeshShape(triangleMesh, true)
 }
@@ -32,7 +36,8 @@ fun createCollisionShape(shape: Shape, scale: Vector3): btCollisionShape {
   return when (shape) {
     is ShapeTransform -> {
       val parent = btCompoundShape()
-      parent.addChildShape(toGdxMatrix4(shape.transform), createCollisionShape(shape.shape, scale))
+      parent.addChildShape(toGdxMatrix4(shape.transform), createCollisionShape(shape.shape, Vector3.unit))
+      parent.localScaling = toGdxVector3(scale)
       parent
     }
     is Box -> btBoxShape(toGdxVector3(shape.halfExtents * scale))
@@ -47,7 +52,7 @@ fun createCollisionShape(shape: Shape, scale: Vector3): btCollisionShape {
     }
     is Cylinder -> btCylinderShapeZ(toGdxVector3(Vector3(shape.radius * scale.x, shape.radius * scale.y, shape.height * scale.z * 0.5f)))
 
-    is MeshShape -> createBulletStaticMesh(shape.triangles)
+    is MeshShape -> createBulletStaticMesh(shape.triangles, scale)
     else -> throw Error("Not supported")
   }
 }

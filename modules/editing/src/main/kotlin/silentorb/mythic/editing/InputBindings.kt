@@ -40,6 +40,7 @@ fun keyboardFlyThroughBindings() =
             GLFW.GLFW_KEY_SPACE to CameramanCommands.moveUp,
             GLFW.GLFW_KEY_LEFT_CONTROL to CameramanCommands.moveDown,
             GLFW.GLFW_KEY_ESCAPE to EditorCommands.toggleFlythroughMode,
+            GLFW.GLFW_KEY_F to EditorCommands.toggleFlythroughMode,
         )
     )
 
