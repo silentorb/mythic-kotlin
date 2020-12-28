@@ -23,7 +23,6 @@ data class BulletState(
     var dynamicsWorld: btDiscreteDynamicsWorld,
     var dynamicBodies: Map<Id, btRigidBody>,
     var staticBodies: Map<Any, btCollisionObject>,
-//    var collisionObjectMap: Map<Int, Id>,
     var isMapSynced: Boolean = false,
 
     // The following are not directly used but are stored here to prevent premature garbage collection
@@ -100,8 +99,9 @@ fun newBulletState(): BulletState {
 }
 
 fun releaseBulletState(bulletState: BulletState) {
-  bulletState.dynamicsWorld.release()
+  bulletState.dynamicsWorld.dispose()
   bulletState.dynamicBodies = mapOf()
+  bulletState.staticBodies = mapOf()
 }
 
 data class LinearImpulse(

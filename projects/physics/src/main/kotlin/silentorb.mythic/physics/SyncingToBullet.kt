@@ -157,8 +157,10 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
         if (shapeDefinition == null)
           null
         else {
-          val transform = getNodeTransformWithoutScale(graph, node)
-          val scale = getNodeScale(graph, node)
+          val fullTransform = getNodeTransform(graph, node)
+          val scale = fullTransform.getScale()
+          val transform = fullTransform.scale(Vector3.unit / scale)
+//          val scale = getNodeScale(graph, node)
           val shape = createCollisionShape(shapeDefinition, scale)
           val groups = getGraphValue<Int>(graph, node, SceneProperties.collisionGroups) ?: 1
           val mask = getGraphValue<Int>(graph, node, SceneProperties.collisionMask) ?: 2 or 4
@@ -169,7 +171,7 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
             createGhostBody(transform, shape)
 
           collisionObject.userData = node
-          bulletState.dynamicsWorld.addCollisionObject(collisionObject, groups, mask)
+          bulletState.dynamicsWorld.addCollisionObject(collisionObject, 17, mask)
           Pair(node, collisionObject)
         }
       }
