@@ -43,8 +43,7 @@ fun cameraRigToCamera(camera: CameraRig): Camera =
         position = if (camera.projection == ProjectionType.perspective)
           camera.location
         else
-          camera.location + (camera.orientation.transform(Vector3(-50f, 0f, 0f)))
-        ,
+          camera.location + (camera.orientation.transform(Vector3(-50f, 0f, 0f))),
         orientation = camera.orientation,
         angleOrZoom = if (camera.projection == ProjectionType.perspective)
           70f
@@ -63,17 +62,18 @@ fun sceneFromEditorGraph(meshShapes: Map<String, Shape>, editor: Editor, lightin
         color = Vector4(0.9f),
         drawMethod = DrawMethod.lineLoop,
     )
-    initialElements
-        .map { elementGroup ->
-          elementGroup.copy(
-              meshes = elementGroup.meshes
-                  .map { meshElement ->
-                    meshElement.copy(
-                        material = wireframeMaterial,
-                    )
-                  }
-          )
-        }
+    initialElements +
+        initialElements
+            .map { elementGroup ->
+              elementGroup.copy(
+                  meshes = elementGroup.meshes
+                      .map { meshElement ->
+                        meshElement.copy(
+                            material = wireframeMaterial,
+                        )
+                      }
+              )
+            }
   } else
     initialElements
 
