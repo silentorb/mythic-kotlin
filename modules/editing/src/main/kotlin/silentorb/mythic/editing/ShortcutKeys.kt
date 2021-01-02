@@ -5,12 +5,12 @@ import imgui.flag.ImGuiKey
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT
 import silentorb.mythic.ent.singleValueCache
+import silentorb.mythic.haft.DeviceIndexes
 import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.platforming.Devices
 import silentorb.mythic.platforming.InputEvent
-import silentorb.mythic.platforming.Devices.keyboard
 
 object ModifierKeys {
   const val ctrl = 1 shl 10
@@ -25,10 +25,11 @@ private var modifierStateComposite: Int = 0
 private val mouseButtonState: MutableList<Boolean> = MutableList(3) { false }
 private var doubleClickState: Boolean = false
 
-fun updateModifierKeyStates() {
-  modifierStateCtrl = ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL)
-  modifierStateShift = ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_SHIFT)
-  modifierStateAlt = ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_ALT) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_ALT)
+fun updateModifierKeyStates(events: List<InputEvent>) {
+  val keyPresses = events.asSequence().filter { it.device == DeviceIndexes.keyboard }
+  modifierStateCtrl = keyPresses.any { it.index == GLFW.GLFW_KEY_LEFT_CONTROL || it.index == GLFW.GLFW_KEY_RIGHT_CONTROL }
+  modifierStateShift = keyPresses.any { it.index == GLFW.GLFW_KEY_LEFT_SHIFT || it.index == GLFW.GLFW_KEY_RIGHT_SHIFT }
+  modifierStateAlt = keyPresses.any { it.index == GLFW.GLFW_KEY_LEFT_ALT || it.index == GLFW.GLFW_KEY_RIGHT_ALT }
   modifierStateComposite =
       (if (modifierStateCtrl) ModifierKeys.ctrl else 0) +
           (if (modifierStateShift) ModifierKeys.shift else 0) +

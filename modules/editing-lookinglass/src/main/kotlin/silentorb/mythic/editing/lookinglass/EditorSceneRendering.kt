@@ -3,10 +3,8 @@ package silentorb.mythic.editing.lookinglass
 import silentorb.mythic.drawing.flipViewport
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.panels.defaultViewportId
-import silentorb.mythic.ent.Graph
-import silentorb.mythic.ent.Key
-import silentorb.mythic.ent.mapByProperty
-import silentorb.mythic.ent.newGraph
+import silentorb.mythic.ent.*
+import silentorb.mythic.ent.scenery.expandInstances
 import silentorb.mythic.ent.scenery.getSceneTree
 import silentorb.mythic.ent.scenery.nodesToElements
 import silentorb.mythic.glowing.DrawMethod
@@ -51,11 +49,19 @@ fun cameraRigToCamera(camera: CameraRig): Camera =
           getOrthoZoom(camera),
     )
 
+val graphCache = singleValueCache<Pair<GraphLibrary, Graph>, Graph> { (library, graph) ->
+  expandInstances(library, graph)
+}
+
+val elementsCache = singleValueCache<Graph, List<ElementGroup>>()
+
 fun sceneFromEditorGraph(meshShapes: Map<String, Shape>, editor: Editor, lightingConfig: LightingConfig, viewport: Key): GameScene {
-  val graph = getActiveEditorGraph(editor) ?: newGraph()
+  val startingGraph = getActiveEditorGraph(editor) ?: newGraph()
+  val graph = graphCache(Pair(editor.graphLibrary, startingGraph))
   val camera = cameraRigToCamera(getEditorCamera(editor, viewport) ?: CameraRig())
 
-  val initialElements = nodesToElements(meshShapes, editor.graphLibrary, graph)
+  val initialElements = elementsCache(graph) { nodesToElements(meshShapes, editor.graphLibrary, graph) }
+
   val elements = if (getRenderingMode(editor) == RenderingMode.wireframe) {
     val wireframeMaterial = Material(
         shading = false,

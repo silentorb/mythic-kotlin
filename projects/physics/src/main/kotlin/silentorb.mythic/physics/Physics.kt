@@ -62,7 +62,7 @@ fun toGdxMatrix4(matrix: Matrix): Matrix4 {
 
 private var isBulletInitialized = false
 
-fun staticGravity() = GdxVector3(0f, 0f, -10f)
+fun staticGravity() = GdxVector3(0f, 0f, -20f)
 
 fun newBulletState(): BulletState {
   if (!isBulletInitialized) {

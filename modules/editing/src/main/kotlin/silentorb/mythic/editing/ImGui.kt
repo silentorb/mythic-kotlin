@@ -82,7 +82,7 @@ fun defineEditorGui(editor: Editor, deviceStates: List<InputDeviceState>): Comma
   renderReady = true
   imGuiGlfw!!.newFrame()
   ImGui.newFrame()
-  updateModifierKeyStates()
+  updateModifierKeyStates(deviceStates.lastOrNull()?.events ?: listOf())
   activeInputType = null
 
   return drawEditor(editor, deviceStates)
