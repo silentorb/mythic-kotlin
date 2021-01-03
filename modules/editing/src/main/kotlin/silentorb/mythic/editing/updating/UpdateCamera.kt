@@ -5,10 +5,7 @@ import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.scenery.getNodeTransform
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.scenery.ProjectionType
-import silentorb.mythic.spatial.Vector2
-import silentorb.mythic.spatial.Vector3
-import silentorb.mythic.spatial.getYawAndPitch
-import silentorb.mythic.spatial.toVector2
+import silentorb.mythic.spatial.*
 
 fun applyCameraPreset(camera: CameraRig, lookat: Vector3): CameraRig {
   val pivot = getCameraPivot(camera)
@@ -31,7 +28,7 @@ fun toggleProjectionMode(camera: CameraRig): CameraRig =
 fun centerOnSelection(editor: Editor, camera: CameraRig): CameraRig {
   val selection = getNodeSelection(editor)
   val graph = getActiveEditorGraph(editor)
-  return if (selection.any() && graph != null){
+  return if (selection.any() && graph != null) {
     val nodeLocation = getNodeTransform(graph, selection.first()).translation()
     val pivot = getCameraPivot(camera)
     val pivotToCameraOffset = camera.location - pivot
@@ -39,8 +36,7 @@ fun centerOnSelection(editor: Editor, camera: CameraRig): CameraRig {
     camera.copy(
         location = nextLocation
     )
-  }
-  else
+  } else
     camera
 }
 
@@ -63,12 +59,24 @@ fun applyCameraPresets(editor: Editor, commands: List<Command>, camera: CameraRi
         .mapNotNull { applyCameraPresets(editor, it.type, camera) }
         .firstOrNull()
 
-fun updateCamera(editor: Editor, mouseOffset: Vector2, commands: List<Command>, camera: CameraRig, isInBounds: Boolean): CameraRig {
+fun updateCameraMouseAction(mouseAction: MouseAction, mouseOffset: Vector2, camera: CameraRig): CameraRig =
+    when (mouseAction) {
+      MouseAction.pan -> updateCameraPanning(mouseOffset, camera)
+      MouseAction.orbit -> updateCameraOrbiting(mouseOffset, camera)
+      else -> camera
+    }
+
+fun updateCamera(editor: Editor, mousePosition: Vector2i, mouseOffset: Vector2, commands: List<Command>, viewport: String, camera: CameraRig): CameraRig {
+  val isInBounds = isInViewportBounds(editor, mousePosition, viewport)
+
   val lookOffset = if (editor.flyThrough && mouseOffset != Vector2.zero)
     -mouseOffset * 4f / (editor.viewportBoundsMap[defaultViewportId]?.zw()?.toVector2() ?: Vector2.zero)
   else
     Vector2.zero
 
   return applyCameraPresets(editor, commands, camera)
-      ?: updateFlyThroughCamera(mouseOffset, commands, camera, isInBounds, lookOffset)
+      ?: if (editor.mouseAction != MouseAction.none && editor.mouseActionViewport == viewport)
+        updateCameraMouseAction(editor.mouseAction, mouseOffset, camera)
+      else
+        updateFlyThroughCamera(mouseOffset, commands, camera, isInBounds, lookOffset)
 }

@@ -62,11 +62,22 @@ val updateRenderingMode = handleCommands<RenderingMode> { command, renderingMode
   }
 }
 
-fun updateViewport(editor: Editor, commands: Commands, mouseOffset: Vector2, viewport: ViewportState, isInBounds: Boolean): ViewportState {
-  return viewport.copy(
-      camera = updateCamera(editor, mouseOffset, commands, viewport.camera, isInBounds),
+fun updateViewport(editor: Editor, commands: Commands, mousePosition: Vector2i, mouseOffset: Vector2, viewport: String, viewportState: ViewportState): ViewportState {
+  return viewportState.copy(
+      camera = updateCamera(editor, mousePosition, mouseOffset, commands, viewport, viewportState.camera),
   )
 }
+
+fun isInViewportBounds(editor: Editor, mousePosition: Vector2i, viewport: String): Boolean {
+  val bounds = editor.viewportBoundsMap[viewport]
+  return if (bounds == null)
+    false
+  else
+    isInBounds(mousePosition, bounds)
+}
+
+fun mouseViewport(editor: Editor, mousePosition: Vector2i): String? =
+    editor.viewportBoundsMap.keys.firstOrNull { isInViewportBounds(editor, mousePosition, it) }
 
 fun updateSceneStates(commands: Commands, editor: Editor, graph: Graph?, mousePosition: Vector2i, mouseOffset: Vector2): SceneStates =
     if (graph == null)
@@ -75,13 +86,7 @@ fun updateSceneStates(commands: Commands, editor: Editor, graph: Graph?, mousePo
       val graphId = editor.state.graph!!
       val viewports = (getViewports(editor) ?: defaultViewports())
           .mapValues { (key, viewport) ->
-            val bounds = editor.viewportBoundsMap[key]
-            val isInBounds = if (bounds == null)
-              false
-            else
-              isInBounds(mousePosition, bounds)
-
-            updateViewport(editor, commands, mouseOffset, viewport, isInBounds)
+            updateViewport(editor, commands, mousePosition, mouseOffset, key, viewport)
           }
 
       val nextNodeSelection = updateNodeSelection(editor, graph)(commands, getNodeSelection(editor))
@@ -139,6 +144,22 @@ fun getNextGraph(editor: Editor, commands: Commands): Graph? {
   }
 }
 
+fun updateMouseAction(isInBounds: Boolean, mouseAction: MouseAction): MouseAction {
+  val mouse = isMouseDown(1)
+  return if (mouseAction == MouseAction.none)
+    if (isInBounds && mouse)
+      if (isShiftDown())
+        MouseAction.pan
+      else
+        MouseAction.orbit
+    else
+      MouseAction.none
+  else if (mouse)
+    mouseAction
+  else
+    MouseAction.none
+}
+
 fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector2, commands: Commands, editor: Editor): Editor {
   val commandTypes = commands.map { it.type }
   val nextGraph = getNextGraph(editor, commands)
@@ -147,6 +168,13 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
   val mousePosition = (previousMousePosition + mouseOffset).toVector2i()
   val nextState = updateEditorState(commands, editor, nextGraph, mousePosition, mouseOffset)
   val nextHistory = updateHistory(nextGraph, getNodeSelection(nextState), nextState.graph, commands, editor.maxHistory, editor.history)
+  val mouseViewport = mouseViewport(editor, mousePosition)
+  val mouseAction = updateMouseAction(mouseViewport != null, editor.mouseAction)
+  val mouseActionViewport = if (mouseAction == editor.mouseAction)
+    editor.mouseActionViewport
+  else
+    mouseViewport
+
   val flyThrough = if (commands.any { it.type == EditorCommands.toggleFlythroughMode })
     !editor.flyThrough
   else
@@ -163,6 +191,8 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
       history = nextHistory,
       selectionQuery = updateSelectionQuery(editor, commands),
       flyThrough = flyThrough,
+      mouseActionViewport = mouseActionViewport,
+      mouseAction = mouseAction,
   )
 }
 

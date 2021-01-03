@@ -116,6 +116,12 @@ data class EditHistory(
 
 typealias HistoryMap = Map<String, EditHistory>
 
+enum class MouseAction {
+  none,
+  pan,
+  orbit
+}
+
 data class Editor(
     val projectPath: Path,
     val state: EditorState = EditorState(),
@@ -131,6 +137,8 @@ data class Editor(
     val selectionQuery: SelectionQuery? = null,
     val maxHistory: Int = 30,
     val flyThrough: Boolean = false,
+    val mouseActionViewport: String? = null,
+    val mouseAction: MouseAction = MouseAction.none,
 )
 
 const val keypadKey = "Numpad"

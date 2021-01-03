@@ -76,8 +76,10 @@ fun defineEditorGui(editor: Editor, deviceStates: List<InputDeviceState>): Comma
   if (!imguiInitialized)
     return listOf()
 
-  if (renderReady)
+  if (renderReady) {
+    ImGui.endFrame()
     return listOf()
+  }
 
   renderReady = true
   imGuiGlfw!!.newFrame()
