@@ -1,9 +1,6 @@
 package silentorb.mythic.cameraman
 
-import silentorb.mythic.spatial.Quaternion
-import silentorb.mythic.spatial.Vector2
-import silentorb.mythic.spatial.minMax
-import silentorb.mythic.spatial.normalizeRadialAngle
+import silentorb.mythic.spatial.*
 
 fun updateFirstPersonFacingRotation(facingRotation: Vector2, mouseLookOffset: Vector2?, lookVelocity: Vector2, delta: Float): Vector2 {
   val next = if (mouseLookOffset != null)
@@ -11,9 +8,10 @@ fun updateFirstPersonFacingRotation(facingRotation: Vector2, mouseLookOffset: Ve
   else
     facingRotation + fpCameraRotation(lookVelocity, delta)
 
+  val verticalMax = 0.9f * Pi / 2f
   return Vector2(
       normalizeRadialAngle(next.x),
-      minMax(next.y, -1.1f, 1.1f)
+      minMax(next.y, -verticalMax, verticalMax)
   )
 }
 
