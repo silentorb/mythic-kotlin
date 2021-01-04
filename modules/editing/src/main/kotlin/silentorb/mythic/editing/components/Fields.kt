@@ -155,8 +155,13 @@ fun spatialWidget(entry: Entry): Vector3 {
 val propertySpatialWidget: PropertyWidget = { _, entry -> spatialWidget(entry) }
 
 fun rotationWidget(entry: Entry): Vector3 {
-  val result = spatialWidget(entry.copy(target = radiansToDegrees(entry.target as Vector3)))
-  return degreesToRadians(result)
+  val original = entry.target as Vector3
+  val degreesValue = radiansToDegrees(original)
+  val result = spatialWidget(entry.copy(target = degreesValue))
+  return if (degreesValue == result)
+    original
+  else
+  degreesToRadians(result)
 }
 
 val propertyRotationWidget: PropertyWidget = { _, entry -> rotationWidget(entry) }

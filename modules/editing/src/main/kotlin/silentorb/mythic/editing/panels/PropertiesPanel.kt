@@ -108,7 +108,7 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): PanelResponse =
               val nextValue = if (definition.widget != null) {
                 ImGui.text(definition.displayName)
                 ImGui.sameLine()
-                if (ImGui.smallButton("x##property-${entry.target}")) {
+                if (ImGui.smallButton("x##property-${entry.property}")) {
                   commands = commands.plus(Command(EditorCommands.removeGraphValue, value = entry))
                 }
                 drawFormField(editor, definition, entry)
