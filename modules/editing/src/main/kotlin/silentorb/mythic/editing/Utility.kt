@@ -29,6 +29,9 @@ fun getViewports(editor: Editor) =
 fun getRenderingMode(editor: Editor, viewport: Key = defaultViewportId): RenderingMode =
     editor.state.renderingModes[viewport] ?: RenderingMode.lit
 
+fun isManyToMany(editor: Editor, property:  String): Boolean =
+    editor.enumerations.schema[property]?.manyToMany == true
+
 fun getEditorViewport(editor: Editor, viewport: Key?): ViewportState? {
   val viewports = getViewports(editor)
   return if (viewports != null)

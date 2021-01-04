@@ -19,9 +19,13 @@ object SceneProperties {
   const val collisionGroups = "collisionGroups"
   const val collisionMask = "collisionMask"
   const val value = "value"
+  const val connects = "connects"
 }
 
 fun scenePropertiesSchema(): PropertySchema = mapOf(
+    SceneProperties.connects to PropertyInfo(
+        manyToMany = true,
+    ),
     SceneProperties.type to PropertyInfo(
         manyToMany = true,
     )

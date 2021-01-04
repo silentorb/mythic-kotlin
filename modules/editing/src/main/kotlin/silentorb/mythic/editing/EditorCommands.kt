@@ -13,6 +13,7 @@ object EditorCommands {
   val startNodeDrillDown = " startNodeDrillDown"
 
   val setGraphValue = "setGraphValue"
+  val replaceGraphValue = "replaceGraphValue"
   val removeGraphValue = "removeGraphValue"
   val setActiveGraph = "setActiveGraph"
   val setNodeSelection = "setNodeSelection"

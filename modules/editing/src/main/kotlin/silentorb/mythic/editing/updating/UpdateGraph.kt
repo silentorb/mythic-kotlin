@@ -1,10 +1,7 @@
 package silentorb.mythic.editing.updating
 
-import silentorb.mythic.editing.Editor
-import silentorb.mythic.editing.EditorCommands
+import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.nameText
-import silentorb.mythic.editing.getBaseName
-import silentorb.mythic.editing.getNodeSelection
 import silentorb.mythic.ent.*
 import silentorb.mythic.ent.scenery.gatherChildren
 import silentorb.mythic.ent.scenery.getGraphRoots
@@ -98,10 +95,15 @@ fun updateSceneGraph(editor: Editor) = handleCommands<Graph> { command, graph ->
 
     EditorCommands.setGraphValue -> {
       val newEntry = command.value as Entry
-      if (editor.enumerations.schema[newEntry.property]?.manyToMany == true)
+      if (isManyToMany(editor, newEntry.property))
         graph + newEntry
       else
         replaceValues(graph, listOf(newEntry))
+    }
+
+    EditorCommands.replaceGraphValue -> {
+      val (previous, next) = command.value as Pair<Entry, Entry>
+      (graph - previous) + next
     }
 
     EditorCommands.removeGraphValue -> {

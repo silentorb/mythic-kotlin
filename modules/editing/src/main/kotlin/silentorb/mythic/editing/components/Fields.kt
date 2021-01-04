@@ -13,6 +13,8 @@ import silentorb.mythic.spatial.degreesToRadians
 import silentorb.mythic.spatial.radiansToDegrees
 import silentorb.mythic.spatial.toList
 
+fun <T>wrapSimpleWidget(widget: (Entry) -> T): PropertyWidget = { _, entry, _ -> widget(entry) as Any }
+
 fun dropDownWidget(options: List<Key>, entry: Entry): String {
   val value = entry.target as String
   var nextValue = value
@@ -55,11 +57,11 @@ fun <T> labeledDropDownWidget(options: Map<T, String>, entry: Entry): T {
 typealias EditorOptionsSource = (Editor) -> List<Key>
 typealias LabeledEditorOptionsSource<T> = (Editor) -> Map<T, Key>
 
-fun dropDownWidget(options: EditorOptionsSource): PropertyWidget = { editor, entry ->
+fun dropDownWidget(options: EditorOptionsSource): PropertyWidget = { editor, entry, _ ->
   dropDownWidget(options(editor), entry)
 }
 
-fun <T> labeledDropDownWidget(options: LabeledEditorOptionsSource<T>): PropertyWidget = { editor, entry ->
+fun <T> labeledDropDownWidget(options: LabeledEditorOptionsSource<T>): PropertyWidget = { editor, entry, _ ->
   labeledDropDownWidget(options(editor), entry) as Any
 }
 
@@ -103,15 +105,14 @@ fun rgbaField(entry: Entry): String {
   return arrayToHexColorString(reference)
 }
 
-val propertyRgbaField: PropertyWidget = { _, entry -> rgbaField(entry) }
+val propertyRgbaField: PropertyWidget = wrapSimpleWidget(::rgbaField)
 
-fun textField(entry: Entry): String {
+fun textField(entry: Entry, id: String): String {
   val value = entry.target as String
-  val owner = "${entry.source}.${entry.property}"
-  return textField(owner, value)
+  return textField(id, value)
 }
 
-val propertyTextField: PropertyWidget = { _, entry -> textField(entry) }
+val propertyTextField: PropertyWidget = { _, entry, id -> textField(entry, id) }
 
 fun decimalTextField(entry: Entry): Float {
   val value = entry.target as Float
@@ -127,8 +128,8 @@ fun integerTextField(entry: Entry): Int {
   return result.toIntOrNull() ?: value
 }
 
-val propertyDecimalTextField: PropertyWidget = { _, entry -> decimalTextField(entry) }
-val propertyIntegerTextField: PropertyWidget = { _, entry -> integerTextField(entry) }
+val propertyDecimalTextField: PropertyWidget = wrapSimpleWidget(::decimalTextField)
+val propertyIntegerTextField: PropertyWidget = wrapSimpleWidget(::integerTextField)
 
 fun axisInput(owner: String, label: String, value: Float): Float {
   val flags = ImGuiInputTextFlags.CharsDecimal or ImGuiInputTextFlags.AutoSelectAll
@@ -152,7 +153,7 @@ fun spatialWidget(entry: Entry): Vector3 {
 //  return Vector3(x, 0f, 0f)
 }
 
-val propertySpatialWidget: PropertyWidget = { _, entry -> spatialWidget(entry) }
+val propertySpatialWidget: PropertyWidget = wrapSimpleWidget(::spatialWidget)
 
 fun rotationWidget(entry: Entry): Vector3 {
   val original = entry.target as Vector3
@@ -164,10 +165,10 @@ fun rotationWidget(entry: Entry): Vector3 {
   degreesToRadians(result)
 }
 
-val propertyRotationWidget: PropertyWidget = { _, entry -> rotationWidget(entry) }
+val propertyRotationWidget: PropertyWidget = wrapSimpleWidget(::rotationWidget)
 
 fun bitmaskField(entry: Entry): Int {
   return 0
 }
 
-val propertyBitmaskField: PropertyWidget = { _, entry -> bitmaskField(entry) }
+val propertyBitmaskField: PropertyWidget = wrapSimpleWidget(::bitmaskField)

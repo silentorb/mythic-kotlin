@@ -110,4 +110,9 @@ fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
         widget = propertyIntegerTextField,
         defaultValue = { 0f },
     ),
+    SceneProperties.connects to PropertyDefinition(
+        displayName = "Connects",
+        widget = propertyTextField,
+        defaultValue = { "" },
+    ),
 )

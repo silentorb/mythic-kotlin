@@ -15,13 +15,42 @@ fun getAvailableTypes(editor: Editor): List<Key> =
         .minus(editor.state.graph ?: "")
         .toList()
 
-fun drawFormField(editor: Editor, definition: PropertyDefinition, entry: Entry): Any {
+fun drawFormField(editor: Editor, definition: PropertyDefinition, entry: Entry, id: String): Any {
   val widget = definition.widget
   return if (widget != null) {
-    widget(editor, entry)
+    widget(editor, entry, id)
   } else
     entry.target
 }
+
+private var previousNode: String? = null
+private var propertyOrderState: MutableMap<String, LooseGraph> = mutableMapOf()
+
+fun managePropertyOrder(entries: LooseGraph): LooseGraph =
+    if (entries.size < 2)
+      entries
+    else {
+      val first = entries.first()
+      if (first.source != previousNode) {
+        propertyOrderState.clear()
+        previousNode = first.source
+      }
+
+      val key = first.property
+      val previous = propertyOrderState[key]
+      if (previous == null) {
+        propertyOrderState[key] = entries
+        entries
+      } else {
+        entries.sortedBy {
+          val index = previous.indexOf(it)
+          if (index == -1)
+            1000
+          else
+            index
+        }
+      }
+    }
 
 fun addPropertiesDropDown(editor: Editor, availableDefinitions: PropertyDefinitions, attributes: List<Key>, entries: Graph, node: Key): Commands {
   var commands: Commands = listOf()
@@ -86,7 +115,8 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): PanelResponse =
 
           ImGui.text(node)
           ImGui.separator()
-          val availableDefinitions = definitions.minus(entries.map { it.property })
+          val existing = entries.map { it.property } - editor.enumerations.schema.filter { it.value.manyToMany }.keys
+          val availableDefinitions = definitions.minus(existing)
           val union = getPropertyValues<Key>(graph, node, SceneProperties.type)
           if (availableDefinitions.any()) {
             commands = commands + addPropertiesDropDown(editor, availableDefinitions, union, entries, node)
@@ -102,21 +132,28 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): PanelResponse =
           }
 
           for ((property, definition) in definitions) {
-            val entry = entries.firstOrNull { it.property == property }
-            if (entry != null) {
+            val propertyEntries = managePropertyOrder(entries.filter { it.property == property })
+            propertyEntries.forEachIndexed { index, entry ->
               ImGui.separator()
               val nextValue = if (definition.widget != null) {
                 ImGui.text(definition.displayName)
                 ImGui.sameLine()
-                if (ImGui.smallButton("x##property-${entry.property}")) {
+                val id = "${entry.source}.${entry.property}.${index}"
+
+                if (ImGui.smallButton("x##property-${id}")) {
                   commands = commands.plus(Command(EditorCommands.removeGraphValue, value = entry))
                 }
-                drawFormField(editor, definition, entry)
+                drawFormField(editor, definition, entry, id)
               } else
                 entry.target
 
               if (nextValue != entry.target) {
-                commands = commands.plus(Command(EditorCommands.setGraphValue, value = Entry(node, property, nextValue)))
+                val command = if (isManyToMany(editor, property))
+                  Command(EditorCommands.replaceGraphValue, value = entry to Entry(node, property, nextValue))
+                else
+                  Command(EditorCommands.setGraphValue, value = Entry(node, property, nextValue))
+
+                commands = commands + command
               }
             }
           }
