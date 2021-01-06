@@ -9,7 +9,7 @@ import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.scenery.SceneProperties
 
-fun nodeTreeMenus(getShortcut: GetShortcut): Commands =
+fun nodeTreeMenus(getShortcut: GetShortcut) =
     drawMenuBar(getShortcut, listOf(
         MenuItem("Edit", items = listOf(
             MenuItem("Add Node", EditorCommands.addNodeWithNameDialog),

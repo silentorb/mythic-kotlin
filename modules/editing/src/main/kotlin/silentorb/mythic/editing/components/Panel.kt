@@ -9,11 +9,12 @@ import silentorb.mythic.happenings.Commands
 
 fun panel(
     editor: Editor,
-          title: String,
-          context: String,
-          menu: MenuDefinition? = null,
+    title: String,
+    context: String,
+    menu: MenuDefinition? = null,
     flags: Int = ImGuiWindowFlags.None,
-          body: () -> Commands): PanelResponse {
+    body: () -> Commands
+): PanelResponse {
   val menuFlags = if (menu != null)
     ImGuiWindowFlags.MenuBar
   else

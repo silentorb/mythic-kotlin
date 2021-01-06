@@ -3,23 +3,7 @@ package silentorb.mythic.editing.components
 import imgui.ImGui
 import silentorb.mythic.editing.*
 import silentorb.mythic.happenings.Command
-
-//fun pollMenuItem(getShortcut: GetShortcut): (MenuItem) -> List<Command> = { item ->
-//  val command = item.command
-//  val shortcut = if (command!= null) getShortcut(command) else null
-//  if (shortcut != null && command != null && isShortcutPressed(shortcut))
-//    listOf(Command(type = command))
-//  else
-//    listOf()
-//}
-//
-//fun pollMenuItems(getShortcut: GetShortcut): (List<MenuItem>) -> List<Command> = { items ->
-//  items.flatMap(pollMenuItem(getShortcut))
-//}
-//
-//fun pollMenu(getShortcut: GetShortcut): (MenuItem) -> List<Command> = { item ->
-//  pollMenuItems(getShortcut)(item.items ?: listOf())
-//}
+import silentorb.mythic.happenings.Commands
 
 fun drawMenuItem(getShortcut: GetShortcut): (MenuItem) -> List<Command> = { item ->
   val command = item.command
@@ -40,26 +24,23 @@ fun drawMenu(getShortcut: GetShortcut): (MenuItem) -> List<Command> = { item ->
     result
   } else
     listOf()
-//    pollMenuItems(getShortcut)(item.items ?: listOf())
 }
 
-fun drawMainMenuBar(getShortcut: GetShortcut, items: List<MenuItem>): List<Command> =
+fun drawMainMenuBar(getShortcut: GetShortcut, items: List<MenuItem>): MenuResponse =
     if (ImGui.beginMainMenuBar()) {
       val result = items.flatMap(drawMenu(getShortcut))
       ImGui.endMainMenuBar()
       result
     } else
       listOf()
-//      items.flatMap(pollMenu(getShortcut))
 
-fun drawMenuBar(getShortcut: GetShortcut, items: List<MenuItem>): List<Command> =
+fun drawMenuBar(getShortcut: GetShortcut, items: List<MenuItem>): MenuResponse =
     if (ImGui.beginMenuBar()) {
       val result = items.flatMap(drawMenu(getShortcut))
       ImGui.endMenuBar()
       result
     } else
       listOf()
-//      items.flatMap(pollMenu(getShortcut))
 
 fun getShortcutForContext(bindings: KeystrokeBindings, context: String): GetShortcut = { command ->
   bindings[ContextCommand(context, command)]

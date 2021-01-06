@@ -12,7 +12,8 @@ import java.nio.file.Path
 const val sceneFileExtension = ".scene"
 
 typealias SceneTree = Map<Key, Key>
-typealias MenuDefinition = (GetShortcut) -> Commands
+typealias MenuResponse = Commands
+typealias MenuDefinition = (GetShortcut) -> MenuResponse
 typealias PanelResponse = Pair<String?, Commands>
 
 data class Typeface(

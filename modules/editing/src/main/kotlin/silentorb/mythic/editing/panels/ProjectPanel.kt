@@ -8,7 +8,7 @@ import silentorb.mythic.editing.components.*
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 
-fun projectMenus(getShortcut: GetShortcut): Commands =
+fun projectMenus(getShortcut: GetShortcut) =
     drawMenuBar(getShortcut, listOf(
         MenuItem("File", items = listOf(
             MenuItem("New File", EditorCommands.newFileWithNameDialog),

@@ -14,7 +14,7 @@ import silentorb.mythic.spatial.Vector4i
 
 const val defaultViewportId = "viewport"
 
-fun viewportMenus(getShortcut: GetShortcut): Commands =
+fun viewportMenus(getShortcut: GetShortcut): MenuResponse =
     drawMenuBar(getShortcut, listOf(
         MenuItem("View", items = listOf(
             MenuItem("View Front", EditorCommands.viewFront),
@@ -33,9 +33,10 @@ fun viewportMenus(getShortcut: GetShortcut): Commands =
 
 fun drawViewportPanel(editor: Editor): PanelResponse =
     panel(editor, "Viewport", Contexts.viewport, ::viewportMenus, ImGuiWindowFlags.NoBackground) {
+      val menuHeight = 40
       val viewport = Vector4i(
-          ImGui.getWindowPosX().toInt(), ImGui.getWindowPosY().toInt(),
-          ImGui.getWindowSizeX().toInt(), ImGui.getWindowSizeY().toInt()
+          ImGui.getWindowPosX().toInt(), ImGui.getWindowPosY().toInt() + menuHeight,
+          ImGui.getWindowSizeX().toInt(), ImGui.getWindowSizeY().toInt() - menuHeight
       )
 
       val mousePositionReference = ImVec2()
