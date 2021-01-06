@@ -33,6 +33,7 @@ fun updateOperation(commandType: Any, operation: Operation?): Operation? {
     EditorCommands.startTranslating -> startOperation(OperationType.translate, operation)
     EditorCommands.startRotating -> startOperation(OperationType.rotate, operation)
     EditorCommands.startScaling -> startOperation(OperationType.scale, operation)
+    EditorCommands.startConnecting -> startOperation(OperationType.connecting, operation)
     EditorCommands.restrictAxisX -> restrictAxis(Axis.x, operation)
     EditorCommands.restrictAxisY -> restrictAxis(Axis.y, operation)
     EditorCommands.restrictAxisZ -> restrictAxis(Axis.z, operation)
@@ -236,6 +237,9 @@ fun updateScaling(previousMousePosition: Vector2, mouseOffset: Vector2, editor: 
       }
     }
 
+fun updateConnecting(previousMousePosition: Vector2, mouseOffset: Vector2, editor: Editor, graph: Graph): Graph =
+    graph
+
 fun updateStaging(editor: Editor, previousMousePosition: Vector2, mouseOffset: Vector2, commandTypes: List<Any>): Graph? {
   val graph = editor.staging
   val operation = editor.operation
@@ -246,6 +250,7 @@ fun updateStaging(editor: Editor, previousMousePosition: Vector2, mouseOffset: V
       OperationType.translate -> updateTranslation(previousMousePosition, mouseOffset, editor, graph)
       OperationType.rotate -> updateRotation(previousMousePosition, mouseOffset, editor, graph)
       OperationType.scale -> updateScaling(previousMousePosition, mouseOffset, editor, graph)
+      OperationType.connecting -> updateConnecting(previousMousePosition, mouseOffset, editor, graph)
       else -> graph
     }
   }

@@ -77,6 +77,7 @@ fun defaultEditorMenuKeystrokes(): KeystrokeBindings = mapOf(
     ContextCommand(Contexts.viewport, EditorCommands.centerOnSelection) to "F",
     ContextCommand(Contexts.viewport, EditorCommands.toggleFlythroughMode) to "Shift+F",
     ContextCommand(Contexts.viewport, EditorCommands.deleteNode) to "Del",
+    ContextCommand(Contexts.viewport, EditorCommands.startConnecting) to "Ctrl+J",
 
     // These will probably need modifier keys eventually
     ContextCommand(Contexts.viewport, EditorCommands.renderingModeWireframe) to "1",

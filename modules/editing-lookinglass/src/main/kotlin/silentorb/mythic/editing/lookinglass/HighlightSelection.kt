@@ -2,7 +2,7 @@ package silentorb.mythic.editing.lookinglass
 
 import org.lwjgl.opengl.GL11.*
 import silentorb.mythic.editing.Editor
-import silentorb.mythic.editing.getActiveEditorGraph
+import silentorb.mythic.editing.getCachedGraph
 import silentorb.mythic.editing.getNodeSelection
 import silentorb.mythic.glowing.clearStencil
 import silentorb.mythic.glowing.globalState

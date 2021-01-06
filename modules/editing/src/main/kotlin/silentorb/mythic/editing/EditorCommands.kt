@@ -44,6 +44,7 @@ object EditorCommands {
   val renderingModeFlat = "renderingModeFlat"
   val renderingModeLit = "renderingModeLit"
   val toggleFlythroughMode = "toggleFlythroughMode"
+  val startConnecting = "startConnecting"
 
   val newFile = "newFile"
   val newFileWithNameDialog = "newFileWithNameDialog"

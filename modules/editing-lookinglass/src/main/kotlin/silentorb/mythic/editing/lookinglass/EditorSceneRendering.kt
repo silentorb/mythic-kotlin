@@ -47,16 +47,7 @@ fun cameraRigToCamera(camera: CameraRig): Camera =
           getOrthoZoom(camera),
     )
 
-val graphCache = singleValueCache<Pair<ExpansionLibrary, Graph>, Graph> { (library, graph) ->
-  expandInstances(library, graph)
-}
-
 val elementsCache = singleValueCache<Graph, List<ElementGroup>>()
-
-fun getCachedGraph(editor: Editor): Graph {
-  val startingGraph = getActiveEditorGraph(editor) ?: newGraph()
-  return graphCache(Pair(getExpansionLibrary(editor), startingGraph))
-}
 
 fun sceneFromEditorGraph(meshShapes: Map<String, Shape>, editor: Editor, lightingConfig: LightingConfig, viewport: Key): GameScene {
   val graph = getCachedGraph(editor)

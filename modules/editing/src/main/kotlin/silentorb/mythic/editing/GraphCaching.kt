@@ -1,6 +1,11 @@
 package silentorb.mythic.editing
 
+import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.GraphLibrary
+import silentorb.mythic.ent.newGraph
+import silentorb.mythic.ent.scenery.ExpansionLibrary
+import silentorb.mythic.ent.scenery.expandInstances
+import silentorb.mythic.ent.singleValueCache
 
 fun loadImmediateDependencies(editor: Editor, library: GraphLibrary, graphId: String): GraphLibrary {
   val dependencies = getGraphDependencies(library, setOf(graphId)).plus(graphId) - library.keys
@@ -41,4 +46,13 @@ fun updateSceneCaching(editor: Editor): GraphLibrary {
 
   } else
     library
+}
+
+val graphCache = singleValueCache<Pair<ExpansionLibrary, Graph>, Graph> { (library, graph) ->
+  expandInstances(library, graph)
+}
+
+fun getCachedGraph(editor: Editor): Graph {
+  val startingGraph = getActiveEditorGraph(editor) ?: newGraph()
+  return graphCache(Pair(getExpansionLibrary(editor), startingGraph))
 }

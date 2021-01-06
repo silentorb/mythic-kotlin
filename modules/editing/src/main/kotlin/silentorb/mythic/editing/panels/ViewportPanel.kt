@@ -33,7 +33,7 @@ fun viewportMenus(getShortcut: GetShortcut): MenuResponse =
 
 fun drawViewportPanel(editor: Editor): PanelResponse =
     panel(editor, "Viewport", Contexts.viewport, ::viewportMenus, ImGuiWindowFlags.NoBackground) {
-      val menuHeight = 40
+      val menuHeight = 0
       val viewport = Vector4i(
           ImGui.getWindowPosX().toInt(), ImGui.getWindowPosY().toInt() + menuHeight,
           ImGui.getWindowSizeX().toInt(), ImGui.getWindowSizeY().toInt() - menuHeight
@@ -64,5 +64,9 @@ fun drawViewportPanel(editor: Editor): PanelResponse =
       else
         listOf()
 
+      if (editor.operation != null) {
+        ImGui.setCursorPos(60f, viewport.y + viewport.z - 20f)
+        ImGui.text(editor.operation.type.name)
+      }
       viewportCommands + clickCommands
     }

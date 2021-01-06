@@ -4,6 +4,7 @@ enum class OperationType {
   translate,
   rotate,
   scale,
+  connecting,
 }
 
 enum class Axis {

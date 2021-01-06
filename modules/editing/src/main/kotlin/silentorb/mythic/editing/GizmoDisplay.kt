@@ -3,6 +3,7 @@ package silentorb.mythic.editing
 import imgui.ImColor
 import imgui.ImDrawList
 import imgui.ImGui
+import silentorb.mythic.ent.scenery.filterByAttribute
 import silentorb.mythic.ent.scenery.getNodeTransform
 import silentorb.mythic.spatial.*
 
@@ -26,18 +27,21 @@ fun drawAxisRails(axis: Axis, origin: Vector3, transform: ScreenTransform, drawL
   drawList.addLine(center.x, center.y, end.x, end.y, axisColors()[axis.ordinal], 2f)
 }
 
-fun drawSelectedObjectAnnotations(editor: Editor, viewport: Vector4i, camera: CameraRig, drawList: ImDrawList) {
+fun getStandardPointTransform(viewport: Vector4i, camera: CameraRig): ScreenTransform {
+  val dimensions = viewport.zw()
+  val viewTransform = createViewMatrix(camera.location, camera.orientation)
+  val cameraTransform = createProjectionMatrix(camera, dimensions) * viewTransform
+  val offset = viewport.xy()
+  return transformPoint(cameraTransform, dimensions.toVector2(), offset.toVector2())
+}
+
+fun drawSelectedObjectAnnotations(editor: Editor, transform: ScreenTransform, drawList: ImDrawList) {
   val selection = getNodeSelection(editor)
   val graph = getActiveEditorGraph(editor)
   val operation = editor.operation
   val data = operation?.data
   val node = selection.firstOrNull()
   if (node != null && graph != null) {
-    val dimensions = viewport.zw()
-    val viewTransform = createViewMatrix(camera.location, camera.orientation)
-    val cameraTransform = createProjectionMatrix(camera, dimensions) * viewTransform
-    val offset = viewport.xy()
-    val transform = transformPoint(cameraTransform, dimensions.toVector2(), offset.toVector2())
     val location = getNodeTransform(graph, node).translation()
 
     if (data != null && data is SpatialTransformState) {
@@ -78,6 +82,20 @@ fun drawCompass(transform: ScreenTransform, lookAt: Vector3, drawList: ImDrawLis
   }
 }
 
+fun drawJoints(editor: Editor, transform: ScreenTransform, drawList: ImDrawList) {
+  if (editor.operation?.type != OperationType.connecting)
+    return
+
+  val pointColor = ImColor.intToColor(255, 0, 255, 255)
+  val graph = getCachedGraph(editor)
+  val joints = filterByAttribute(graph, CommonEditorAttributes.joint)
+  for (joint in joints) {
+    val location = getNodeTransform(graph, joint).translation()
+    val point = transform(location)
+    drawList.addCircleFilled(point.x, point.y, 9f, pointColor)
+  }
+}
+
 fun drawEditor3dElements(editor: Editor, viewport: Vector4i, camera: CameraRig) {
   val drawList = ImGui.getBackgroundDrawList()
 //  drawList.addCircle(viewport.x.toFloat() + viewport.z.toFloat() * 0.5f,
@@ -95,7 +113,9 @@ fun drawEditor3dElements(editor: Editor, viewport: Vector4i, camera: CameraRig) 
   drawList.pushClipRect(bounds.x, bounds.y, bounds.x + bounds.z, bounds.y + bounds.w)
 
   val lookAt = getCameraLookat(camera)
-  drawSelectedObjectAnnotations(editor, viewport, camera, drawList)
+  val transform = getStandardPointTransform(viewport, camera)
+  drawSelectedObjectAnnotations(editor, transform, drawList)
+  drawJoints(editor, transform, drawList)
   drawCompass(compassTransform, lookAt, drawList)
 
   drawList.popClipRect()
