@@ -4,9 +4,7 @@ import silentorb.mythic.drawing.flipViewport
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.*
-import silentorb.mythic.ent.scenery.expandInstances
-import silentorb.mythic.ent.scenery.getSceneTree
-import silentorb.mythic.ent.scenery.nodesToElements
+import silentorb.mythic.ent.scenery.*
 import silentorb.mythic.glowing.DrawMethod
 import silentorb.mythic.lookinglass.*
 import silentorb.mythic.platforming.WindowInfo
@@ -49,15 +47,19 @@ fun cameraRigToCamera(camera: CameraRig): Camera =
           getOrthoZoom(camera),
     )
 
-val graphCache = singleValueCache<Pair<GraphLibrary, Graph>, Graph> { (library, graph) ->
+val graphCache = singleValueCache<Pair<ExpansionLibrary, Graph>, Graph> { (library, graph) ->
   expandInstances(library, graph)
 }
 
 val elementsCache = singleValueCache<Graph, List<ElementGroup>>()
 
-fun sceneFromEditorGraph(meshShapes: Map<String, Shape>, editor: Editor, lightingConfig: LightingConfig, viewport: Key): GameScene {
+fun getCachedGraph(editor: Editor): Graph {
   val startingGraph = getActiveEditorGraph(editor) ?: newGraph()
-  val graph = graphCache(Pair(editor.graphLibrary, startingGraph))
+  return graphCache(Pair(getExpansionLibrary(editor), startingGraph))
+}
+
+fun sceneFromEditorGraph(meshShapes: Map<String, Shape>, editor: Editor, lightingConfig: LightingConfig, viewport: Key): GameScene {
+  val graph = getCachedGraph(editor)
   val camera = cameraRigToCamera(getEditorCamera(editor, viewport) ?: CameraRig())
 
   val initialElements = elementsCache(graph) { nodesToElements(meshShapes, editor.graphLibrary, graph) }
@@ -111,9 +113,9 @@ fun renderEditor(renderer: Renderer, windowInfo: WindowInfo, editor: Editor, lig
     val scene = sceneFromEditorGraph(getMeshShapes(renderer), editor, lightingConfig, defaultViewportId)
     val sceneRenderer = createSceneRenderer(renderer, windowInfo, scene, adjustedViewport)
     val previousSelectionQuery = editor.selectionQuery
-    val graph = getActiveEditorGraph(editor)
+    val graph = getCachedGraph(editor)
     val filters = prepareRender(sceneRenderer, scene)
-    val nextSelectionQuery = if (previousSelectionQuery != null && graph != null) {
+    val nextSelectionQuery = if (previousSelectionQuery != null) {
       val selectedObject = plumbPixelDepth(sceneRenderer, editor, previousSelectionQuery, graph)
       previousSelectionQuery.copy(
           response = SelectionQueryResponse(

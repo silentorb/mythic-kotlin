@@ -16,45 +16,43 @@ val selectionColor = Vector4(0.9f, 0.9f, 0.4f, 1f)
 
 fun renderEditorSelection(editor: Editor, sceneRenderer: SceneRenderer) {
   val selection = getNodeSelection(editor)
-  val graph = getActiveEditorGraph(editor)
-  if (graph != null) {
-    for (node in selection) {
-      val meshNodes = getSelectionMeshes(editor, graph, node)
-      if (meshNodes.any()) {
-        val material = Material(
-            shading = false,
-            color = selectionColor,
-        )
-        globalState.depthEnabled = false
-        val viewport = globalState.viewport
-        val offset = viewport.xy()
-        val dimensions = viewport.zw()
+  val graph = getCachedGraph(editor)
+  for (node in selection) {
+    val meshNodes = getSelectionMeshes(editor, graph, node)
+    if (meshNodes.any()) {
+      val material = Material(
+          shading = false,
+          color = selectionColor,
+      )
+      globalState.depthEnabled = false
+      val viewport = globalState.viewport
+      val offset = viewport.xy()
+      val dimensions = viewport.zw()
 
-        glStencilMask(0xFF)
-        clearStencil()
-        globalState.stencilTest = true
+      glStencilMask(0xFF)
+      clearStencil()
+      globalState.stencilTest = true
 
-        glStencilFunc(GL_ALWAYS, 1, 0xFF)
-        glStencilOp(GL_KEEP, GL_KEEP, GL_INCR)
-        glStencilMask(0xFF)
-        withoutFrontDrawing {
+      glStencilFunc(GL_ALWAYS, 1, 0xFF)
+      glStencilOp(GL_KEEP, GL_KEEP, GL_INCR)
+      glStencilMask(0xFF)
+      withoutFrontDrawing {
+        renderMeshNodes(sceneRenderer, material, meshNodes)
+      }
+
+      glStencilMask(0x00)
+      glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
+      glStencilFunc(GL_EQUAL, 0, 0xFF)
+
+      for (y in -1..1 step 2) {
+        for (x in -1..1 step 2) {
+          globalState.viewport = Vector4i(offset.x + x, offset.y + y, dimensions.x, dimensions.y)
           renderMeshNodes(sceneRenderer, material, meshNodes)
         }
-
-        glStencilMask(0x00)
-        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
-        glStencilFunc(GL_EQUAL, 0, 0xFF)
-
-        for (y in -1..1 step 2) {
-          for (x in -1..1 step 2) {
-            globalState.viewport = Vector4i(offset.x + x, offset.y + y, dimensions.x, dimensions.y)
-            renderMeshNodes(sceneRenderer, material, meshNodes)
-          }
-        }
-        globalState.depthEnabled = true
-        globalState.stencilTest = false
-        globalState.viewport = viewport
       }
+      globalState.depthEnabled = true
+      globalState.stencilTest = false
+      globalState.viewport = viewport
     }
   }
 }

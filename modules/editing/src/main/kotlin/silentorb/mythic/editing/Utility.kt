@@ -4,6 +4,7 @@ import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.GraphLibrary
 import silentorb.mythic.ent.Key
+import silentorb.mythic.ent.scenery.ExpansionLibrary
 import silentorb.mythic.scenery.ProjectionType
 import silentorb.mythic.scenery.SceneProperties
 import silentorb.mythic.spatial.*
@@ -51,6 +52,14 @@ fun getEditorCamera(editor: Editor, viewport: Key?): CameraRig? =
 
 fun getActiveEditorGraph(editor: Editor): Graph? =
     editor.staging ?: getLatestGraph(editor) ?: editor.graphLibrary[editor.state.graph]
+
+fun getExpansionLibrary(editor: Editor) =
+    ExpansionLibrary(
+        graphs = editor.graphLibrary,
+        expanders = editor.enumerations.expanders,
+        schema = editor.enumerations.schema,
+        meshShapes = editor.enumerations.meshShapes
+    )
 
 fun defaultViewports() =
     mapOf(

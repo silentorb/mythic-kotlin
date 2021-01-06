@@ -1,6 +1,7 @@
 package silentorb.mythic.editing.lookinglass
 
 import silentorb.mythic.editing.Editor
+import silentorb.mythic.editing.getExpansionLibrary
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Key
 import silentorb.mythic.ent.getGraphValue
@@ -18,7 +19,7 @@ typealias MeshNodes = List<Pair<Key, Matrix>>
 fun getSelectionMeshes(editor: Editor, graph: Graph, node: Key): List<Pair<Key, Matrix>> {
   val type = getGraphValue<Key>(graph, node, SceneProperties.type)
   val subGraph = if (type != null && editor.graphLibrary.containsKey(type))
-    expandInstances(editor.graphLibrary, editor.graphLibrary[type]!!)
+    expandInstances(getExpansionLibrary(editor), editor.graphLibrary[type]!!)
   else
     null
 

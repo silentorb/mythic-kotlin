@@ -8,7 +8,7 @@ import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 
-fun getTranslationRotationMatrix(graph: Graph, node: Key): Matrix {
+fun getTranslationRotationMatrix(graph: LooseGraph, node: Key): Matrix {
   val translation = getGraphValue<Vector3>(graph, node, SceneProperties.translation) ?: Vector3.zero
   val rotation = getGraphValue<Vector3>(graph, node, SceneProperties.rotation) ?: Vector3.zero
   return Matrix.identity
@@ -18,10 +18,10 @@ fun getTranslationRotationMatrix(graph: Graph, node: Key): Matrix {
       .rotateX(rotation.x)
 }
 
-fun getNodeScale(graph: Graph, node: Key): Vector3 =
+fun getNodeScale(graph: LooseGraph, node: Key): Vector3 =
     getGraphValue<Vector3>(graph, node, SceneProperties.scale) ?: Vector3.unit
 
-fun getNodeTransform(graph: Graph, node: Key): Matrix {
+fun getNodeTransform(graph: LooseGraph, node: Key): Matrix {
   val scale = getNodeScale(graph, node)
   val localTransform = getTranslationRotationMatrix(graph, node)
       .scale(scale)
@@ -95,49 +95,6 @@ fun getGraphRoots(graph: LooseGraph): Set<Key> =
     getGraphKeys(graph)
         .filter { key -> graph.none { it.source == key && it.property == SceneProperties.parent } }
         .toSet()
-
-fun expandInstance(graphs: GraphLibrary, key: Key, target: Key): LooseGraph {
-  val definition = graphs[target]
-  return if (definition == null)
-    setOf()
-  else {
-    val roots = getGraphRoots(definition)
-    val (rootEntries, withoutRoots) = definition
-        .partition { roots.contains(it.source) }
-
-    val inheritedProperties = rootEntries.map { it.copy(source = key) }
-    val transposed = transposeNamespace(withoutRoots.toSet(), key)
-    val expanded = expandInstances(graphs, transposed)
-    val newRoots = filterByPropertyValue(transposed, SceneProperties.parent, roots.first())
-    inheritedProperties + expanded - newRoots + newRoots.map { root -> root.copy(target = key) }
-  }
-}
-
-fun expandInstances(graphs: GraphLibrary, instances: LooseGraph, accumulator: Graph): Graph =
-    if (instances.none())
-      accumulator
-    else {
-      val key = instances.first().source
-      val targetEntries = instances
-          .filter { it.source == key }
-
-      val initial: LooseGraph = listOf()
-      val additions = targetEntries.fold(initial) { a, b -> a + expandInstance(graphs, key, b.target as Key) }
-      val nextInstances = instances - targetEntries
-      // Make sure accumulator is added to additions and not the other way around
-      // so that local properties override inherited properties
-      expandInstances(graphs, nextInstances, additions.toSet() + accumulator)
-    }
-
-fun expandInstances(graphs: GraphLibrary, graph: Graph): Graph {
-  val instances = filterByProperty<Key>(graph, SceneProperties.type)
-      .filter { graphs.containsKey(it.target) }
-
-  return expandInstances(graphs, instances, graph)
-}
-
-fun expandInstances(graphs: GraphLibrary, name: String): Graph =
-    expandInstances(graphs, graphs[name]!!)
 
 fun getShape(meshShapeMap: Map<Key, Shape>, graph: Graph, node: Key): Shape? {
   val shapeType = getGraphValue<Key>(graph, node, SceneProperties.collisionShape)
