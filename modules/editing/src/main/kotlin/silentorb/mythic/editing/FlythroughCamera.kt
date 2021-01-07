@@ -18,6 +18,7 @@ data class CameraRig(
     val lookVelocity: Vector2 = Vector2.zero,
     val pivotDistance: Float = 10f,
     val projection: ProjectionType = ProjectionType.perspective,
+    val angle: Float = 70f
 ) {
   @get:JsonIgnore
   val orientation: Quaternion

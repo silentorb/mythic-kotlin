@@ -141,13 +141,13 @@ fun loadProjectTree(rootPath: Path, rootName: String): FileItems {
   return fileItems
 }
 
-fun loadEditorState(filePath: String = defaultConfigFilePath): EditorState? =
+fun loadEditorState(filePath: String = defaultConfigFilePath): EditorPersistentState? =
     loadYamlFile(filePath)
 
-fun loadEditorStateOrDefault(filePath: String = defaultConfigFilePath): EditorState =
+fun loadEditorStateOrDefault(filePath: String = defaultConfigFilePath): EditorPersistentState =
     loadEditorState(filePath) ?: defaultEditorState()
 
-fun checkSaveEditorState(previous: EditorState?, next: EditorState?, filePath: String = defaultConfigFilePath) {
+fun checkSaveEditorState(previous: EditorPersistentState?, next: EditorPersistentState?, filePath: String = defaultConfigFilePath) {
   if (next != null && previous != next && !getDebugBoolean("EDITOR_DISABLE_SAVE")) {
     saveYamlFile(filePath, next)
   }
@@ -179,7 +179,7 @@ fun checkSaveGraph(previous: Editor, next: Editor) {
   if (getDebugBoolean("EDITOR_DISABLE_SAVE"))
     return
 
-  val graphName = next.state.graph
+  val graphName = next.persistentState.graph
   val nextGraph = next.graphLibrary[graphName]
   val previousGraph = previous.graphLibrary[graphName]
   if (graphName != null && previousGraph != null && nextGraph != null && previousGraph != nextGraph) {
@@ -191,7 +191,7 @@ fun checkSaveGraph(previous: Editor, next: Editor) {
 }
 
 fun checkSaveEditor(previous: Editor?, next: Editor?, filePath: String = defaultConfigFilePath) {
-  checkSaveEditorState(previous?.state, next?.state, filePath)
+  checkSaveEditorState(previous?.persistentState, next?.persistentState, filePath)
   if (previous != null && next != null) {
     checkSaveGraph(previous, next)
   }

@@ -3,8 +3,11 @@ package silentorb.mythic.editing.updating
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.Graph
+import silentorb.mythic.ent.Key
 import silentorb.mythic.ent.getGraphKeys
+import silentorb.mythic.ent.scenery.filterByAttribute
 import silentorb.mythic.ent.scenery.gatherChildren
+import silentorb.mythic.ent.scenery.getNodeTransform
 import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.haft.getMouseOffset
 import silentorb.mythic.happenings.Command
@@ -14,6 +17,7 @@ import silentorb.mythic.happenings.onSetCommand
 import silentorb.mythic.scenery.SceneProperties
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector2i
+import silentorb.mythic.spatial.toVector2
 import silentorb.mythic.spatial.toVector2i
 
 val updateFileSelection = handleCommands<NodeSelection> { command, selection ->
@@ -81,25 +85,25 @@ fun mouseViewport(editor: Editor, mousePosition: Vector2i): String? =
 
 fun updateSceneStates(commands: Commands, editor: Editor, graph: Graph?, mousePosition: Vector2i, mouseOffset: Vector2): SceneStates =
     if (graph == null)
-      editor.state.sceneStates
+      editor.persistentState.sceneStates
     else {
-      val graphId = editor.state.graph!!
+      val graphId = editor.persistentState.graph!!
       val viewports = (getViewports(editor) ?: defaultViewports())
           .mapValues { (key, viewport) ->
             updateViewport(editor, commands, mousePosition, mouseOffset, key, viewport)
           }
 
       val nextNodeSelection = updateNodeSelection(editor, graph)(commands, getNodeSelection(editor))
-      val previous = editor.state.sceneStates[graphId] ?: SceneState()
+      val previous = editor.persistentState.sceneStates[graphId] ?: SceneState()
       val next = previous.copy(
           viewports = viewports,
           nodeSelection = nextNodeSelection,
       )
-      editor.state.sceneStates + (graphId to next)
+      editor.persistentState.sceneStates + (graphId to next)
     }
 
-fun updateEditorState(commands: Commands, editor: Editor, graph: Graph?, mousePosition: Vector2i, mouseOffset: Vector2): EditorState {
-  val state = editor.state
+fun updateEditorState(commands: Commands, editor: Editor, graph: Graph?, mousePosition: Vector2i, mouseOffset: Vector2): EditorPersistentState {
+  val state = editor.persistentState
   val renderingMode = updateRenderingMode(commands, getRenderingMode(editor))
   return state.copy(
       graph = onSetCommand(commands, EditorCommands.setActiveGraph, state.graph),
@@ -125,15 +129,15 @@ fun updateSelectionQuery(editor: Editor, commands: Commands): SelectionQuery? {
     null
 }
 
-fun getNextGraph(editor: Editor, commands: Commands): Graph? {
+fun getNextGraph(editor: Editor, staging: Graph?, commands: Commands): Graph? {
   val commandTypes = commands.map { it.type }
   return if (commandTypes.contains(EditorCommands.setActiveGraph)) {
     editor.graphLibrary[commands.first { it.type == EditorCommands.setActiveGraph }.value]
   } else if (commandTypes.contains(EditorCommands.commitOperation) && editor.staging != null)
-    editor.staging
-  else if (!editor.graphLibrary.containsKey(editor.state.graph))
+    staging
+  else if (!editor.graphLibrary.containsKey(editor.persistentState.graph))
     null
-  else if (editor.staging != null)
+  else if (staging != null)
     getLatestGraph(editor)
   else {
     val activeGraph = getActiveEditorGraph(editor)
@@ -160,11 +164,42 @@ fun updateMouseAction(isInBounds: Boolean, mouseAction: MouseAction): MouseActio
     MouseAction.none
 }
 
+fun onTrySelectJoint(editor: Editor, mousePosition: Vector2, commands: Commands): Commands =
+    if (commands.any { it.type == EditorCommands.trySelectJoint }) {
+      val camera = getEditorCamera(editor, defaultViewportId)
+      val viewport = editor.viewportBoundsMap[defaultViewportId]
+      if (camera != null && viewport != null) {
+        val transform = getStandardPointTransform(viewport, camera)
+        val graph = getCachedGraph(editor)
+        val joints = filterByAttribute(graph, CommonEditorAttributes.joint)
+        val hit = joints
+            .firstOrNull { joint ->
+              val location = getNodeTransform(graph, joint).translation()
+              val point = transform(location)
+              mousePosition.distance(point) < 6f
+            }
+        if (hit != null) {
+          if (editor.selectedJoint == null)
+            listOf(Command(EditorCommands.selectJoint, hit))
+          else
+            listOf(
+                Command(EditorCommands.connectJoints, hit),
+                Command(EditorCommands.commitOperation),
+            )
+        } else
+          listOf()
+      } else
+        listOf()
+    } else
+      listOf()
+
+fun getNextSelectedJoint(commandType: Any, commands: Commands): Key? =
+    commands.firstOrNull { it.type == commandType }?.value as? Key
+
 fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector2, commands: Commands, editor: Editor): Editor {
-  val commandTypes = commands.map { it.type }
-  val nextGraph = getNextGraph(editor, commands)
-  val nextOperation = updateOperation(commandTypes, editor)
-  val nextStaging = updateStaging(editor, previousMousePosition, mouseOffset, commandTypes, nextOperation)
+  val nextStaging = updateStaging(editor, previousMousePosition, mouseOffset, commands, editor.operation)
+  val nextOperation = updateOperation(commands, editor.operation)
+  val nextGraph = getNextGraph(editor, nextStaging, commands)
   val mousePosition = (previousMousePosition + mouseOffset).toVector2i()
   val nextState = updateEditorState(commands, editor, nextGraph, mousePosition, mouseOffset)
   val nextHistory = updateHistory(nextGraph, getNodeSelection(nextState), nextState.graph, commands, editor.maxHistory, editor.history)
@@ -180,8 +215,13 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
   else
     editor.flyThrough
 
+  val selectedJoint = if (editor.operation?.type != OperationType.connecting)
+    null
+  else
+    editor.selectedJoint ?: getNextSelectedJoint(EditorCommands.selectJoint, commands)
+
   return editor.copy(
-      state = nextState,
+      persistentState = nextState,
       operation = nextOperation,
       staging = nextStaging,
       graphLibrary = updateSceneCaching(editor),
@@ -193,6 +233,7 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
       flyThrough = flyThrough,
       mouseActionViewport = mouseActionViewport,
       mouseAction = mouseAction,
+      selectedJoint = selectedJoint,
   )
 }
 
@@ -233,6 +274,8 @@ fun updateEditor(deviceStates: List<InputDeviceState>, commands: Commands, edito
     else
       listOf()
 
-    updateEditorFromCommands(previousMousePosition, mouseOffset, commands + additionalFlythroughCommands, editor)
+    val jointSelectCommands = onTrySelectJoint(editor, deviceStates.last().mousePosition, commands)
+    val finalCommands = commands + additionalFlythroughCommands + jointSelectCommands
+    updateEditorFromCommands(previousMousePosition, mouseOffset, finalCommands, editor)
   }
 }

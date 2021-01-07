@@ -8,7 +8,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 fun getSelectedFileItem(editor: Editor): FileItem? {
-  val selected = editor.state.fileSelection.firstOrNull()
+  val selected = editor.persistentState.fileSelection.firstOrNull()
   return if (selected == null)
     null
   else

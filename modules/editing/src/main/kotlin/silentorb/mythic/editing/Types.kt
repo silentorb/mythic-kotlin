@@ -83,8 +83,7 @@ data class SceneState(
 
 typealias SceneStates = Map<Key, SceneState>
 
-// Persistent State
-data class EditorState(
+data class EditorPersistentState(
     val graph: String? = null,
     val sceneStates: SceneStates = mapOf(),
     val renderingModes: Map<Key, RenderingMode> = mapOf(),
@@ -129,7 +128,7 @@ enum class MouseAction {
 
 data class Editor(
     val projectPath: Path,
-    val state: EditorState = EditorState(),
+    val persistentState: EditorPersistentState = EditorPersistentState(),
     val staging: Graph? = null,
     val clipboard: Graph? = null,
     val history: HistoryMap = mapOf(),
@@ -144,6 +143,7 @@ data class Editor(
     val flyThrough: Boolean = false,
     val mouseActionViewport: String? = null,
     val mouseAction: MouseAction = MouseAction.none,
+    val selectedJoint: Key? = null,
 )
 
 const val keypadKey = "Numpad"

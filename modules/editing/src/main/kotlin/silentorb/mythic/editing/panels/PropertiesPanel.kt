@@ -12,7 +12,7 @@ import silentorb.mythic.scenery.SceneProperties
 fun getAvailableTypes(editor: Editor): List<Key> =
     getSceneFiles(editor)
         .map { sceneFileNameWithoutExtension(it.name) }
-        .minus(editor.state.graph ?: "")
+        .minus(editor.persistentState.graph ?: "")
         .toList()
 
 fun drawFormField(editor: Editor, definition: PropertyDefinition, entry: Entry, id: String): Any {

@@ -9,8 +9,11 @@ object EditorCommands {
   val copyNode = "copyNode"
   val pasteNode = "pasteNode"
   val duplicateNode = "duplicateNode"
-  val startNodeSelect = " startNodeSelect"
-  val startNodeDrillDown = " startNodeDrillDown"
+  val startNodeSelect = "startNodeSelect"
+  val startNodeDrillDown = "startNodeDrillDown"
+  val trySelectJoint = "trySelectJoint"
+  val selectJoint = "selectJoint"
+  val connectJoints = "connectJoints"
 
   val setGraphValue = "setGraphValue"
   val replaceGraphValue = "replaceGraphValue"

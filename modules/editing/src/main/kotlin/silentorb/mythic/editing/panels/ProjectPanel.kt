@@ -86,5 +86,5 @@ fun renderProject(editor: Editor): PanelResponse =
       if (root == null)
         listOf()
       else
-        renderProjectTree(items, root, editor.state.fileSelection)
+        renderProjectTree(items, root, editor.persistentState.fileSelection)
     }

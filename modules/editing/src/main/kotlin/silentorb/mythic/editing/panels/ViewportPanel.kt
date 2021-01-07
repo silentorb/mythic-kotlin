@@ -8,7 +8,6 @@ import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.drawMenuBar
 import silentorb.mythic.editing.components.panel
 import silentorb.mythic.happenings.Command
-import silentorb.mythic.happenings.Commands
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector4i
 
@@ -51,13 +50,18 @@ fun drawViewportPanel(editor: Editor): PanelResponse =
           mousePosition.x < viewport.z &&
           mousePosition.y < viewport.w
 
-      val clickCommands =
-          if (ImGui.isMouseDoubleClicked(ImGuiMouseButton.Left) && isInBounds)
-            listOf(Command(EditorCommands.startNodeDrillDown, mousePosition))
-          else if (ImGui.isMouseClicked(ImGuiMouseButton.Left) && isInBounds)
-            listOf(Command(EditorCommands.startNodeSelect, mousePosition))
+      val clickCommands = if (isInBounds)
+        if (ImGui.isMouseDoubleClicked(ImGuiMouseButton.Left))
+          listOf(Command(EditorCommands.startNodeDrillDown, mousePosition))
+        else if (ImGui.isMouseClicked(ImGuiMouseButton.Left))
+          if (editor.operation?.type == OperationType.connecting)
+            listOf(Command(EditorCommands.trySelectJoint, mousePosition))
           else
-            listOf()
+            listOf(Command(EditorCommands.startNodeSelect, mousePosition))
+        else
+          listOf()
+      else
+        listOf()
 
       val viewportCommands = if (viewport != editor.viewportBoundsMap[defaultViewportId])
         listOf(Command(EditorCommands.setViewportBounds, mapOf(defaultViewportId to viewport)))
@@ -65,8 +69,16 @@ fun drawViewportPanel(editor: Editor): PanelResponse =
         listOf()
 
       if (editor.operation != null) {
-        ImGui.setCursorPos(60f, viewport.y + viewport.z - 20f)
-        ImGui.text(editor.operation.type.name)
+        val ki = ImGui.getCursorPosY()
+        ImGui.setCursorPos(100f, viewport.w - 50f)
+        ImGui.text(editor.operation.type.name.capitalize())
       }
+
+      val camera = getEditorCamera(editor, defaultViewportId)
+      if (camera != null) {
+        ImGui.setCursorPos(viewport.z - 100f, 50f)
+        ImGui.text(camera.projection.name.capitalize())
+      }
+
       viewportCommands + clickCommands
     }

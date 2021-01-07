@@ -13,7 +13,8 @@ fun mapCommands(bindings: Bindings, deviceStates: List<InputDeviceState>): Comma
 
 fun getImGuiCommands(editor: Editor): Commands {
   return listOfNotNull(
-      if (editor.operation != null && ImGui.isMouseClicked(ImGuiMouseButton.Left))
+      if (editor.operation != null && editor.operation.type != OperationType.connecting &&
+          ImGui.isMouseClicked(ImGuiMouseButton.Left))
         Command(EditorCommands.commitOperation)
       else
         null,

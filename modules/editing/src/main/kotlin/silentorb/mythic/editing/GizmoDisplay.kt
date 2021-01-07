@@ -87,12 +87,18 @@ fun drawJoints(editor: Editor, transform: ScreenTransform, drawList: ImDrawList)
     return
 
   val pointColor = ImColor.intToColor(255, 0, 255, 255)
+  val selectionColor = ImColor.intToColor(255, 128, 255, 255)
   val graph = getCachedGraph(editor)
   val joints = filterByAttribute(graph, CommonEditorAttributes.joint)
   for (joint in joints) {
     val location = getNodeTransform(graph, joint).translation()
     val point = transform(location)
-    drawList.addCircleFilled(point.x, point.y, 9f, pointColor)
+    val color = if (joint == editor.selectedJoint)
+      selectionColor
+    else
+      pointColor
+
+    drawList.addCircleFilled(point.x, point.y, 6f, color)
   }
 }
 

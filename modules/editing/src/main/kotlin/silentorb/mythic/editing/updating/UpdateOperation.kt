@@ -6,6 +6,8 @@ import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.getGraphValue
 import silentorb.mythic.ent.replaceValues
 import silentorb.mythic.ent.scenery.getNodeTransform
+import silentorb.mythic.happenings.Commands
+import silentorb.mythic.happenings.handleCommands
 import silentorb.mythic.scenery.SceneProperties
 import silentorb.mythic.spatial.*
 
@@ -28,8 +30,8 @@ fun restrictAxis(axis: Axis, previous: Operation?): Operation? =
           )
       )
 
-fun updateOperation(commandType: Any, operation: Operation?): Operation? {
-  return when (commandType) {
+val updateOperation = handleCommands<Operation?> { command, operation ->
+  when (command.type) {
     EditorCommands.startTranslating -> startOperation(OperationType.translate, operation)
     EditorCommands.startRotating -> startOperation(OperationType.rotate, operation)
     EditorCommands.startScaling -> startOperation(OperationType.scale, operation)
@@ -42,9 +44,6 @@ fun updateOperation(commandType: Any, operation: Operation?): Operation? {
     else -> operation
   }
 }
-
-fun updateOperation(commandTypes: List<Any>, editor: Editor): Operation? =
-    commandTypes.fold(editor.operation) { a, commandType -> updateOperation(commandType, a) }
 
 fun isInBounds(position: Vector2i, bounds: Vector4i): Boolean =
     position.x >= bounds.x &&
@@ -237,10 +236,19 @@ fun updateScaling(previousMousePosition: Vector2, mouseOffset: Vector2, editor: 
       }
     }
 
-fun updateConnecting(previousMousePosition: Vector2, mouseOffset: Vector2, editor: Editor, graph: Graph): Graph =
+fun updateConnecting(editor: Editor, commands: Commands, graph: Graph): Graph {
+  val firstJoint = editor.selectedJoint
+  val secondJoint = getNextSelectedJoint(EditorCommands.connectJoints, commands)
+  return if (firstJoint != null && secondJoint != null) {
+    val connectorNode = firstJoint.split(".").first()
+    graph + listOf(
+        Entry(connectorNode, SceneProperties.connects, "$firstJoint+$secondJoint")
+    )
+  } else
     graph
+}
 
-fun updateStaging(editor: Editor, previousMousePosition: Vector2, mouseOffset: Vector2, commandTypes: List<Any>): Graph? {
+fun updateStaging(editor: Editor, previousMousePosition: Vector2, mouseOffset: Vector2, commands: Commands): Graph? {
   val graph = editor.staging
   val operation = editor.operation
   return if (graph == null || operation == null)
@@ -250,16 +258,16 @@ fun updateStaging(editor: Editor, previousMousePosition: Vector2, mouseOffset: V
       OperationType.translate -> updateTranslation(previousMousePosition, mouseOffset, editor, graph)
       OperationType.rotate -> updateRotation(previousMousePosition, mouseOffset, editor, graph)
       OperationType.scale -> updateScaling(previousMousePosition, mouseOffset, editor, graph)
-      OperationType.connecting -> updateConnecting(previousMousePosition, mouseOffset, editor, graph)
+      OperationType.connecting -> updateConnecting(editor, commands, graph)
       else -> graph
     }
   }
 }
 
-fun updateStaging(editor: Editor, previousMousePosition: Vector2, mouseOffset: Vector2, commandTypes: List<Any>, nextOperation: Operation?): Graph? =
-    if (nextOperation == null || commandTypes.contains(EditorCommands.cancelOperation))
+fun updateStaging(editor: Editor, previousMousePosition: Vector2, mouseOffset: Vector2, commands: Commands, nextOperation: Operation?): Graph? =
+    if (nextOperation == null || commands.any { it.type == EditorCommands.cancelOperation })
       null
     else if (editor.staging == null || editor.operation != nextOperation)
       getLatestGraph(editor)
     else
-      updateStaging(editor, previousMousePosition, mouseOffset, commandTypes)
+      updateStaging(editor, previousMousePosition, mouseOffset, commands)

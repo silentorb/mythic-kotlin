@@ -85,6 +85,8 @@ fun renderTree(editor: Editor, graph: Graph?): PanelResponse =
         val rootNodes = getGraphKeys(graph)
             .plus(tree.values)
             .minus(tree.keys)
+//            .filter { !it.contains('.') }
+
         assert(rootNodes.size == 1)
         val rootId = rootNodes.first()
         renderTree(graph, tree, rootId, getNodeSelection(editor))

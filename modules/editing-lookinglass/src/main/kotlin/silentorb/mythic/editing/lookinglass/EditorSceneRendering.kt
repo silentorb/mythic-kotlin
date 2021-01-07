@@ -42,7 +42,7 @@ fun cameraRigToCamera(camera: CameraRig): Camera =
           camera.location + (camera.orientation.transform(Vector3(-50f, 0f, 0f))),
         orientation = camera.orientation,
         angleOrZoom = if (camera.projection == ProjectionType.perspective)
-          70f
+          camera.angle
         else
           getOrthoZoom(camera),
     )

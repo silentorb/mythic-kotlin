@@ -25,7 +25,7 @@ tailrec fun loadAllDependencies(editor: Editor, graphId: String, accumulator: Gr
 fun updateSceneCaching(editor: Editor): GraphLibrary {
   val graph = getActiveEditorGraph(editor)
   val library = editor.graphLibrary
-  val graphId = editor.state.graph
+  val graphId = editor.persistentState.graph
   return if (graph == null) {
     if (graphId == null)
       library

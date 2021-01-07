@@ -77,12 +77,12 @@ fun renameFileItemDialog(editor: Editor) = nameDialog(
     "Rename",
     EditorCommands.renameFileItemWithNameDialog,
     { text ->
-      val selected = editor.fileItems[editor.state.fileSelection.firstOrNull()]
+      val selected = editor.fileItems[editor.persistentState.fileSelection.firstOrNull()]
       if (selected == null)
         listOf()
       else
         listOf(Command(EditorCommands.moveFileItem, selected.fullPath to (selected.parent + "/" + text)))
     }
 ) {
-  editor.fileItems[editor.state.fileSelection.firstOrNull()]?.name
+  editor.fileItems[editor.persistentState.fileSelection.firstOrNull()]?.name
 }

@@ -10,25 +10,25 @@ import silentorb.mythic.scenery.SceneProperties
 import silentorb.mythic.spatial.*
 
 fun getLatestSnapshot(editor: Editor): Snapshot? =
-    editor.history[editor.state.graph]?.pastAndPresent?.lastOrNull()
+    editor.history[editor.persistentState.graph]?.pastAndPresent?.lastOrNull()
 
 fun getPreviousSnapshot(editor: Editor): Snapshot? =
-    editor.history[editor.state.graph]?.pastAndPresent?.dropLast(1)?.lastOrNull()
+    editor.history[editor.persistentState.graph]?.pastAndPresent?.dropLast(1)?.lastOrNull()
 
 fun getNextSnapshot(editor: Editor): Snapshot? =
-    editor.history[editor.state.graph]?.future?.firstOrNull()
+    editor.history[editor.persistentState.graph]?.future?.firstOrNull()
 
 fun getLatestGraph(editor: Editor): Graph? =
     getLatestSnapshot(editor)?.graph
 
 fun getSceneState(editor: Editor): SceneState? =
-    editor.state.sceneStates[editor.state.graph]
+    editor.persistentState.sceneStates[editor.persistentState.graph]
 
 fun getViewports(editor: Editor) =
     getSceneState(editor)?.viewports
 
 fun getRenderingMode(editor: Editor, viewport: Key = defaultViewportId): RenderingMode =
-    editor.state.renderingModes[viewport] ?: RenderingMode.lit
+    editor.persistentState.renderingModes[viewport] ?: RenderingMode.lit
 
 fun isManyToMany(editor: Editor, property:  String): Boolean =
     editor.enumerations.schema[property]?.manyToMany == true
@@ -44,14 +44,14 @@ fun getEditorViewport(editor: Editor, viewport: Key?): ViewportState? {
 fun getNodeSelection(editor: Editor): NodeSelection =
     getSceneState(editor)?.nodeSelection ?: setOf()
 
-fun getNodeSelection(state: EditorState): NodeSelection =
+fun getNodeSelection(state: EditorPersistentState): NodeSelection =
     state.sceneStates[state.graph]?.nodeSelection ?: setOf()
 
 fun getEditorCamera(editor: Editor, viewport: Key?): CameraRig? =
     getEditorViewport(editor, viewport)?.camera
 
 fun getActiveEditorGraph(editor: Editor): Graph? =
-    editor.staging ?: getLatestGraph(editor) ?: editor.graphLibrary[editor.state.graph]
+    editor.staging ?: getLatestGraph(editor) ?: editor.graphLibrary[editor.persistentState.graph]
 
 fun getExpansionLibrary(editor: Editor) =
     ExpansionLibrary(
@@ -69,7 +69,7 @@ fun defaultViewports() =
     )
 
 fun defaultEditorState() =
-    EditorState()
+    EditorPersistentState()
 
 fun axisMask(axis: Set<Axis>): List<Float> =
     (0 until 3).map { index ->
@@ -129,6 +129,6 @@ tailrec fun getGraphDependencies(
 
 fun createProjectionMatrix(camera: CameraRig, dimensions: Vector2i, distance: Float = 1000f): Matrix =
     if (camera.projection == ProjectionType.perspective)
-      createPerspectiveMatrix(dimensions, 45f, 0.01f, distance)
+      createPerspectiveMatrix(dimensions, camera.angle, 0.01f, distance)
     else
       createOrthographicMatrix(dimensions, getOrthoZoom(camera), 0.01f, distance)
