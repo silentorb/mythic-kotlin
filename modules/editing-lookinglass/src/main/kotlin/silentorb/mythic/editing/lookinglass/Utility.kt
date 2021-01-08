@@ -7,6 +7,7 @@ import silentorb.mythic.ent.Key
 import silentorb.mythic.ent.getGraphValue
 import silentorb.mythic.ent.mapByProperty
 import silentorb.mythic.ent.scenery.expandInstances
+import silentorb.mythic.ent.scenery.gatherChildren
 import silentorb.mythic.ent.scenery.getNodeTransform
 import silentorb.mythic.lookinglass.Material
 import silentorb.mythic.lookinglass.SceneRenderer
@@ -17,12 +18,13 @@ import silentorb.mythic.spatial.Matrix
 typealias MeshNodes = List<Pair<Key, Matrix>>
 
 fun getSelectionMeshes(editor: Editor, graph: Graph, node: Key): List<Pair<Key, Matrix>> {
-  val type = getGraphValue<Key>(graph, node, SceneProperties.type)
-  val subGraph = if (type != null && editor.graphLibrary.containsKey(type))
-    expandInstances(getExpansionLibrary(editor), editor.graphLibrary[type]!!)
-  else
-    null
-
+//  val type = getGraphValue<Key>(graph, node, SceneProperties.type)
+//  val subGraph2 = if (type != null && editor.graphLibrary.containsKey(type))
+//    expandInstances(getExpansionLibrary(editor), editor.graphLibrary[type]!!)
+//  else
+//    null
+  val nodes = gatherChildren(graph, node) + node
+  val subGraph = graph.filter { nodes.contains(it.source) }
   val localMesh = getGraphValue<Key>(graph, node, SceneProperties.mesh)
 
   val subGraphMeshNodes = if (subGraph != null)
@@ -35,7 +37,7 @@ fun getSelectionMeshes(editor: Editor, graph: Graph, node: Key): List<Pair<Key, 
   else
     mapOf()
 
-  val localTransform = getNodeTransform(graph, node)
+  val localTransform = Matrix.identity // getNodeTransform(graph, node)
   return selfMeshNodes
       .map { (_, mesh) ->
         mesh to localTransform
@@ -44,7 +46,7 @@ fun getSelectionMeshes(editor: Editor, graph: Graph, node: Key): List<Pair<Key, 
           subGraphMeshNodes
               .map { (key, mesh) ->
                 // TODO: For some reason the matrix integration is needing to be backwards from the main rendering pass
-                mesh to localTransform * getNodeTransform(subGraph!!, key)
+                mesh to getNodeTransform(graph, key)
               }
       )
 }

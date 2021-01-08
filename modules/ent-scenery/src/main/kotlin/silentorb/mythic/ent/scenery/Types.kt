@@ -13,5 +13,5 @@ data class ExpansionLibrary(
     val meshShapes: Map<String, Shape>,
 )
 
-typealias Expander = (ExpansionLibrary, LooseGraph, Key) -> LooseGraph
+typealias Expander = (ExpansionLibrary, LooseGraph, Key) -> LooseGraph?
 typealias Expanders = Map<Key, Expander>

@@ -8,15 +8,16 @@ fun expandInstance(library: ExpansionLibrary, node: Key, target: Key): LooseGrap
   return if (definition == null)
     setOf()
   else {
-    val roots = getGraphRoots(definition)
-    val (rootEntries, withoutRoots) = definition
+    val expanded1 = expandInstances(library, definition)
+    val roots = getGraphRoots(expanded1)
+    val (rootEntries, withoutRoots) = expanded1
         .partition { roots.contains(it.source) }
 
     val inheritedProperties = rootEntries.map { it.copy(source = node) }
     val transposed = transposeNamespace(withoutRoots.toSet(), node)
-    val expanded = expandInstances(library, transposed)
+    val expanded2 = expandInstances(library, transposed)
     val newRoots = filterByPropertyValue(transposed, SceneProperties.parent, roots.first())
-    inheritedProperties + expanded - newRoots + newRoots.map { root -> root.copy(target = node) }
+    inheritedProperties + expanded2 - newRoots + newRoots.map { root -> root.copy(target = node) }
   }
 }
 
@@ -43,6 +44,14 @@ fun expandInstances(library: ExpansionLibrary, instances: LooseGraph, accumulato
       expandInstances(library, nextInstances, graph)
     }
 
+fun expand(library: ExpansionLibrary, accumulator: LooseGraph, node: Key, type: Key, expander: Expander): LooseGraph {
+  val result = expander(library, accumulator, node)
+  return if (result == null)
+    accumulator
+  else
+    result - Entry(node, SceneProperties.type, type)
+}
+
 fun expandExpansions(library: ExpansionLibrary, instances: LooseGraph, accumulator: LooseGraph): LooseGraph =
     if (instances.none())
       accumulator
@@ -53,19 +62,20 @@ fun expandExpansions(library: ExpansionLibrary, instances: LooseGraph, accumulat
 
       val instanceTypes = instanceTypesEntries.map { it.target as Key }
 
-      val expander = library.expanders.entries.firstOrNull { (expander, _) ->
-        instanceTypes.contains(expander)
-      }?.value
+      val expander = library.expanders.entries
+          .firstOrNull { (expander, _) ->
+            instanceTypes.contains(expander)
+          }
 
       val expanded = if (expander == null)
         accumulator
       else
-        expander(library, accumulator, node)
+        expand(library, accumulator, node, expander.key, expander.value)
 
       val nextInstances = instances - instanceTypesEntries
 
       // Make sure expansions are added after everything else so they can override the others
-      expandExpansions(library, nextInstances, expanded)
+      expandExpansions(library, nextInstances, expanded ?: accumulator)
     }
 
 fun expandInstances(library: ExpansionLibrary, graph: Graph): Graph {
@@ -81,4 +91,4 @@ fun expandInstances(library: ExpansionLibrary, graph: Graph): Graph {
 }
 
 fun expandInstances(library: ExpansionLibrary, name: String): Graph =
-    expandInstances(library,  library.graphs[name]!!)
+    expandInstances(library, library.graphs[name]!!)

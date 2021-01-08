@@ -14,11 +14,14 @@ import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.typography.IndexedTextStyle
 
-fun nodesToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph: Graph): List<ElementGroup> {
+fun getElementNodes(graph: Graph): Set<String> {
   val tree = getSceneTree(graph)
-  val nodes = getGraphKeys(graph)
+  return getGraphKeys(graph)
       .plus(tree.values)
+}
 
+fun nodesToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph: Graph): List<ElementGroup> {
+  val nodes = getElementNodes(graph)
   return nodes.flatMap { node -> nodeToElements(meshesShapes, graphs, graph, node) }
 }
 
@@ -32,7 +35,10 @@ fun getGraphElementMaterial(graph: Graph, node: Key): Material? {
 
 fun instanceToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph: Graph, node: Key, subGraph: Graph): List<ElementGroup> {
   val instanceTransform = getNodeTransform(graph, node)
-  return nodesToElements(meshesShapes, graphs, subGraph)
+  val nodes = getElementNodes(graph) - node
+  return nodes
+      .flatMap { node -> nodeToElements(meshesShapes, graphs, graph, node) }
+//  return nodesToElements(meshesShapes, graphs, subGraph)
       .map { group ->
         group.copy(
             meshes = group.meshes
@@ -55,7 +61,7 @@ fun instanceToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, g
 fun nodeToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph: Graph, node: Key): List<ElementGroup> {
   val isSelected = false
   val mesh = getGraphValue<Key>(graph, node, SceneProperties.mesh)
-  val type = getGraphValue<Key>(graph, node, SceneProperties.type)
+  val types = getGraphValues<Key>(graph, node, SceneProperties.type)
   val text3d = getGraphValue<String>(graph, node, SceneProperties.text3d)
   val light = getGraphValue<String>(graph, node, SceneProperties.light)
   val collisionShape = if (isSelected)
@@ -63,26 +69,30 @@ fun nodeToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph
   else
     null
 
-  val subGraph = graphs[type]
+//  val subGraphs = types
+//      .minus(context)
+//      .mapNotNull { graphs[it] }
 
-  val instancedElements = if (subGraph != null && subGraph != graph)
-    instanceToElements(meshesShapes, graphs, graph, node, subGraph)
-  else
-    listOf()
+//  val instancedElements = subGraphs
+//      .flatMap { subGraph ->
+//        instanceToElements(meshesShapes, graphs, graph, node, subGraph)
+//      }
 
   val localElements = if (mesh == null && text3d == null && light == null && collisionShape == null)
     listOf()
   else {
-    val inheritedProperties = if (subGraph != null && subGraph != graph) {
-      val subgraphRoot = getGraphRoots(subGraph).first()
-      subGraph
-          .filter { it.source == subgraphRoot }
-          .map { it.copy(source = node) }
-          .toSet()
-    } else
-      setOf()
+//    val inheritedProperties = subGraphs
+//        .flatMap { subGraph ->
+//          val subgraphRoot = getGraphRoots(subGraph).first()
+//          subGraph
+//              .filter { it.source == subgraphRoot }
+//              .map { it.copy(source = node) }
+//              .toSet()
+//        }
+//        .toSet()
 
-    val combinedGraph = inheritedProperties + graph
+//    val combinedGraph = inheritedProperties + graph
+    val combinedGraph = graph
     val transform = getNodeTransform(combinedGraph, node)
     val meshElements = if (mesh != null) {
       val material = getGraphElementMaterial(combinedGraph, node)
@@ -146,5 +156,5 @@ fun nodeToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph
         )
     )
   }
-  return localElements + instancedElements
+  return localElements // + instancedElements
 }
