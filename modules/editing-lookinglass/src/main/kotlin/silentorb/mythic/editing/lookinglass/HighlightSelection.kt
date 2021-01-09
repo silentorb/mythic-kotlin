@@ -9,6 +9,7 @@ import silentorb.mythic.glowing.globalState
 import silentorb.mythic.glowing.withoutFrontDrawing
 import silentorb.mythic.lookinglass.Material
 import silentorb.mythic.lookinglass.SceneRenderer
+import silentorb.mythic.lookinglass.drawing.renderElementGroups
 import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.spatial.Vector4i
 
@@ -18,12 +19,13 @@ fun renderEditorSelection(editor: Editor, sceneRenderer: SceneRenderer) {
   val selection = getNodeSelection(editor)
   val graph = getCachedGraph(editor)
   for (node in selection) {
-    val meshNodes = getSelectionMeshes(editor, graph, node)
-    if (meshNodes.any()) {
+    val elementGroups = getSelectionMeshes(editor, graph, node)
+    if (elementGroups.any()) {
       val material = Material(
           shading = false,
           color = selectionColor,
       )
+      val groups = setElementGroupMaterial(material, elementGroups)
       globalState.depthEnabled = false
       val viewport = globalState.viewport
       val offset = viewport.xy()
@@ -37,7 +39,7 @@ fun renderEditorSelection(editor: Editor, sceneRenderer: SceneRenderer) {
       glStencilOp(GL_KEEP, GL_KEEP, GL_INCR)
       glStencilMask(0xFF)
       withoutFrontDrawing {
-        renderMeshNodes(sceneRenderer, material, meshNodes)
+        renderElementGroups(sceneRenderer, groups)
       }
 
       glStencilMask(0x00)
@@ -47,7 +49,7 @@ fun renderEditorSelection(editor: Editor, sceneRenderer: SceneRenderer) {
       for (y in -1..1 step 2) {
         for (x in -1..1 step 2) {
           globalState.viewport = Vector4i(offset.x + x, offset.y + y, dimensions.x, dimensions.y)
-          renderMeshNodes(sceneRenderer, material, meshNodes)
+          renderElementGroups(sceneRenderer, groups)
         }
       }
       globalState.depthEnabled = true

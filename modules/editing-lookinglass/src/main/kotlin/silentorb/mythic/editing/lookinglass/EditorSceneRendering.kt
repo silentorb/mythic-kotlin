@@ -49,11 +49,29 @@ fun cameraRigToCamera(camera: CameraRig): Camera =
 
 val elementsCache = singleValueCache<Graph, List<ElementGroup>>()
 
+fun prepareDynamicDepictions(depictions: EditorDepictionMap, graph: Graph, nodes: Set<String>): List<ElementGroup> =
+    nodes.mapNotNull { node ->
+      val typeEntries = graph.filter { it.source == node && it.property == SceneProperties.type }
+      val depictionKey = typeEntries.firstOrNull { depictions.keys.contains(it.target as Key) }?.target
+      val depiction = depictions[depictionKey]
+      if (depiction != null)
+        depiction(graph, node)
+      else
+        null
+    }
+
+fun nodesToElements(editor: Editor, graph: Graph, nodes: Set<String>) =
+    nodesToElements(editor.enumerations.meshShapes, graph, nodes) +
+        prepareDynamicDepictions(editor.enumerations.depictions, graph, nodes)
+
 fun sceneFromEditorGraph(meshShapes: Map<String, Shape>, editor: Editor, lightingConfig: LightingConfig, viewport: Key): GameScene {
   val graph = getCachedGraph(editor)
   val camera = cameraRigToCamera(getEditorCamera(editor, viewport) ?: CameraRig())
 
-  val initialElements = elementsCache(graph) { nodesToElements(meshShapes, editor.graphLibrary, graph) }
+  val initialElements = elementsCache(graph) {
+    val nodes = getElementNodes(graph)
+    nodesToElements(editor, graph, nodes)
+  }
 
   val elements = if (getRenderingMode(editor) == RenderingMode.wireframe) {
     val wireframeMaterial = Material(

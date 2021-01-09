@@ -13,7 +13,8 @@ data class Light(
     val color: Vector4, // w is brightness
     val offset: Vector3,
     val direction: Vector3? = null,
-    val range: Float
+    val range: Float,
+    val isDynamic: Boolean = true,
 )
 
 data class LightingConfig(

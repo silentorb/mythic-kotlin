@@ -142,3 +142,12 @@ fun renderElementGroup(renderer: SceneRenderer, camera: Camera, group: ElementGr
     drawText(renderer, text.content, text.position, text.style, text.depthOffset)
   }
 }
+
+fun renderElementGroups(renderer: SceneRenderer, camera: Camera, groups: Collection<ElementGroup>) {
+  for (group in groups) {
+    renderElementGroup(renderer, camera, group)
+  }
+}
+
+fun renderElementGroups(renderer: SceneRenderer, groups: Collection<ElementGroup>) =
+    renderElementGroups(renderer, renderer.camera, groups)

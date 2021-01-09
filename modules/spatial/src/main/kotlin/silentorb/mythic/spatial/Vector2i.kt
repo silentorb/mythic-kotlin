@@ -10,6 +10,7 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 
 private val _zero = Vector2i()
+private val _unit = Vector2i(1, 1)
 
 /**
  * Represents a 2D vector with single-precision.
@@ -410,6 +411,7 @@ data class Vector2i(
 
   companion object {
     val zero: Vector2i get() = _zero
+    val unit: Vector2i get() = _unit
     private val serialVersionUID = 1L
   }
 

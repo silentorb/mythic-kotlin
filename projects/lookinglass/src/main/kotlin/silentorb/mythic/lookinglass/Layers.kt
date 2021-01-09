@@ -3,6 +3,7 @@ package silentorb.mythic.lookinglass
 import silentorb.mythic.glowing.clearDepth
 import silentorb.mythic.glowing.globalState
 import silentorb.mythic.lookinglass.drawing.renderElementGroup
+import silentorb.mythic.lookinglass.drawing.renderElementGroups
 import silentorb.mythic.lookinglass.drawing.renderVolumes
 import silentorb.mythic.scenery.Camera
 
@@ -24,9 +25,7 @@ fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer,
   if (layer.resetDepth)
     clearDepth()
 
-  for (group in layer.elements) {
-    renderElementGroup(renderer, camera, group)
-  }
+  renderElementGroups(renderer, camera, layer.elements)
 
   if (callback != null) {
     callback(renderer, camera, layer)

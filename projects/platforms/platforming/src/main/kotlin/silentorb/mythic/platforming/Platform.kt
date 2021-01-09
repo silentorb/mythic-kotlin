@@ -35,7 +35,7 @@ enum class WindowMode {
 
 data class PlatformDisplayConfig(
     val fullscreenDimensions: Vector2i,
-    val windowedDimensions: Vector2i,
+    val windowedDimensions: Vector2i?,
     val windowMode: WindowMode = WindowMode.windowed,
     val vsync: Boolean,
     val multisamples: Int

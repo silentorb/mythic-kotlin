@@ -20,9 +20,13 @@ fun getElementNodes(graph: Graph): Set<String> {
       .plus(tree.values)
 }
 
-fun nodesToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph: Graph): List<ElementGroup> {
+fun nodesToElements(meshShapes: Map<String, Shape>, graph: Graph, nodes: Set<String>): List<ElementGroup> {
+  return nodes.flatMap { node -> nodeToElements(meshShapes, graph, node) }
+}
+
+fun nodesToElements(meshShapes: Map<String, Shape>, graph: Graph): List<ElementGroup> {
   val nodes = getElementNodes(graph)
-  return nodes.flatMap { node -> nodeToElements(meshesShapes, graphs, graph, node) }
+  return nodesToElements(meshShapes, graph, nodes)
 }
 
 fun getGraphElementMaterial(graph: Graph, node: Key): Material? {
@@ -37,7 +41,7 @@ fun instanceToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, g
   val instanceTransform = getNodeTransform(graph, node)
   val nodes = getElementNodes(graph) - node
   return nodes
-      .flatMap { node -> nodeToElements(meshesShapes, graphs, graph, node) }
+      .flatMap { node -> nodeToElements(meshesShapes, graph, node) }
 //  return nodesToElements(meshesShapes, graphs, subGraph)
       .map { group ->
         group.copy(
@@ -58,10 +62,9 @@ fun instanceToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, g
       }
 }
 
-fun nodeToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph: Graph, node: Key): List<ElementGroup> {
+fun nodeToElements(meshesShapes: Map<String, Shape>, graph: Graph, node: Key): List<ElementGroup> {
   val isSelected = false
   val mesh = getGraphValue<Key>(graph, node, SceneProperties.mesh)
-  val types = getGraphValues<Key>(graph, node, SceneProperties.type)
   val text3d = getGraphValue<String>(graph, node, SceneProperties.text3d)
   val light = getGraphValue<String>(graph, node, SceneProperties.light)
   val collisionShape = if (isSelected)
@@ -69,29 +72,9 @@ fun nodeToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph
   else
     null
 
-//  val subGraphs = types
-//      .minus(context)
-//      .mapNotNull { graphs[it] }
-
-//  val instancedElements = subGraphs
-//      .flatMap { subGraph ->
-//        instanceToElements(meshesShapes, graphs, graph, node, subGraph)
-//      }
-
   val localElements = if (mesh == null && text3d == null && light == null && collisionShape == null)
     listOf()
   else {
-//    val inheritedProperties = subGraphs
-//        .flatMap { subGraph ->
-//          val subgraphRoot = getGraphRoots(subGraph).first()
-//          subGraph
-//              .filter { it.source == subgraphRoot }
-//              .map { it.copy(source = node) }
-//              .toSet()
-//        }
-//        .toSet()
-
-//    val combinedGraph = inheritedProperties + graph
     val combinedGraph = graph
     val transform = getNodeTransform(combinedGraph, node)
     val meshElements = if (mesh != null) {
