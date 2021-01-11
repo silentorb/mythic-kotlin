@@ -1,6 +1,7 @@
 package silentorb.mythic.editing.updating
 
 import silentorb.mythic.editing.*
+import silentorb.mythic.editing.components.activeFieldId
 import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Key
@@ -234,6 +235,7 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
       mouseActionViewport = mouseActionViewport,
       mouseAction = mouseAction,
       selectedJoint = selectedJoint,
+      previousActiveField = activeFieldId,
   )
 }
 
@@ -264,8 +266,10 @@ fun prepareEditorUpdate(deviceStates: List<InputDeviceState>, editor: Editor): C
 }
 
 fun updateEditor(deviceStates: List<InputDeviceState>, commands: Commands, editor: Editor): Editor {
-  return if (isImGuiFieldActive())
-    editor
+  return if (isImGuiFieldActive() && editor.previousActiveField == activeFieldId)//!isTabPressed(deviceStates.last()))
+    editor.copy(
+        previousActiveField = activeFieldId,
+    )
   else {
     val previousMousePosition = deviceStates.dropLast(1).last().mousePosition
     val mouseOffset = getMouseOffset(deviceStates)

@@ -149,6 +149,7 @@ data class Editor(
     val mouseActionViewport: String? = null,
     val mouseAction: MouseAction = MouseAction.none,
     val selectedJoint: Key? = null,
+    val previousActiveField: String? = null,
 )
 
 const val keypadKey = "Numpad"

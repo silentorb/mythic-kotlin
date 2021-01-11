@@ -36,6 +36,7 @@ fun sceneTreeDragSource(graph: Graph, node: Key): Commands =
           listOf(
               Command(EditorCommands.setGraphValue, Entry(key, SceneProperties.parent, node)),
               Command(EditorCommands.setGraphValue, Entry(key, SceneProperties.type, typeName)),
+              Command(EditorCommands.setNodeSelection, setOf(key)),
           )
         },
         DraggingTypes.node to DragTarget({ payload ->
