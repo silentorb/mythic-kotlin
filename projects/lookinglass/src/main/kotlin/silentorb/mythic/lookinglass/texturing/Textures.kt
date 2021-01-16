@@ -43,7 +43,6 @@ fun loadTextureFromFile(loadImage: ImageLoader, path: Path, attributes: TextureA
 }
 
 fun deferImageFile(loadImage: ImageLoader, path: Path, attributes: TextureAttributes): DeferredTexture {
-//  val fullPath = getResourceUrl(path)!!.path.substring(1)
   val shortName = getFileShortName(path)
   val (truncated, newAttributes) = if (shortName.contains('.')) {
     val tokens = shortName.split('.')
@@ -82,7 +81,7 @@ fun loadDeferredTextures(list: List<DeferredTexture>): List<LoadedTextureData> {
 
 fun texturesToGpu(list: List<LoadedTextureData>): Map<String, Texture> {
   return list.map {
-    Pair(it.name, Texture(it.image.width, it.image.height, it.attributes, it.image.buffer))
+//    Pair(it.name, Texture(it.image.width, it.image.height, it.attributes, it.image.buffer))
     Pair(it.name, rawImageToTexture(it.image, it.attributes))
   }.associate { it }
 }

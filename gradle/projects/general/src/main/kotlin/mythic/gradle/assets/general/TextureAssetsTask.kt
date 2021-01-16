@@ -11,6 +11,7 @@ abstract class TextureAssetsTask : ConvertFilesTaskSimple() {
   override val inputExtension: String = "ffxml"
 
   override fun getArgs(inputPath: Path): List<String> {
-    return listOf(executablePath.get(), "${projectDir.get()}/scripts/textures.py", inputPath.fileName.toString().split(".").first())
+    val outputFile = inputPath.fileName.toString().split(".").dropLast(1).joinToString(".")
+    return listOf(executablePath.get(), "${projectDir.get()}/scripts/textures.py", outputFile)
   }
 }

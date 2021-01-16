@@ -30,3 +30,7 @@ fun scenePropertiesSchema(): PropertySchema = mapOf(
         manyToMany = true,
     )
 )
+
+object SceneTypes {
+  val billboard = "billboard"
+}

@@ -5,11 +5,12 @@ import silentorb.mythic.editing.panels.getAvailableTypes
 import silentorb.mythic.ent.*
 import silentorb.mythic.scenery.LightType
 import silentorb.mythic.scenery.SceneProperties
+import silentorb.mythic.scenery.SceneTypes
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.toList
 
 fun commonEditorAttributes() =
-    reflectProperties<String>(CommonEditorAttributes)
+    reflectProperties<String>(CommonEditorAttributes) + reflectProperties(SceneTypes)
 
 val vector3Serialization = Serialization(
     load = {
@@ -45,7 +46,6 @@ fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
     SceneProperties.texture to PropertyDefinition(
         displayName = "Texture",
         widget = dropDownWidget { it.enumerations.textures },
-        dependencies = setOf(SceneProperties.mesh),
         defaultValue = { editor -> editor.enumerations.textures.firstOrNull() },
     ),
     SceneProperties.text3d to PropertyDefinition(

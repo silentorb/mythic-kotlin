@@ -37,7 +37,7 @@ abstract class ConvertFilesTask : DefaultTask() {
       else if (change.changeType == ChangeType.REMOVED) {
         println("Ignoring removed ${change.file.name}")
       } else {
-        println("out of date: ${change.file.toPath()}")
+        println("[${change.changeType}] out of date: ${change.file.toPath()}")
         val args = getArgs(change.file.toPath())
         runProcess(args)
       }

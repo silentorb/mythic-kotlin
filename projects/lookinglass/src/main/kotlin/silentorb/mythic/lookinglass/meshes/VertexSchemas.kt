@@ -9,7 +9,7 @@ import silentorb.mythic.glowing.VertexSchema
 import silentorb.mythic.glowing.floatVertexAttribute
 
 data class VertexSchemas(
-    val billboard: VertexSchema,
+//    val billboard: VertexSchema,
     val imported: VertexSchema,
     val textured: VertexSchema,
     val flat: VertexSchema,
@@ -21,10 +21,10 @@ data class VertexSchemas(
 )
 
 fun createVertexSchemas() = VertexSchemas(
-    billboard = VertexSchema(listOf(
-        floatVertexAttribute(AttributeName.position, 3),
-        floatVertexAttribute(AttributeName.uv, 2)
-    )),
+//    billboard = VertexSchema(listOf(
+//        floatVertexAttribute(AttributeName.position, 3),
+//        floatVertexAttribute(AttributeName.uv, 2)
+//    )),
     shaded = VertexSchema(listOf(
         floatVertexAttribute(AttributeName.position, 3),
         floatVertexAttribute(AttributeName.normal, 3)

@@ -94,9 +94,16 @@ fun sceneFromEditorGraph(meshShapes: Map<String, Shape>, editor: Editor, lightin
   } else
     initialElements
 
+  val (particleGroups, solidGroups) = elements
+      .partition { group -> group.billboards.any() }
+
   val layers = listOf(
       SceneLayer(
-          elements = elements,
+          elements = solidGroups,
+          useDepth = true
+      ),
+      SceneLayer(
+          elements = particleGroups.sortedByDescending { it.billboards.first().position.distance(camera.position) },
           useDepth = true
       ),
   )

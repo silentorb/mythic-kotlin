@@ -2,14 +2,8 @@ package silentorb.mythic.ent.scenery
 
 import silentorb.mythic.ent.*
 import silentorb.mythic.glowing.DrawMethod
-import silentorb.mythic.lookinglass.ElementGroup
-import silentorb.mythic.lookinglass.Material
-import silentorb.mythic.lookinglass.MeshElement
-import silentorb.mythic.lookinglass.TextBillboard
-import silentorb.mythic.scenery.Light
-import silentorb.mythic.scenery.LightType
-import silentorb.mythic.scenery.SceneProperties
-import silentorb.mythic.scenery.Shape
+import silentorb.mythic.lookinglass.*
+import silentorb.mythic.scenery.*
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.typography.IndexedTextStyle
@@ -29,56 +23,28 @@ fun nodesToElements(meshShapes: Map<String, Shape>, graph: Graph): List<ElementG
   return nodesToElements(meshShapes, graph, nodes)
 }
 
-fun getGraphElementMaterial(graph: Graph, node: Key): Material? {
-  val texture = getGraphValue<Key>(graph, node, SceneProperties.texture)
-  return if (texture != null)
-    Material(texture = texture, shading = true)
-  else
-    null
-}
-
-fun instanceToElements(meshesShapes: Map<String, Shape>, graphs: GraphLibrary, graph: Graph, node: Key, subGraph: Graph): List<ElementGroup> {
-  val instanceTransform = getNodeTransform(graph, node)
-  val nodes = getElementNodes(graph) - node
-  return nodes
-      .flatMap { node -> nodeToElements(meshesShapes, graph, node) }
-//  return nodesToElements(meshesShapes, graphs, subGraph)
-      .map { group ->
-        group.copy(
-            meshes = group.meshes
-                .map { meshElement ->
-                  meshElement.copy(
-                      // TODO: For some reason the matrix integration is needing to be backwards from the highlight pass
-                      transform = instanceTransform * meshElement.transform
-                  )
-                },
-            textBillboards = group.textBillboards
-                .map { textBillboard ->
-                  textBillboard.copy(
-                      position = instanceTransform.translate(textBillboard.position).translation()
-                  )
-                }
-        )
-      }
-}
+fun getGraphElementMaterial(texture: String?): Material? =
+    if (texture != null)
+      Material(texture = texture, shading = true)
+    else
+      null
 
 fun nodeToElements(meshesShapes: Map<String, Shape>, graph: Graph, node: Key): List<ElementGroup> {
   val isSelected = false
   val mesh = getGraphValue<Key>(graph, node, SceneProperties.mesh)
   val text3d = getGraphValue<String>(graph, node, SceneProperties.text3d)
   val light = getGraphValue<String>(graph, node, SceneProperties.light)
+  val isBillboard = graph.contains(Entry(node, SceneProperties.type, SceneTypes.billboard))
+  val texture = getGraphValue<Key>(graph, node, SceneProperties.texture)
   val collisionShape = if (isSelected)
     getGraphValue<String>(graph, node, SceneProperties.collisionShape)
   else
     null
 
-  val localElements = if (mesh == null && text3d == null && light == null && collisionShape == null)
-    listOf()
-  else {
-    val combinedGraph = graph
-    val transform = getNodeTransform(combinedGraph, node)
+  return if (mesh != null || text3d != null || light != null || collisionShape != null || isBillboard) {
+    val transform = getNodeTransform(graph, node)
     val meshElements = if (mesh != null) {
-      val material = getGraphElementMaterial(combinedGraph, node)
+      val material = getGraphElementMaterial(texture)
 
       listOf(
           MeshElement(
@@ -131,13 +97,26 @@ fun nodeToElements(meshesShapes: Map<String, Shape>, graph: Graph, node: Key): L
     else
       listOf()
 
+    val billboards = if (isBillboard && texture != null)
+      listOf(
+      TexturedBillboard(
+          texture = texture,
+          position = transform.translation(),
+          color = Vector4(1f),
+          scale = transform.getScale().x,
+      )
+      )
+    else
+      listOf()
+
     listOf(
         ElementGroup(
+            billboards = billboards,
             textBillboards = textBillboards,
             meshes = meshElements + collisionMeshes,
             lights = lights,
         )
     )
-  }
-  return localElements // + instancedElements
+  } else
+    listOf()
 }

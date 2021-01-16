@@ -41,6 +41,14 @@ fun getMaxAnistropy(): Float {
   return _maxAnistropy!!
 }
 
+fun mapTextureFormat(format: TextureFormat) =
+    when (format) {
+      TextureFormat.rgb -> GL_RGB
+      TextureFormat.rgba -> GL_RGBA
+      TextureFormat.scalar -> GL_RED
+      TextureFormat.depth -> GL_DEPTH_COMPONENT
+    }
+
 fun initializeTexture(width: Int, height: Int, attributes: TextureAttributes, buffer: ByteBuffer? = null) {
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1) // Disable byte-alignment restriction
   val wrapMode = if (attributes.repeating)
@@ -69,12 +77,7 @@ fun initializeTexture(width: Int, height: Int, attributes: TextureAttributes, bu
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter)
 
-  val internalFormat = when (attributes.format) {
-    TextureFormat.rgb -> GL_RGB
-    TextureFormat.rgba -> GL_RGBA
-    TextureFormat.scalar -> GL_RED
-    TextureFormat.depth -> GL_DEPTH_COMPONENT
-  }
+  val internalFormat = mapTextureFormat(attributes.format)
 
   val storageUnit = when (attributes.storageUnit) {
     TextureStorageUnit.float -> GL_FLOAT
@@ -100,6 +103,7 @@ enum class TextureTarget {
 
 class Texture(val width: Int, val height: Int, val target: TextureTarget) {
   var id: Int = glGenTextures()
+  var format = GL_RGB
 
   init {
     if (target == TextureTarget.multisample) {
@@ -115,6 +119,7 @@ class Texture(val width: Int, val height: Int, val target: TextureTarget) {
 
   constructor(width: Int, height: Int, attributes: TextureAttributes, buffer: ByteBuffer? = null, target: TextureTarget = TextureTarget.general) : this(width, height, target) {
     initializeTexture(width, height, attributes, buffer)
+    format = mapTextureFormat(attributes.format)
   }
 
   fun dispose() {
@@ -124,7 +129,7 @@ class Texture(val width: Int, val height: Int, val target: TextureTarget) {
 
   fun update(buffer: ByteBuffer) {
     buffer.rewind()
-    glTextureSubImage2D(id, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer)
+    glTextureSubImage2D(id, 0, 0, 0, width, height, format, GL_UNSIGNED_BYTE, buffer)
   }
 
   fun update(buffer: FloatBuffer) {

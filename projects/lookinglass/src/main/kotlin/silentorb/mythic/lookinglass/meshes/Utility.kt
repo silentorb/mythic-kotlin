@@ -61,10 +61,10 @@ fun createLineMesh(vertexSchema: VertexSchema) =
 
 fun createBillboardMesh(vertexSchema: VertexSchema) =
     newGeneralMesh(vertexSchema, PrimitiveType.loops, listOf(
-        0f, 1f, 0f, 0f, 1f,
-        0f, 0f, 0f, 0f, 0f,
-        1f, 0f, 0f, 1f, 0f,
-        1f, 1f, 0f, 1f, 1f
+        0f, 1f, 0f, 1f, 0f, 0f, 0f, 1f,
+        0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f,
+        1f, 0f, 0f, 1f, 0f, 0f, 1f, 0f,
+        1f, 1f, 0f, 1f, 0f, 0f, 1f, 1f
     ))
 
 typealias Lod = Map<Float, GeneralMesh>

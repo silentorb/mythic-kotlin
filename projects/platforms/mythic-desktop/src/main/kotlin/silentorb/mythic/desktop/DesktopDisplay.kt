@@ -1,8 +1,7 @@
 package silentorb.mythic.desktop
 
 import org.lwjgl.glfw.GLFW.*
-import org.lwjgl.stb.STBImage.stbi_failure_reason
-import org.lwjgl.stb.STBImage.stbi_load_from_memory
+import org.lwjgl.stb.STBImage.*
 import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil
 import silentorb.mythic.platforming.*
@@ -119,7 +118,7 @@ val loadImageFromFile: ImageLoader = { filePath ->
 
     val imageBuffer = ioResourceToByteBuffer(filePath)
 
-//    stbi_set_flip_vertically_on_load(true)
+    stbi_set_flip_vertically_on_load(true)
     buffer = stbi_load_from_memory(imageBuffer, widthBuffer, heightBuffer, channelBuffer, 0)
     if (buffer == null) {
       val reason = stbi_failure_reason()
