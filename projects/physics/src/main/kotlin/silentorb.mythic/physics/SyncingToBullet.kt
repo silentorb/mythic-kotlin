@@ -102,6 +102,22 @@ fun createGhostBody(transform: Matrix, shape: btCollisionShape): btCollisionObje
   return btBody
 }
 
+fun createStaticBody(body: Body, shape: btCollisionShape): btCollisionObject {
+  val btBody = btCollisionObject()
+  btBody.collisionShape = shape
+  btBody.worldTransform = toGdxMatrix4(getBodyTransform(body))
+  return btBody
+}
+
+fun createGhostBody(body: Body, shape: btCollisionShape): btCollisionObject {
+  val btBody = btCollisionObject()
+  btBody.collisionShape = shape
+  btBody.worldTransform = toGdxMatrix4(getBodyTransform(body))
+//  val j = btBody.collisionFlags
+  btBody.collisionFlags = btBody.collisionFlags or btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE
+  return btBody
+}
+
 fun initializeHinge(bulletState: BulletState, bulletBody: btRigidBody, hingeInfo: HingeConstraint, body: Body) {
   val hinge = btHingeConstraint(bulletBody, toGdxVector3(hingeInfo.pivot * body.scale), toGdxVector3(hingeInfo.axis), true)
 //          hinge.enableAngularMotor(true, 1f, 1f)
@@ -176,10 +192,27 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
         }
       }
 
+  val newStaticBodies2 = deck.collisionObjects
+      .filterKeys { key ->
+        !deck.dynamicBodies.containsKey(key) && !bulletState.staticBodies.containsKey(key)
+      }
+      .map { (key, shapeDefinition) ->
+        val body = deck.bodies[key]!!
+        val shape = createCollisionShape(shapeDefinition.shape, body.scale)
+        val collisionObject = if (shapeDefinition.isSolid)
+          createStaticBody(body, shape)
+        else
+          createGhostBody(body, shape)
+
+        collisionObject.userData = key
+        bulletState.dynamicsWorld.addCollisionObject(collisionObject, shapeDefinition.groups, shapeDefinition.mask)
+        Pair(key, collisionObject)
+      }
+
   bulletState.dynamicBodies = bulletState.dynamicBodies
       .plus(newDynamicBodies)
 
-  bulletState.staticBodies = bulletState.staticBodies.plus(newStaticBodies)
+  bulletState.staticBodies = bulletState.staticBodies + newStaticBodies + newStaticBodies2
 
   if (!bulletState.isMapSynced) {
     bulletState.isMapSynced = true

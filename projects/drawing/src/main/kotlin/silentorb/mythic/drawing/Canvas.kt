@@ -35,10 +35,10 @@ fun createSquareMesh(vertexSchema: VertexSchema) =
 
 fun createImageMesh(vertexSchema: VertexSchema) =
     SimpleMesh(vertexSchema, listOf(
-        0f, 1f, 0f, 1f,
-        0f, 0f, 0f, 0f,
-        1f, 0f, 1f, 0f,
-        1f, 1f, 1f, 1f
+        0f, 0f, 0f, 1f,
+        0f, 1f, 0f, 0f,
+        1f, 1f, 1f, 0f,
+        1f, 0f, 1f, 1f,
     ))
 
 fun createCircleList(radius: Float, count: Int, offset: Float = 0f, direction: Float = 1f): ArrayList<Float> {
