@@ -2,7 +2,7 @@ package silentorb.mythic.ent
 
 interface GraphStore {
   fun filterByProperty(property: String): List<AnyEntry>
-  fun <V> filterByPropertyAndValue(property: String, value: V): List<AnyEntry>
+  fun <V> filterByPropertyAndValue(property: String, value: V): List<Any>
   fun filterByEntity(entity: Any): List<AnyEntry>
   fun filterByEntityAndProperty(entity: Any, property: String): List<AnyEntry>
 

@@ -124,3 +124,11 @@ fun mergeGraphsWithRenaming(primary: Graph, secondary: Graph): Graph {
 
   return primary + updatedSecondary
 }
+typealias SerializationMethod = (Any) -> Any
+
+data class Serialization(
+    val load: SerializationMethod,
+    val save: SerializationMethod,
+)
+
+typealias PropertiesSerialization = Map<String, Serialization>

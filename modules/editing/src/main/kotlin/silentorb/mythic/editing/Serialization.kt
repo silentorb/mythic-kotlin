@@ -8,10 +8,7 @@ import silentorb.mythic.configuration.loadJsonFile
 import silentorb.mythic.configuration.loadYamlFile
 import silentorb.mythic.configuration.saveYamlFile
 import silentorb.mythic.debugging.getDebugBoolean
-import silentorb.mythic.ent.Entry
-import silentorb.mythic.ent.Graph
-import silentorb.mythic.ent.GraphFile
-import silentorb.mythic.ent.GraphLibrary
+import silentorb.mythic.ent.*
 import silentorb.mythic.resource_loading.getUrlPath
 import silentorb.mythic.resource_loading.listFilesAndFoldersRecursive
 import silentorb.mythic.resource_loading.listFilesRecursive
@@ -55,11 +52,11 @@ fun serializeGraph(propertyDefinitions: PropertyDefinitions, graph: Graph) =
       listOf(it.source, it.property, value)
     }
 
-fun deserializeGraph(propertyDefinitions: PropertyDefinitions, file: GraphFile) =
+fun deserializeGraph(propertiesSerialization: PropertiesSerialization, file: GraphFile) =
     file.graph
         .map {
           val property = it[1].toString()
-          val serialization = propertyDefinitions[property]?.serialization
+          val serialization = propertiesSerialization[property]
           val value = if (serialization != null)
             serialization.load(it[2])
           else
@@ -69,11 +66,11 @@ fun deserializeGraph(propertyDefinitions: PropertyDefinitions, file: GraphFile) 
         }
         .toSet()
 
-fun loadGraph(propertyDefinitions: PropertyDefinitions, path: String): Graph =
-    deserializeGraph(propertyDefinitions, loadJsonFile(path))
+fun loadGraph(propertiesSerialization: PropertiesSerialization, path: String): Graph =
+    deserializeGraph(propertiesSerialization, loadJsonFile(path))
 
-fun loadGraphResource(propertyDefinitions: PropertyDefinitions, path: String): Graph =
-    deserializeGraph(propertyDefinitions, loadSpatialJsonResource(path))
+fun loadGraphResource(propertiesSerialization: PropertiesSerialization, path: String): Graph =
+    deserializeGraph(propertiesSerialization, loadSpatialJsonResource(path))
 
 fun saveGraph(propertyDefinitions: PropertyDefinitions, path: String, graph: Graph) =
     Files.newBufferedWriter(Paths.get(path)).use { stream ->
@@ -110,7 +107,7 @@ fun saveGraph(propertyDefinitions: PropertyDefinitions, path: String, graph: Gra
       stream.newLine()
     }
 
-fun loadGraphLibrary(propertyDefinitions: PropertyDefinitions, directoryPath: String): GraphLibrary {
+fun loadGraphLibrary(propertiesSerialization: PropertiesSerialization, directoryPath: String): GraphLibrary {
   val rootPath = getUrlPath(directoryPath)
   val resourcesPath = rootPath.getRoot().resolve(rootPath.subpath(0, rootPath.nameCount - Path.of(directoryPath).nameCount))
   val files = listFilesRecursive(rootPath)
@@ -118,7 +115,7 @@ fun loadGraphLibrary(propertyDefinitions: PropertyDefinitions, directoryPath: St
     val name = filePath.fileName.toString().dropLast(sceneFileExtension.length)
     val relativePath = resourcesPath.relativize(filePath)
     val path = relativePath.toString().replace("\\", "/")
-    val graph = loadGraphResource(propertyDefinitions, path)
+    val graph = loadGraphResource(propertiesSerialization, path)
     name to graph
   }
   return library
@@ -172,7 +169,7 @@ fun loadGraph(editor: Editor, graphName: String): Graph? {
   return if (filePath == null)
     null
   else
-    loadGraph(editor.enumerations.propertyDefinitions, filePath)
+    loadGraph(editor.enumerations.propertiesSerialization, filePath)
 }
 
 fun checkSaveGraph(previous: Editor, next: Editor) {

@@ -29,13 +29,6 @@ object DraggingTypes {
   const val node = "node"
 }
 
-typealias SerializationMethod = (Any) -> Any
-
-data class Serialization(
-    val load: SerializationMethod,
-    val save: SerializationMethod,
-)
-
 typealias DefaultValueSource = (Editor) -> Any?
 typealias PropertyWidget = (Editor, Entry, String) -> Any
 
@@ -96,6 +89,7 @@ typealias EditorDepictionMap = Map<Key, EditorDepiction>
 
 data class EditorEnumerations(
     val propertyDefinitions: PropertyDefinitions,
+    val propertiesSerialization: PropertiesSerialization,
     val schema: PropertySchema = mapOf(),
     val attributes: List<Key> = listOf(),
     val textures: List<Key> = listOf(),

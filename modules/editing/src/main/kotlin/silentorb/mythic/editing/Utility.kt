@@ -4,6 +4,7 @@ import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.GraphLibrary
 import silentorb.mythic.ent.Key
+import silentorb.mythic.ent.PropertiesSerialization
 import silentorb.mythic.ent.scenery.ExpansionLibrary
 import silentorb.mythic.scenery.ProjectionType
 import silentorb.mythic.scenery.SceneProperties
@@ -30,7 +31,7 @@ fun getViewports(editor: Editor) =
 fun getRenderingMode(editor: Editor, viewport: Key = defaultViewportId): RenderingMode =
     editor.persistentState.renderingModes[viewport] ?: RenderingMode.lit
 
-fun isManyToMany(editor: Editor, property:  String): Boolean =
+fun isManyToMany(editor: Editor, property: String): Boolean =
     editor.enumerations.schema[property]?.manyToMany == true
 
 fun getEditorViewport(editor: Editor, viewport: Key?): ViewportState? {
@@ -132,3 +133,10 @@ fun createProjectionMatrix(camera: CameraRig, dimensions: Vector2i, distance: Fl
       createPerspectiveMatrix(dimensions, camera.angle, 0.01f, distance)
     else
       createOrthographicMatrix(dimensions, getOrthoZoom(camera), 0.01f, distance)
+
+fun extractPropertiesSerialization(properties: PropertyDefinitions): PropertiesSerialization =
+    properties
+        .filterValues { it.serialization != null }
+        .mapValues { (_, property) ->
+          property.serialization!!
+        }
