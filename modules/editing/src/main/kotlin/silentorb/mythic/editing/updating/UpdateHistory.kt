@@ -3,6 +3,7 @@ package silentorb.mythic.editing.updating
 import silentorb.mythic.editing.*
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Key
+import silentorb.mythic.ent.LooseGraph
 import silentorb.mythic.happenings.Commands
 
 fun undoEdit(history: EditHistory): EditHistory {
@@ -29,12 +30,12 @@ fun redoEdit(history: EditHistory): EditHistory {
     )
 }
 
-fun appendHistory(graph: Graph, nodeSelection: NodeSelection, maxDepth: Int, history: EditHistory): EditHistory =
+fun appendHistory(graph: LooseGraph, nodeSelection: NodeSelection, maxDepth: Int, history: EditHistory): EditHistory =
     EditHistory(
         pastAndPresent = history.pastAndPresent
             .plus(
                 Snapshot(
-                    graph = graph,
+                    graph = graph.toSet(),
                     nodeSelection = nodeSelection,
                 )
             )
@@ -42,7 +43,7 @@ fun appendHistory(graph: Graph, nodeSelection: NodeSelection, maxDepth: Int, his
         future = listOf(),
     )
 
-fun shouldAppendHistory(nextGraph: Graph, nodeSelection: NodeSelection, history: EditHistory): Boolean {
+fun shouldAppendHistory(nextGraph: LooseGraph, nodeSelection: NodeSelection, history: EditHistory): Boolean {
   val pastAndPresent = history.pastAndPresent
   val last = pastAndPresent.lastOrNull()
   if (last?.graph != nextGraph)
@@ -55,7 +56,7 @@ fun shouldAppendHistory(nextGraph: Graph, nodeSelection: NodeSelection, history:
 }
 
 fun updateHistory(
-    nextGraph: Graph,
+    nextGraph: LooseGraph,
     nodeSelection: NodeSelection,
     commands: Commands,
     maxDepth: Int,
@@ -71,7 +72,7 @@ fun updateHistory(
     }
 
 fun updateHistory(
-    nextGraph: Graph?,
+    nextGraph: LooseGraph?,
     nodeSelection: NodeSelection,
     graphId: Key?,
     commands: Commands,

@@ -44,10 +44,10 @@ fun getGraphKeys(graph: LooseGraph) =
         .map { it.source }
         .toSet()
 
-inline fun <reified T> filterByProperty(graph: LooseGraph, relationship: Key): ListGraph =
+inline fun <reified T> filterByPropertyStrict(graph: LooseGraph, relationship: Key): ListGraph =
     graph.filter { it.property == relationship && it.target is T }
 
-fun filterByProperty2(graph: LooseGraph, relationship: Key): ListGraph =
+fun filterByProperty(graph: LooseGraph, relationship: Key): ListGraph =
     graph.filter { it.property == relationship }
 
 inline fun <reified T> filterByPropertyValue(graph: LooseGraph, relationship: Key, value: T): ListGraph =
@@ -81,7 +81,7 @@ fun replaceValues(graph: LooseGraph, additional: LooseGraph): Graph =
         .plus(additional)
         .toSet()
 
-fun renameNode(graph: Graph, previous: Key, next: Key): Graph =
+fun renameNode(graph: LooseGraph, previous: Key, next: Key): Graph =
     graph.map {
       when {
         it.source == previous -> it.copy(source = next)
@@ -114,7 +114,7 @@ fun uniqueNodeName(keys: Set<Key>, name: String): String {
   }
 }
 
-fun mergeGraphsWithRenaming(primary: Graph, secondary: Graph): Graph {
+fun mergeGraphsWithRenaming(primary: LooseGraph, secondary: LooseGraph): LooseGraph {
   val primaryKeys = getGraphKeys(primary)
   val secondaryKeys = getGraphKeys(secondary)
   val duplicates = primaryKeys.intersect(secondaryKeys)

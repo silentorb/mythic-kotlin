@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-  implementation("io.imgui.java:imgui-java-binding:1.78-1.3.0")
+  api("io.imgui.java:imgui-java-binding:1.78-1.3.0")
   implementation("io.imgui.java:imgui-java-lwjgl3:1.78-1.3.0")
   runtimeOnly("io.imgui.java:imgui-java-natives-windows:1.78-1.3.0")
 

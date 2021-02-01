@@ -15,10 +15,9 @@ import silentorb.mythic.spatial.toList
 
 fun <T>wrapSimpleWidget(widget: (Entry) -> T): PropertyWidget = { _, entry, _ -> widget(entry) as Any }
 
-fun dropDownWidget(options: List<Key>, entry: Entry): String {
-  val value = entry.target as String
+fun dropDownWidget(options: List<Key>, id: String, value: String): String {
   var nextValue = value
-  ImGui.pushID(entry.property)
+  ImGui.pushID(id)
   if (ImGui.beginCombo("", value)) {
     for (option in options.sorted()) {
       if (ImGui.selectable(option)) {
@@ -33,6 +32,9 @@ fun dropDownWidget(options: List<Key>, entry: Entry): String {
   ImGui.popID()
   return nextValue
 }
+
+fun dropDownWidget(options: List<Key>, entry: Entry): String =
+    dropDownWidget(options, entry.property, entry.target as String)
 
 fun <T> labeledDropDownWidget(options: Map<T, String>, entry: Entry): T {
   val value = entry.target as T
@@ -121,12 +123,13 @@ fun decimalTextField(entry: Entry): Float {
   return result.toFloatOrNull() ?: value
 }
 
-fun integerTextField(entry: Entry): Int {
-  val value = entry.target as Int
-  val owner = "${entry.source}.${entry.property}"
-  val result = textField(owner, value.toString(), ImGuiInputTextFlags.CharsDecimal)
+fun integerTextField(id: String, value: Int): Int {
+  val result = textField(id, value.toString(), ImGuiInputTextFlags.CharsDecimal)
   return result.toIntOrNull() ?: value
 }
+
+fun integerTextField(entry: Entry): Int =
+    integerTextField("${entry.source}.${entry.property}", entry.target as Int)
 
 val propertyDecimalTextField: PropertyWidget = wrapSimpleWidget(::decimalTextField)
 val propertyIntegerTextField: PropertyWidget = wrapSimpleWidget(::integerTextField)
@@ -150,7 +153,6 @@ fun spatialWidget(entry: Entry): Vector3 {
   ImGui.sameLine()
   val z = axisInput(owner, "Z", value.z)
   return Vector3(x, y, z)
-//  return Vector3(x, 0f, 0f)
 }
 
 val propertySpatialWidget: PropertyWidget = wrapSimpleWidget(::spatialWidget)

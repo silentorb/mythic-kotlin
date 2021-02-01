@@ -5,6 +5,7 @@ import silentorb.mythic.editing.components.activeFieldId
 import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Key
+import silentorb.mythic.ent.LooseGraph
 import silentorb.mythic.ent.getGraphKeys
 import silentorb.mythic.ent.scenery.filterByAttribute
 import silentorb.mythic.ent.scenery.gatherChildren
@@ -28,7 +29,7 @@ val updateFileSelection = handleCommands<NodeSelection> { command, selection ->
   }
 }
 
-fun gatherSelectionHierarchy(graph: Graph, selection: NodeSelection): Graph {
+fun gatherSelectionHierarchy(graph: LooseGraph, selection: NodeSelection): Graph {
   val selectionAndChildren = selection + gatherChildren(graph, selection)
   return graph
       .filter {
@@ -84,7 +85,7 @@ fun isInViewportBounds(editor: Editor, mousePosition: Vector2i, viewport: String
 fun mouseViewport(editor: Editor, mousePosition: Vector2i): String? =
     editor.viewportBoundsMap.keys.firstOrNull { isInViewportBounds(editor, mousePosition, it) }
 
-fun updateSceneStates(commands: Commands, editor: Editor, graph: Graph?, mousePosition: Vector2i, mouseOffset: Vector2): SceneStates =
+fun updateSceneStates(commands: Commands, editor: Editor, graph: LooseGraph?, mousePosition: Vector2i, mouseOffset: Vector2): SceneStates =
     if (graph == null)
       editor.persistentState.sceneStates
     else {
@@ -103,7 +104,7 @@ fun updateSceneStates(commands: Commands, editor: Editor, graph: Graph?, mousePo
       editor.persistentState.sceneStates + (graphId to next)
     }
 
-fun updateEditorState(commands: Commands, editor: Editor, graph: Graph?, mousePosition: Vector2i, mouseOffset: Vector2): EditorPersistentState {
+fun updateEditorState(commands: Commands, editor: Editor, graph: LooseGraph?, mousePosition: Vector2i, mouseOffset: Vector2): EditorPersistentState {
   val state = editor.persistentState
   val renderingMode = updateRenderingMode(commands, getRenderingMode(editor))
   return state.copy(
@@ -130,7 +131,7 @@ fun updateSelectionQuery(editor: Editor, commands: Commands): SelectionQuery? {
     null
 }
 
-fun getNextGraph(editor: Editor, staging: Graph?, commands: Commands): Graph? {
+fun getNextGraph(editor: Editor, staging: Graph?, commands: Commands): LooseGraph? {
   val commandTypes = commands.map { it.type }
   return if (commandTypes.contains(EditorCommands.setActiveGraph)) {
     editor.graphLibrary[commands.first { it.type == EditorCommands.setActiveGraph }.value]

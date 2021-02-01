@@ -8,7 +8,7 @@ import silentorb.mythic.ent.scenery.getGraphRoots
 import silentorb.mythic.happenings.handleCommands
 import silentorb.mythic.scenery.SceneProperties
 
-fun duplicateNode(graph: Graph, node: Key): Graph {
+fun duplicateNode(graph: LooseGraph, node: Key): LooseGraph {
   val parent = getGraphValue<String>(graph, node, SceneProperties.parent)
   return if (parent == null)
     graph
@@ -20,7 +20,7 @@ fun duplicateNode(graph: Graph, node: Key): Graph {
   }
 }
 
-fun updateSceneGraph(editor: Editor) = handleCommands<Graph> { command, graph ->
+fun updateSceneGraph(editor: Editor) = handleCommands<LooseGraph> { command, graph ->
   val selection = getNodeSelection(editor)
 
   when (command.type) {

@@ -55,7 +55,7 @@ fun toSpatialEntries(matrix: Matrix, node: Key): AnyGraph {
   )
 }
 
-tailrec fun gatherChildren(graph: Graph, nodes: Set<Key>, accumulator: Set<Key> = setOf()): Set<Key> {
+tailrec fun gatherChildren(graph: LooseGraph, nodes: Set<Key>, accumulator: Set<Key> = setOf()): Set<Key> {
   val next = nodes
       .flatMap { node ->
         graph.filter { it.property == SceneProperties.parent && it.target == node }
