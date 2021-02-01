@@ -114,14 +114,25 @@ fun uniqueNodeName(keys: Set<Key>, name: String): String {
   }
 }
 
+fun renameNodes(duplicates: List<String>, allKeys: Set<String>, graph: LooseGraph): LooseGraph =
+    if (duplicates.none())
+      graph
+    else {
+      val next = duplicates.first()
+      val newName = uniqueNodeName(allKeys, next)
+      val nextGraph = renameNode(graph, next, newName)
+      renameNodes(duplicates.drop(1), allKeys + newName, nextGraph)
+    }
+
 fun mergeGraphsWithRenaming(primary: LooseGraph, secondary: LooseGraph): LooseGraph {
   val primaryKeys = getGraphKeys(primary)
   val secondaryKeys = getGraphKeys(secondary)
-  val duplicates = primaryKeys.intersect(secondaryKeys)
+  val duplicates = primaryKeys.intersect(secondaryKeys).toList()
   val allKeys = primaryKeys + secondaryKeys
-  val updatedSecondary = duplicates
-      .fold(secondary) { a, b -> renameNode(a, b, uniqueNodeName(allKeys, b)) }
+//  val updatedSecondary = duplicates
+//      .fold(secondary) { a, b -> renameNode(a, b, uniqueNodeName(allKeys, b)) }
 
+  val updatedSecondary = renameNodes(duplicates, allKeys, secondary)
   return primary + updatedSecondary
 }
 typealias SerializationMethod = (Any) -> Any
