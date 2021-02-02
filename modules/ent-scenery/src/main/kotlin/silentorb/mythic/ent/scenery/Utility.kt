@@ -143,3 +143,6 @@ fun filterByAttribute(graph: LooseGraph, attribute: String): List<Key> =
     graph
         .filter { it.property == SceneProperties.type && it.target == attribute }
         .map { it.source }
+
+fun hasAttribute(graph: LooseGraph, node: Key, attribute: String): Boolean =
+    graph.any { it.source == node && it.property == SceneProperties.type && it.target == attribute }
