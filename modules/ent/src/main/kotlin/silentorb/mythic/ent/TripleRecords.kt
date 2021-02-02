@@ -91,7 +91,7 @@ fun renameNode(graph: LooseGraph, previous: Key, next: Key): Graph =
     }
         .toSet()
 
-fun uniqueNodeName(keys: Set<Key>, name: String): String {
+fun uniqueNodeName(keys: Collection<Key>, name: String): String {
   return if (!keys.contains(name))
     name
   else {

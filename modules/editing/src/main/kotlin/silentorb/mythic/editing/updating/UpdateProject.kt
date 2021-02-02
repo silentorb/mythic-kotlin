@@ -1,10 +1,12 @@
 package silentorb.mythic.editing.updating
 
 import silentorb.mythic.editing.*
+import silentorb.mythic.ent.uniqueNodeName
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.happenings.handleCommands
 import java.io.File
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 
 fun getSelectedFileItem(editor: Editor): FileItem? {
@@ -40,6 +42,27 @@ fun handleProjectCommands(editor: Editor) = handleCommands<FileItems> { command,
         val absolutePath = resolveProjectFilePath(editor, fullPath)
         File(absolutePath).writeText("{\"graph\":[[\"$key\",\"\",\"\"]]}\n")
         newFileItem(FileItemType.file, selected.fullPath, name, items)
+      }
+    }
+
+    EditorCommands.duplicateFile -> {
+      val selected = getSelectedFileItem(editor)
+      if (selected == null)
+        items
+      else {
+        val parent =getParentPath(selected.fullPath)
+        val siblings = File( resolveProjectFilePath(editor, parent)).listFiles()
+            ?.map { it.name.split(".").first() }
+            ?: listOf()
+
+        val name = selected.name.split(".").first()
+        val newName = uniqueNodeName(siblings, name) + sceneFileExtension
+        val fullPath = parent + "/" + newName
+        Files.copy(
+            Path.of(resolveProjectFilePath(editor, selected.fullPath)),
+            Path.of(resolveProjectFilePath(editor, fullPath))
+        )
+        newFileItem(FileItemType.file, parent, newName, items)
       }
     }
 

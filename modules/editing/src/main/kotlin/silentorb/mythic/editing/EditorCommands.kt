@@ -50,6 +50,7 @@ object EditorCommands {
   val startConnecting = "startConnecting"
 
   val newFile = "newFile"
+  val duplicateFile = "duplicateFile"
   val newFileWithNameDialog = "newFileWithNameDialog"
   val newFolder = "newFolder"
   val newFolderWithNameDialog = "newFolderWithNameDialog"
