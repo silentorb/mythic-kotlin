@@ -3,7 +3,7 @@ package silentorb.mythic.editing
 import imgui.ImColor
 import imgui.ImDrawList
 import imgui.ImGui
-import silentorb.mythic.ent.scenery.filterByAttribute
+import silentorb.mythic.ent.scenery.nodeAttributes
 import silentorb.mythic.ent.scenery.getNodeTransform
 import silentorb.mythic.spatial.*
 
@@ -89,7 +89,7 @@ fun drawJoints(editor: Editor, transform: ScreenTransform, drawList: ImDrawList)
   val pointColor = ImColor.intToColor(255, 0, 255, 255)
   val selectionColor = ImColor.intToColor(255, 128, 255, 255)
   val graph = getCachedGraph(editor)
-  val joints = filterByAttribute(graph, CommonEditorAttributes.joint)
+  val joints = nodeAttributes(graph, CommonEditorAttributes.joint)
   for (joint in joints) {
     val location = getNodeTransform(graph, joint).translation()
     val point = transform(location)

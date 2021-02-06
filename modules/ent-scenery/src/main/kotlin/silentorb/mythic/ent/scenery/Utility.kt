@@ -139,7 +139,7 @@ fun getSceneTree(graph: Graph): Map<Key, Key> =
 fun firstOrNullWithAttribute(graph: LooseGraph, attribute: String) =
     graph.firstOrNull { it.property == SceneProperties.type && it.target == attribute }?.target as Key?
 
-fun filterByAttribute(graph: LooseGraph, attribute: String): List<Key> =
+fun nodeAttributes(graph: LooseGraph, attribute: String): List<Key> =
     graph
         .filter { it.property == SceneProperties.type && it.target == attribute }
         .map { it.source }

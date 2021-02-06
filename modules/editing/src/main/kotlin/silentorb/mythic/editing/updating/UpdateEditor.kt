@@ -7,7 +7,7 @@ import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Key
 import silentorb.mythic.ent.LooseGraph
 import silentorb.mythic.ent.getGraphKeys
-import silentorb.mythic.ent.scenery.filterByAttribute
+import silentorb.mythic.ent.scenery.nodeAttributes
 import silentorb.mythic.ent.scenery.gatherChildren
 import silentorb.mythic.ent.scenery.getNodeTransform
 import silentorb.mythic.haft.InputDeviceState
@@ -19,7 +19,6 @@ import silentorb.mythic.happenings.onSetCommand
 import silentorb.mythic.scenery.SceneProperties
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector2i
-import silentorb.mythic.spatial.toVector2
 import silentorb.mythic.spatial.toVector2i
 
 val updateFileSelection = handleCommands<NodeSelection> { command, selection ->
@@ -173,7 +172,7 @@ fun onTrySelectJoint(editor: Editor, mousePosition: Vector2, commands: Commands)
       if (camera != null && viewport != null) {
         val transform = getStandardPointTransform(viewport, camera)
         val graph = getCachedGraph(editor)
-        val joints = filterByAttribute(graph, CommonEditorAttributes.joint)
+        val joints = nodeAttributes(graph, CommonEditorAttributes.joint)
         val hit = joints
             .firstOrNull { joint ->
               val location = getNodeTransform(graph, joint).translation()
