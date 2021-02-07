@@ -116,7 +116,11 @@ fun updateEditorState(commands: Commands, editor: Editor, graph: LooseGraph?, mo
 
 fun updateSelectionQuery(editor: Editor, commands: Commands): SelectionQuery? {
   val selectionCommand = commands
-      .firstOrNull { it.type == EditorCommands.startNodeSelect || it.type == EditorCommands.startNodeDrillDown }
+      .firstOrNull {
+        it.type == EditorCommands.startNodeSelectReplace ||
+            it.type == EditorCommands.startNodeSelectToggle ||
+            it.type == EditorCommands.startNodeDrillDown
+      }
 
   val previousSelectionQuery = editor.selectionQuery
   return if (selectionCommand != null && commands.none { it.type == EditorCommands.commitOperation })
@@ -242,20 +246,36 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
 fun getQuerySelectionCommands(editor: Editor): Commands {
   val request = editor.selectionQuery
   val response = request?.response
-  return if (request != null && response != null)
-    if (request.command?.type == EditorCommands.startNodeDrillDown)
-      listOf(Command(EditorCommands.setActiveGraph, response.selectedObject))
-    else
-      listOf(Command(EditorCommands.setNodeSelection, setOfNotNull(response.selectedObject)))
-  else
+  return if (response != null) {
+    val node = response.selectedObject
+    when (request.command?.type) {
+      EditorCommands.startNodeDrillDown -> listOf(Command(EditorCommands.setActiveGraph, node))
+      EditorCommands.startNodeSelectReplace -> listOf(Command(EditorCommands.setNodeSelection, setOfNotNull(node)))
+      EditorCommands.startNodeSelectToggle -> {
+        if (node == null)
+          listOf()
+        else {
+          val selection = getNodeSelection(editor)
+          val nextSelection = if (selection.contains(node))
+            selection - node
+          else
+            selection + node
+          listOf(Command(EditorCommands.setNodeSelection, nextSelection))
+        }
+      }
+      else -> listOf()
+    }
+  } else
     listOf()
 }
 
 fun prepareEditorUpdate(deviceStates: List<InputDeviceState>, editor: Editor): Commands {
-  val externalCommands = if (isCtrlDown() || isAltDown() || isShiftDown())
-    listOf()
-  else
-    mapCommands(defaultEditorBindings(), deviceStates) + getQuerySelectionCommands(editor)
+//  val externalCommands = if (isCtrlDown() || isAltDown() || isShiftDown())
+//    listOf()
+//  else
+//    mapCommands(defaultEditorBindings(), deviceStates) + getQuerySelectionCommands(editor)
+
+  val externalCommands = mapCommands(defaultEditorBindings(), deviceStates) + getQuerySelectionCommands(editor)
 
   val guiCommands = defineEditorGui(editor, deviceStates)
   return if (editor.flyThrough)

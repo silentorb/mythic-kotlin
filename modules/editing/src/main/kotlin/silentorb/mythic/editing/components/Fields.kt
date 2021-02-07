@@ -13,12 +13,25 @@ import silentorb.mythic.spatial.degreesToRadians
 import silentorb.mythic.spatial.radiansToDegrees
 import silentorb.mythic.spatial.toList
 
-fun <T>wrapSimpleWidget(widget: (Entry) -> T): PropertyWidget = { _, entry, _ -> widget(entry) as Any }
+var _stagingValue: Any? = null
+var _stagingValueKey: String = ""
 
-fun dropDownWidget(options: List<Key>, id: String, value: String): String {
+inline fun <reified T> stagingValue(key: String, default: () -> T): T =
+    if (key == _stagingValueKey)
+      _stagingValue as? T ?: default()
+    else {
+      _stagingValueKey = key
+      val value = default()
+      _stagingValue = value
+      value
+    }
+
+fun <T> wrapSimpleWidget(widget: (Entry) -> T): PropertyWidget = { _, entry, _ -> widget(entry) }
+
+fun dropDownWidget(options: List<Key>, id: String, value: String?): String? {
   var nextValue = value
   ImGui.pushID(id)
-  if (ImGui.beginCombo("", value)) {
+  if (ImGui.beginCombo("", value ?: "")) {
     for (option in options.sorted()) {
       if (ImGui.selectable(option)) {
         nextValue = option
@@ -33,8 +46,8 @@ fun dropDownWidget(options: List<Key>, id: String, value: String): String {
   return nextValue
 }
 
-fun dropDownWidget(options: List<Key>, entry: Entry): String =
-    dropDownWidget(options, entry.property, entry.target as String)
+fun dropDownWidget(options: List<Key>, entry: Entry): String? =
+    dropDownWidget(options, entry.property, entry.target as? String)
 
 fun <T> labeledDropDownWidget(options: Map<T, String>, entry: Entry): T {
   val value = entry.target as T
@@ -144,27 +157,32 @@ fun axisInput(owner: String, label: String, value: Float): Float {
   return result.toFloatOrNull() ?: value
 }
 
-fun spatialWidget(entry: Entry): Vector3 {
-  val value = entry.target as Vector3
+fun spatialWidget(entry: Entry): Vector3? {
   val owner = "${entry.source}.${entry.property}"
+  val value = entry.target as? Vector3 ?: stagingValue(owner) { Vector3.zero }
   val x = axisInput(owner, "X", value.x)
   ImGui.sameLine()
   val y = axisInput(owner, "Y", value.y)
   ImGui.sameLine()
   val z = axisInput(owner, "Z", value.z)
-  return Vector3(x, y, z)
+  return if (x == value.x && y == value.y && z == value.z)
+    null
+  else
+    Vector3(x, y, z)
 }
 
 val propertySpatialWidget: PropertyWidget = wrapSimpleWidget(::spatialWidget)
 
-fun rotationWidget(entry: Entry): Vector3 {
-  val original = entry.target as Vector3
+fun rotationWidget(entry: Entry): Vector3? {
+  val original = entry.target as? Vector3 ?: stagingValue("${entry.source}.${entry.property}") { Vector3.zero }
   val degreesValue = radiansToDegrees(original)
   val result = spatialWidget(entry.copy(target = degreesValue))
-  return if (degreesValue == result)
+  return if (result == null)
+    null
+  else if (degreesValue == result)
     original
   else
-  degreesToRadians(result)
+    degreesToRadians(result)
 }
 
 val propertyRotationWidget: PropertyWidget = wrapSimpleWidget(::rotationWidget)

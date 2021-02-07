@@ -56,8 +56,10 @@ fun drawViewportPanel(editor: Editor): PanelResponse =
         else if (ImGui.isMouseClicked(ImGuiMouseButton.Left))
           if (editor.operation?.type == OperationType.connecting)
             listOf(Command(EditorCommands.trySelectJoint, mousePosition))
+          else if (isShiftDown())
+            listOf(Command(EditorCommands.startNodeSelectToggle, mousePosition))
           else
-            listOf(Command(EditorCommands.startNodeSelect, mousePosition))
+            listOf(Command(EditorCommands.startNodeSelectReplace, mousePosition))
         else
           listOf()
       else

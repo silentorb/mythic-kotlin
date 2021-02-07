@@ -30,7 +30,7 @@ object DraggingTypes {
 }
 
 typealias DefaultValueSource = (Editor) -> Any?
-typealias PropertyWidget = (Editor, Entry, String) -> Any
+typealias PropertyWidget = (Editor, Entry, String) -> Any?
 
 data class PropertyDefinition(
     val displayName: String,
