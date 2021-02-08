@@ -46,7 +46,7 @@ fun drawViewportPanel(editor: Editor): PanelResponse =
       )
 
       val isInBounds = mousePosition.x > 0 &&
-          mousePosition.y > 0 &&
+          mousePosition.y > 35 &&
           mousePosition.x < viewport.z &&
           mousePosition.y < viewport.w
 

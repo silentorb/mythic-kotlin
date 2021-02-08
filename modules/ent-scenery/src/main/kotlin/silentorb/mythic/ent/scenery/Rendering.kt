@@ -14,7 +14,7 @@ fun getElementNodes(graph: Graph): Set<String> {
       .plus(tree.values)
 }
 
-fun nodesToElements(meshShapes: Map<String, Shape>, graph: Graph, nodes: Set<String>): List<ElementGroup> {
+fun nodesToElements(meshShapes: Map<String, Shape>, graph: Graph, nodes: Collection<String>): List<ElementGroup> {
   return nodes.flatMap { node -> nodeToElements(meshShapes, graph, node) }
 }
 

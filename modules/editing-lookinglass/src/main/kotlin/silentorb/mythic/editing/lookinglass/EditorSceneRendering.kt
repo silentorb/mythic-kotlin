@@ -49,7 +49,7 @@ fun cameraRigToCamera(camera: CameraRig): Camera =
 
 val elementsCache = singleValueCache<Graph, List<ElementGroup>>()
 
-fun prepareDynamicDepictions(depictions: EditorDepictionMap, graph: Graph, nodes: Set<String>): List<ElementGroup> =
+fun prepareDynamicDepictions(depictions: EditorDepictionMap, graph: Graph, nodes: Collection<String>): List<ElementGroup> =
     nodes.mapNotNull { node ->
       val typeEntries = graph.filter { it.source == node && it.property == SceneProperties.type }
       val depictionKey = typeEntries.firstOrNull { depictions.keys.contains(it.target as Key) }?.target
@@ -60,7 +60,7 @@ fun prepareDynamicDepictions(depictions: EditorDepictionMap, graph: Graph, nodes
         null
     }
 
-fun nodesToElements(editor: Editor, graph: Graph, nodes: Set<String>) =
+fun nodesToElements(editor: Editor, graph: Graph, nodes: Collection<String>) =
     nodesToElements(editor.enumerations.meshShapes, graph, nodes) +
         prepareDynamicDepictions(editor.enumerations.depictions, graph, nodes)
 

@@ -55,7 +55,7 @@ fun toSpatialEntries(matrix: Matrix, node: Key): AnyGraph {
   )
 }
 
-tailrec fun gatherChildren(graph: Graph, nodes: Set<Key>, accumulator: Set<Key> = setOf()): Set<Key> {
+tailrec fun gatherChildren(graph: Graph, nodes: Collection<Key>, accumulator: Set<Key> = setOf()): Collection<Key> {
   val next = nodes
       .flatMap { node ->
         graph.filter { it.property == SceneProperties.parent && it.target == node }
@@ -70,8 +70,14 @@ tailrec fun gatherChildren(graph: Graph, nodes: Set<Key>, accumulator: Set<Key> 
     gatherChildren(graph, next, nextAccumulator)
 }
 
-fun gatherChildren(graph: Graph, node: Key): Set<Key> =
-    gatherChildren(graph, setOf(node))
+fun gatherChildren(graph: Graph, node: Key): Collection<Key> =
+    gatherChildren(graph, listOf(node))
+
+fun removeNodesAndChildren(graph: Graph, nodes: Collection<Key>): Graph {
+  val withChildren = gatherChildren(graph, nodes)
+  return graph
+      .filter { !withChildren.contains(it.source) }
+}
 
 fun renameNode(graph: Graph, previous: Key, next: Key): Graph =
     graph.map {
@@ -136,8 +142,10 @@ fun arrayToHexColorString(values: FloatArray): String {
 fun getSceneTree(graph: Graph): Map<Key, Key> =
     mapByProperty(graph, SceneProperties.parent)
 
-fun firstOrNullWithAttribute(graph: Graph, attribute: String) =
-    graph.firstOrNull { it.property == SceneProperties.type && it.target == attribute }?.target as Key?
+fun nodesWithAttribute(graph: Graph, attribute: String): List<Key> =
+    graph
+        .filter { it.property == SceneProperties.type && it.target == attribute }
+        .map { it.source }
 
 fun nodeAttributes(graph: Graph, attribute: String): List<Key> =
     graph

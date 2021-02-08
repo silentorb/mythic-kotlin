@@ -5,6 +5,7 @@ import silentorb.mythic.editing.components.nameText
 import silentorb.mythic.ent.*
 import silentorb.mythic.ent.scenery.gatherChildren
 import silentorb.mythic.ent.scenery.getGraphRoots
+import silentorb.mythic.ent.scenery.removeNodesAndChildren
 import silentorb.mythic.happenings.handleCommands
 import silentorb.mythic.scenery.SceneProperties
 
@@ -87,9 +88,7 @@ fun updateSceneGraph(editor: Editor) = handleCommands<Graph> { command, graph ->
     }
 
     EditorCommands.deleteNode -> {
-      val selectionAndChildren = gatherChildren(graph, selection)
-      graph
-          .filter { !selectionAndChildren.contains(it.source) }
+      removeNodesAndChildren(graph, selection)
           .toSet()
     }
 
