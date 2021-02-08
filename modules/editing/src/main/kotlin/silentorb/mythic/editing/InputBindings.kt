@@ -20,12 +20,6 @@ fun defaultGamepadBindings() = mapOf(
 )
 
 fun defaultKeyboardBindings() = mapOf(
-    GLFW.GLFW_KEY_G to EditorCommands.startTranslating,
-    GLFW.GLFW_KEY_R to EditorCommands.startRotating,
-    GLFW.GLFW_KEY_S to EditorCommands.startScaling,
-    GLFW.GLFW_KEY_X to EditorCommands.restrictAxisX,
-    GLFW.GLFW_KEY_Y to EditorCommands.restrictAxisY,
-    GLFW.GLFW_KEY_Z to EditorCommands.restrictAxisZ,
     GLFW.GLFW_KEY_ESCAPE to EditorCommands.cancelOperation,
 )
 
@@ -80,6 +74,12 @@ fun defaultEditorMenuKeystrokes(): KeystrokeBindings = mapOf(
     ContextCommand(Contexts.viewport, EditorCommands.deleteNode) to "Del",
     ContextCommand(Contexts.viewport, EditorCommands.startConnecting) to "Ctrl+J",
     ContextCommand(Contexts.viewport, EditorCommands.duplicateNode) to "Ctrl+D",
+    ContextCommand(Contexts.viewport, EditorCommands.startTranslating) to "G",
+    ContextCommand(Contexts.viewport, EditorCommands.startRotating) to "R",
+    ContextCommand(Contexts.viewport, EditorCommands.startScaling) to "S",
+    ContextCommand(Contexts.viewport, EditorCommands.restrictAxisX) to "X",
+    ContextCommand(Contexts.viewport, EditorCommands.restrictAxisY) to "Y",
+    ContextCommand(Contexts.viewport, EditorCommands.restrictAxisZ) to "Z",
 
     // These will probably need modifier keys eventually
     ContextCommand(Contexts.viewport, EditorCommands.renderingModeWireframe) to "1",

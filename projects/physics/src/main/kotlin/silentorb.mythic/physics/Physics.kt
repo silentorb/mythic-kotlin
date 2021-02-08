@@ -8,8 +8,8 @@ import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver
 import silentorb.mythic.debugging.getDebugBoolean
-import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Id
+import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Table
 import silentorb.mythic.scenery.Shape
 import silentorb.mythic.spatial.Matrix

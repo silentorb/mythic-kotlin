@@ -51,7 +51,7 @@ fun renderProjectTree(items: Collection<FileItem>, item: FileItem, selection: No
         !isDerivativePath(source.fullPath, item.fullPath) && item.fullPath != source.parent
     }) { payload ->
       val source = (payload as FileItem).fullPath
-      val destination = item.fullPath + "/" + getBaseName(source)
+      val destination = item.fullPath + "/" + getFileName(source)
       listOf(Command(EditorCommands.moveFileItem, source to destination))
     }
     dragTargets(mapOf(
@@ -69,7 +69,8 @@ fun renderProjectTree(items: Collection<FileItem>, item: FileItem, selection: No
 
   val childCommands = mutableListOf<Command>()
   if (isOpen) {
-    for (child in children.sortedBy { it.name }) {
+    val sorted = children.sortedBy { getFileName(it.baseName) }
+    for (child in sorted) {
       childCommands += renderProjectTree(items, child, selection)
     }
     ImGui.treePop()

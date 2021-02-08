@@ -24,9 +24,9 @@ fun drawFormField(editor: Editor, definition: PropertyDefinition, entry: Entry, 
 }
 
 private var previousNode: String? = null
-private var propertyOrderState: MutableMap<String, LooseGraph> = mutableMapOf()
+private var propertyOrderState: MutableMap<String, Graph> = mutableMapOf()
 
-fun managePropertyOrder(entries: LooseGraph): LooseGraph =
+fun managePropertyOrder(entries: Graph): Graph =
     if (entries.size < 2)
       entries
     else {
@@ -53,7 +53,7 @@ fun managePropertyOrder(entries: LooseGraph): LooseGraph =
     }
 
 fun addPropertiesDropDown(editor: Editor, availableDefinitions: PropertyDefinitions, attributes: List<Key>,
-                          entries: LooseGraph, nodes: Collection<Key>): Commands {
+                          entries: Graph, nodes: Collection<Key>): Commands {
   var commands: Commands = listOf()
   if (ImGui.beginCombo("Add Property", "")) {
     for ((property, definition) in availableDefinitions.entries.sortedBy { it.value.displayName }) {

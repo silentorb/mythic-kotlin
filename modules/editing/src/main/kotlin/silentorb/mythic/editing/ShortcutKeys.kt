@@ -141,10 +141,13 @@ fun getShortcutCommands(bindings: KeystrokeBindings, context: String, deviceStat
   else {
     val options = compressedBindings[combo]
     val commandType = if (options != null && options.any()) {
-      val option = if (options.size == 1)
-        options.first()
-      else
-        options.firstOrNull { it.context == context }
+//      val option = if (options.size == 1)
+//        options.first()
+//      else
+//        options.firstOrNull { it.context == context }
+
+      val option = options.firstOrNull { it.context == context }
+          ?: options.firstOrNull { it.context == "global" }
 
       option?.command
     } else

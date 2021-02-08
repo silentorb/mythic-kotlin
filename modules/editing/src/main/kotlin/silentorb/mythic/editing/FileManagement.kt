@@ -9,7 +9,8 @@ data class FileItem(
     val type: FileItemType,
     val fullPath: String,
     val name: String,
-    val parent: String?
+    val parent: String?,
+    val baseName: String = name.split(".").first()
 )
 
 typealias FileItems = Map<String, FileItem>
@@ -59,7 +60,7 @@ fun isParent(parent: String, child: String): Boolean =
         child.substring(0, parent.length + 1) == "$parent/" &&
         !child.substring(parent.length + 1).contains('/')
 
-fun getBaseName(path: String): String =
+fun getFileName(path: String): String =
     path.split('/').last()
 
 fun getParentPath(path: String): String =

@@ -8,7 +8,7 @@ import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 
-fun getTranslationRotationMatrix(graph: LooseGraph, node: Key): Matrix {
+fun getTranslationRotationMatrix(graph: Graph, node: Key): Matrix {
   val translation = getGraphValue<Vector3>(graph, node, SceneProperties.translation) ?: Vector3.zero
   val rotation = getGraphValue<Vector3>(graph, node, SceneProperties.rotation) ?: Vector3.zero
   return Matrix.identity
@@ -18,10 +18,10 @@ fun getTranslationRotationMatrix(graph: LooseGraph, node: Key): Matrix {
       .rotateX(rotation.x)
 }
 
-fun getNodeScale(graph: LooseGraph, node: Key): Vector3 =
+fun getNodeScale(graph: Graph, node: Key): Vector3 =
     getGraphValue<Vector3>(graph, node, SceneProperties.scale) ?: Vector3.unit
 
-fun getNodeTransform(graph: LooseGraph, node: Key): Matrix {
+fun getNodeTransform(graph: Graph, node: Key): Matrix {
   val scale = getNodeScale(graph, node)
   val localTransform = getTranslationRotationMatrix(graph, node)
       .scale(scale)
@@ -55,7 +55,7 @@ fun toSpatialEntries(matrix: Matrix, node: Key): AnyGraph {
   )
 }
 
-tailrec fun gatherChildren(graph: LooseGraph, nodes: Set<Key>, accumulator: Set<Key> = setOf()): Set<Key> {
+tailrec fun gatherChildren(graph: Graph, nodes: Set<Key>, accumulator: Set<Key> = setOf()): Set<Key> {
   val next = nodes
       .flatMap { node ->
         graph.filter { it.property == SceneProperties.parent && it.target == node }
@@ -91,7 +91,7 @@ fun transposeNamespace(graph: Graph, parent: Key): Graph {
   }
 }
 
-fun getGraphRoots(graph: LooseGraph): Set<Key> =
+fun getGraphRoots(graph: Graph): Set<Key> =
     getGraphKeys(graph)
         .filter { key -> graph.none { it.source == key && it.property == SceneProperties.parent } }
         .toSet()
@@ -136,13 +136,13 @@ fun arrayToHexColorString(values: FloatArray): String {
 fun getSceneTree(graph: Graph): Map<Key, Key> =
     mapByProperty(graph, SceneProperties.parent)
 
-fun firstOrNullWithAttribute(graph: LooseGraph, attribute: String) =
+fun firstOrNullWithAttribute(graph: Graph, attribute: String) =
     graph.firstOrNull { it.property == SceneProperties.type && it.target == attribute }?.target as Key?
 
-fun nodeAttributes(graph: LooseGraph, attribute: String): List<Key> =
+fun nodeAttributes(graph: Graph, attribute: String): List<Key> =
     graph
         .filter { it.property == SceneProperties.type && it.target == attribute }
         .map { it.source }
 
-fun hasAttribute(graph: LooseGraph, node: Key, attribute: String): Boolean =
+fun hasAttribute(graph: Graph, node: Key, attribute: String): Boolean =
     graph.any { it.source == node && it.property == SceneProperties.type && it.target == attribute }

@@ -8,7 +8,7 @@ import silentorb.mythic.ent.scenery.getGraphRoots
 import silentorb.mythic.happenings.handleCommands
 import silentorb.mythic.scenery.SceneProperties
 
-fun duplicateNode(graph: LooseGraph, node: Key): LooseGraph {
+fun duplicateNode(graph: Graph, node: Key): Graph {
   val parent = getGraphValue<String>(graph, node, SceneProperties.parent)
   return if (parent == null)
     graph
@@ -20,7 +20,7 @@ fun duplicateNode(graph: LooseGraph, node: Key): LooseGraph {
   }
 }
 
-fun updateSceneGraph(editor: Editor) = handleCommands<LooseGraph> { command, graph ->
+fun updateSceneGraph(editor: Editor) = handleCommands<Graph> { command, graph ->
   val selection = getNodeSelection(editor)
 
   when (command.type) {
@@ -70,8 +70,8 @@ fun updateSceneGraph(editor: Editor) = handleCommands<LooseGraph> { command, gra
     EditorCommands.moveFileItem -> {
       val selected = getSelectedFileItem(editor)
       val (from, to) = command.value as Pair<String, String>
-      val previous = getBaseName(from).split('.').first()
-      val next = getBaseName(to).split('.').first()
+      val previous = getFileName(from).split('.').first()
+      val next = getFileName(to).split('.').first()
       if (selected == null || previous == next)
         graph
       else {

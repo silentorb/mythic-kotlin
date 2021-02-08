@@ -2,12 +2,11 @@ package silentorb.mythic.editing.updating
 
 import silentorb.mythic.editing.*
 import silentorb.mythic.ent.Graph
-import silentorb.mythic.ent.LooseGraph
 import silentorb.mythic.ent.getGraphKeys
 import silentorb.mythic.happenings.handleCommands
 import silentorb.mythic.scenery.SceneProperties
 
-fun updateNodeSelection(editor: Editor, nextGraph: LooseGraph?) = handleCommands<NodeSelection> { command, selection ->
+fun updateNodeSelection(editor: Editor, nextGraph: Graph?) = handleCommands<NodeSelection> { command, selection ->
   val graph = getActiveEditorGraph(editor)
   if (graph != null && nextGraph != null) {
     when (command.type) {

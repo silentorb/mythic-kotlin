@@ -3,7 +3,7 @@ package silentorb.mythic.ent.scenery
 import silentorb.mythic.ent.*
 import silentorb.mythic.scenery.SceneProperties
 
-fun expandInstance(library: ExpansionLibrary, node: Key, target: Key): LooseGraph {
+fun expandInstance(library: ExpansionLibrary, node: Key, target: Key): Graph {
   val definition = library.graphs[target]
   return if (definition == null)
     setOf()
@@ -21,7 +21,7 @@ fun expandInstance(library: ExpansionLibrary, node: Key, target: Key): LooseGrap
   }
 }
 
-fun expandInstances(library: ExpansionLibrary, instances: LooseGraph, accumulator: Graph): Graph =
+fun expandInstances(library: ExpansionLibrary, instances: Graph, accumulator: Graph): Graph =
     if (instances.none())
       accumulator
     else {
@@ -31,7 +31,7 @@ fun expandInstances(library: ExpansionLibrary, instances: LooseGraph, accumulato
 
       val instanceTypes = instanceTypesEntries.map { it.target as Key }
 
-      val initial: LooseGraph = listOf()
+      val initial: Graph = listOf()
       val additions = instanceTypes
           .fold(initial) { a, b ->
             a + expandInstance(library, node, b)
@@ -44,7 +44,7 @@ fun expandInstances(library: ExpansionLibrary, instances: LooseGraph, accumulato
       expandInstances(library, nextInstances, graph)
     }
 
-fun expand(library: ExpansionLibrary, accumulator: LooseGraph, node: Key, type: Key, expander: Expander): LooseGraph {
+fun expand(library: ExpansionLibrary, accumulator: Graph, node: Key, type: Key, expander: Expander): Graph {
   val result = expander(library, accumulator, node)
   return if (result == null)
     accumulator
@@ -52,7 +52,7 @@ fun expand(library: ExpansionLibrary, accumulator: LooseGraph, node: Key, type: 
     result - Entry(node, SceneProperties.type, type)
 }
 
-fun expandExpansions(library: ExpansionLibrary, instances: LooseGraph, accumulator: LooseGraph): LooseGraph =
+fun expandExpansions(library: ExpansionLibrary, instances: Graph, accumulator: Graph): Graph =
     if (instances.none())
       accumulator
     else {

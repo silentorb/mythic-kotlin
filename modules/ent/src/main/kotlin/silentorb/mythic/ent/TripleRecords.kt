@@ -15,14 +15,14 @@ data class ContextKey(
 
 typealias Entry = GenericEntry<String>
 
-typealias Graph = Set<Entry>
+typealias GraphSet = Set<Entry>
 typealias GraphLibrary = Map<String, Graph>
 typealias ListGraph = List<Entry>
 typealias AnyEntry = GenericEntry<Any>
 typealias AnyGraph = Collection<AnyEntry>
 typealias GraphStores = Map<String, GraphStore>
 
-typealias LooseGraph = Collection<Entry>
+typealias Graph = Collection<Entry>
 
 typealias GenericGraph<T> = Collection<GenericEntry<T>>
 
@@ -39,49 +39,49 @@ data class GraphFile(
     val graph: List<List<Any>>
 )
 
-fun getGraphKeys(graph: LooseGraph) =
+fun getGraphKeys(graph: Graph) =
     graph
         .map { it.source }
         .toSet()
 
-inline fun <reified T> filterByPropertyStrict(graph: LooseGraph, relationship: Key): ListGraph =
+inline fun <reified T> filterByPropertyStrict(graph: Graph, relationship: Key): ListGraph =
     graph.filter { it.property == relationship && it.target is T }
 
-fun filterByProperty(graph: LooseGraph, relationship: Key): ListGraph =
+fun filterByProperty(graph: Graph, relationship: Key): ListGraph =
     graph.filter { it.property == relationship }
 
-inline fun <reified T> filterByPropertyValue(graph: LooseGraph, relationship: Key, value: T): ListGraph =
+inline fun <reified T> filterByPropertyValue(graph: Graph, relationship: Key, value: T): ListGraph =
     graph.filter { it.property == relationship && it.target == value }
 
-inline fun <reified T> mapByProperty(graph: LooseGraph, relationship: Key): Map<Key, T> =
+inline fun <reified T> mapByProperty(graph: Graph, relationship: Key): Map<Key, T> =
     graph
         .filter { it.property == relationship && it.target is T }
         .associate { it.source to it.target as T }
 
-fun getProperties(graph: LooseGraph, key: String): Graph =
+fun getProperties(graph: Graph, key: String): Graph =
     graph
         .filter { it.source == key }
         .toSet()
 
-fun <T> getPropertyValues(graph: LooseGraph, key: String, property: Key): List<T> =
+fun <T> getPropertyValues(graph: Graph, key: String, property: Key): List<T> =
     graph
         .filter { it.source == key && it.property == property }
         .map { it.target as T }
 
-inline fun <reified T> getGraphValue(graph: LooseGraph, key: String, property: Key): T? =
+inline fun <reified T> getGraphValue(graph: Graph, key: String, property: Key): T? =
     graph.firstOrNull { it.source == key && it.property == property }?.target as T?
 
-inline fun <reified T> getGraphValues(graph: LooseGraph, key: String, property: Key): List<T> =
+inline fun <reified T> getGraphValues(graph: Graph, key: String, property: Key): List<T> =
     graph.filter { it.source == key && it.property == property }.map { it.target as T }
 
-fun replaceValues(graph: LooseGraph, additional: LooseGraph): Graph =
+fun replaceValues(graph: Graph, additional: Graph): Graph =
     graph.filter { entry ->
       additional.none { it.source == entry.source && it.property == entry.property }
     }
         .plus(additional)
         .toSet()
 
-fun renameNode(graph: LooseGraph, previous: Key, next: Key): Graph =
+fun renameNode(graph: Graph, previous: Key, next: Key): Graph =
     graph.map {
       when {
         it.source == previous -> it.copy(source = next)
@@ -114,7 +114,7 @@ fun uniqueNodeName(keys: Collection<Key>, name: String): String {
   }
 }
 
-fun renameNodes(duplicates: List<String>, allKeys: Set<String>, graph: LooseGraph): LooseGraph =
+fun renameNodes(duplicates: List<String>, allKeys: Set<String>, graph: Graph): Graph =
     if (duplicates.none())
       graph
     else {
@@ -124,7 +124,7 @@ fun renameNodes(duplicates: List<String>, allKeys: Set<String>, graph: LooseGrap
       renameNodes(duplicates.drop(1), allKeys + newName, nextGraph)
     }
 
-fun mergeGraphsWithRenaming(primary: LooseGraph, secondary: LooseGraph): LooseGraph {
+fun mergeGraphsWithRenaming(primary: Graph, secondary: Graph): Graph {
   val primaryKeys = getGraphKeys(primary)
   val secondaryKeys = getGraphKeys(secondary)
   val duplicates = primaryKeys.intersect(secondaryKeys).toList()
