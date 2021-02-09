@@ -14,7 +14,6 @@ typealias MeshNodes = List<Pair<Key, Matrix>>
 
 fun getSelectionMeshes(editor: Editor, graph: Graph, node: Key): List<ElementGroup> {
   val nodes = gatherChildren(graph, node) + node
-//  val subGraph = graph.filter { nodes.contains(it.source) }
   return nodesToElements(editor, graph, nodes)
 }
 

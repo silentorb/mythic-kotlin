@@ -2,10 +2,10 @@ package silentorb.mythic.ent
 
 typealias Key = String
 
-data class GenericEntry<T>(
-    val source: T,
+data class GenericEntry<S, T>(
+    val source: S,
     val property: Key,
-    val target: Any
+    val target: T
 )
 
 data class ContextKey(
@@ -13,18 +13,18 @@ data class ContextKey(
     val name: Any
 )
 
-typealias Entry = GenericEntry<String>
+typealias Entry = GenericEntry<String, Any>
 
 typealias GraphSet = Set<Entry>
 typealias GraphLibrary = Map<String, Graph>
 typealias ListGraph = List<Entry>
-typealias AnyEntry = GenericEntry<Any>
+typealias AnyEntry = GenericEntry<Any, Any>
 typealias AnyGraph = Collection<AnyEntry>
 typealias GraphStores = Map<String, GraphStore>
 
 typealias Graph = Collection<Entry>
 
-typealias GenericGraph<T> = Collection<GenericEntry<T>>
+typealias GenericGraph<S, T> = Collection<GenericEntry<S, T>>
 
 data class PropertyInfo(
     val manyToMany: Boolean = false,
@@ -44,8 +44,8 @@ fun getGraphKeys(graph: Graph) =
         .map { it.source }
         .toSet()
 
-inline fun <reified T> filterByPropertyStrict(graph: Graph, relationship: Key): ListGraph =
-    graph.filter { it.property == relationship && it.target is T }
+inline fun <reified T> filterByPropertyStrict(graph: Graph, relationship: Key): GenericGraph<String, T> =
+    graph.filter { it.property == relationship && it.target is T } as GenericGraph<String, T>
 
 fun filterByProperty(graph: Graph, relationship: Key): ListGraph =
     graph.filter { it.property == relationship }

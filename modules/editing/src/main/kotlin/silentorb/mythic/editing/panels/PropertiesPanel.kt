@@ -142,7 +142,7 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): PanelResponse =
 
           val existing = entries.map { it.property } - schema.filter { it.value.manyToMany }.keys
           val availableDefinitions = definitions.minus(existing)
-          val union = filterByPropertyStrict<String>(entries, SceneProperties.type)
+          val union = filterByProperty(entries, SceneProperties.type)
               .map { it.target as String }
               .distinct()
 

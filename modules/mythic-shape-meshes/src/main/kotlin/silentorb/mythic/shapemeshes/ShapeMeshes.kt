@@ -108,5 +108,7 @@ fun getShapeVertices(shape: Shape): IntermediateMesh =
 
       is MeshShape -> meshShapeVertices(shape)
 
+      is Sphere -> box(Vector3(shape.radius))
+
       else -> throw Error("Not implemented")
     }

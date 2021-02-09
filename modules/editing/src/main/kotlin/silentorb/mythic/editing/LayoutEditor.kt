@@ -11,7 +11,7 @@ import silentorb.mythic.happenings.Commands
 
 fun drawEditor(editor: Editor, deviceStates: List<InputDeviceState>): Commands {
   val graph = getActiveEditorGraph(editor)
-  val menuCommands = mainMenus(getShortcutForContext(editor.bindings, Contexts.global))
+  val menuCommands = mainMenus(newMenuChannel(editor, Contexts.global))
 
   ImGui.setNextWindowBgAlpha(0f)
   ImGui.dockSpaceOverViewport()

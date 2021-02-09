@@ -6,9 +6,9 @@ import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Key
 import silentorb.mythic.ent.getGraphKeys
-import silentorb.mythic.ent.scenery.nodeAttributes
 import silentorb.mythic.ent.scenery.gatherChildren
 import silentorb.mythic.ent.scenery.getNodeTransform
+import silentorb.mythic.ent.scenery.nodeAttributes
 import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.haft.getMouseOffset
 import silentorb.mythic.happenings.Command
@@ -66,6 +66,19 @@ val updateRenderingMode = handleCommands<RenderingMode> { command, renderingMode
   }
 }
 
+fun <T> toggleKey(set: Set<T>, key: T): Set<T> =
+    if (set.contains(key))
+      set - key
+    else
+      set + key
+
+val updateVisibleWidgetTypes = handleCommands<Set<WidgetTypes>> { command, value ->
+  when (command.type) {
+    EditorCommands.toggleCollisionDisplay -> toggleKey(value, WidgetTypes.collision)
+    else -> value
+  }
+}
+
 fun updateViewport(editor: Editor, commands: Commands, mousePosition: Vector2i, mouseOffset: Vector2, viewport: String, viewportState: ViewportState): ViewportState {
   return viewportState.copy(
       camera = updateCamera(editor, mousePosition, mouseOffset, commands, viewport, viewportState.camera),
@@ -109,7 +122,8 @@ fun updateEditorState(commands: Commands, editor: Editor, graph: Graph?, mousePo
       graph = onSetCommand(commands, EditorCommands.setActiveGraph, state.graph),
       sceneStates = updateSceneStates(commands, editor, graph, mousePosition, mouseOffset),
       fileSelection = updateFileSelection(commands, state.fileSelection),
-      renderingModes = state.renderingModes + (defaultViewportId to renderingMode)
+      renderingModes = state.renderingModes + (defaultViewportId to renderingMode),
+      visibleWidgetTypes = updateVisibleWidgetTypes(commands, state.visibleWidgetTypes),
   )
 }
 

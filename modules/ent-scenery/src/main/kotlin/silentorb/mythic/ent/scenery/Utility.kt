@@ -1,9 +1,7 @@
 package silentorb.mythic.ent.scenery
 
 import silentorb.mythic.ent.*
-import silentorb.mythic.scenery.Box
-import silentorb.mythic.scenery.SceneProperties
-import silentorb.mythic.scenery.Shape
+import silentorb.mythic.scenery.*
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
@@ -108,8 +106,24 @@ fun getShape(meshShapeMap: Map<Key, Shape>, graph: Graph, node: Key): Shape? {
     null
   else {
     val mesh = getGraphValue<Key>(graph, node, SceneProperties.mesh)
-    val meshBounds = meshShapeMap[mesh]
-    return meshBounds ?: Box(Vector3.unit / 2f)
+    return when (shapeType) {
+      "cylinder" -> {
+        val radius = getGraphValue<Float>(graph, node, SceneProperties.radius)
+        val height = getGraphValue<Float>(graph, node, SceneProperties.height)
+        if (radius != null && height != null)
+          Cylinder(radius, height)
+        else
+          null
+      }
+      "sphere" -> {
+        val radius = getGraphValue<Float>(graph, node, SceneProperties.radius)
+        if (radius != null)
+          Sphere(radius)
+        else
+          null
+      }
+      else -> meshShapeMap[mesh] ?: Box(Vector3.unit / 2f)
+    }
   }
 }
 

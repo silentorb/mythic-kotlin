@@ -11,6 +11,7 @@ import kotlin.math.sin
 data class Meshes(
     val square: Drawable,
     val image: Drawable,
+    val imageGl: Drawable,
     val circle: Drawable,
     val solidCircle: Drawable
 )
@@ -41,6 +42,15 @@ fun createImageMesh(vertexSchema: VertexSchema) =
         1f, 0f, 1f, 1f,
     ))
 
+// An image mesh where the coordinates are upside down (or right side up depending on context)
+fun createImageMeshGl(vertexSchema: VertexSchema) =
+    SimpleMesh(vertexSchema, listOf(
+        0f, 1f, 0f, 1f,
+        0f, 0f, 0f, 0f,
+        1f, 0f, 1f, 0f,
+        1f, 1f, 1f, 1f
+    ))
+
 fun createCircleList(radius: Float, count: Int, offset: Float = 0f, direction: Float = 1f): ArrayList<Float> {
   val vertices = ArrayList<Float>((count) * 2)
   val increment = direction * Pi * 2 / count
@@ -64,6 +74,7 @@ const val circleResolution = 32
 fun createDrawingMeshes(vertexSchemas: DrawingVertexSchemas) = Meshes(
     square = createSquareMesh(vertexSchemas.simple),
     image = createImageMesh(vertexSchemas.image),
+    imageGl = createImageMeshGl(vertexSchemas.image),
     circle = createCircleMesh(vertexSchemas.simple, 1f, circleResolution),
     solidCircle = createSolidCircleMesh(vertexSchemas.simple, 1f, circleResolution)
 )

@@ -14,7 +14,7 @@ const val sceneFileExtension = ".scene"
 
 typealias SceneTree = Map<Key, Key>
 typealias MenuResponse = Commands
-typealias MenuDefinition = (GetShortcut) -> MenuResponse
+typealias MenuDefinition = (MenuChannel) -> MenuResponse
 typealias PanelResponse = Pair<String?, Commands>
 
 data class Typeface(
@@ -52,13 +52,19 @@ typealias GraphHistory = List<Snapshot>
 
 data class ContextCommand(
     val context: String,
-    val command: String
+    val command: String,
+    val menu: String? = null
 )
 
 typealias KeystrokeBindings = Map<ContextCommand, String>
 typealias CompressedKeystrokeBindings = Map<Int, List<ContextCommand>>
 
 typealias GetShortcut = (String) -> String?
+
+data class MenuChannel(
+    val getShortcut: GetShortcut,
+    val editor: Editor,
+)
 
 enum class RenderingMode {
   flat,
@@ -77,10 +83,15 @@ data class SceneState(
 
 typealias SceneStates = Map<Key, SceneState>
 
+enum class WidgetTypes {
+  collision
+}
+
 data class EditorPersistentState(
     val graph: String? = null,
     val sceneStates: SceneStates = mapOf(),
     val renderingModes: Map<Key, RenderingMode> = mapOf(),
+    val visibleWidgetTypes: Set<WidgetTypes> = setOf(),
     val fileSelection: Set<String> = setOf(),
 )
 
@@ -149,10 +160,13 @@ data class Editor(
 const val keypadKey = "Numpad"
 const val numpadPeriodKey = "$keypadKey ."
 
+typealias GetMenuItemState = (Editor) -> Boolean
+
 data class MenuItem(
     val label: String,
     val command: String? = null,
-    val items: List<MenuItem>? = null
+    val items: List<MenuItem>? = null,
+    val getState: GetMenuItemState? = null
 )
 
 enum class CollisionShape {
@@ -160,6 +174,7 @@ enum class CollisionShape {
   composite,
   cylinder,
   mesh,
+  sphere,
 }
 
 object Contexts {

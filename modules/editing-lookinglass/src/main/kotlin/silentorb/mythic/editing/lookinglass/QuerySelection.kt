@@ -4,24 +4,31 @@ import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL14.GL_INCR_WRAP
 import silentorb.mythic.editing.Editor
 import silentorb.mythic.editing.SelectionQuery
+import silentorb.mythic.editing.getActiveEditorGraph
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Key
 import silentorb.mythic.ent.getGraphKeys
+import silentorb.mythic.ent.scenery.removeNodesAndChildren
 import silentorb.mythic.glowing.*
 import silentorb.mythic.lookinglass.Material
 import silentorb.mythic.lookinglass.SceneRenderer
 import silentorb.mythic.lookinglass.drawing.renderElementGroups
 import silentorb.mythic.lookinglass.flipY
+import silentorb.mythic.scenery.SceneProperties
 import silentorb.mythic.spatial.Vector4i
 
-fun plumbPixelDepth(sceneRenderer: SceneRenderer, editor: Editor, selectionQuery: SelectionQuery, graph: Graph): Key? {
+fun plumbPixelDepth(sceneRenderer: SceneRenderer, editor: Editor, selectionQuery: SelectionQuery, expandedGraph: Graph): Key? {
   val pixelPositionX = selectionQuery.position.x + sceneRenderer.viewport.x
   val pixelPositionY = flipY(sceneRenderer.viewport.w, selectionQuery.position.y) + sceneRenderer.viewport.y
   val crop = Vector4i(pixelPositionX, pixelPositionY, 1, 1)
 
   return withCropping(crop) {
     withoutFrontDrawing {
+      val graph = getActiveEditorGraph(editor)!!
       val nodes = getGraphKeys(graph)
+      val childGraph = expandedGraph
+          .filter { !(it.property == SceneProperties.parent && nodes.contains(it.source)) }
+
       val material = Material(
           shading = false,
           color = selectionColor,
@@ -37,7 +44,7 @@ fun plumbPixelDepth(sceneRenderer: SceneRenderer, editor: Editor, selectionQuery
       var lastSample = 0
 
       for (node in nodes) {
-        val elementGroups = getSelectionMeshes(editor, graph, node)
+        val elementGroups = getSelectionMeshes(editor, childGraph, node)
         if (elementGroups.any()) {
           val groups = setElementGroupMaterial(material, elementGroups)
           renderElementGroups(sceneRenderer, groups)

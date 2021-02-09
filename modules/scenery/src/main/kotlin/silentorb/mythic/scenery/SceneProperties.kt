@@ -4,6 +4,7 @@ import silentorb.mythic.ent.PropertyInfo
 import silentorb.mythic.ent.PropertySchema
 
 object SceneProperties {
+  const val height = "height"
   const val parent = "parent"
   const val translation = "translation"
   const val rotation = "rotation"
@@ -14,6 +15,7 @@ object SceneProperties {
   const val text3d = "text3d"
   const val light = "light"
   const val rgba = "rgba"
+  const val radius = "radius"
   const val range = "range"
   const val collisionShape = "collisionShape"
   const val collisionGroups = "collisionGroups"

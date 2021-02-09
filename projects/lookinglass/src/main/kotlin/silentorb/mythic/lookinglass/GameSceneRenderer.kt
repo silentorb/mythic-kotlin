@@ -87,5 +87,5 @@ fun applyFrameBufferTexture(renderer: SceneRenderer, filter: ScreenFilter) {
   val scale = Vector2(dimensions.x.toFloat(), dimensions.y.toFloat()) / renderer.viewport.zw.toVector2()
   filter(renderer.renderer.shaders, scale)
   activateTextures(listOf(offscreenBuffer.colorTexture, offscreenBuffer.depthTexture!!))
-  canvasDependencies.meshes.image.draw(DrawMethod.triangleFan)
+  canvasDependencies.meshes.imageGl.draw(DrawMethod.triangleFan)
 }

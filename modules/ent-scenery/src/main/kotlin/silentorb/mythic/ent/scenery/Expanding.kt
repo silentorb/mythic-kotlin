@@ -79,12 +79,12 @@ fun expandExpansions(library: ExpansionLibrary, instances: Graph, accumulator: G
     }
 
 fun expandInstances(library: ExpansionLibrary, graph: Graph): Graph {
-  val instances = filterByPropertyStrict<Key>(graph, SceneProperties.type)
+  val instances = filterByProperty(graph, SceneProperties.type)
       .filter { library.graphs.containsKey(it.target) }
 
   val instanced = expandInstances(library, instances, graph)
 
-  val expansions = filterByPropertyStrict<Key>(instanced, SceneProperties.type)
+  val expansions = filterByProperty(instanced, SceneProperties.type)
       .filter { library.expanders.containsKey(it.target) }
 
   return expandExpansions(library, expansions, instanced).toSet()

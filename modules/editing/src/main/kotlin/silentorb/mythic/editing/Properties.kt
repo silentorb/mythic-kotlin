@@ -82,6 +82,18 @@ fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
         widget = propertyDecimalTextField,
         defaultValue = { 1f },
     ),
+    SceneProperties.height to PropertyDefinition(
+        displayName = "Height",
+        serialization = floatSerialization,
+        widget = propertyDecimalTextField,
+        defaultValue = { 1f },
+    ),
+    SceneProperties.radius to PropertyDefinition(
+        displayName = "Radius",
+        serialization = floatSerialization,
+        widget = propertyDecimalTextField,
+        defaultValue = { 1f },
+    ),
     SceneProperties.light to PropertyDefinition(
         displayName = "Light",
         widget = dropDownWidget { LightType.values().map { it.name } },

@@ -13,9 +13,13 @@ import silentorb.mythic.spatial.Vector4i
 
 const val defaultViewportId = "viewport"
 
-fun viewportMenus(getShortcut: GetShortcut): MenuResponse =
-    drawMenuBar(getShortcut, listOf(
-        MenuItem("View", items = listOf(
+fun renderingModeState(mode: RenderingMode): GetMenuItemState = { editor ->
+  editor.persistentState.renderingModes[defaultViewportId] == mode
+}
+
+fun viewportMenus(channel: MenuChannel): MenuResponse =
+    drawMenuBar(channel, listOf(
+        MenuItem("Camera", items = listOf(
             MenuItem("View Front", EditorCommands.viewFront),
             MenuItem("View Back", EditorCommands.viewBack),
             MenuItem("View Right", EditorCommands.viewRight),
@@ -24,10 +28,21 @@ fun viewportMenus(getShortcut: GetShortcut): MenuResponse =
             MenuItem("View Bottom", EditorCommands.viewBottom),
             MenuItem("Toggle Projection", EditorCommands.toggleProjectionMode),
             MenuItem("Center on Selection", EditorCommands.centerOnSelection),
-            MenuItem("Draw Wireframe", EditorCommands.renderingModeWireframe),
-            MenuItem("Draw Flat", EditorCommands.renderingModeFlat),
-            MenuItem("Draw Lit", EditorCommands.renderingModeLit),
-        ))
+        )),
+        MenuItem("Display", items = listOf(
+            MenuItem("Draw Wireframe", EditorCommands.renderingModeWireframe,
+                getState = renderingModeState(RenderingMode.wireframe)
+            ),
+            MenuItem("Draw Flat", EditorCommands.renderingModeFlat,
+                getState = renderingModeState(RenderingMode.flat)
+            ),
+            MenuItem("Draw Lit", EditorCommands.renderingModeLit,
+                getState = renderingModeState(RenderingMode.lit)
+            ),
+            MenuItem("Draw Collision", EditorCommands.toggleCollisionDisplay) {
+              it.persistentState.visibleWidgetTypes.contains(WidgetTypes.collision)
+            },
+        )),
     ))
 
 fun drawViewportPanel(editor: Editor): PanelResponse =

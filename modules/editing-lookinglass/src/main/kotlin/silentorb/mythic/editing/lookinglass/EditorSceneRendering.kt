@@ -47,7 +47,7 @@ fun cameraRigToCamera(camera: CameraRig): Camera =
           getOrthoZoom(camera),
     )
 
-val elementsCache = singleValueCache<Graph, List<ElementGroup>>()
+val elementsCache = singleValueCache<Pair<Graph, Set<WidgetTypes>>, List<ElementGroup>>()
 
 fun prepareDynamicDepictions(depictions: EditorDepictionMap, graph: Graph, nodes: Collection<String>): List<ElementGroup> =
     nodes.mapNotNull { node ->
@@ -60,15 +60,37 @@ fun prepareDynamicDepictions(depictions: EditorDepictionMap, graph: Graph, nodes
         null
     }
 
+fun collisionElements(editor: Editor, graph: Graph, nodes: Collection<String>) =
+    if (editor.persistentState.visibleWidgetTypes.contains(WidgetTypes.collision)) {
+      val collisionNodes = filterByProperty(graph, SceneProperties.collisionShape)
+          .filter { nodes.contains(it.source) }
+
+      listOf(
+          ElementGroup(
+              meshes = collisionNodes.mapNotNull {
+                val shape = getShape(editor.enumerations.meshShapes, graph, it.source)
+                if (shape != null) {
+                  val transform = getNodeTransform(graph, it.source)
+                  shapeToMeshes(shape, transform)
+                } else
+                  null
+              }
+                  .flatten()
+          )
+      )
+    } else
+      listOf()
+
 fun nodesToElements(editor: Editor, graph: Graph, nodes: Collection<String>) =
     nodesToElements(editor.enumerations.meshShapes, graph, nodes) +
+        collisionElements(editor, graph, nodes) +
         prepareDynamicDepictions(editor.enumerations.depictions, graph, nodes)
 
 fun sceneFromEditorGraph(meshShapes: Map<String, Shape>, editor: Editor, lightingConfig: LightingConfig, viewport: Key): GameScene {
   val graph = getCachedGraph(editor)
   val camera = cameraRigToCamera(getEditorCamera(editor, viewport) ?: CameraRig())
 
-  val initialElements = elementsCache(graph) {
+  val initialElements = elementsCache(graph to editor.persistentState.visibleWidgetTypes) {
     val nodes = getElementNodes(graph)
     nodesToElements(editor, graph, nodes)
   }
@@ -129,10 +151,10 @@ fun renderEditor(renderer: Renderer, windowInfo: WindowInfo, editor: Editor, lig
     val scene = sceneFromEditorGraph(getMeshShapes(renderer), editor, lightingConfig, defaultViewportId)
     val sceneRenderer = createSceneRenderer(renderer, windowInfo, scene, adjustedViewport)
     val previousSelectionQuery = editor.selectionQuery
-    val graph = getCachedGraph(editor)
+    val expandedGraph = getCachedGraph(editor)
     val filters = prepareRender(sceneRenderer, scene)
     val nextSelectionQuery = if (previousSelectionQuery != null) {
-      val selectedObject = plumbPixelDepth(sceneRenderer, editor, previousSelectionQuery, graph)
+      val selectedObject = plumbPixelDepth(sceneRenderer, editor, previousSelectionQuery, expandedGraph)
       previousSelectionQuery.copy(
           response = SelectionQueryResponse(
               selectedObject = selectedObject

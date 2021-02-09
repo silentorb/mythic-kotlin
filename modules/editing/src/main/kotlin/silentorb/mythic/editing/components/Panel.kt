@@ -3,6 +3,7 @@ package silentorb.mythic.editing.components
 import imgui.ImGui
 import imgui.flag.ImGuiWindowFlags
 import silentorb.mythic.editing.Editor
+import silentorb.mythic.editing.MenuChannel
 import silentorb.mythic.editing.MenuDefinition
 import silentorb.mythic.editing.PanelResponse
 import silentorb.mythic.happenings.Commands
@@ -22,9 +23,9 @@ fun panel(
 
   ImGui.begin(title, flags or menuFlags)
 
-  val menuCommands = if (menu != null)
-    menu(getShortcutForContext(editor.bindings, context))
-  else
+  val menuCommands = if (menu != null) {
+    menu(newMenuChannel(editor, context))
+  } else
     listOf()
 
   val bodyCommands = body()
