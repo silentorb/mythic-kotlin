@@ -83,20 +83,21 @@ data class SceneState(
 
 typealias SceneStates = Map<Key, SceneState>
 
-enum class WidgetTypes {
-  collision
+object WidgetTypes {
+  val collision = "collision"
 }
 
 data class EditorPersistentState(
     val graph: String? = null,
     val sceneStates: SceneStates = mapOf(),
     val renderingModes: Map<Key, RenderingMode> = mapOf(),
-    val visibleWidgetTypes: Set<WidgetTypes> = setOf(),
+    val visibleWidgetTypes: Set<String> = setOf(),
     val fileSelection: Set<String> = setOf(),
 )
 
 typealias EditorDepiction = (Graph, Key) -> ElementGroup
 typealias EditorDepictionMap = Map<Key, EditorDepiction>
+typealias ContextMenus =  Map<String, List<MenuItem>>
 
 data class EditorEnumerations(
     val propertyDefinitions: PropertyDefinitions,
@@ -108,7 +109,8 @@ data class EditorEnumerations(
     val meshShapes: Map<Key, Shape> = mapOf(),
     val collisionPresets: Map<Int, String> = mapOf(),
     val expanders: Expanders = mapOf(),
-    val depictions: EditorDepictionMap = mapOf()
+    val depictions: EditorDepictionMap = mapOf(),
+    val menus: ContextMenus = mapOf(),
 )
 
 // Even if this only ever has one field, it's useful to wrap it to have a distinction between

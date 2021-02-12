@@ -123,7 +123,7 @@ data class MixedValue(
 val mixedValue = MixedValue()
 
 fun drawPropertiesPanel(editor: Editor, graph: Graph?): PanelResponse =
-    panel(editor, "Properties", Contexts.properties, null) {
+    panel(editor, "Properties", Contexts.properties) {
       panelBackground()
 
       if (graph != null) {

@@ -9,8 +9,8 @@ import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.scenery.SceneProperties
 
-fun nodeTreeMenus(channel: MenuChannel) =
-    drawMenuBar(channel, listOf(
+fun sceneTreeMenus(): List<MenuItem> =
+    listOf(
         MenuItem("Edit", items = listOf(
             MenuItem("Add Node", EditorCommands.addNodeWithNameDialog),
             MenuItem("Rename Node", EditorCommands.renameNodeWithNameDialog),
@@ -19,7 +19,7 @@ fun nodeTreeMenus(channel: MenuChannel) =
             MenuItem("Paste Node", EditorCommands.pasteNode),
             MenuItem("Duplicate Node", EditorCommands.duplicateNode),
         ))
-    ))
+    )
 
 fun sceneTreeDragSource(graph: Graph, node: Key): Commands =
     dragTargets(mapOf(
@@ -78,7 +78,7 @@ fun renderTree(graph: Graph, tree: SceneTree, node: String, selection: NodeSelec
 }
 
 fun renderTree(editor: Editor, graph: Graph?): PanelResponse =
-    panel(editor, "Node Tree", Contexts.nodes, ::nodeTreeMenus) {
+    panel(editor, "Node Tree", Contexts.nodes) {
       panelBackground()
 
       if (graph != null) {

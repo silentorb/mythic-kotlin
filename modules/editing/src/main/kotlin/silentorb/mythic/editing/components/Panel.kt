@@ -12,10 +12,10 @@ fun panel(
     editor: Editor,
     title: String,
     context: String,
-    menu: MenuDefinition? = null,
     flags: Int = ImGuiWindowFlags.None,
     body: () -> Commands
 ): PanelResponse {
+  val menu = editor.enumerations.menus[context]
   val menuFlags = if (menu != null)
     ImGuiWindowFlags.MenuBar
   else
@@ -24,7 +24,7 @@ fun panel(
   ImGui.begin(title, flags or menuFlags)
 
   val menuCommands = if (menu != null) {
-    menu(newMenuChannel(editor, context))
+    drawMenuBar(newMenuChannel(editor, context), menu)
   } else
     listOf()
 

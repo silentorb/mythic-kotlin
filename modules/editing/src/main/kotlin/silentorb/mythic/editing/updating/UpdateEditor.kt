@@ -72,7 +72,7 @@ fun <T> toggleKey(set: Set<T>, key: T): Set<T> =
     else
       set + key
 
-val updateVisibleWidgetTypes = handleCommands<Set<WidgetTypes>> { command, value ->
+val updateVisibleWidgetTypes = handleCommands<Set<String>> { command, value ->
   when (command.type) {
     EditorCommands.toggleCollisionDisplay -> toggleKey(value, WidgetTypes.collision)
     else -> value

@@ -8,14 +8,14 @@ import silentorb.mythic.editing.components.*
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 
-fun projectMenus(channel: MenuChannel) =
-    drawMenuBar(channel, listOf(
+fun projectMenus(): List<MenuItem> =
+    listOf(
         MenuItem("File", items = listOf(
             MenuItem("New File", EditorCommands.newFileWithNameDialog),
             MenuItem("New Folder", EditorCommands.newFolderWithNameDialog),
             MenuItem("Rename", EditorCommands.renameFileItemWithNameDialog),
         ))
-    ))
+    )
 
 fun getDragType(type: FileItemType): String =
     if (type == FileItemType.file)
@@ -80,7 +80,7 @@ fun renderProjectTree(items: Collection<FileItem>, item: FileItem, selection: No
 }
 
 fun renderProject(editor: Editor): PanelResponse =
-    panel(editor, "Project", Contexts.project, ::projectMenus) {
+    panel(editor, "Project", Contexts.project) {
       panelBackground()
       val items = editor.fileItems.values
       val root = items.firstOrNull { it.parent == null }

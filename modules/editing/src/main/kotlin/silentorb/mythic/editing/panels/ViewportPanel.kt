@@ -17,8 +17,8 @@ fun renderingModeState(mode: RenderingMode): GetMenuItemState = { editor ->
   editor.persistentState.renderingModes[defaultViewportId] == mode
 }
 
-fun viewportMenus(channel: MenuChannel): MenuResponse =
-    drawMenuBar(channel, listOf(
+fun viewportMenus(): List<MenuItem> =
+    listOf(
         MenuItem("Camera", items = listOf(
             MenuItem("View Front", EditorCommands.viewFront),
             MenuItem("View Back", EditorCommands.viewBack),
@@ -43,10 +43,10 @@ fun viewportMenus(channel: MenuChannel): MenuResponse =
               it.persistentState.visibleWidgetTypes.contains(WidgetTypes.collision)
             },
         )),
-    ))
+    )
 
 fun drawViewportPanel(editor: Editor): PanelResponse =
-    panel(editor, "Viewport", Contexts.viewport, ::viewportMenus, ImGuiWindowFlags.NoBackground) {
+    panel(editor, "Viewport", Contexts.viewport, ImGuiWindowFlags.NoBackground) {
       val menuHeight = 0
       val viewport = Vector4i(
           ImGui.getWindowPosX().toInt(), ImGui.getWindowPosY().toInt() + menuHeight,

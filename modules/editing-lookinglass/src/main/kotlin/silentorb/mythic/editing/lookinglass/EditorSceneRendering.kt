@@ -47,7 +47,7 @@ fun cameraRigToCamera(camera: CameraRig): Camera =
           getOrthoZoom(camera),
     )
 
-val elementsCache = singleValueCache<Pair<Graph, Set<WidgetTypes>>, List<ElementGroup>>()
+val elementsCache = singleValueCache<Pair<Graph, Set<String>>, List<ElementGroup>>()
 
 fun prepareDynamicDepictions(depictions: EditorDepictionMap, graph: Graph, nodes: Collection<String>): List<ElementGroup> =
     nodes.mapNotNull { node ->

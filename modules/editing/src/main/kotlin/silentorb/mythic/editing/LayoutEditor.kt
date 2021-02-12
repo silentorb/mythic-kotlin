@@ -2,10 +2,7 @@ package silentorb.mythic.editing
 
 import imgui.ImGui
 import silentorb.mythic.editing.components.*
-import silentorb.mythic.editing.panels.drawPropertiesPanel
-import silentorb.mythic.editing.panels.drawViewportPanel
-import silentorb.mythic.editing.panels.renderProject
-import silentorb.mythic.editing.panels.renderTree
+import silentorb.mythic.editing.panels.*
 import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.happenings.Commands
 
@@ -45,3 +42,9 @@ fun drawEditor(editor: Editor, deviceStates: List<InputDeviceState>): Commands {
 
   return menuAndPanelCommands + dialogCommands + getImGuiCommands(editor)
 }
+
+fun panelMenus(): ContextMenus = mapOf(
+    Contexts.project to projectMenus(),
+    Contexts.nodes to sceneTreeMenus(),
+    Contexts.viewport to viewportMenus(),
+)
