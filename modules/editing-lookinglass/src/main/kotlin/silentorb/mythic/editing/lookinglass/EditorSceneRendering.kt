@@ -61,7 +61,7 @@ fun prepareDynamicDepictions(depictions: EditorDepictionMap, graph: Graph, nodes
     }
 
 fun collisionElements(editor: Editor, graph: Graph, nodes: Collection<String>) =
-    if (editor.persistentState.visibleWidgetTypes.contains(WidgetTypes.collision)) {
+    if (editor.persistentState.visibleGizmoTypes.contains(GizmoTypes.collision)) {
       val collisionNodes = filterByProperty(graph, SceneProperties.collisionShape)
           .filter { nodes.contains(it.source) }
 
@@ -90,7 +90,7 @@ fun sceneFromEditorGraph(meshShapes: Map<String, Shape>, editor: Editor, lightin
   val graph = getCachedGraph(editor)
   val camera = cameraRigToCamera(getEditorCamera(editor, viewport) ?: CameraRig())
 
-  val initialElements = elementsCache(graph to editor.persistentState.visibleWidgetTypes) {
+  val initialElements = elementsCache(graph to editor.persistentState.visibleGizmoTypes) {
     val nodes = getElementNodes(graph)
     nodesToElements(editor, graph, nodes)
   }

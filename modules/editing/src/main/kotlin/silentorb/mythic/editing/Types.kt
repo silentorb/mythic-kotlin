@@ -1,5 +1,6 @@
 package silentorb.mythic.editing
 
+import imgui.ImDrawList
 import silentorb.mythic.ent.*
 import silentorb.mythic.ent.scenery.Expanders
 import silentorb.mythic.happenings.Command
@@ -64,6 +65,7 @@ typealias GetShortcut = (String) -> String?
 data class MenuChannel(
     val getShortcut: GetShortcut,
     val editor: Editor,
+    val menus: ContextMenus,
 )
 
 enum class RenderingMode {
@@ -83,7 +85,7 @@ data class SceneState(
 
 typealias SceneStates = Map<Key, SceneState>
 
-object WidgetTypes {
+object GizmoTypes {
   val collision = "collision"
 }
 
@@ -91,13 +93,42 @@ data class EditorPersistentState(
     val graph: String? = null,
     val sceneStates: SceneStates = mapOf(),
     val renderingModes: Map<Key, RenderingMode> = mapOf(),
-    val visibleWidgetTypes: Set<String> = setOf(),
+    val visibleGizmoTypes: Set<String> = setOf(),
     val fileSelection: Set<String> = setOf(),
 )
 
+data class MenuItem(
+    val label: String,
+    val commandType: String? = null,
+    val command: Command? = null,
+    val getState: GetMenuItemState? = null,
+    val weight: Int = 1000
+)
+
+data class MenuTree(
+    val label: String,
+    val commandType: String? = null,
+    val command: Command? = null,
+    val items: List<MenuTree>? = null,
+    val key: String? = null,
+    val getState: GetMenuItemState? = null,
+)
+
+typealias PathList = List<String>
+
 typealias EditorDepiction = (Graph, Key) -> ElementGroup
 typealias EditorDepictionMap = Map<Key, EditorDepiction>
-typealias ContextMenus =  Map<String, List<MenuItem>>
+typealias ContextMenus = Map<PathList, MenuItem>
+
+data class GizmoEnvironment(
+    val editor: Editor,
+    val viewport: Vector4i,
+    val camera: CameraRig,
+    val transform: ScreenTransform,
+    val drawList: ImDrawList,
+)
+
+typealias GizmoPainter = (GizmoEnvironment) -> Unit
 
 data class EditorEnumerations(
     val propertyDefinitions: PropertyDefinitions,
@@ -111,6 +142,7 @@ data class EditorEnumerations(
     val expanders: Expanders = mapOf(),
     val depictions: EditorDepictionMap = mapOf(),
     val menus: ContextMenus = mapOf(),
+    val gizmoPainters: List<GizmoPainter>,
 )
 
 // Even if this only ever has one field, it's useful to wrap it to have a distinction between
@@ -164,13 +196,6 @@ const val numpadPeriodKey = "$keypadKey ."
 
 typealias GetMenuItemState = (Editor) -> Boolean
 
-data class MenuItem(
-    val label: String,
-    val command: String? = null,
-    val items: List<MenuItem>? = null,
-    val getState: GetMenuItemState? = null
-)
-
 enum class CollisionShape {
   box,
   composite,
@@ -185,4 +210,10 @@ object Contexts {
   const val project = "project"
   const val viewport = "viewport"
   const val properties = "properties"
+}
+
+object Menus {
+  const val camera = "camera"
+  const val display = "display"
+  const val file = "file"
 }

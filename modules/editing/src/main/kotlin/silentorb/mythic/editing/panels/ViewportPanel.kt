@@ -5,7 +5,7 @@ import imgui.ImVec2
 import imgui.flag.ImGuiMouseButton
 import imgui.flag.ImGuiWindowFlags
 import silentorb.mythic.editing.*
-import silentorb.mythic.editing.components.drawMenuBar
+import silentorb.mythic.editing.components.gizmoMenuToggleState
 import silentorb.mythic.editing.components.panel
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.spatial.Vector2i
@@ -17,31 +17,31 @@ fun renderingModeState(mode: RenderingMode): GetMenuItemState = { editor ->
   editor.persistentState.renderingModes[defaultViewportId] == mode
 }
 
-fun viewportMenus(): List<MenuItem> =
+fun viewportMenus(): List<MenuTree> =
     listOf(
-        MenuItem("Camera", items = listOf(
-            MenuItem("View Front", EditorCommands.viewFront),
-            MenuItem("View Back", EditorCommands.viewBack),
-            MenuItem("View Right", EditorCommands.viewRight),
-            MenuItem("View Left", EditorCommands.viewLeft),
-            MenuItem("View Top", EditorCommands.viewTop),
-            MenuItem("View Bottom", EditorCommands.viewBottom),
-            MenuItem("Toggle Projection", EditorCommands.toggleProjectionMode),
-            MenuItem("Center on Selection", EditorCommands.centerOnSelection),
+        MenuTree("Camera", key = Menus.camera, items = listOf(
+            MenuTree("View Front", EditorCommands.viewFront),
+            MenuTree("View Back", EditorCommands.viewBack),
+            MenuTree("View Right", EditorCommands.viewRight),
+            MenuTree("View Left", EditorCommands.viewLeft),
+            MenuTree("View Top", EditorCommands.viewTop),
+            MenuTree("View Bottom", EditorCommands.viewBottom),
+            MenuTree("Toggle Projection", EditorCommands.toggleProjectionMode),
+            MenuTree("Center on Selection", EditorCommands.centerOnSelection),
         )),
-        MenuItem("Display", items = listOf(
-            MenuItem("Draw Wireframe", EditorCommands.renderingModeWireframe,
+        MenuTree("Display", key = Menus.display, items = listOf(
+            MenuTree("Draw Wireframe", EditorCommands.renderingModeWireframe,
                 getState = renderingModeState(RenderingMode.wireframe)
             ),
-            MenuItem("Draw Flat", EditorCommands.renderingModeFlat,
+            MenuTree("Draw Flat", EditorCommands.renderingModeFlat,
                 getState = renderingModeState(RenderingMode.flat)
             ),
-            MenuItem("Draw Lit", EditorCommands.renderingModeLit,
+            MenuTree("Draw Lit", EditorCommands.renderingModeLit,
                 getState = renderingModeState(RenderingMode.lit)
             ),
-            MenuItem("Draw Collision", EditorCommands.toggleCollisionDisplay) {
-              it.persistentState.visibleWidgetTypes.contains(WidgetTypes.collision)
-            },
+            MenuTree("Collision", command = Command(EditorCommands.toggleGizmoVisibility, GizmoTypes.collision),
+                getState = gizmoMenuToggleState(GizmoTypes.collision)
+            ),
         )),
     )
 

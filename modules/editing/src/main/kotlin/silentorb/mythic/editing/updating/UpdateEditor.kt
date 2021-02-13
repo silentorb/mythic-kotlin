@@ -74,7 +74,8 @@ fun <T> toggleKey(set: Set<T>, key: T): Set<T> =
 
 val updateVisibleWidgetTypes = handleCommands<Set<String>> { command, value ->
   when (command.type) {
-    EditorCommands.toggleCollisionDisplay -> toggleKey(value, WidgetTypes.collision)
+    EditorCommands.toggleCollisionDisplay -> toggleKey(value, GizmoTypes.collision)
+    EditorCommands.toggleGizmoVisibility -> toggleKey(value, command.value as String)
     else -> value
   }
 }
@@ -123,7 +124,7 @@ fun updateEditorState(commands: Commands, editor: Editor, graph: Graph?, mousePo
       sceneStates = updateSceneStates(commands, editor, graph, mousePosition, mouseOffset),
       fileSelection = updateFileSelection(commands, state.fileSelection),
       renderingModes = state.renderingModes + (defaultViewportId to renderingMode),
-      visibleWidgetTypes = updateVisibleWidgetTypes(commands, state.visibleWidgetTypes),
+      visibleGizmoTypes = updateVisibleWidgetTypes(commands, state.visibleGizmoTypes),
   )
 }
 

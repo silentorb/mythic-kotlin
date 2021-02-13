@@ -15,6 +15,12 @@ fun axisColors() = listOf(
     ImColor.intToColor(40, 144, 255, 255),
 )
 
+fun gizmoPainterToggle(key: String, painter: GizmoPainter): GizmoPainter = { environment ->
+  if (environment.editor.persistentState.visibleGizmoTypes.contains(key)) {
+    painter(environment)
+  }
+}
+
 fun drawAxisRails(axis: Axis, origin: Vector3, transform: ScreenTransform, drawList: ImDrawList) {
   val mask = axisMask(setOf(axis))
   val other = Vector3(mask.map { 1f - it }) * origin
@@ -33,6 +39,12 @@ fun getStandardPointTransform(viewport: Vector4i, camera: CameraRig): ScreenTran
   val cameraTransform = createProjectionMatrix(camera, dimensions) * viewTransform
   val offset = viewport.xy()
   return transformPoint(cameraTransform, dimensions.toVector2(), offset.toVector2())
+}
+
+fun drawGizmoLine(drawList: ImDrawList, transform: ScreenTransform, start: Vector3, end: Vector3, color: Int, thickness: Float = 1f) {
+  val a = transform(start)
+  val b = transform(end)
+  drawList.addLine(a.x, a.y, b.x, b.y, color, thickness)
 }
 
 fun drawSelectedObjectAnnotations(editor: Editor, transform: ScreenTransform, drawList: ImDrawList) {
@@ -82,6 +94,17 @@ fun drawCompass(transform: ScreenTransform, lookAt: Vector3, drawList: ImDrawLis
   }
 }
 
+fun drawCompass(viewport: Vector4i, camera: CameraRig, drawList: ImDrawList) {
+  val dimensions = viewport.zw()
+  val viewTransform = createViewMatrix(Vector3.zero, camera.orientation)
+  val orthoTransform = createOrthographicMatrix(dimensions, 30f, 0.01f, 1000f) * viewTransform
+  val compassPadding = 50
+  val compassOffset = viewport.xy() + Vector2i(compassPadding, viewport.w - compassPadding) - viewport.zw() / 2
+  val compassTransform = transformPoint(orthoTransform, dimensions.toVector2(), compassOffset.toVector2())
+  val lookAt = getCameraLookat(camera)
+  drawCompass(compassTransform, lookAt, drawList)
+}
+
 fun drawJoints(editor: Editor, transform: ScreenTransform, drawList: ImDrawList) {
   if (editor.operation?.type != OperationType.connecting)
     return
@@ -104,25 +127,25 @@ fun drawJoints(editor: Editor, transform: ScreenTransform, drawList: ImDrawList)
 
 fun drawEditor3dElements(editor: Editor, viewport: Vector4i, camera: CameraRig) {
   val drawList = ImGui.getBackgroundDrawList()
-//  drawList.addCircle(viewport.x.toFloat() + viewport.z.toFloat() * 0.5f,
-//      viewport.y.toFloat() + viewport.w.toFloat() * 0.5f,
-//      100f, ImColor.intToColor(64, 64, 64, 255), 32, 2f)
-
-  val dimensions = viewport.zw()
-  val viewTransform = createViewMatrix(Vector3.zero, camera.orientation)
-  val orthoTransform = createOrthographicMatrix(dimensions, 30f, 0.01f, 1000f) * viewTransform
-  val compassPadding = 50
-  val compassOffset = viewport.xy() + Vector2i(compassPadding, viewport.w - compassPadding) - viewport.zw() / 2
-  val compassTransform = transformPoint(orthoTransform, dimensions.toVector2(), compassOffset.toVector2())
 
   val bounds = viewport.toVector4()
   drawList.pushClipRect(bounds.x, bounds.y, bounds.x + bounds.z, bounds.y + bounds.w)
 
-  val lookAt = getCameraLookat(camera)
   val transform = getStandardPointTransform(viewport, camera)
   drawSelectedObjectAnnotations(editor, transform, drawList)
   drawJoints(editor, transform, drawList)
-  drawCompass(compassTransform, lookAt, drawList)
+  drawCompass(viewport, camera, drawList)
+
+  val environment = GizmoEnvironment(
+      editor = editor,
+      viewport = viewport,
+      camera = camera,
+      transform = transform,
+      drawList = drawList,
+  )
+  for (painter in editor.enumerations.gizmoPainters) {
+    painter(environment)
+  }
 
   drawList.popClipRect()
 }

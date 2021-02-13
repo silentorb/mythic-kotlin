@@ -9,15 +9,15 @@ import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.scenery.SceneProperties
 
-fun sceneTreeMenus(): List<MenuItem> =
+fun sceneTreeMenus(): List<MenuTree> =
     listOf(
-        MenuItem("Edit", items = listOf(
-            MenuItem("Add Node", EditorCommands.addNodeWithNameDialog),
-            MenuItem("Rename Node", EditorCommands.renameNodeWithNameDialog),
-            MenuItem("Delete Node", EditorCommands.deleteNode),
-            MenuItem("Copy Node", EditorCommands.copyNode),
-            MenuItem("Paste Node", EditorCommands.pasteNode),
-            MenuItem("Duplicate Node", EditorCommands.duplicateNode),
+        MenuTree("Edit", items = listOf(
+            MenuTree("Add Node", EditorCommands.addNodeWithNameDialog),
+            MenuTree("Rename Node", EditorCommands.renameNodeWithNameDialog),
+            MenuTree("Delete Node", EditorCommands.deleteNode),
+            MenuTree("Copy Node", EditorCommands.copyNode),
+            MenuTree("Paste Node", EditorCommands.pasteNode),
+            MenuTree("Duplicate Node", EditorCommands.duplicateNode),
         ))
     )
 

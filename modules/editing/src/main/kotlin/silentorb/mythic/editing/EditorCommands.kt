@@ -50,6 +50,7 @@ object EditorCommands {
   val toggleFlythroughMode = "toggleFlythroughMode"
   val startConnecting = "startConnecting"
   val toggleCollisionDisplay = "toggleCollisionDisplay"
+  val toggleGizmoVisibility = "toggleGizmoVisibility"
 
   val newFile = "newFile"
   val duplicateFile = "duplicateFile"

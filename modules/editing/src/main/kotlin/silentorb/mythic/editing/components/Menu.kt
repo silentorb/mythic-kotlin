@@ -3,46 +3,60 @@ package silentorb.mythic.editing.components
 import imgui.ImGui
 import silentorb.mythic.editing.*
 import silentorb.mythic.happenings.Command
-import silentorb.mythic.happenings.Commands
 
-fun drawMenuItem(channel: MenuChannel): (MenuItem) -> List<Command> = { item ->
+fun getMenuItems(menus: ContextMenus, path: PathList): ContextMenus =
+    menus
+        .filterKeys { it.dropLast(1) == path }
+
+fun drawMenuItem(channel: MenuChannel, item: MenuItem): List<Command> {
+  val commandType = item.commandType
   val command = item.command
-  val shortcut = (if (command != null) channel.getShortcut(command) else null) ?: ""
+  val shortcut = (if (commandType != null) channel.getShortcut(commandType) else null) ?: ""
   val getMenuItemState = item.getState
   val expanded = if (getMenuItemState != null)
     ImGui.menuItem(item.label, shortcut, getMenuItemState(channel.editor))
   else
     ImGui.menuItem(item.label, shortcut)
 
-  if (expanded && command != null) {
-    listOf(Command(type = command))
+  return if (expanded && (command != null || commandType != null)) {
+    listOf(command ?: Command(type = commandType!!))
   } else
     listOf()
 }
 
-fun drawMenuItems(channel: MenuChannel, items: List<MenuItem>): List<Command> =
-    items.flatMap(drawMenuItem(channel))
+fun sortMenu(items: ContextMenus) =
+    items.entries
+        .sortedWith(compareBy({ it.value.weight }, { it.value.label }))
 
-fun drawMenu(channel: MenuChannel): (MenuItem) -> List<Command> = { item ->
-  if (ImGui.beginMenu(item.label)) {
-    val result = drawMenuItems(channel, item.items ?: listOf())
-    ImGui.endMenu()
-    result
-  } else
-    listOf()
-}
+fun drawMenuItems(channel: MenuChannel, items: ContextMenus): List<Command> =
+    sortMenu(items)
+        .flatMap { drawMenuItem(channel, it.value) }
 
-fun drawMainMenuBar(channel: MenuChannel, items: List<MenuItem>): MenuResponse =
+fun drawMenu(channel: MenuChannel, path: PathList, item: MenuItem): List<Command> =
+    if (ImGui.beginMenu(item.label)) {
+      val items = getMenuItems(channel.menus, path)
+      val result = drawMenuItems(channel, items)
+      ImGui.endMenu()
+      result
+    } else
+      listOf()
+
+fun drawMenu(channel: MenuChannel, items: ContextMenus) =
+    sortMenu(items)
+        .flatMap { drawMenu(channel, it.key, it.value) }
+
+fun drawMainMenuBar(channel: MenuChannel, path: PathList): MenuResponse =
     if (ImGui.beginMainMenuBar()) {
-      val result = items.flatMap(drawMenu(channel))
+      val items = getMenuItems(channel.menus, path)
+      val result = drawMenu(channel, items)
       ImGui.endMainMenuBar()
       result
     } else
       listOf()
 
-fun drawMenuBar(channel: MenuChannel, items: List<MenuItem>): MenuResponse =
+fun drawMenuBar(channel: MenuChannel, items: ContextMenus): MenuResponse =
     if (ImGui.beginMenuBar()) {
-      val result = items.flatMap(drawMenu(channel))
+      val result = drawMenu(channel, items)
       ImGui.endMenuBar()
       result
     } else
@@ -56,4 +70,9 @@ fun newMenuChannel(editor: Editor, context: String): MenuChannel =
     MenuChannel(
         getShortcut = getShortcutForContext(editor.bindings, context),
         editor = editor,
+        menus = editor.enumerations.menus,
     )
+
+fun gizmoMenuToggleState(gizmo: String): GetMenuItemState = { editor ->
+  editor.persistentState.visibleGizmoTypes.contains(gizmo)
+}

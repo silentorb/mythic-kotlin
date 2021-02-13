@@ -8,7 +8,7 @@ import silentorb.mythic.happenings.Commands
 
 fun drawEditor(editor: Editor, deviceStates: List<InputDeviceState>): Commands {
   val graph = getActiveEditorGraph(editor)
-  val menuCommands = mainMenus(newMenuChannel(editor, Contexts.global))
+  val menuCommands = drawMainMenuBar(newMenuChannel(editor, Contexts.global), listOf(Contexts.global))
 
   ImGui.setNextWindowBgAlpha(0f)
   ImGui.dockSpaceOverViewport()
@@ -43,8 +43,33 @@ fun drawEditor(editor: Editor, deviceStates: List<InputDeviceState>): Commands {
   return menuAndPanelCommands + dialogCommands + getImGuiCommands(editor)
 }
 
+fun mapMenu(parent: PathList, index: Int, menuItem: MenuTree): ContextMenus {
+  val key = menuItem.key ?: menuItem.commandType ?: menuItem.label
+  val path = parent + key
+  val items = menuItem.items
+  return mapOf(
+      path to MenuItem(
+          label = menuItem.label,
+          commandType = menuItem.commandType,
+          command = menuItem.command,
+          getState = menuItem.getState,
+          weight = index * 10
+      ),
+  ) + if (items != null)
+    items.mapIndexed { index, child ->
+      mapMenu(path, index, child)
+    }
+        .fold(mapOf()) { a, b -> a + b }
+  else
+    mapOf()
+}
+
 fun panelMenus(): ContextMenus = mapOf(
+    Contexts.global to mainMenus(),
     Contexts.project to projectMenus(),
     Contexts.nodes to sceneTreeMenus(),
     Contexts.viewport to viewportMenus(),
 )
+    .entries
+    .flatMap { b -> b.value.mapIndexed { index, item -> mapMenu(listOf(b.key), index, item) } }
+    .fold(mapOf()) { a, b -> a + b }

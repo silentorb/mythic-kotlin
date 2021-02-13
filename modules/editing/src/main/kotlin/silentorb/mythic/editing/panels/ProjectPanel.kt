@@ -8,12 +8,12 @@ import silentorb.mythic.editing.components.*
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 
-fun projectMenus(): List<MenuItem> =
+fun projectMenus(): List<MenuTree> =
     listOf(
-        MenuItem("File", items = listOf(
-            MenuItem("New File", EditorCommands.newFileWithNameDialog),
-            MenuItem("New Folder", EditorCommands.newFolderWithNameDialog),
-            MenuItem("Rename", EditorCommands.renameFileItemWithNameDialog),
+        MenuTree("File", key = Menus.file, items = listOf(
+            MenuTree("New File", EditorCommands.newFileWithNameDialog),
+            MenuTree("New Folder", EditorCommands.newFolderWithNameDialog),
+            MenuTree("Rename", EditorCommands.renameFileItemWithNameDialog),
         ))
     )
 

@@ -168,3 +168,6 @@ fun nodeAttributes(graph: Graph, attribute: String): List<Key> =
 
 fun hasAttribute(graph: Graph, node: Key, attribute: String): Boolean =
     graph.any { it.source == node && it.property == SceneProperties.type && it.target == attribute }
+
+fun hasAttribute(graph: Graph, attribute: String): Boolean =
+    graph.any { it.property == SceneProperties.type && it.target == attribute }
