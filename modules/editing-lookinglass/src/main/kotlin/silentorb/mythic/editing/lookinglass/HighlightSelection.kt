@@ -19,7 +19,7 @@ fun renderEditorSelection(editor: Editor, sceneRenderer: SceneRenderer) {
   val selection = getNodeSelection(editor)
   val graph = getCachedGraph(editor)
   for (node in selection) {
-    val elementGroups = getSelectionMeshes(editor, graph, node)
+    val elementGroups = getSelectionMeshes(editor, graph, graph, node)
     if (elementGroups.any()) {
       val material = Material(
           shading = false,

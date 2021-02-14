@@ -44,7 +44,7 @@ fun plumbPixelDepth(sceneRenderer: SceneRenderer, editor: Editor, selectionQuery
       var lastSample = 0
 
       for (node in nodes) {
-        val elementGroups = getSelectionMeshes(editor, childGraph, node)
+        val elementGroups = getSelectionMeshes(editor, childGraph, expandedGraph, node)
         if (elementGroups.any()) {
           val groups = setElementGroupMaterial(material, elementGroups)
           renderElementGroups(sceneRenderer, groups)

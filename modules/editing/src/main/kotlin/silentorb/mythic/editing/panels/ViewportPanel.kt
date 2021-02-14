@@ -47,7 +47,7 @@ fun viewportMenus(): List<MenuTree> =
 
 fun drawViewportPanel(editor: Editor): PanelResponse =
     panel(editor, "Viewport", Contexts.viewport, ImGuiWindowFlags.NoBackground) {
-      val menuHeight = 0
+      val menuHeight = 35
       val viewport = Vector4i(
           ImGui.getWindowPosX().toInt(), ImGui.getWindowPosY().toInt() + menuHeight,
           ImGui.getWindowSizeX().toInt(), ImGui.getWindowSizeY().toInt() - menuHeight
@@ -61,7 +61,7 @@ fun drawViewportPanel(editor: Editor): PanelResponse =
       )
 
       val isInBounds = mousePosition.x > 0 &&
-          mousePosition.y > 35 &&
+          mousePosition.y > 0 &&
           mousePosition.x < viewport.z &&
           mousePosition.y < viewport.w
 
