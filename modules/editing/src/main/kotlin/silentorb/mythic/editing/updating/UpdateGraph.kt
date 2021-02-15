@@ -110,6 +110,12 @@ fun updateSceneGraph(editor: Editor) = handleCommands<Graph> { command, graph ->
       graph - listOf(entry)
     }
 
-    else -> graph
+    else -> {
+      val handler = editor.enumerations.graphEditors[command.type]
+      if (handler != null)
+        handler(editor, command, graph)
+      else
+        graph
+    }
   }
 }

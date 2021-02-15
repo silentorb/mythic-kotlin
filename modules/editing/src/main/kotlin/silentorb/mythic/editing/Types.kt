@@ -130,6 +130,9 @@ data class GizmoEnvironment(
 
 typealias GizmoPainter = (GizmoEnvironment) -> Unit
 
+typealias GraphEditor = (Editor, Command, Graph) -> Graph
+typealias GraphEditors = Map<String, GraphEditor>
+
 data class EditorEnumerations(
     val propertyDefinitions: PropertyDefinitions,
     val propertiesSerialization: PropertiesSerialization,
@@ -143,6 +146,7 @@ data class EditorEnumerations(
     val depictions: EditorDepictionMap = mapOf(),
     val menus: ContextMenus = mapOf(),
     val gizmoPainters: List<GizmoPainter>,
+    val graphEditors: GraphEditors = mapOf(),
 )
 
 // Even if this only ever has one field, it's useful to wrap it to have a distinction between
@@ -215,5 +219,6 @@ object Contexts {
 object Menus {
   const val camera = "camera"
   const val display = "display"
+  const val edit = "edit"
   const val file = "file"
 }

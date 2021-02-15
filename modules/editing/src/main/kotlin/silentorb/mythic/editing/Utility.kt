@@ -140,3 +140,5 @@ fun extractPropertiesSerialization(properties: PropertyDefinitions): PropertiesS
         .mapValues { (_, property) ->
           property.serialization!!
         }
+
+fun defaultGraphEditors(): GraphEditors = mapOf()

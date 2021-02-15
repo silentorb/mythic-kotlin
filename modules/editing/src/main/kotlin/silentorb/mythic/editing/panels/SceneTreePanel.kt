@@ -11,7 +11,7 @@ import silentorb.mythic.scenery.SceneProperties
 
 fun sceneTreeMenus(): List<MenuTree> =
     listOf(
-        MenuTree("Edit", items = listOf(
+        MenuTree("Edit", key = Menus.edit, items = listOf(
             MenuTree("Add Node", EditorCommands.addNodeWithNameDialog),
             MenuTree("Rename Node", EditorCommands.renameNodeWithNameDialog),
             MenuTree("Delete Node", EditorCommands.deleteNode),
