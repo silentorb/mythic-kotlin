@@ -42,9 +42,10 @@ fun updateSceneGraph(editor: Editor) = handleCommands<Graph> { command, graph ->
         graph
       else {
         val selected = selection.first()
-        val roots = getGraphRoots(clipboard)
+        val newClipboardGraph = prepareGraphForMerging(graph, clipboard)
+        val roots = getGraphRoots(newClipboardGraph)
         val glue = roots.map { Entry(it, SceneProperties.parent, selected) }
-        val result = mergeGraphsWithRenaming(graph, clipboard) + glue
+        val result = graph + newClipboardGraph + glue
         result
       }
     }

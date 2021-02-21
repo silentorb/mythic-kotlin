@@ -124,15 +124,16 @@ fun renameNodes(duplicates: List<String>, allKeys: Set<String>, graph: Graph): G
       renameNodes(duplicates.drop(1), allKeys + newName, nextGraph)
     }
 
-fun mergeGraphsWithRenaming(primary: Graph, secondary: Graph): Graph {
+fun prepareGraphForMerging(primary: Graph, secondary: Graph): Graph {
   val primaryKeys = getGraphKeys(primary)
   val secondaryKeys = getGraphKeys(secondary)
   val duplicates = primaryKeys.intersect(secondaryKeys).toList()
   val allKeys = primaryKeys + secondaryKeys
-//  val updatedSecondary = duplicates
-//      .fold(secondary) { a, b -> renameNode(a, b, uniqueNodeName(allKeys, b)) }
+  return renameNodes(duplicates, allKeys, secondary)
+}
 
-  val updatedSecondary = renameNodes(duplicates, allKeys, secondary)
+fun mergeGraphsWithRenaming(primary: Graph, secondary: Graph): Graph {
+  val updatedSecondary = prepareGraphForMerging(primary, secondary)
   return primary + updatedSecondary
 }
 typealias SerializationMethod = (Any) -> Any

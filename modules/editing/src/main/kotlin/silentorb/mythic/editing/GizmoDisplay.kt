@@ -3,6 +3,7 @@ package silentorb.mythic.editing
 import imgui.ImColor
 import imgui.ImDrawList
 import imgui.ImGui
+import imgui.ImVec2
 import silentorb.mythic.ent.scenery.nodeAttributes
 import silentorb.mythic.ent.scenery.getNodeTransform
 import silentorb.mythic.spatial.*
@@ -45,6 +46,16 @@ fun drawGizmoLine(drawList: ImDrawList, transform: ScreenTransform, start: Vecto
   val a = transform(start)
   val b = transform(end)
   drawList.addLine(a.x, a.y, b.x, b.y, color, thickness)
+}
+
+fun drawGizmoSolidPolygon(drawList: ImDrawList, transform: ScreenTransform, points: Collection<Vector3>, color: Int) {
+  val p = points.map {
+    val point = transform(it)
+    ImVec2(point.x, point.y)
+  }
+      .toTypedArray()
+
+  drawList.addConvexPolyFilled(p, p.size, color)
 }
 
 fun drawSelectedObjectAnnotations(editor: Editor, transform: ScreenTransform, drawList: ImDrawList) {
