@@ -17,7 +17,7 @@ data class CameraRig(
     val rotation: Vector2 = Vector2.zero,
     val lookVelocity: Vector2 = Vector2.zero,
     val pivotDistance: Float = 10f,
-    val projection: ProjectionType = ProjectionType.perspective,
+    val projection: ProjectionType = ProjectionType.orthographic,
     val angle: Float = 70f
 ) {
   @get:JsonIgnore
