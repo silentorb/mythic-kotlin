@@ -35,6 +35,14 @@ val intSerialization = Serialization(
     },
     save = { it }
 )
+
+inline fun <T> enumSerialization(crossinline loader: (String) -> T) = Serialization(
+    load = {
+      loader(it as String) as Any
+    },
+    save = { it }
+)
+
 val collisionGroupWidget: PropertyWidget = labeledDropDownWidget { it.enumerations.collisionPresets }
 
 fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
