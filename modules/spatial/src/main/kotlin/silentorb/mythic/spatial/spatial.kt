@@ -324,6 +324,13 @@ fun minMax(value: Float, min: Float, max: Float): Float =
     else
       value
 
+fun clipByRange(range: Float, value: Float): Float =
+    when {
+      value > 0 && value > range -> range
+      value < 0 && value < range -> -range
+      else -> value
+    }
+
 operator fun Vector3i.plus(other: Vector3i): Vector3i = Vector3i(x + other.x, y + other.y, z + other.z)
 operator fun Vector3i.plus(other: Int): Vector3i = Vector3i(x + other, y + other, z + other)
 //operator fun Vector2f.minus(other: Float): Vector2f = Vector2f(x - other, y - other)

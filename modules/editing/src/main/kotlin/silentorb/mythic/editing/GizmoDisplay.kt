@@ -48,6 +48,11 @@ fun drawGizmoLine(drawList: ImDrawList, transform: ScreenTransform, start: Vecto
   drawList.addLine(a.x, a.y, b.x, b.y, color, thickness)
 }
 
+fun drawGizmoText(drawList: ImDrawList, transform: ScreenTransform, location: Vector3, text: String, color: Int) {
+  val point = transform(location)
+  drawList.addText(point.x, point.y, color, text)
+}
+
 fun drawGizmoSolidPolygon(drawList: ImDrawList, transform: ScreenTransform, points: Collection<Vector3>, color: Int) {
   val p = points.map {
     val point = transform(it)

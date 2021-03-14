@@ -10,6 +10,7 @@ data class FileItem(
     val fullPath: String,
     val name: String,
     val parent: String?,
+    val isVirtual: Boolean = false,
     val baseName: String = name.split(".").first()
 )
 

@@ -83,9 +83,11 @@ fun renderProject(editor: Editor): PanelResponse =
     panel(editor, "Project", Contexts.project) {
       panelBackground()
       val items = editor.fileItems.values
-      val root = items.firstOrNull { it.parent == null }
-      if (root == null)
-        listOf()
-      else
-        renderProjectTree(items, root, editor.persistentState.fileSelection)
+      val roots = items
+          .filter { it.parent == null }
+          .sortedBy { it.name }
+
+      roots.fold(listOf()) { commands, root ->
+        commands + renderProjectTree(items, root, editor.persistentState.fileSelection)
+      }
     }
