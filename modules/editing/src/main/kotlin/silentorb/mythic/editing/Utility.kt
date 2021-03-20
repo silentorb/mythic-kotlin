@@ -51,6 +51,9 @@ fun getNodeSelection(state: EditorPersistentState): NodeSelection =
 fun getEditorCamera(editor: Editor, viewport: Key?): CameraRig? =
     getEditorViewport(editor, viewport)?.camera
 
+fun getActiveEditorGraphKey(editor: Editor): String? =
+    editor.persistentState.graph
+
 fun getActiveEditorGraph(editor: Editor): Graph? =
     editor.staging ?: getLatestGraph(editor) ?: editor.graphLibrary[editor.persistentState.graph]
 
