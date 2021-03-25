@@ -1,12 +1,14 @@
 package silentorb.mythic.debugging
 
 data class Metrics(
-    var iterations: Int,
-    var total: Long
+    var iterations: Int = 0,
+    var total: Long = 0L,
 )
 
+typealias MetricMap = MutableMap<String, Metrics>
+
 class Profiler {
-  val metrics: MutableMap<String, Metrics> = mutableMapOf()
+  val metrics: MetricMap = mutableMapOf()
 
   fun <T> wrapBlock(name: String, action: () -> T): T {
     val record = metrics.getOrElse(name) { Metrics(0, 0L) }
@@ -29,8 +31,8 @@ class Profiler {
   }
 }
 
-fun printProfiler(profiler: Profiler) {
-  for ((name, metric) in profiler.metrics) {
+fun printProfiler(metrics: MetricMap) {
+  for ((name, metric) in metrics) {
     println(
         name.take(12).padStart(12, ' ')
             + " total: "

@@ -77,6 +77,9 @@ fun getConfigString(name: String): String? =
 fun getDebugInt(name: String): Int? =
     getDebugString(name)?.toIntOrNull()
 
+fun getDebugLong(name: String): Long? =
+    getDebugString(name)?.toLongOrNull()
+
 fun getDebugBoolean(name: String): Boolean =
     getDebugInt(name)?.equals(1) ?: false
 
