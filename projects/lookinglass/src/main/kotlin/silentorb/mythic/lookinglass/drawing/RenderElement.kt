@@ -2,6 +2,7 @@ package silentorb.mythic.lookinglass.drawing
 
 import silentorb.mythic.breeze.MultiAnimationPart
 import silentorb.mythic.breeze.transformAnimatedSkeleton
+import silentorb.mythic.debugging.getDebugBoolean
 import silentorb.mythic.glowing.drawMesh
 import silentorb.mythic.lookinglass.*
 import silentorb.mythic.lookinglass.meshes.Primitive
@@ -32,7 +33,7 @@ fun renderElement(renderer: SceneRenderer, primitive: Primitive, material: Mater
   val effect = renderer.getShader(primitive.mesh.vertexSchema, ShaderFeatureConfig(
       skeleton = isAnimated,
       texture = texture != null && primitive.mesh.vertexSchema.attributes.any { it.name == "uv" },
-      shading = material.shading,
+      shading = if (getDebugBoolean("NO_SHADING")) false else material.shading,
       colored = primitive.material.coloredVertices || material.coloredVertices
   ))
 
