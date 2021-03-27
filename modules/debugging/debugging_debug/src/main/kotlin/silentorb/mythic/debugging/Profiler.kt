@@ -3,6 +3,7 @@ package silentorb.mythic.debugging
 data class Metrics(
     var iterations: Int = 0,
     var total: Long = 0L,
+    var last: Long = 0L,
 )
 
 typealias MetricMap = MutableMap<String, Metrics>

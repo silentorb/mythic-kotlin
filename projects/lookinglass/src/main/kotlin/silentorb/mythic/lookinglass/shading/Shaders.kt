@@ -1,5 +1,6 @@
 package silentorb.mythic.lookinglass.shading
 
+import silentorb.mythic.debugging.getDebugBoolean
 import silentorb.mythic.glowing.*
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector2
@@ -70,6 +71,29 @@ fun generateShaderProgram(vertexSchema: VertexSchema, featureConfig: ShaderFeatu
   return ShaderProgram(vertexShader, fragmentShader)
 }
 
+val debugGpuModelTransformCost = getDebugBoolean("DEBUG_GPU_MODEL_TRANSFORM_COST")
+
+// This code is used roughly  measure the cost of transforming models
+// It's purpose is to weigh the cost of passing model transforms
+// It does not weigh the cost of applying model transforms in the vertex shader
+// The last use of this code demonstrated that passing model transforms had no discernable impact
+// on performance
+fun setModelTransformWithDebugging(config: ObjectShaderConfig, perspective: PerspectiveFeature) {
+  if (!getDebugBoolean("DISABLE_RENDER_MODEL_TRANSFORMS"))
+    when {
+      getDebugBoolean("RENDER_FIXED_MODEL_TRANSFORMS") -> {
+        perspective.modelTransform.setValue(Matrix.identity.translate(20f, 0f, 0f))
+      }
+      // Used to verify that setting the same matrix repeatedly is not somehow getting optimized away
+      getDebugBoolean("RENDER_FIXED_MODEL_TRANSFORMS_SLOW") -> {
+        for (i in 0 until 100) {
+          perspective.modelTransform.setValue(Matrix.identity.translate(20f, 0f, 0f))
+        }
+      }
+      else -> perspective.modelTransform.setValue(config.transform)
+    }
+}
+
 class GeneralPerspectiveShader(buffers: UniformBuffers, vertexSchema: VertexSchema, featureConfig: ShaderFeatureConfig) {
   val program = generateShaderProgram(vertexSchema, featureConfig)
   val perspective: PerspectiveFeature = PerspectiveFeature(program)
@@ -85,10 +109,16 @@ class GeneralPerspectiveShader(buffers: UniformBuffers, vertexSchema: VertexSche
   // IntelliJ will flag this use of inline as a warning, but using inline here
   // causes the JVM to optimize away the ObjectShaderConfig allocation and significantly
   // reduces the amount of objects created each frame.
+  // A similar optimization may eventually be applied by the JIT, but this way the optimization is applied immediately
   inline fun activate(config: ObjectShaderConfig) {
     program.activate()
 
-    perspective.modelTransform.setValue(config.transform)
+    if (debugGpuModelTransformCost) {
+      setModelTransformWithDebugging(config, perspective)
+    } else {
+      perspective.modelTransform.setValue(config.transform)
+    }
+
     coloring.colorProperty.setValue(config.color ?: Vector4(1f))
 
     if (shading != null) {

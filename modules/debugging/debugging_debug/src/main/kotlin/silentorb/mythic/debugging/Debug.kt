@@ -9,6 +9,11 @@ import java.nio.file.Paths
 
 private var dotEnv: Dotenv? = null
 
+// Nullable for porentially faster access checks when not being used.
+// (Only potentially because the JVM may already perform a similar optimization for empty MutableMaps)
+// It's only an internal implementation difference so can be easily changed later if needed.
+private var overrides: MutableMap<String, Any>? = null
+
 private var privateLoopNumber = 0
 
 fun setGlobalLoopNumber(value: Int) {
@@ -26,14 +31,6 @@ fun getDebugRangeValue(): Float = debugRangeValue
 
 fun setDebugRangeValue(value: Float) {
   debugRangeValue = value
-}
-
-private var debugString = ""
-
-fun getDebugString(): String = debugString
-
-fun setDebugString(value: String) {
-  debugString = value
 }
 
 tailrec fun findParentDotEnvFile(path: Path = Paths.get(System.getProperty("user.dir"))): String? =
@@ -66,9 +63,27 @@ fun checkDotEnvChanged() {
 }
 
 fun getDebugString(name: String): String? {
+  val localOverrides = overrides
+  if (localOverrides != null) {
+    val value = localOverrides[name]
+    if (value != null)
+      return value.toString()
+  }
   dotEnv = dotEnv
       ?: newDotEnv()
   return dotEnv!![name]
+}
+
+fun setDebugValue(name: String, value: Any) {
+  if (overrides == null)
+    overrides = mutableMapOf()
+
+  overrides!![name] = value
+}
+
+fun toggleDebugBoolean(name: String) {
+  val value = getDebugBoolean(name)
+  setDebugValue(name, if (value) 0 else 1)
 }
 
 fun getConfigString(name: String): String? =
@@ -95,3 +110,6 @@ fun conditionalDebugLog(booleanSetting: String): (() -> String) -> Unit = { mess
     println(message())
   }
 }
+
+fun getDebugOverrides() =
+    overrides?.toMap() ?: mapOf()

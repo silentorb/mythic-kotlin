@@ -4,6 +4,7 @@ import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.stb.STBImage.*
 import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil
+import silentorb.mythic.debugging.getDebugBoolean
 import silentorb.mythic.platforming.*
 import silentorb.mythic.resource_loading.ioResourceToByteBuffer
 import silentorb.mythic.spatial.Vector2i
@@ -16,8 +17,10 @@ fun createWindow(title: String, config: PlatformDisplayConfig): Long {
   glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE) // the window will stay hidden after creation
   glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE) // the window will be resizable
   glfwWindowHint(GLFW_SAMPLES, config.multisamples)
+  if (getDebugBoolean("DEBUG_OPENGL")) {
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+  }
 //  val pid = ProcessHandle.current().getPid()
-
   val dimensions = config.windowedDimensions ?: Vector2i.unit
 
   val window = glfwCreateWindow(dimensions.x, dimensions.y, title, MemoryUtil.NULL, MemoryUtil.NULL)

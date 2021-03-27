@@ -12,7 +12,7 @@ abstract class ShaderBase(code: String, type: Int) {
     glCompileShader(id)
     val compiled = glGetShaderi(id, GL_COMPILE_STATUS)
     val shaderLog = glGetShaderInfoLog(id)
-    if (shaderLog!!.trim { it <= ' ' }.isNotEmpty())
+    if (shaderLog.trim { it <= ' ' }.isNotEmpty())
       throw Error(shaderLog)
 
     if (compiled == 0)

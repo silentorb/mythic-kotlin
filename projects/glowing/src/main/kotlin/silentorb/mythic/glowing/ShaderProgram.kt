@@ -14,8 +14,6 @@ class ShaderProgram(val vertexShader: VertexShader, val fragmentShader: Fragment
     id = glCreateProgram()
     glAttachShader(id, vertexShader.id)
     glAttachShader(id, fragmentShader.id)
-    glBindAttribLocation(id, 0, "position")
-    glBindFragDataLocation(id, 0, "color")
     glLinkProgram(id)
     val linked = glGetProgrami(id, GL_LINK_STATUS)
     val programLog = glGetProgramInfoLog(id)
