@@ -5,6 +5,7 @@ import silentorb.mythic.breeze.Bones
 import silentorb.mythic.breeze.SkeletonAnimation
 import silentorb.mythic.drawing.createDrawingEffects
 import silentorb.mythic.glowing.*
+import silentorb.mythic.lookinglass.deferred.DeferredRenderer
 import silentorb.mythic.lookinglass.meshes.VertexSchemas
 import silentorb.mythic.lookinglass.meshes.createVertexSchemas
 import silentorb.mythic.lookinglass.shading.*
@@ -25,6 +26,11 @@ enum class TextureAntialiasing {
   trilinear
 }
 
+enum class RenderingSystem {
+  forward,
+  deferred
+}
+
 data class DisplayOptions(
     val fullscreenResolution: Vector2i = Vector2i(1920, 1080),
     val windowedResolution: Vector2i? = null,
@@ -33,6 +39,7 @@ data class DisplayOptions(
     val vsync: Boolean = true,
     val multisamples: Int = 0,
     val depthOfField: Boolean = false,
+    val system: RenderingSystem = RenderingSystem.deferred,
     val textureAntialiasing: TextureAntialiasing = TextureAntialiasing.trilinear
 )
 
@@ -46,7 +53,7 @@ fun toPlatformDisplayConfig(display: DisplayOptions) =
     )
 
 data class Multisampler(
-    val framebuffer: Framebuffer,
+    val frameBuffer: FrameBuffer,
     val renderbuffer: Renderbuffer
 )
 
@@ -74,6 +81,11 @@ data class FloatTextureBuffer(
     var buffer: FloatBuffer? = null
 )
 
+data class RenderBuffers(
+    val color: ByteTextureBuffer = ByteTextureBuffer(),
+    val depth: FloatTextureBuffer = FloatTextureBuffer(),
+)
+
 data class Renderer(
     val glow: Glow,
     val options: DisplayOptions,
@@ -85,8 +97,7 @@ data class Renderer(
     val offscreenBuffers: List<OffscreenBuffer>,
     val textures: DynamicTextureLibrary = mutableMapOf()
 ) {
-  val renderColor: ByteTextureBuffer = ByteTextureBuffer()
-  val renderDepth: FloatTextureBuffer = FloatTextureBuffer()
+  val buffers: RenderBuffers = RenderBuffers()
   val uniformBuffers = UniformBuffers(
       instance = UniformBuffer(instanceBufferSize),
       scene = UniformBuffer(sceneBufferSize),
@@ -98,6 +109,16 @@ data class Renderer(
   val getShader = getCachedShader(uniformBuffers, shaderCache)
   val drawing = createDrawingEffects()
   val dynamicMesh = MutableSimpleMesh(vertexSchemas.flat)
+  private var internalDeferred: DeferredRenderer? = null
+
+  var deferred: DeferredRenderer?
+    get() = internalDeferred
+    set(value) {
+      if (internalDeferred != value) {
+        internalDeferred?.dispose()
+      }
+      internalDeferred = value
+    }
 }
 
 //fun updateOffscreenBufferAllocations(renderer: Renderer, oldConfig: DisplayConfig?) {

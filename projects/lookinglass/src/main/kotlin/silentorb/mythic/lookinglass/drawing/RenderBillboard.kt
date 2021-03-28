@@ -35,7 +35,7 @@ fun renderBillboard(renderer: Renderer, camera: Camera, billboards: List<Texture
         texture = true,
         instanced = true,
         animatedTexture = isTextureAnimated,
-        shading = true,
+        lighting = true,
     ))
     shader.activate(ObjectShaderConfig(
         texture = texture,

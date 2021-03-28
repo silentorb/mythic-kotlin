@@ -2,6 +2,7 @@ package silentorb.mythic.lookinglass.shading
 
 import silentorb.mythic.debugging.getDebugBoolean
 import silentorb.mythic.glowing.*
+import silentorb.mythic.lookinglass.RenderingSystem
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector4
@@ -26,7 +27,7 @@ fun bindUniformBuffer(id: UniformBufferId, program: ShaderProgram, buffer: Unifo
   return UniformBufferProperty(program, id.name, index, buffer)
 }
 
-class ShadingFeature(program: ShaderProgram, sectionBuffer: UniformBuffer) {
+class LightingFeature(program: ShaderProgram, sectionBuffer: UniformBuffer) {
   val normalTransformProperty = MatrixProperty(program, "normalTransform")
   val glowProperty = FloatProperty(program, "glow")
   val sectionProperty = bindUniformBuffer(UniformBufferId.SectionUniform, program, sectionBuffer)
@@ -44,8 +45,9 @@ fun populateBoneBuffer(boneBuffer: UniformBuffer, originalTransforms: List<Matri
 }
 
 data class ShaderFeatureConfig(
+    val system: RenderingSystem = RenderingSystem.forward,
     val pointSize: Boolean = false,
-    val shading: Boolean = false,
+    val lighting: Boolean = false,
     val skeleton: Boolean = false,
     val texture: Boolean = false,
     val colored: Boolean = false,
@@ -101,7 +103,7 @@ class GeneralPerspectiveShader(buffers: UniformBuffers, vertexSchema: VertexSche
   val textureScale = if (featureConfig.animatedTexture) Vector2Property(program, "uniformTextureScale") else null
   val instanceProperty = if (featureConfig.instanced) bindUniformBuffer(UniformBufferId.InstanceUniform, program, buffers.instance) else null
   val sceneProperty = bindUniformBuffer(UniformBufferId.SceneUniform, program, buffers.scene)
-  val shading: ShadingFeature? = if (featureConfig.shading) ShadingFeature(program, buffers.section) else null
+  val lighting: LightingFeature? = if (featureConfig.lighting) LightingFeature(program, buffers.section) else null
   val skeleton: SkeletonFeature? = if (featureConfig.skeleton) SkeletonFeature(program, buffers.bone) else null
   val nearPlaneHeight: FloatProperty? = if (featureConfig.pointSize) FloatProperty(program, "nearPlaneHeight") else null
   val lodOpacityLevels: FloatArrayProperty? = if (featureConfig.pointSize) FloatArrayProperty(program, "lodOpacityLevels") else null
@@ -121,9 +123,9 @@ class GeneralPerspectiveShader(buffers: UniformBuffers, vertexSchema: VertexSche
 
     coloring.colorProperty.setValue(config.color ?: Vector4(1f))
 
-    if (shading != null) {
-      shading.glowProperty.setValue(config.glow)
-      shading.normalTransformProperty.setValue(config.normalTransform ?: Matrix.identity)
+    if (lighting != null) {
+      lighting.glowProperty.setValue(config.glow)
+      lighting.normalTransformProperty.setValue(config.normalTransform ?: Matrix.identity)
     }
 
     if (config.texture != null) {

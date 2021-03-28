@@ -7,8 +7,9 @@ import org.lwjgl.opengl.GL11.GL_NEAREST
 import org.lwjgl.opengl.GL20
 import org.lwjgl.opengl.GL30.*
 import org.lwjgl.opengl.GL32
+import org.lwjgl.opengl.GL32.glFramebufferTexture
 
-class Framebuffer() {
+class FrameBuffer() {
   val id = glGenFramebuffers()
   private var disposed = false
 
@@ -22,7 +23,7 @@ class Framebuffer() {
     glBlitFramebuffer(
         0, 0, sourceDimensions.x, sourceDimensions.y,
         0, 0, targetDimensions.x, targetDimensions.y,
-        GL11.GL_COLOR_BUFFER_BIT,
+        GL_COLOR_BUFFER_BIT,
         if (smooth) GL_LINEAR else GL_NEAREST
     )
   }
@@ -41,30 +42,30 @@ class Framebuffer() {
 }
 
 data class OffscreenBuffer(
-    val framebuffer: Framebuffer,
+    val frameBuffer: FrameBuffer,
     val colorTexture: Texture,
     val depthTexture: Texture?
 )
 
 fun applyOffscreenBuffer(buffer: OffscreenBuffer, windowDimensions: Vector2i, smooth: Boolean) {
-  buffer.framebuffer.blitToScreen(Vector2i(buffer.colorTexture.width, buffer.colorTexture.height), windowDimensions, smooth)
+  buffer.frameBuffer.blitToScreen(Vector2i(buffer.colorTexture.width, buffer.colorTexture.height), windowDimensions, smooth)
 }
 
 fun prepareScreenFrameBuffer(windowWidth: Int, windowHeight: Int, withDepth: Boolean): OffscreenBuffer {
   val dimensions = Vector2i(windowWidth, windowHeight)
-  val framebuffer = Framebuffer()
+  val framebuffer = FrameBuffer()
   val textureAttributes = TextureAttributes(
       repeating = false,
       smooth = false,
       storageUnit = TextureStorageUnit.unsigned_byte
   )
   val colorTexture = Texture(dimensions.x, dimensions.y, textureAttributes)
-  GL32.glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, colorTexture.id, 0)
-  GL20.glDrawBuffers(GL_COLOR_ATTACHMENT0)
+  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, colorTexture.id, 0)
+  glDrawBuffers(GL_COLOR_ATTACHMENT0)
 
   val depthTexture = if (withDepth) {
     val depthTexture = Texture(dimensions.x, dimensions.y, textureAttributes.copy(format = TextureFormat.depth, storageUnit = TextureStorageUnit.float))
-    GL32.glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture.id, 0)
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture.id, 0)
     depthTexture
   } else
     null

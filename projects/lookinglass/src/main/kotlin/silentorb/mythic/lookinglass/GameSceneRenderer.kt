@@ -44,7 +44,7 @@ fun prepareRender(renderer: SceneRenderer, filters: List<ScreenFilter>) {
   if (filters.any()) {
     val offscreenBuffer = renderer.renderer.offscreenBuffers.first()
     val dimensions = Vector2i(offscreenBuffer.colorTexture.width, offscreenBuffer.colorTexture.height)
-    glow.state.setFrameBuffer(offscreenBuffer.framebuffer.id)
+    glow.state.setFrameBuffer(offscreenBuffer.frameBuffer.id)
     glow.state.viewport = Vector4i(0, 0, renderer.viewport.z, renderer.viewport.w)
   } else {
     glow.state.viewport = renderer.viewport
@@ -69,7 +69,7 @@ fun applyFilters(renderer: SceneRenderer, filters: List<ScreenFilter>) {
   }
 
   if (renderer.renderer.multisampler != null) {
-    renderer.renderer.multisampler.framebuffer.activateDraw()
+    renderer.renderer.multisampler.frameBuffer.activateDraw()
   }
   else {
     globalState.setFrameBuffer(0)

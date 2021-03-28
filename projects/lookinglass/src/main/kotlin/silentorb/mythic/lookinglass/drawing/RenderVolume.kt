@@ -113,7 +113,7 @@ fun prepareRenderVolume(renderer: SceneRenderer, sampledModel: SampledModel, loc
 
 fun renderBatchedVolumes(renderer: SceneRenderer, volumes: List<BatchedVolume>) {
   val effect = renderer.getShader(renderer.renderer.vertexSchemas.shadedPoint, ShaderFeatureConfig(
-      shading = true,
+      lighting = true,
       pointSize = true
   ))
 

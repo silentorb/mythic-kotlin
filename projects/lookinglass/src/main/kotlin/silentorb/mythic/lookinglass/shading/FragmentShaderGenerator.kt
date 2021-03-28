@@ -21,7 +21,7 @@ out vec4 output_color;""",
         """uniform sampler2D text;
 in vec2 textureCoordinates;"""
       else null,
-      addIf(config.shading, lightingHeader)
+      addIf(config.lighting, lightingHeader)
   ).joinToString("\n")
 }
 
@@ -35,17 +35,17 @@ fun generateFragmentShader(config: ShaderFeatureConfig): String {
   val outColor = listOfNotNull(
       when {
         config.pointSize || config.instanced || config.colored -> "fragmentColor"
-        config.shading -> null
+        config.lighting -> null
         else -> "uniformColor"
       },
       if (config.texture) "sampled" else null,
-      if (config.shading) lightingApplication2 else null
+      if (config.lighting) lightingApplication2 else null
   ).joinToString(" * ")
 
   val mainBody = listOfNotNull(
 //      if (config.pointSize) "if (length(gl_PointCoord - vec2(0.5)) > 0.5) discard;" else null,
       textureOperations(config),
-      addIf(config.shading, lightingApplication1),
+      addIf(config.lighting, lightingApplication1),
       "output_color = $outColor;"
   ).joinToString("\n")
 

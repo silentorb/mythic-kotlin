@@ -33,7 +33,7 @@ fun renderElement(renderer: SceneRenderer, primitive: Primitive, material: Mater
   val effect = renderer.getShader(primitive.mesh.vertexSchema, ShaderFeatureConfig(
       skeleton = isAnimated,
       texture = texture != null && primitive.mesh.vertexSchema.attributes.any { it.name == "uv" },
-      shading = if (getDebugBoolean("NO_SHADING")) false else material.shading,
+      lighting = if (getDebugBoolean("NO_SHADING")) false else material.shading,
       colored = primitive.material.coloredVertices || material.coloredVertices
   ))
 

@@ -81,7 +81,7 @@ private fun instanceOperations(instanced: Boolean) =
 private fun mainVertex(config: ShaderFeatureConfig): String {
   return """
 ${instanceHeader(config.instanced)}
-${if (config.shading) shadingHeader else ""}
+${if (config.lighting) shadingHeader else ""}
 ${if (config.texture) textureHeader else ""}
 ${if (config.animatedTexture) "uniform vec2 uniformTextureScale;" else ""}
 ${if (config.skeleton) weightHeader else ""}
@@ -94,7 +94,7 @@ ${instanceOperations(config.instanced)}
  ${if (config.skeleton) weightOperations else ""}
  vec4 modelPosition = modelTransform * position4;
   gl_Position = scene.cameraTransform * modelPosition;
-${if (config.shading) shadingOperations else ""}
+${if (config.lighting) shadingOperations else ""}
 ${if (config.pointSize) pointSizeOutput else ""}
 ${if (config.colored) coloredOutput else ""}
 ${textureOperations(config)}

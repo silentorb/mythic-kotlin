@@ -8,6 +8,8 @@ import silentorb.mythic.drawing.Canvas
 import silentorb.mythic.drawing.getStaticCanvasDependencies
 import silentorb.mythic.drawing.getUnitScaling
 import silentorb.mythic.glowing.*
+import silentorb.mythic.lookinglass.deferred.DeferredRenderer
+import silentorb.mythic.lookinglass.deferred.newDeferredRenderer
 import silentorb.mythic.lookinglass.shading.EffectsData
 import silentorb.mythic.lookinglass.shading.createSceneBuffer
 import silentorb.mythic.lookinglass.texturing.DynamicTextureLibrary
@@ -48,19 +50,15 @@ fun getPlayerViewports(playerCount: Int, dimensions: Vector2i): List<Vector4i> {
   }
 }
 
-
 fun createMultiSampler(glow: Glow, width: Int, height: Int, multisamples: Int): Multisampler {
   val texture = Texture(width, height, null, { width: Int, height: Int, buffer: FloatBuffer? ->
     glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, multisamples, GL_RGB, width, height, true)
   }, TextureTarget.multisample)
 
-  val framebuffer: Framebuffer
-  val renderbuffer: Renderbuffer
-
-  framebuffer = Framebuffer()
+  val framebuffer = FrameBuffer()
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, texture.id, 0)
 
-  renderbuffer = Renderbuffer()
+  val renderbuffer = Renderbuffer()
   glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisamples, GL_DEPTH24_STENCIL8, width, height);
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, renderbuffer.id);
 
@@ -71,7 +69,7 @@ fun createMultiSampler(glow: Glow, width: Int, height: Int, multisamples: Int): 
     throw Error("Error creating multisample framebuffer.")
 
   return Multisampler(
-      framebuffer = framebuffer,
+      frameBuffer = framebuffer,
       renderbuffer = renderbuffer
   )
 }
@@ -140,22 +138,35 @@ fun createSceneRenderer(renderer: Renderer, windowInfo: WindowInfo, scene: GameS
   return createSceneRenderer(renderer, windowInfo, minimalScene, viewport)
 }
 
+fun updateDeferredRenderer(renderer: Renderer, dimensions: Vector2i): DeferredRenderer? {
+  val deferred = renderer.deferred
+  return if (renderer.options.system == RenderingSystem.deferred) {
+    if (deferred == null || dimensions.x != deferred.albedo.width || dimensions.y != deferred.albedo.height)
+      newDeferredRenderer(dimensions)
+    else
+      deferred
+  } else
+    null
+}
+
 fun prepareRender(renderer: Renderer, windowInfo: WindowInfo) {
+  val dimensions = windowInfo.dimensions
   if (renderer.multisampler != null) {
-    renderer.multisampler.framebuffer.activateDraw()
+    renderer.multisampler.frameBuffer.activateDraw()
   }
-  renderer.glow.state.viewport = Vector4i(0, 0, windowInfo.dimensions.x, windowInfo.dimensions.y)
+  renderer.deferred = updateDeferredRenderer(renderer, dimensions)
+  renderer.glow.state.viewport = Vector4i(0, 0, dimensions.x, dimensions.y)
   renderer.glow.state.depthEnabled = true
   renderer.glow.operations.clearScreen()
-  renderer.renderColor.buffer = renderer.renderColor.buffer
-      ?: BufferUtils.createByteBuffer(windowInfo.dimensions.x * windowInfo.dimensions.y * 3)
+  renderer.buffers.color.buffer = renderer.buffers.color.buffer
+      ?: BufferUtils.createByteBuffer(dimensions.x * dimensions.y * 3)
 
-  renderer.renderDepth.buffer = renderer.renderDepth.buffer
-      ?: BufferUtils.createFloatBuffer(windowInfo.dimensions.x * windowInfo.dimensions.y)
+  renderer.buffers.depth.buffer = renderer.buffers.depth.buffer
+      ?: BufferUtils.createFloatBuffer(dimensions.x * dimensions.y)
 }
 
 fun applyRenderBuffer(renderer: Renderer, dimensions: Vector2i) {
-  updateTextureBuffer(dimensions, renderer.renderColor) {
+  updateTextureBuffer(dimensions, renderer.buffers.color) {
     TextureAttributes(
         repeating = false,
         smooth = false,
@@ -163,7 +174,7 @@ fun applyRenderBuffer(renderer: Renderer, dimensions: Vector2i) {
     )
   }
 
-  updateTextureBuffer(dimensions, renderer.renderDepth) {
+  updateTextureBuffer(dimensions, renderer.buffers.depth) {
     TextureAttributes(
         repeating = false,
         smooth = false,
@@ -174,7 +185,7 @@ fun applyRenderBuffer(renderer: Renderer, dimensions: Vector2i) {
 
   renderer.shaders.screenTexture.activate(Vector2(1f))
   val canvasDependencies = getStaticCanvasDependencies()
-  activateTextures(listOf(renderer.renderColor.texture!!, renderer.renderDepth.texture!!))
+  activateTextures(listOf(renderer.buffers.color.texture!!, renderer.buffers.depth.texture!!))
   canvasDependencies.meshes.image.draw(DrawMethod.triangleFan)
 }
 
@@ -183,7 +194,7 @@ fun finishRender(renderer: Renderer, windowInfo: WindowInfo) {
     val width = windowInfo.dimensions.x
     val height = windowInfo.dimensions.y
     renderer.glow.state.drawFramebuffer = 0
-    renderer.glow.state.readFramebuffer = renderer.multisampler.framebuffer.id
+    renderer.glow.state.readFramebuffer = renderer.multisampler.frameBuffer.id
     glDrawBuffer(GL_BACK)                       // Set the back buffer as the draw buffer
     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST)
   }
