@@ -2,7 +2,6 @@ package silentorb.mythic.lookinglass
 
 import silentorb.mythic.glowing.clearDepth
 import silentorb.mythic.glowing.globalState
-import silentorb.mythic.lookinglass.drawing.renderElementGroup
 import silentorb.mythic.lookinglass.drawing.renderElementGroups
 import silentorb.mythic.lookinglass.drawing.renderVolumes
 import silentorb.mythic.scenery.Camera
@@ -11,7 +10,8 @@ data class SceneLayer(
     val elements: ElementGroups,
     val useDepth: Boolean,
     val resetDepth: Boolean = false,
-    val attributes: Set<String> = setOf()
+    val attributes: Set<String> = setOf(),
+    val lightingMode: LightingMode = LightingMode.forward,
 )
 
 typealias SceneLayers = List<SceneLayer>
@@ -25,13 +25,21 @@ fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer,
   if (layer.resetDepth)
     clearDepth()
 
-  renderElementGroups(renderer, camera, layer.elements)
+  val deferred = layer.lightingMode == LightingMode.deferred &&
+      renderer.renderer.options.lightingMode == LightingMode.deferred
+
+  val lightingMode = if (deferred)
+    LightingMode.deferred
+  else
+    LightingMode.forward
+
+  renderElementGroups(renderer, camera, layer.elements, lightingMode)
 
   if (callback != null) {
     callback(renderer, camera, layer)
   }
 
-  renderVolumes(renderer, layer.elements)
+  renderVolumes(renderer, layer.elements, lightingMode)
   globalState.depthEnabled = previousDepthEnabled
 }
 

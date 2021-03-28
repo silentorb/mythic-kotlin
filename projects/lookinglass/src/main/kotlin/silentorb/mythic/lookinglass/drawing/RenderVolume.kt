@@ -4,6 +4,7 @@ import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
 import silentorb.mythic.glowing.globalState
 import silentorb.mythic.lookinglass.*
+import silentorb.mythic.lookinglass.LightingMode
 import silentorb.mythic.lookinglass.shading.ObjectShaderConfig
 import silentorb.mythic.lookinglass.shading.ShaderFeatureConfig
 import silentorb.mythic.spatial.Matrix
@@ -111,9 +112,9 @@ fun prepareRenderVolume(renderer: SceneRenderer, sampledModel: SampledModel, loc
   )
 }
 
-fun renderBatchedVolumes(renderer: SceneRenderer, volumes: List<BatchedVolume>) {
+fun renderBatchedVolumes(renderer: SceneRenderer, volumes: List<BatchedVolume>, lighting: LightingMode) {
   val effect = renderer.getShader(renderer.renderer.vertexSchemas.shadedPoint, ShaderFeatureConfig(
-      lighting = true,
+      lighting = lighting,
       pointSize = true
   ))
 
@@ -134,7 +135,7 @@ fun renderBatchedVolumes(renderer: SceneRenderer, volumes: List<BatchedVolume>) 
   globalState.depthWrite = true
 }
 
-fun renderVolumes(sceneRenderer: SceneRenderer, elements: ElementGroups) {
+fun renderVolumes(sceneRenderer: SceneRenderer, elements: ElementGroups, lightingMode: LightingMode) {
   val volumes = elements.flatMap { group ->
     group.meshes.mapNotNull { element ->
       val mesh = sceneRenderer.meshes[element.mesh]
@@ -146,5 +147,5 @@ fun renderVolumes(sceneRenderer: SceneRenderer, elements: ElementGroups) {
     }
   }
 
-  renderBatchedVolumes(sceneRenderer, volumes)
+  renderBatchedVolumes(sceneRenderer, volumes, lightingMode)
 }

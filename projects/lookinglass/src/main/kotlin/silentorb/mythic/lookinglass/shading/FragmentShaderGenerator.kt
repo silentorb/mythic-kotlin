@@ -1,5 +1,6 @@
 package silentorb.mythic.lookinglass.shading
 
+import silentorb.mythic.lookinglass.LightingMode
 import silentorb.mythic.resource_loading.loadTextResource
 
 val lightingHeader = loadTextResource("shaders/lighting.glsl")
@@ -9,6 +10,19 @@ const val lightingApplication1 = "vec3 lightResult = processLights(uniformColor,
 const val lightingApplication2 = "vec4(lightResult, uniformColor.w)"
 
 fun addIf(condition: Boolean, value: String) = if (condition) value else null
+
+const val deferredFragmentHeader = """
+layout (location = 0) out vec4 deferredAlbedo;
+layout (location = 1) out vec3 deferredPosition;
+layout (location = 2) out vec3 deferredNormal;
+"""
+
+fun deferredFragmentApplication(color: String) = """
+deferredAlbedo.rgb = $color;
+deferredAlbedo.a = 1.0;
+deferredPosition = fragmentPosition;
+deferredNormal = fragmentNormal;
+"""
 
 fun fragmentHeader(config: ShaderFeatureConfig): String {
   return listOfNotNull(
@@ -21,7 +35,11 @@ out vec4 output_color;""",
         """uniform sampler2D text;
 in vec2 textureCoordinates;"""
       else null,
-      addIf(config.lighting, lightingHeader)
+      when (config.lighting) {
+        LightingMode.forward -> lightingHeader
+        LightingMode.deferred -> deferredFragmentHeader
+        LightingMode.none -> null
+      },
   ).joinToString("\n")
 }
 
@@ -35,18 +53,21 @@ fun generateFragmentShader(config: ShaderFeatureConfig): String {
   val outColor = listOfNotNull(
       when {
         config.pointSize || config.instanced || config.colored -> "fragmentColor"
-        config.lighting -> null
+        config.lighting == LightingMode.forward -> null
         else -> "uniformColor"
       },
       if (config.texture) "sampled" else null,
-      if (config.lighting) lightingApplication2 else null
+      if (config.lighting == LightingMode.forward) lightingApplication2 else null
   ).joinToString(" * ")
 
   val mainBody = listOfNotNull(
 //      if (config.pointSize) "if (length(gl_PointCoord - vec2(0.5)) > 0.5) discard;" else null,
       textureOperations(config),
-      addIf(config.lighting, lightingApplication1),
-      "output_color = $outColor;"
+      addIf(config.lighting == LightingMode.forward, lightingApplication1),
+      if (config.lighting == LightingMode.deferred)
+        deferredFragmentApplication(outColor)
+      else
+        "output_color = $outColor;",
   ).joinToString("\n")
 
   val inputs = listOf(

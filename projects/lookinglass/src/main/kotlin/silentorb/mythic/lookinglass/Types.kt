@@ -26,9 +26,10 @@ enum class TextureAntialiasing {
   trilinear
 }
 
-enum class RenderingSystem {
+enum class LightingMode {
+  deferred,
   forward,
-  deferred
+  none,
 }
 
 data class DisplayOptions(
@@ -39,7 +40,7 @@ data class DisplayOptions(
     val vsync: Boolean = true,
     val multisamples: Int = 0,
     val depthOfField: Boolean = false,
-    val system: RenderingSystem = RenderingSystem.deferred,
+    val lightingMode: LightingMode = LightingMode.deferred,
     val textureAntialiasing: TextureAntialiasing = TextureAntialiasing.trilinear
 )
 

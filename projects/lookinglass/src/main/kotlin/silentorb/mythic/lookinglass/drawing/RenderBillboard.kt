@@ -6,16 +6,14 @@ import silentorb.mythic.glowing.DrawMethod
 import silentorb.mythic.glowing.debugMarkPass
 import silentorb.mythic.glowing.drawMeshInstanced
 import silentorb.mythic.glowing.globalState
+import silentorb.mythic.lookinglass.LightingMode
 import silentorb.mythic.lookinglass.Renderer
 import silentorb.mythic.lookinglass.TexturedBillboard
-import silentorb.mythic.lookinglass.shading.ObjectShaderConfig
-import silentorb.mythic.lookinglass.shading.ShaderFeatureConfig
-import silentorb.mythic.lookinglass.shading.createInstanceBuffer
-import silentorb.mythic.lookinglass.shading.padBuffer
+import silentorb.mythic.lookinglass.shading.*
 import silentorb.mythic.scenery.Camera
 import kotlin.math.roundToInt
 
-fun renderBillboard(renderer: Renderer, camera: Camera, billboards: List<TexturedBillboard>) {
+fun renderBillboard(renderer: Renderer, camera: Camera, billboards: List<TexturedBillboard>, lightingMode: LightingMode) {
   val model = renderer.meshes["billboard"]!!
   val textures = renderer.textures
   val texture = textures[billboards.first().texture]
@@ -35,7 +33,7 @@ fun renderBillboard(renderer: Renderer, camera: Camera, billboards: List<Texture
         texture = true,
         instanced = true,
         animatedTexture = isTextureAnimated,
-        lighting = true,
+        lighting = lightingMode,
     ))
     shader.activate(ObjectShaderConfig(
         texture = texture,

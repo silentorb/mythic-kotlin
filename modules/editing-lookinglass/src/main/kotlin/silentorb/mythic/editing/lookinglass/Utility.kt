@@ -5,6 +5,7 @@ import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Key
 import silentorb.mythic.ent.scenery.gatherChildren
 import silentorb.mythic.lookinglass.ElementGroup
+import silentorb.mythic.lookinglass.LightingMode
 import silentorb.mythic.lookinglass.Material
 import silentorb.mythic.lookinglass.SceneRenderer
 import silentorb.mythic.lookinglass.drawing.renderMeshElement
@@ -17,9 +18,9 @@ fun getSelectionMeshes(editor: Editor, childGraph: Graph, graph: Graph, node: Ke
   return nodesToElements(editor, graph, nodes)
 }
 
-fun renderMeshNodes(sceneRenderer: SceneRenderer, material: Material, meshNodes: MeshNodes) {
+fun renderMeshNodes(sceneRenderer: SceneRenderer, material: Material, meshNodes: MeshNodes, lightingMode: LightingMode) {
   for ((mesh, transform) in meshNodes) {
-    renderMeshElement(sceneRenderer, mesh, transform, material)
+    renderMeshElement(sceneRenderer, mesh, transform, material, lightingMode)
   }
 }
 

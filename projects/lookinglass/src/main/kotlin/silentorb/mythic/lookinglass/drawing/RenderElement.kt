@@ -6,6 +6,7 @@ import silentorb.mythic.debugging.getDebugBoolean
 import silentorb.mythic.glowing.drawMesh
 import silentorb.mythic.lookinglass.*
 import silentorb.mythic.lookinglass.meshes.Primitive
+import silentorb.mythic.lookinglass.LightingMode
 import silentorb.mythic.lookinglass.shading.ObjectShaderConfig
 import silentorb.mythic.lookinglass.shading.ShaderFeatureConfig
 import silentorb.mythic.lookinglass.shading.populateBoneBuffer
@@ -15,7 +16,9 @@ import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Pi
 import silentorb.mythic.spatial.getRotationMatrix
 
-fun renderElement(renderer: SceneRenderer, primitive: Primitive, material: Material, transform: Matrix, isAnimated: Boolean) {
+fun renderElement(renderer: SceneRenderer, primitive: Primitive, material: Material, transform: Matrix,
+                  isAnimated: Boolean,
+                  lightingMode: LightingMode) {
   val orientationTransform = getRotationMatrix(transform)
   val texture = renderer.textures[material.texture]
 
@@ -30,10 +33,11 @@ fun renderElement(renderer: SceneRenderer, primitive: Primitive, material: Mater
       normalTransform = orientationTransform,
       texture = texture
   )
+
   val effect = renderer.getShader(primitive.mesh.vertexSchema, ShaderFeatureConfig(
       skeleton = isAnimated,
       texture = texture != null && primitive.mesh.vertexSchema.attributes.any { it.name == "uv" },
-      lighting = if (getDebugBoolean("NO_SHADING")) false else material.shading,
+      lighting = lightingMode,
       colored = primitive.material.coloredVertices || material.coloredVertices
   ))
 
@@ -84,7 +88,10 @@ private fun useMesh(meshes: ModelMeshMap, MeshName: MeshName, action: (ModelMesh
   }
 }
 
-fun renderMeshElement(renderer: SceneRenderer, mesh: String, transform: Matrix, material: Material?, armature: Armature? = null, transforms: List<Matrix>? = null) {
+fun renderMeshElement(renderer: SceneRenderer, mesh: String, transform: Matrix, material: Material?,
+                      lightingMode: LightingMode,
+                      armature: Armature? = null,
+                      transforms: List<Matrix>? = null) {
   val meshes = renderer.meshes
   useMesh(meshes, mesh) { mesh ->
     if (mesh.sampledModel == null) {
@@ -92,17 +99,18 @@ fun renderMeshElement(renderer: SceneRenderer, mesh: String, transform: Matrix, 
         val transform = getElementTransform(transform, primitive, transforms)
         val materal = material ?: primitive.material
         val isAnimated = armature != null && primitive.isAnimated
-        renderElement(renderer, primitive, materal, transform, isAnimated)
+        renderElement(renderer, primitive, materal, transform, isAnimated, lightingMode)
       }
     }
   }
 }
 
-fun renderMeshElement(renderer: SceneRenderer, element: MeshElement, armature: Armature? = null, transforms: List<Matrix>? = null) {
-  renderMeshElement(renderer, element.mesh, element.transform, element.material, armature, transforms)
+fun renderMeshElement(renderer: SceneRenderer, element: MeshElement, lightingMode: LightingMode, armature: Armature? = null,
+                      transforms: List<Matrix>? = null) {
+  renderMeshElement(renderer, element.mesh, element.transform, element.material, lightingMode, armature, transforms)
 }
 
-fun renderElementGroup(renderer: SceneRenderer, camera: Camera, group: ElementGroup) {
+fun renderElementGroup(renderer: SceneRenderer, camera: Camera, group: ElementGroup, lightingMode: LightingMode) {
   val armature = renderer.armatures[group.armature]
   val transforms = if (armature != null)
     armatureTransforms(armature, group)
@@ -114,7 +122,7 @@ fun renderElementGroup(renderer: SceneRenderer, camera: Camera, group: ElementGr
   }
 
   for (element in group.meshes) {
-    renderMeshElement(renderer, element, armature, transforms)
+    renderMeshElement(renderer, element, lightingMode, armature, transforms)
   }
 
   if (armature != null) {
@@ -128,7 +136,7 @@ fun renderElementGroup(renderer: SceneRenderer, camera: Camera, group: ElementGr
           for (primitive in mesh.primitives) {
             val transform = element.transform * transforms!![bone]
             val materal = element.material ?: primitive.material
-            renderElement(renderer, primitive, materal, transform, false)
+            renderElement(renderer, primitive, materal, transform, false, lightingMode)
           }
         }
       }
@@ -136,7 +144,7 @@ fun renderElementGroup(renderer: SceneRenderer, camera: Camera, group: ElementGr
   }
 
   if (group.billboards.any()) {
-    renderBillboard(renderer.renderer, camera, group.billboards)
+    renderBillboard(renderer.renderer, camera, group.billboards, lightingMode)
   }
 
   for (text in group.textBillboards) {
@@ -144,11 +152,11 @@ fun renderElementGroup(renderer: SceneRenderer, camera: Camera, group: ElementGr
   }
 }
 
-fun renderElementGroups(renderer: SceneRenderer, camera: Camera, groups: Collection<ElementGroup>) {
+fun renderElementGroups(renderer: SceneRenderer, camera: Camera, groups: Collection<ElementGroup>, lightingMode: LightingMode) {
   for (group in groups) {
-    renderElementGroup(renderer, camera, group)
+    renderElementGroup(renderer, camera, group, lightingMode)
   }
 }
 
-fun renderElementGroups(renderer: SceneRenderer, groups: Collection<ElementGroup>) =
-    renderElementGroups(renderer, renderer.camera, groups)
+fun renderElementGroups(renderer: SceneRenderer, groups: Collection<ElementGroup>, lightingMode: LightingMode) =
+    renderElementGroups(renderer, renderer.camera, groups, lightingMode)

@@ -140,7 +140,7 @@ fun createSceneRenderer(renderer: Renderer, windowInfo: WindowInfo, scene: GameS
 
 fun updateDeferredRenderer(renderer: Renderer, dimensions: Vector2i): DeferredRenderer? {
   val deferred = renderer.deferred
-  return if (renderer.options.system == RenderingSystem.deferred) {
+  return if (renderer.options.lightingMode == LightingMode.deferred) {
     if (deferred == null || dimensions.x != deferred.albedo.width || dimensions.y != deferred.albedo.height)
       newDeferredRenderer(dimensions)
     else
