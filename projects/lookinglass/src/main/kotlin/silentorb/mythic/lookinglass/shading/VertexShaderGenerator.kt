@@ -3,7 +3,7 @@ package silentorb.mythic.lookinglass.shading
 import org.lwjgl.opengl.GL11.*
 import silentorb.mythic.glowing.VertexAttribute
 import silentorb.mythic.glowing.VertexSchema
-import silentorb.mythic.lookinglass.LightingMode
+import silentorb.mythic.lookinglass.ShadingMode
 
 private const val weightHeader = """
 layout (std140) uniform BoneTransforms {
@@ -82,7 +82,7 @@ private fun instanceOperations(instanced: Boolean) =
 private fun mainVertex(config: ShaderFeatureConfig): String {
   return """
 ${instanceHeader(config.instanced)}
-${if (config.lighting == LightingMode.forward) shadingHeader else ""}
+${if (config.shading == ShadingMode.forward) shadingHeader else ""}
 ${if (config.texture) textureHeader else ""}
 ${if (config.animatedTexture) "uniform vec2 uniformTextureScale;" else ""}
 ${if (config.skeleton) weightHeader else ""}
@@ -95,7 +95,7 @@ ${instanceOperations(config.instanced)}
  ${if (config.skeleton) weightOperations else ""}
  vec4 modelPosition = modelTransform * position4;
   gl_Position = scene.cameraTransform * modelPosition;
-${if (config.lighting == LightingMode.forward) shadingOperations else ""}
+${if (config.shading == ShadingMode.forward) shadingOperations else ""}
 ${if (config.pointSize) pointSizeOutput else ""}
 ${if (config.colored) coloredOutput else ""}
 ${textureOperations(config)}

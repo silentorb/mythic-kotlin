@@ -86,7 +86,7 @@ fun nodesToElements(editor: Editor, graph: Graph, nodes: Collection<String>) =
         collisionElements(editor, graph, nodes) +
         prepareDynamicDepictions(editor.enumerations.depictions, graph, nodes)
 
-fun sceneFromEditorGraph(meshShapes: Map<String, Shape>, editor: Editor, lightingConfig: LightingConfig, viewport: Key): GameScene {
+fun sceneFromEditorGraph(meshShapes: Map<String, Shape>, editor: Editor, lightingConfig: LightingConfig, viewport: Key): Scene {
   val graph = getCachedGraph(editor)
   val camera = cameraRigToCamera(getEditorCamera(editor, viewport) ?: CameraRig())
 
@@ -132,12 +132,10 @@ fun sceneFromEditorGraph(meshShapes: Map<String, Shape>, editor: Editor, lightin
   val elementLights = layers.flatMap { layer ->
     layer.elements.flatMap { it.lights }
   }
-  return GameScene(
-      main = Scene(
-          camera = camera,
-          lights = elementLights,
-          lightingConfig = lightingConfig
-      ),
+  return Scene(
+      camera = camera,
+      lights = elementLights,
+      lightingConfig = lightingConfig,
       layers = layers,
       filters = listOf()
   )

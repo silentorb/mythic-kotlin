@@ -1,6 +1,6 @@
 package silentorb.mythic.lookinglass.shading
 
-import silentorb.mythic.lookinglass.LightingMode
+import silentorb.mythic.lookinglass.ShadingMode
 import silentorb.mythic.resource_loading.loadTextResource
 
 val lightingHeader = loadTextResource("shaders/lighting.glsl")
@@ -35,10 +35,10 @@ out vec4 output_color;""",
         """uniform sampler2D text;
 in vec2 textureCoordinates;"""
       else null,
-      when (config.lighting) {
-        LightingMode.forward -> lightingHeader
-        LightingMode.deferred -> deferredFragmentHeader
-        LightingMode.none -> null
+      when (config.shading) {
+        ShadingMode.forward -> lightingHeader
+        ShadingMode.deferred -> deferredFragmentHeader
+        ShadingMode.none -> null
       },
   ).joinToString("\n")
 }
@@ -53,18 +53,18 @@ fun generateFragmentShader(config: ShaderFeatureConfig): String {
   val outColor = listOfNotNull(
       when {
         config.pointSize || config.instanced || config.colored -> "fragmentColor"
-        config.lighting == LightingMode.forward -> null
+        config.shading == ShadingMode.forward -> null
         else -> "uniformColor"
       },
       if (config.texture) "sampled" else null,
-      if (config.lighting == LightingMode.forward) lightingApplication2 else null
+      if (config.shading == ShadingMode.forward) lightingApplication2 else null
   ).joinToString(" * ")
 
   val mainBody = listOfNotNull(
 //      if (config.pointSize) "if (length(gl_PointCoord - vec2(0.5)) > 0.5) discard;" else null,
       textureOperations(config),
-      addIf(config.lighting == LightingMode.forward, lightingApplication1),
-      if (config.lighting == LightingMode.deferred)
+      addIf(config.shading == ShadingMode.forward, lightingApplication1),
+      if (config.shading == ShadingMode.deferred)
         deferredFragmentApplication(outColor)
       else
         "output_color = $outColor;",

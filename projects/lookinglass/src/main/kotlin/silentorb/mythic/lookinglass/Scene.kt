@@ -7,11 +7,7 @@ import silentorb.mythic.scenery.LightingConfig
 data class Scene(
     val camera: Camera,
     val lights: List<Light> = listOf(),
-    val lightingConfig: LightingConfig
-)
-
-data class GameScene(
-    val main: Scene,
+    val lightingConfig: LightingConfig,
     val layers: SceneLayers,
-    val filters: List<ScreenFilter>
+    val filters: List<ScreenFilter>,
 )

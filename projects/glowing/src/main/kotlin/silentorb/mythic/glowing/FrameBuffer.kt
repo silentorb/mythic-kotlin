@@ -18,7 +18,7 @@ class FrameBuffer() {
   }
 
   fun blitToScreen(sourceDimensions: Vector2i, targetDimensions: Vector2i, smooth: Boolean) {
-    globalState.readFramebuffer = id
+    activateRead()
     globalState.drawFramebuffer = 0
     glBlitFramebuffer(
         0, 0, sourceDimensions.x, sourceDimensions.y,
@@ -38,6 +38,10 @@ class FrameBuffer() {
 
   fun activateDraw() {
     globalState.drawFramebuffer = id
+  }
+
+  fun activateRead() {
+    globalState.readFramebuffer = id
   }
 }
 

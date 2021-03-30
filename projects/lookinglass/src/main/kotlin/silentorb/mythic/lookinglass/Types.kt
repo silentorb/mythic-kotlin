@@ -5,7 +5,7 @@ import silentorb.mythic.breeze.Bones
 import silentorb.mythic.breeze.SkeletonAnimation
 import silentorb.mythic.drawing.createDrawingEffects
 import silentorb.mythic.glowing.*
-import silentorb.mythic.lookinglass.deferred.DeferredRenderer
+import silentorb.mythic.lookinglass.deferred.DeferredShading
 import silentorb.mythic.lookinglass.meshes.VertexSchemas
 import silentorb.mythic.lookinglass.meshes.createVertexSchemas
 import silentorb.mythic.lookinglass.shading.*
@@ -26,7 +26,7 @@ enum class TextureAntialiasing {
   trilinear
 }
 
-enum class LightingMode {
+enum class ShadingMode {
   deferred,
   forward,
   none,
@@ -40,7 +40,7 @@ data class DisplayOptions(
     val vsync: Boolean = true,
     val multisamples: Int = 0,
     val depthOfField: Boolean = false,
-    val lightingMode: LightingMode = LightingMode.deferred,
+    val shadingMode: ShadingMode = ShadingMode.deferred,
     val textureAntialiasing: TextureAntialiasing = TextureAntialiasing.trilinear
 )
 
@@ -110,9 +110,9 @@ data class Renderer(
   val getShader = getCachedShader(uniformBuffers, shaderCache)
   val drawing = createDrawingEffects()
   val dynamicMesh = MutableSimpleMesh(vertexSchemas.flat)
-  private var internalDeferred: DeferredRenderer? = null
+  private var internalDeferred: DeferredShading? = null
 
-  var deferred: DeferredRenderer?
+  var deferred: DeferredShading?
     get() = internalDeferred
     set(value) {
       if (internalDeferred != value) {

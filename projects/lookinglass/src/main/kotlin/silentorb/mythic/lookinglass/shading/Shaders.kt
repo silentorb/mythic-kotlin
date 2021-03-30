@@ -2,7 +2,7 @@ package silentorb.mythic.lookinglass.shading
 
 import silentorb.mythic.debugging.getDebugBoolean
 import silentorb.mythic.glowing.*
-import silentorb.mythic.lookinglass.LightingMode
+import silentorb.mythic.lookinglass.ShadingMode
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector4
@@ -46,7 +46,7 @@ fun populateBoneBuffer(boneBuffer: UniformBuffer, originalTransforms: List<Matri
 
 data class ShaderFeatureConfig(
     val pointSize: Boolean = false,
-    val lighting: LightingMode = LightingMode.none,
+    val shading: ShadingMode = ShadingMode.none,
     val skeleton: Boolean = false,
     val texture: Boolean = false,
     val colored: Boolean = false,
@@ -102,7 +102,7 @@ class GeneralPerspectiveShader(buffers: UniformBuffers, vertexSchema: VertexSche
   val textureScale = if (featureConfig.animatedTexture) Vector2Property(program, "uniformTextureScale") else null
   val instanceProperty = if (featureConfig.instanced) bindUniformBuffer(UniformBufferId.InstanceUniform, program, buffers.instance) else null
   val sceneProperty = bindUniformBuffer(UniformBufferId.SceneUniform, program, buffers.scene)
-  val lighting: LightingFeature? = if (featureConfig.lighting == LightingMode.forward) LightingFeature(program, buffers.section) else null
+  val lighting: LightingFeature? = if (featureConfig.shading == ShadingMode.forward) LightingFeature(program, buffers.section) else null
   val skeleton: SkeletonFeature? = if (featureConfig.skeleton) SkeletonFeature(program, buffers.bone) else null
   val nearPlaneHeight: FloatProperty? = if (featureConfig.pointSize) FloatProperty(program, "nearPlaneHeight") else null
   val lodOpacityLevels: FloatArrayProperty? = if (featureConfig.pointSize) FloatArrayProperty(program, "lodOpacityLevels") else null
@@ -149,7 +149,8 @@ data class Shaders(
     val depthOfField: DepthScreenShader,
     val screenColor: ScreenColorShader,
     val screenDesaturation: DepthScreenShader,
-    val screenTexture: DepthScreenShader
+    val screenTexture: DepthScreenShader,
+    val deferredShading: DepthScreenShader,
 )
 
 data class UniformBuffers(
@@ -164,6 +165,7 @@ fun createShaders(): Shaders {
       depthOfField = DepthScreenShader(ShaderProgram(screenVertex, depthOfFieldFragment)),
       screenColor = ScreenColorShader(ShaderProgram(screenVertex, screenColorFragment)),
       screenDesaturation = DepthScreenShader(ShaderProgram(screenVertex, screenDesaturation)),
-      screenTexture = DepthScreenShader(ShaderProgram(screenVertex, screenTextureFragment))
+      screenTexture = DepthScreenShader(ShaderProgram(screenVertex, screenTextureFragment)),
+      deferredShading = DepthScreenShader(ShaderProgram(screenVertex, deferredShadingFragment)),
   )
 }

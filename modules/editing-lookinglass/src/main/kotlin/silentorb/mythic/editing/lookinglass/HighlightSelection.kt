@@ -9,6 +9,7 @@ import silentorb.mythic.glowing.globalState
 import silentorb.mythic.glowing.withoutFrontDrawing
 import silentorb.mythic.lookinglass.Material
 import silentorb.mythic.lookinglass.SceneRenderer
+import silentorb.mythic.lookinglass.ShadingMode
 import silentorb.mythic.lookinglass.drawing.renderElementGroups
 import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.spatial.Vector4i
@@ -39,7 +40,7 @@ fun renderEditorSelection(editor: Editor, sceneRenderer: SceneRenderer) {
       glStencilOp(GL_KEEP, GL_KEEP, GL_INCR)
       glStencilMask(0xFF)
       withoutFrontDrawing {
-        renderElementGroups(sceneRenderer, groups)
+        renderElementGroups(sceneRenderer, groups, ShadingMode.forward)
       }
 
       glStencilMask(0x00)
@@ -49,7 +50,7 @@ fun renderEditorSelection(editor: Editor, sceneRenderer: SceneRenderer) {
       for (y in -1..1 step 2) {
         for (x in -1..1 step 2) {
           globalState.viewport = Vector4i(offset.x + x, offset.y + y, dimensions.x, dimensions.y)
-          renderElementGroups(sceneRenderer, groups)
+          renderElementGroups(sceneRenderer, groups, ShadingMode.forward)
         }
       }
       globalState.depthEnabled = true

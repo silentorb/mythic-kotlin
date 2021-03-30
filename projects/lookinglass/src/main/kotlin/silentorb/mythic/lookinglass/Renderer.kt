@@ -1,15 +1,11 @@
 package silentorb.mythic.lookinglass
 
-import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL30.*
 import org.lwjgl.opengl.GL32.GL_TEXTURE_2D_MULTISAMPLE
 import org.lwjgl.opengl.GL32.glTexImage2DMultisample
 import silentorb.mythic.drawing.Canvas
-import silentorb.mythic.drawing.getStaticCanvasDependencies
 import silentorb.mythic.drawing.getUnitScaling
 import silentorb.mythic.glowing.*
-import silentorb.mythic.lookinglass.deferred.DeferredRenderer
-import silentorb.mythic.lookinglass.deferred.newDeferredRenderer
 import silentorb.mythic.lookinglass.shading.EffectsData
 import silentorb.mythic.lookinglass.shading.createSceneBuffer
 import silentorb.mythic.lookinglass.texturing.DynamicTextureLibrary
@@ -123,81 +119,8 @@ fun createSceneRenderer(renderer: Renderer, windowInfo: WindowInfo, scene: Scene
   val dimensions = Vector2i(viewport.z, viewport.w)
   val cameraEffectsData = createCameraEffectsData(dimensions, scene.camera)
   updateShaders(renderer, scene.lightingConfig, scene.lights, dimensions, cameraEffectsData)
-  return SceneRenderer(viewport, renderer, scene.camera, cameraEffectsData, windowInfo)
-}
-
-fun gatherSceneLights(meshes: ModelMeshMap, scene: GameScene): List<Light> {
-  return scene.main.lights
-//      .plus(gatherChildLights(meshes, scene.opaqueElementGroups))
-}
-
-fun createSceneRenderer(renderer: Renderer, windowInfo: WindowInfo, scene: GameScene, viewport: Vector4i): SceneRenderer {
-  val minimalScene = scene.main.copy(
-      lights = gatherSceneLights(renderer.meshes, scene)
-  )
-  return createSceneRenderer(renderer, windowInfo, minimalScene, viewport)
-}
-
-fun updateDeferredRenderer(renderer: Renderer, dimensions: Vector2i): DeferredRenderer? {
-  val deferred = renderer.deferred
-  return if (renderer.options.lightingMode == LightingMode.deferred) {
-    if (deferred == null || dimensions.x != deferred.albedo.width || dimensions.y != deferred.albedo.height)
-      newDeferredRenderer(dimensions)
-    else
-      deferred
-  } else
-    null
-}
-
-fun prepareRender(renderer: Renderer, windowInfo: WindowInfo) {
-  val dimensions = windowInfo.dimensions
-  if (renderer.multisampler != null) {
-    renderer.multisampler.frameBuffer.activateDraw()
-  }
-  renderer.deferred = updateDeferredRenderer(renderer, dimensions)
-  renderer.glow.state.viewport = Vector4i(0, 0, dimensions.x, dimensions.y)
-  renderer.glow.state.depthEnabled = true
-  renderer.glow.operations.clearScreen()
-  renderer.buffers.color.buffer = renderer.buffers.color.buffer
-      ?: BufferUtils.createByteBuffer(dimensions.x * dimensions.y * 3)
-
-  renderer.buffers.depth.buffer = renderer.buffers.depth.buffer
-      ?: BufferUtils.createFloatBuffer(dimensions.x * dimensions.y)
-}
-
-fun applyRenderBuffer(renderer: Renderer, dimensions: Vector2i) {
-  updateTextureBuffer(dimensions, renderer.buffers.color) {
-    TextureAttributes(
-        repeating = false,
-        smooth = false,
-        storageUnit = TextureStorageUnit.unsigned_byte
-    )
-  }
-
-  updateTextureBuffer(dimensions, renderer.buffers.depth) {
-    TextureAttributes(
-        repeating = false,
-        smooth = false,
-        storageUnit = TextureStorageUnit.float,
-        format = TextureFormat.depth
-    )
-  }
-
-  renderer.shaders.screenTexture.activate(Vector2(1f))
-  val canvasDependencies = getStaticCanvasDependencies()
-  activateTextures(listOf(renderer.buffers.color.texture!!, renderer.buffers.depth.texture!!))
-  canvasDependencies.meshes.image.draw(DrawMethod.triangleFan)
-}
-
-fun finishRender(renderer: Renderer, windowInfo: WindowInfo) {
-  if (renderer.multisampler != null) {
-    val width = windowInfo.dimensions.x
-    val height = windowInfo.dimensions.y
-    renderer.glow.state.drawFramebuffer = 0
-    renderer.glow.state.readFramebuffer = renderer.multisampler.frameBuffer.id
-    glDrawBuffer(GL_BACK)                       // Set the back buffer as the draw buffer
-    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST)
-  }
+  val offscreenRendering = scene.layers.any()
+  return SceneRenderer(viewport, renderer, scene.camera, cameraEffectsData, windowInfo, offscreenRendering)
 }
 
 fun createCanvas(renderer: Renderer, custom: Map<String, Any>, dimensions: Vector2i): Canvas {

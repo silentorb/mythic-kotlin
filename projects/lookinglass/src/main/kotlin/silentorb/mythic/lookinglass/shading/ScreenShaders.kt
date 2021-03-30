@@ -139,6 +139,20 @@ void main()
 }
 """
 
+val deferredShadingFragment = """
+in vec2 texCoords;
+out vec4 output_color;
+uniform sampler2D colorTexture;
+uniform vec4 inputColor;
+
+void main()
+{
+  vec3 primaryColorSample = texture(colorTexture, texCoords).xyz;
+  vec3 rgb = primaryColorSample * (1.0 - inputColor.w) + inputColor.xyz * inputColor.w;
+  output_color = vec4(rgb, 1.0);
+}
+"""
+
 class SimpleScreenShader(val program: ShaderProgram) {
 
   init {

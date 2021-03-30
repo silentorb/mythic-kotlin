@@ -12,6 +12,7 @@ import silentorb.mythic.ent.scenery.removeNodesAndChildren
 import silentorb.mythic.glowing.*
 import silentorb.mythic.lookinglass.Material
 import silentorb.mythic.lookinglass.SceneRenderer
+import silentorb.mythic.lookinglass.ShadingMode
 import silentorb.mythic.lookinglass.drawing.renderElementGroups
 import silentorb.mythic.lookinglass.flipY
 import silentorb.mythic.scenery.SceneProperties
@@ -47,7 +48,7 @@ fun plumbPixelDepth(sceneRenderer: SceneRenderer, editor: Editor, selectionQuery
         val elementGroups = getSelectionMeshes(editor, childGraph, expandedGraph, node)
         if (elementGroups.any()) {
           val groups = setElementGroupMaterial(material, elementGroups)
-          renderElementGroups(sceneRenderer, groups)
+          renderElementGroups(sceneRenderer, groups, ShadingMode.forward)
           val pixels = intArrayOf(0)
           glReadPixels(pixelPositionX, pixelPositionY, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, pixels)
           val sample = pixels.first()
