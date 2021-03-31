@@ -11,17 +11,21 @@ const val lightingApplication2 = "vec4(lightResult, uniformColor.w)"
 
 fun addIf(condition: Boolean, value: String) = if (condition) value else null
 
+const val deferredAlbedoKey = "deferredAlbedo"
+const val deferredPositionKey = "deferredPosition"
+const val deferredNormalKey = "deferredNormal"
+
 const val deferredFragmentHeader = """
-layout (location = 0) out vec4 deferredAlbedo;
-layout (location = 1) out vec3 deferredPosition;
-layout (location = 2) out vec3 deferredNormal;
+layout (location = 0) out vec4 $deferredAlbedoKey;
+layout (location = 1) out vec4 $deferredPositionKey;
+layout (location = 2) out vec4 $deferredNormalKey;
 """
 
 fun deferredFragmentApplication(color: String) = """
-deferredAlbedo.rgb = $color;
+deferredAlbedo = $color;
 deferredAlbedo.a = 1.0;
 deferredPosition = fragmentPosition;
-deferredNormal = fragmentNormal;
+deferredNormal = vec4(fragmentNormal, 1.0);
 """
 
 fun fragmentHeader(config: ShaderFeatureConfig): String {

@@ -1,6 +1,7 @@
 package silentorb.mythic.lookinglass
 
 import org.lwjgl.BufferUtils
+import org.lwjgl.opengl.GL11.GL_BACK
 import org.lwjgl.opengl.GL11.glDrawBuffer
 import org.lwjgl.opengl.GL30
 import org.lwjgl.opengl.GL30.glBlitFramebuffer
@@ -56,7 +57,7 @@ fun finishRender(renderer: Renderer, windowInfo: WindowInfo) {
     val height = windowInfo.dimensions.y
     renderer.glow.state.drawFramebuffer = 0
     renderer.multisampler.frameBuffer.activateRead()
-    glDrawBuffer(GL30.GL_BACK)                       // Set the back buffer as the draw buffer
+    glDrawBuffer(GL_BACK)                       // Set the back buffer as the draw buffer
     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL30.GL_COLOR_BUFFER_BIT, GL30.GL_NEAREST)
   }
 }

@@ -1,6 +1,7 @@
 package silentorb.mythic.lookinglass
 
 import silentorb.mythic.glowing.clearDepth
+import silentorb.mythic.glowing.debugMarkPass
 import silentorb.mythic.glowing.globalState
 import silentorb.mythic.lookinglass.deferred.processDeferredShading
 import silentorb.mythic.lookinglass.drawing.renderElementGroups
@@ -31,38 +32,39 @@ fun layerLightingMode(options: DisplayOptions, layer: SceneLayer): ShadingMode {
 }
 
 fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer, callback: OnRenderScene? = null) {
-  val previousDepthEnabled = globalState.depthEnabled
-  globalState.depthEnabled = layer.useDepth
-  if (renderer.offscreenRendering) {
-    activeOffscreenRendering(renderer)
+  val shadingMode = layerLightingMode(renderer.renderer.options, layer)
+  debugMarkPass(shadingMode == ShadingMode.deferred, "Deferred Rendering") {
+
+    val previousDepthEnabled = globalState.depthEnabled
+    globalState.depthEnabled = layer.useDepth
+    if (renderer.offscreenRendering) {
+      activeOffscreenRendering(renderer)
+    } else {
+      activeDirectRendering(renderer)
+    }
+
+    if (layer.resetDepth)
+      clearDepth()
+
+    if (shadingMode == ShadingMode.deferred) {
+      val deferred = renderer.renderer.deferred!!
+      deferred.frameBuffer.activateDraw()
+    }
+
+    renderElementGroups(renderer, camera, layer.elements, shadingMode)
+
+    if (callback != null) {
+      callback(renderer, camera, layer)
+    }
+
+    renderVolumes(renderer, layer.elements, shadingMode)
+
+    if (shadingMode == ShadingMode.deferred) {
+      processDeferredShading(renderer)
+    }
+
+    globalState.depthEnabled = previousDepthEnabled
   }
-  else {
-    activeDirectRendering(renderer)
-  }
-
-  if (layer.resetDepth)
-    clearDepth()
-
-  val lightingMode = layerLightingMode(renderer.renderer.options, layer)
-
-  if (lightingMode == ShadingMode.deferred) {
-    val deferred = renderer.renderer.deferred!!
-    deferred.frameBuffer.activateDraw()
-  }
-
-  renderElementGroups(renderer, camera, layer.elements, lightingMode)
-
-  if (callback != null) {
-    callback(renderer, camera, layer)
-  }
-
-  renderVolumes(renderer, layer.elements, lightingMode)
-
-  if (lightingMode == ShadingMode.deferred) {
-    processDeferredShading(renderer)
-  }
-
-  globalState.depthEnabled = previousDepthEnabled
 }
 
 fun renderSceneLayers(renderer: SceneRenderer, camera: Camera, layers: SceneLayers, callback: OnRenderScene? = null) {

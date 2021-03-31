@@ -1,16 +1,17 @@
 package silentorb.mythic.lookinglass.shading
 
+import org.lwjgl.opengl.GL20.glGetUniformLocation
+import org.lwjgl.opengl.GL20.glUniform1i
 import silentorb.mythic.glowing.ShaderProgram
+import silentorb.mythic.glowing.Vector2Property
 import silentorb.mythic.glowing.Vector4Property
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector4
-import org.lwjgl.opengl.GL20
-import silentorb.mythic.glowing.Vector2Property
 
 fun routeTexture(program: ShaderProgram, name: String, unit: Int) {
-  val location = GL20.glGetUniformLocation(program.id, name)
+  val location = glGetUniformLocation(program.id, name)
   program.activate()
-  GL20.glUniform1i(location, unit)
+  glUniform1i(location, unit)
 }
 
 val screenVertex = """
@@ -135,20 +136,6 @@ void main()
   vec3 s = texture(colorTexture, texCoords).xyz;
   float level = (s.x + s.y + s.z) / 3.0;
   vec3 rgb = vec3(level);
-  output_color = vec4(rgb, 1.0);
-}
-"""
-
-val deferredShadingFragment = """
-in vec2 texCoords;
-out vec4 output_color;
-uniform sampler2D colorTexture;
-uniform vec4 inputColor;
-
-void main()
-{
-  vec3 primaryColorSample = texture(colorTexture, texCoords).xyz;
-  vec3 rgb = primaryColorSample * (1.0 - inputColor.w) + inputColor.xyz * inputColor.w;
   output_color = vec4(rgb, 1.0);
 }
 """

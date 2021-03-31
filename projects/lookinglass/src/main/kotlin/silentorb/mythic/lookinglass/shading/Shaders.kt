@@ -3,6 +3,8 @@ package silentorb.mythic.lookinglass.shading
 import silentorb.mythic.debugging.getDebugBoolean
 import silentorb.mythic.glowing.*
 import silentorb.mythic.lookinglass.ShadingMode
+import silentorb.mythic.lookinglass.deferred.DeferredScreenShader
+import silentorb.mythic.lookinglass.deferred.deferredShadingFragment
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector4
@@ -142,6 +144,7 @@ class GeneralPerspectiveShader(buffers: UniformBuffers, vertexSchema: VertexSche
     if (lodOpacityLevels != null && config.lodOpacityLevels != null) {
       lodOpacityLevels.setValue(config.lodOpacityLevels)
     }
+
   }
 }
 
@@ -150,7 +153,7 @@ data class Shaders(
     val screenColor: ScreenColorShader,
     val screenDesaturation: DepthScreenShader,
     val screenTexture: DepthScreenShader,
-    val deferredShading: DepthScreenShader,
+    val deferredShading: DeferredScreenShader,
 )
 
 data class UniformBuffers(
@@ -166,6 +169,6 @@ fun createShaders(): Shaders {
       screenColor = ScreenColorShader(ShaderProgram(screenVertex, screenColorFragment)),
       screenDesaturation = DepthScreenShader(ShaderProgram(screenVertex, screenDesaturation)),
       screenTexture = DepthScreenShader(ShaderProgram(screenVertex, screenTextureFragment)),
-      deferredShading = DepthScreenShader(ShaderProgram(screenVertex, deferredShadingFragment)),
+      deferredShading = DeferredScreenShader(ShaderProgram(screenVertex, deferredShadingFragment)),
   )
 }
