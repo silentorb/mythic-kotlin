@@ -1,6 +1,7 @@
 package silentorb.mythic.bloom
 
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL11.*
 import silentorb.mythic.bloom.old.getAttributeBoolean
 import silentorb.mythic.drawing.Canvas
 import silentorb.mythic.glowing.withCropping
@@ -88,11 +89,11 @@ fun renderBox(canvas: Canvas, box: Box, offset: Vector2i, debug: Boolean = false
 
 fun enableBloomBlending() {
   globalState.blendEnabled = true
-  globalState.blendFunction = Pair(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+  globalState.blendFunction = Pair(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 }
 
 fun renderLayout(box: Box, canvas: Canvas, debug: Boolean = false) {
-  val current = getGLBounds(GL11.GL_VIEWPORT)
+  val current = getGLBounds(GL_VIEWPORT)
   if (current.z == 0)
     return
 

@@ -1,6 +1,8 @@
 package silentorb.mythic.lookinglass.drawing
 
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA
+import org.lwjgl.opengl.GL11.GL_SRC_ALPHA
 import silentorb.mythic.spatial.*
 import silentorb.mythic.glowing.DrawMethod
 import silentorb.mythic.glowing.debugMarkPass
@@ -22,7 +24,7 @@ fun renderBillboard(renderer: Renderer, camera: Camera, billboards: List<Texture
 
   debugMarkPass(true, "Particles") {
     globalState.blendEnabled = true
-    globalState.blendFunction = Pair(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+    globalState.blendFunction = Pair(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     val isTextureAnimated = texture.width != texture.height
     val textureScale = Vector2(texture.height.toFloat() / texture.width.toFloat(), 1f)
 

@@ -152,8 +152,11 @@ fun applyDeferredShading(renderer: SceneRenderer, sphereMesh: GeneralMesh) {
     shader.activate(dimensions)
     globalState.cullFaceSides = GL_FRONT
     globalState.depthEnabled = false
+    globalState.blendEnabled = true
+    globalState.blendFunction = GL_ONE to GL_ONE
     drawMeshInstanced(sphereMesh, DrawMethod.triangleFan, renderer.scene.lights.size)
     globalState.depthEnabled = true
+    globalState.blendEnabled = false
     globalState.cullFaceSides = GL_BACK
 //    applyFrameBufferTexture(renderer) { shaders, scale -> shaders.deferredShading.activate(scale) }
   }
