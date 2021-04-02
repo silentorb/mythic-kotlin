@@ -3,7 +3,6 @@ package silentorb.mythic.lookinglass.deferred
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL11.GL_TEXTURE_2D
 import org.lwjgl.opengl.GL20.glDrawBuffers
-import org.lwjgl.opengl.GL30
 import org.lwjgl.opengl.GL30.*
 import silentorb.mythic.glowing.*
 import silentorb.mythic.lookinglass.ShadingMode
@@ -50,8 +49,10 @@ void main()
 }
 """
 
-class DeferredScreenShader(val program: ShaderProgram) {
+class DeferredScreenShader(val program: ShaderProgram, uniformBuffers: UniformBuffers) {
   private val scaleProperty = Vector2Property(program, "scale")
+  val sceneProperty = bindUniformBuffer(UniformBufferId.SceneUniform, program, uniformBuffers.scene)
+  val sectionProperty = bindUniformBuffer(UniformBufferId.SectionUniform, program, uniformBuffers.section)
 
   init {
     routeTexture(program, deferredAlbedoKey, 0)
@@ -61,30 +62,42 @@ class DeferredScreenShader(val program: ShaderProgram) {
 
   fun activate(scale: Vector2) {
     scaleProperty.setValue(scale)
+
     program.activate()
   }
 }
 
-fun newFrameBufferTexture(dimensions: Vector2i, attachment: Int): Texture {
+fun newFrameBufferTexture(dimensions: Vector2i, attachment: Int, format: TextureFormat,
+                          storage: TextureStorageUnit): Texture {
   val texture = Texture(dimensions.x, dimensions.y, TextureAttributes(
-      format = TextureFormat.rgba, // alpha isn't always used but some devices prefer 4x float frame buffers
-      storageUnit = TextureStorageUnit.float,
+      format = format,
+      storageUnit = storage,
       smooth = false,
   ))
-  glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, texture.id, 0)
+  glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, texture.id, 0)
   return texture
 }
 
 fun newDeferredShading(dimensions: Vector2i): DeferredShading {
   val frameBuffer = FrameBuffer()
-  val albedo = newFrameBufferTexture(dimensions, GL_COLOR_ATTACHMENT0)
-  val position = newFrameBufferTexture(dimensions, GL_COLOR_ATTACHMENT1)
-  val normal = newFrameBufferTexture(dimensions, GL_COLOR_ATTACHMENT2)
+  val albedo = newFrameBufferTexture(dimensions, GL_COLOR_ATTACHMENT0, TextureFormat.rgba, TextureStorageUnit.unsignedByte)
+  val position = newFrameBufferTexture(dimensions, GL_COLOR_ATTACHMENT1, TextureFormat.rgba16f, TextureStorageUnit.float)
+  val normal = newFrameBufferTexture(dimensions, GL_COLOR_ATTACHMENT2, TextureFormat.rgba16f, TextureStorageUnit.float)
   val attachments = BufferUtils.createIntBuffer(3)
   attachments.put(GL_COLOR_ATTACHMENT0)
   attachments.put(GL_COLOR_ATTACHMENT1)
   attachments.put(GL_COLOR_ATTACHMENT2)
+  attachments.flip()
   glDrawBuffers(attachments)
+  val depth = glGenRenderbuffers()
+  glBindRenderbuffer(GL_RENDERBUFFER, depth)
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, dimensions.x, dimensions.y)
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth)
+  val status = glCheckFramebufferStatus(GL_FRAMEBUFFER)
+  if (status != GL_FRAMEBUFFER_COMPLETE)
+    throw Error("Error creating framebuffer.")
+
+  globalState.setFrameBuffer(0)
   return DeferredShading(
       frameBuffer = frameBuffer,
       albedo = albedo,
@@ -104,10 +117,13 @@ fun updateDeferredShading(renderer: Renderer, dimensions: Vector2i): DeferredSha
     null
 }
 
-fun processDeferredShading(renderer: SceneRenderer) {
+fun applyDeferredShading(renderer: SceneRenderer) {
   val deferred = renderer.renderer.deferred!!
   debugMarkPass(true, "Applied Shading") {
-    deferred.frameBuffer.activateRead()
+    globalState.setFrameBuffer(0)
+    deferred.albedo.activate(GL_TEXTURE0)
+    deferred.position.activate(GL_TEXTURE1)
+    deferred.normal.activate(GL_TEXTURE2)
     applyFrameBufferTexture(renderer) { shaders, scale -> shaders.deferredShading.activate(scale) }
   }
 }

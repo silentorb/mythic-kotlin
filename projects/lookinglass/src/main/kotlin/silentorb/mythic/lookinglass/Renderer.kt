@@ -89,7 +89,7 @@ fun textureAttributesFromConfig(options: DisplayOptions) =
         repeating = true,
         mipmap = options.textureAntialiasing == TextureAntialiasing.trilinear,
         smooth = options.textureAntialiasing != TextureAntialiasing.none,
-        storageUnit = TextureStorageUnit.unsigned_byte
+        storageUnit = TextureStorageUnit.unsignedByte
     )
 
 fun gatherChildLights(meshes: ModelMeshMap, groups: ElementGroups): List<Light> {

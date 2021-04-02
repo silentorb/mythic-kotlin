@@ -62,7 +62,7 @@ private fun textureOperations(config: ShaderFeatureConfig) =
     else if (config.texture)
       "textureCoordinates = uv;"
     else
-      ""
+      null
 
 private fun instanceHeader(instanced: Boolean) =
     if (instanced)
@@ -77,30 +77,31 @@ private fun instanceOperations(instanced: Boolean) =
   mat4 modelTransform = instance.position;
   fragmentColor = instance.color;
 """
-    } else ""
+    }
+    else
+      null
 
 private fun mainVertex(config: ShaderFeatureConfig): String {
-  return """
-${instanceHeader(config.instanced)}
-${if (config.shading == ShadingMode.forward) shadingHeader else ""}
-${if (config.texture) textureHeader else ""}
-${if (config.animatedTexture) "uniform vec2 uniformTextureScale;" else ""}
-${if (config.skeleton) weightHeader else ""}
-${if (config.pointSize) pointSizeHeader else ""}
-${if (config.colored) coloredHeader else ""}
-
-void main() {
-  vec4 position4 = vec4(position, 1.0);
-${instanceOperations(config.instanced)}
- ${if (config.skeleton) weightOperations else ""}
- vec4 modelPosition = modelTransform * position4;
-  gl_Position = scene.cameraTransform * modelPosition;
-${if (config.shading == ShadingMode.forward) shadingOperations else ""}
-${if (config.pointSize) pointSizeOutput else ""}
-${if (config.colored) coloredOutput else ""}
-${textureOperations(config)}
-}
-"""
+  return listOfNotNull(
+      instanceHeader(config.instanced),
+      if (config.shading != ShadingMode.none) shadingHeader else null,
+      if (config.texture) textureHeader else null,
+      if (config.animatedTexture) "uniform vec2 uniformTextureScale;" else null,
+      if (config.skeleton) weightHeader else null,
+      if (config.pointSize) pointSizeHeader else null,
+      if (config.colored) coloredHeader else null,
+      "\nvoid main() {",
+      "  vec4 position4 = vec4(position, 1.0);",
+      instanceOperations(config.instanced),
+      if (config.skeleton) weightOperations else null,
+      "vec4 modelPosition = modelTransform * position4;",
+      "gl_Position = scene.cameraTransform * modelPosition;",
+      if (config.shading != ShadingMode.none) shadingOperations else null,
+      if (config.pointSize) pointSizeOutput else null,
+      if (config.colored) coloredOutput else null,
+      textureOperations(config),
+      "}\n",
+  ).joinToString("\n")
 }
 
 fun shaderFieldType(attribute: VertexAttribute): String =

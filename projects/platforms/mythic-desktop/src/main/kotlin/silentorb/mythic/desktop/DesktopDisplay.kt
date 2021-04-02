@@ -17,9 +17,6 @@ fun createWindow(title: String, config: PlatformDisplayConfig): Long {
   glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE) // the window will stay hidden after creation
   glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE) // the window will be resizable
   glfwWindowHint(GLFW_SAMPLES, config.multisamples)
-  if (getDebugBoolean("DEBUG_OPENGL")) {
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
-  }
 //  val pid = ProcessHandle.current().getPid()
   val dimensions = config.windowedDimensions ?: Vector2i.unit
 

@@ -1,9 +1,10 @@
 package silentorb.mythic.lookinglass
 
+import silentorb.mythic.debugging.getDebugBoolean
 import silentorb.mythic.glowing.clearDepth
 import silentorb.mythic.glowing.debugMarkPass
 import silentorb.mythic.glowing.globalState
-import silentorb.mythic.lookinglass.deferred.processDeferredShading
+import silentorb.mythic.lookinglass.deferred.applyDeferredShading
 import silentorb.mythic.lookinglass.drawing.renderElementGroups
 import silentorb.mythic.lookinglass.drawing.renderVolumes
 import silentorb.mythic.scenery.Camera
@@ -33,9 +34,10 @@ fun layerLightingMode(options: DisplayOptions, layer: SceneLayer): ShadingMode {
 
 fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer, callback: OnRenderScene? = null) {
   val shadingMode = layerLightingMode(renderer.renderer.options, layer)
-  debugMarkPass(shadingMode == ShadingMode.deferred, "Deferred Rendering") {
+  val previousDepthEnabled = globalState.depthEnabled
+  debugMarkPass(shadingMode == ShadingMode.deferred && getDebugBoolean("MARK_DEFERRED_RENDERING"),
+      "Deferred Rendering") {
 
-    val previousDepthEnabled = globalState.depthEnabled
     globalState.depthEnabled = layer.useDepth
     if (renderer.offscreenRendering) {
       activeOffscreenRendering(renderer)
@@ -48,7 +50,8 @@ fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer,
 
     if (shadingMode == ShadingMode.deferred) {
       val deferred = renderer.renderer.deferred!!
-      deferred.frameBuffer.activateDraw()
+      deferred.frameBuffer.activate()
+      renderer.renderer.glow.operations.clearScreen()
     }
 
     renderElementGroups(renderer, camera, layer.elements, shadingMode)
@@ -59,12 +62,12 @@ fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer,
 
     renderVolumes(renderer, layer.elements, shadingMode)
 
-    if (shadingMode == ShadingMode.deferred) {
-      processDeferredShading(renderer)
-    }
-
-    globalState.depthEnabled = previousDepthEnabled
   }
+  if (shadingMode == ShadingMode.deferred) {
+    applyDeferredShading(renderer)
+  }
+
+  globalState.depthEnabled = previousDepthEnabled
 }
 
 fun renderSceneLayers(renderer: SceneRenderer, camera: Camera, layers: SceneLayers, callback: OnRenderScene? = null) {

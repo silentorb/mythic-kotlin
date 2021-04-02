@@ -1,12 +1,9 @@
 package silentorb.mythic.glowing
 
 import silentorb.mythic.spatial.Vector2i
-import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL11.GL_LINEAR
 import org.lwjgl.opengl.GL11.GL_NEAREST
-import org.lwjgl.opengl.GL20
 import org.lwjgl.opengl.GL30.*
-import org.lwjgl.opengl.GL32
 import org.lwjgl.opengl.GL32.glFramebufferTexture
 
 class FrameBuffer() {
@@ -36,6 +33,11 @@ class FrameBuffer() {
     disposed = true
   }
 
+  fun activate() {
+    globalState.setFrameBuffer(id)
+  }
+
+
   fun activateDraw() {
     globalState.drawFramebuffer = id
   }
@@ -61,7 +63,7 @@ fun prepareScreenFrameBuffer(windowWidth: Int, windowHeight: Int, withDepth: Boo
   val textureAttributes = TextureAttributes(
       repeating = false,
       smooth = false,
-      storageUnit = TextureStorageUnit.unsigned_byte
+      storageUnit = TextureStorageUnit.unsignedByte
   )
   val colorTexture = Texture(dimensions.x, dimensions.y, textureAttributes)
   glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, colorTexture.id, 0)

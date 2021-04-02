@@ -3,6 +3,7 @@ package silentorb.mythic.glowing
 import org.lwjgl.opengl.EXTTextureFilterAnisotropic.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT
 import org.lwjgl.opengl.EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT
 import org.lwjgl.opengl.GL13.*
+import org.lwjgl.opengl.GL30.GL_RGBA16F
 import org.lwjgl.opengl.GL30.glGenerateMipmap
 import org.lwjgl.opengl.GL45.glTextureSubImage2D
 import java.nio.ByteBuffer
@@ -13,13 +14,14 @@ typealias TextureInitializer = (width: Int, height: Int, buffer: FloatBuffer?) -
 enum class TextureFormat {
   rgb,
   rgba,
+  rgba16f,
   depth,
   scalar,
 }
 
 enum class TextureStorageUnit {
   float,
-  unsigned_byte
+  unsignedByte
 }
 
 data class TextureAttributes(
@@ -44,9 +46,15 @@ fun getMaxAnistropy(): Float {
 fun mapTextureFormat(format: TextureFormat) =
     when (format) {
       TextureFormat.rgb -> GL_RGB
-      TextureFormat.rgba -> GL_RGBA
+      TextureFormat.rgba, TextureFormat.rgba16f -> GL_RGBA
       TextureFormat.scalar -> GL_RED
       TextureFormat.depth -> GL_DEPTH_COMPONENT
+    }
+
+fun mapInternalTextureFormat(format: TextureFormat) =
+    when (format) {
+      TextureFormat.rgba16f -> GL_RGBA16F
+      else -> mapTextureFormat(format)
     }
 
 fun initializeTexture(width: Int, height: Int, attributes: TextureAttributes, buffer: ByteBuffer? = null) {
@@ -77,18 +85,19 @@ fun initializeTexture(width: Int, height: Int, attributes: TextureAttributes, bu
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter)
 
-  val internalFormat = mapTextureFormat(attributes.format)
+  val internalFormat = mapInternalTextureFormat(attributes.format)
+  val format = mapTextureFormat(attributes.format)
 
   val storageUnit = when (attributes.storageUnit) {
     TextureStorageUnit.float -> GL_FLOAT
-    TextureStorageUnit.unsigned_byte -> GL_UNSIGNED_BYTE
+    TextureStorageUnit.unsignedByte -> GL_UNSIGNED_BYTE
   }
 
   glTexImage2D(
       GL_TEXTURE_2D, 0, internalFormat,
       width,
       height,
-      0, internalFormat, storageUnit, buffer)
+      0, format, storageUnit, buffer)
 
   if (attributes.mipmap) {
     glGenerateMipmap(GL_TEXTURE_2D)

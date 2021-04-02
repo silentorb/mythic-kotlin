@@ -105,7 +105,7 @@ data class Renderer(
       section = UniformBuffer(sectionBufferSize),
       bone = UniformBuffer(boneBufferSize)
   )
-  val shaders: Shaders = createShaders()
+  val shaders: Shaders = createShaders(uniformBuffers)
   val shaderCache: ShaderCache = mutableMapOf()
   val getShader = getCachedShader(uniformBuffers, shaderCache)
   val drawing = createDrawingEffects()

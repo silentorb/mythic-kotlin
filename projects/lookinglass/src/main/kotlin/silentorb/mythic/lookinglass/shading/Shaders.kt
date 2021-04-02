@@ -30,7 +30,6 @@ fun bindUniformBuffer(id: UniformBufferId, program: ShaderProgram, buffer: Unifo
 }
 
 class LightingFeature(program: ShaderProgram, sectionBuffer: UniformBuffer) {
-  val normalTransformProperty = MatrixProperty(program, "normalTransform")
   val glowProperty = FloatProperty(program, "glow")
   val sectionProperty = bindUniformBuffer(UniformBufferId.SectionUniform, program, sectionBuffer)
 }
@@ -108,6 +107,7 @@ class GeneralPerspectiveShader(buffers: UniformBuffers, vertexSchema: VertexSche
   val skeleton: SkeletonFeature? = if (featureConfig.skeleton) SkeletonFeature(program, buffers.bone) else null
   val nearPlaneHeight: FloatProperty? = if (featureConfig.pointSize) FloatProperty(program, "nearPlaneHeight") else null
   val lodOpacityLevels: FloatArrayProperty? = if (featureConfig.pointSize) FloatArrayProperty(program, "lodOpacityLevels") else null
+  val normalTransformProperty = if (featureConfig.shading != ShadingMode.none) MatrixProperty(program, "normalTransform") else null
 
   // IntelliJ will flag this use of inline as a warning, but using inline here
   // causes the JVM to optimize away the ObjectShaderConfig allocation and significantly
@@ -126,7 +126,10 @@ class GeneralPerspectiveShader(buffers: UniformBuffers, vertexSchema: VertexSche
 
     if (lighting != null) {
       lighting.glowProperty.setValue(config.glow)
-      lighting.normalTransformProperty.setValue(config.normalTransform ?: Matrix.identity)
+    }
+
+    if (normalTransformProperty != null) {
+      normalTransformProperty.setValue(config.normalTransform ?: Matrix.identity)
     }
 
     if (config.texture != null) {
@@ -163,12 +166,12 @@ data class UniformBuffers(
     val bone: UniformBuffer
 )
 
-fun createShaders(): Shaders {
+fun createShaders(uniformBuffers: UniformBuffers): Shaders {
   return Shaders(
       depthOfField = DepthScreenShader(ShaderProgram(screenVertex, depthOfFieldFragment)),
       screenColor = ScreenColorShader(ShaderProgram(screenVertex, screenColorFragment)),
       screenDesaturation = DepthScreenShader(ShaderProgram(screenVertex, screenDesaturation)),
       screenTexture = DepthScreenShader(ShaderProgram(screenVertex, screenTextureFragment)),
-      deferredShading = DeferredScreenShader(ShaderProgram(screenVertex, deferredShadingFragment)),
+      deferredShading = DeferredScreenShader(ShaderProgram(screenVertex, deferredShadingFragment), uniformBuffers),
   )
 }

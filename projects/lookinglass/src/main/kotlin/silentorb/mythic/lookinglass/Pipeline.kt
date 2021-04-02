@@ -32,7 +32,7 @@ fun applyRenderBuffer(renderer: Renderer, dimensions: Vector2i) {
     TextureAttributes(
         repeating = false,
         smooth = false,
-        storageUnit = TextureStorageUnit.unsigned_byte
+        storageUnit = TextureStorageUnit.unsignedByte
     )
   }
 
@@ -85,6 +85,9 @@ fun applyFilters(renderer: SceneRenderer, filters: List<ScreenFilter>) {
   globalState.cullFaces = false
   globalState.viewport = renderer.viewport
 
+  val offscreenBuffer = renderer.renderer.offscreenBuffers.first()
+  activateTextures(listOf(offscreenBuffer.colorTexture, offscreenBuffer.depthTexture!!))
+
   for (filter in filters.dropLast(1)) {
 //      globalState.setFrameBuffer(renderer.renderer.offscreenBuffers.first().framebuffer.id)
     applyFrameBufferTexture(renderer, filter)
@@ -104,10 +107,8 @@ fun applyFilters(renderer: SceneRenderer, filters: List<ScreenFilter>) {
 
 fun applyFrameBufferTexture(renderer: SceneRenderer, filter: ScreenFilter) {
   val canvasDependencies = getStaticCanvasDependencies()
-  val offscreenBuffer = renderer.renderer.offscreenBuffers.first()
   val dimensions = renderer.windowInfo.dimensions
   val scale = Vector2(dimensions.x.toFloat(), dimensions.y.toFloat()) / renderer.viewport.zw.toVector2()
   filter(renderer.renderer.shaders, scale)
-  activateTextures(listOf(offscreenBuffer.colorTexture, offscreenBuffer.depthTexture!!))
   canvasDependencies.meshes.imageGl.draw(DrawMethod.triangleFan)
 }
