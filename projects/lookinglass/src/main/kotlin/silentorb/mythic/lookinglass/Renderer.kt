@@ -120,7 +120,7 @@ fun createSceneRenderer(renderer: Renderer, windowInfo: WindowInfo, scene: Scene
   val cameraEffectsData = createCameraEffectsData(dimensions, scene.camera)
   updateShaders(renderer, scene.lightingConfig, scene.lights, dimensions, cameraEffectsData)
   val offscreenRendering = scene.layers.any()
-  return SceneRenderer(viewport, renderer, scene.camera, cameraEffectsData, windowInfo, offscreenRendering)
+  return SceneRenderer(viewport, renderer, scene.camera, cameraEffectsData, windowInfo, offscreenRendering, scene)
 }
 
 fun createCanvas(renderer: Renderer, custom: Map<String, Any>, dimensions: Vector2i): Canvas {

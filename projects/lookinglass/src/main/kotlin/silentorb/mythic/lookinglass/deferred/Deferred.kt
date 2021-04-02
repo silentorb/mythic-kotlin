@@ -5,13 +5,11 @@ import org.lwjgl.opengl.GL11.GL_TEXTURE_2D
 import org.lwjgl.opengl.GL20.glDrawBuffers
 import org.lwjgl.opengl.GL30.*
 import silentorb.mythic.glowing.*
-import silentorb.mythic.lookinglass.ShadingMode
-import silentorb.mythic.lookinglass.Renderer
-import silentorb.mythic.lookinglass.SceneRenderer
-import silentorb.mythic.lookinglass.applyFrameBufferTexture
+import silentorb.mythic.lookinglass.*
 import silentorb.mythic.lookinglass.shading.*
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector2i
+import silentorb.mythic.spatial.toVector2
 
 data class DeferredShading(
     val frameBuffer: FrameBuffer,
@@ -27,30 +25,53 @@ data class DeferredShading(
   }
 }
 
-val deferredShadingFragment = """
-in vec2 texCoords;
+const val deferredScreenVertex = """
+layout(location = 0) in vec3 position;
+out int instanceId;
+uniform vec2 dimensions;
+$sceneHeader
+$lightingHeader
+
+out vec4 fragmentPosition;
+out vec2 screenDimensions;
+
+void main() {
+  instanceId = gl_InstanceID;
+  screenDimensions = dimensions;
+  Light light = section.lights[instanceId];
+  vec4 position4 = vec4(position * light.direction.w + light.position, 1.0);
+  gl_Position = scene.cameraTransform * position4;
+  fragmentPosition = position4;
+}
+"""
+
+const val deferredShadingFragment = """
+flat in int instanceId;
+in vec4 fragmentPosition;
+in vec2 screenDimensions;
 out vec4 output_color;
 uniform sampler2D $deferredAlbedoKey;
 uniform sampler2D $deferredPositionKey;
 uniform sampler2D $deferredNormalKey;
 uniform vec4 inputColor;
 $sceneHeader
-$lightingHeader
+$lightingCode
 
 void main()
 {
+  Light light = section.lights[instanceId];
+  vec2 texCoords = gl_FragCoord.xy / screenDimensions;
   vec3 albedo = texture($deferredAlbedoKey, texCoords).rgb;
   vec3 position = texture($deferredPositionKey, texCoords).xyz;
   vec3 normal = texture($deferredNormalKey, texCoords).xyz;
   float glow = 0.0;
-  vec3 lightResult = processLights(vec4(1.0), normal, scene.cameraDirection, position, glow);
-  vec3 rgb = albedo * lightResult;
+  vec3 rgb = processLight(light, vec4(albedo, 1.0), normal, scene.cameraDirection, position);
   output_color = vec4(rgb, 1.0);
 }
 """
 
 class DeferredScreenShader(val program: ShaderProgram, uniformBuffers: UniformBuffers) {
-  private val scaleProperty = Vector2Property(program, "scale")
+  private val dimensionsProperty = Vector2Property(program, "dimensions")
   val sceneProperty = bindUniformBuffer(UniformBufferId.SceneUniform, program, uniformBuffers.scene)
   val sectionProperty = bindUniformBuffer(UniformBufferId.SectionUniform, program, uniformBuffers.section)
 
@@ -60,12 +81,14 @@ class DeferredScreenShader(val program: ShaderProgram, uniformBuffers: UniformBu
     routeTexture(program, deferredNormalKey, 2)
   }
 
-  fun activate(scale: Vector2) {
-    scaleProperty.setValue(scale)
-
+  fun activate(dimensions: Vector2) {
+    dimensionsProperty.setValue(dimensions)
     program.activate()
   }
 }
+
+fun newDeferredScreenShader(uniformBuffers: UniformBuffers) =
+    DeferredScreenShader(ShaderProgram(deferredScreenVertex, deferredShadingFragment), uniformBuffers)
 
 fun newFrameBufferTexture(dimensions: Vector2i, attachment: Int, format: TextureFormat,
                           storage: TextureStorageUnit): Texture {
@@ -117,13 +140,21 @@ fun updateDeferredShading(renderer: Renderer, dimensions: Vector2i): DeferredSha
     null
 }
 
-fun applyDeferredShading(renderer: SceneRenderer) {
+fun applyDeferredShading(renderer: SceneRenderer, sphereMesh: GeneralMesh) {
   val deferred = renderer.renderer.deferred!!
   debugMarkPass(true, "Applied Shading") {
     globalState.setFrameBuffer(0)
     deferred.albedo.activate(GL_TEXTURE0)
     deferred.position.activate(GL_TEXTURE1)
     deferred.normal.activate(GL_TEXTURE2)
-    applyFrameBufferTexture(renderer) { shaders, scale -> shaders.deferredShading.activate(scale) }
+    val dimensions = renderer.windowInfo.dimensions.toVector2()
+    val shader = renderer.renderer.shaders.deferredShading
+    shader.activate(dimensions)
+    globalState.cullFaceSides = GL_FRONT
+    globalState.depthEnabled = false
+    drawMeshInstanced(sphereMesh, DrawMethod.triangleFan, renderer.scene.lights.size)
+    globalState.depthEnabled = true
+    globalState.cullFaceSides = GL_BACK
+//    applyFrameBufferTexture(renderer) { shaders, scale -> shaders.deferredShading.activate(scale) }
   }
 }

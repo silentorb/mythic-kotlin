@@ -105,10 +105,14 @@ fun applyFilters(renderer: SceneRenderer, filters: List<ScreenFilter>) {
   }
 }
 
+fun getScreenScale(renderer: SceneRenderer): Vector2 {
+  val dimensions = renderer.windowInfo.dimensions
+  return Vector2(dimensions.x.toFloat(), dimensions.y.toFloat()) / renderer.viewport.zw.toVector2()
+}
+
 fun applyFrameBufferTexture(renderer: SceneRenderer, filter: ScreenFilter) {
   val canvasDependencies = getStaticCanvasDependencies()
-  val dimensions = renderer.windowInfo.dimensions
-  val scale = Vector2(dimensions.x.toFloat(), dimensions.y.toFloat()) / renderer.viewport.zw.toVector2()
+  val scale = getScreenScale(renderer)
   filter(renderer.renderer.shaders, scale)
   canvasDependencies.meshes.imageGl.draw(DrawMethod.triangleFan)
 }

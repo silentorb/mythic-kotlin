@@ -5,6 +5,7 @@ import silentorb.mythic.glowing.*
 import silentorb.mythic.lookinglass.ShadingMode
 import silentorb.mythic.lookinglass.deferred.DeferredScreenShader
 import silentorb.mythic.lookinglass.deferred.deferredShadingFragment
+import silentorb.mythic.lookinglass.deferred.newDeferredScreenShader
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector4
@@ -172,6 +173,6 @@ fun createShaders(uniformBuffers: UniformBuffers): Shaders {
       screenColor = ScreenColorShader(ShaderProgram(screenVertex, screenColorFragment)),
       screenDesaturation = DepthScreenShader(ShaderProgram(screenVertex, screenDesaturation)),
       screenTexture = DepthScreenShader(ShaderProgram(screenVertex, screenTextureFragment)),
-      deferredShading = DeferredScreenShader(ShaderProgram(screenVertex, deferredShadingFragment), uniformBuffers),
+      deferredShading = newDeferredScreenShader(uniformBuffers),
   )
 }

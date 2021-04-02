@@ -64,7 +64,8 @@ fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer,
 
   }
   if (shadingMode == ShadingMode.deferred) {
-    applyDeferredShading(renderer)
+    val sphereMesh = renderer.meshes["sphere"]!!.primitives.first().mesh
+    applyDeferredShading(renderer, sphereMesh)
   }
 
   globalState.depthEnabled = previousDepthEnabled

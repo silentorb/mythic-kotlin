@@ -14,10 +14,9 @@ fun routeTexture(program: ShaderProgram, name: String, unit: Int) {
   glUniform1i(location, unit)
 }
 
-val screenVertex = """
+const val screenVertex = """
 in vec4 vertex;
 out vec2 texCoords;
-
 uniform vec2 scale;
 
 void main()

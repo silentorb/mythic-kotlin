@@ -20,6 +20,7 @@ data class SceneRenderer(
     val cameraEffectsData: CameraEffectsData,
     val windowInfo: WindowInfo,
     val offscreenRendering: Boolean,
+    val scene: Scene,
 ) {
 
   val effects: Shaders

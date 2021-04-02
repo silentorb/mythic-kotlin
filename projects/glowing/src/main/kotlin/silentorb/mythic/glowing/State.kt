@@ -236,6 +236,14 @@ class State {
       }
     }
 
+  var cullFaceSides: Int = GL_BACK
+    set(value) {
+      if (field != value) {
+        field = value
+        glCullFace(value)
+      }
+    }
+
   fun setFrameBuffer(value: Int) {
     if (drawFramebuffer != value || readFramebuffer != value) {
       _drawFramebuffer = value

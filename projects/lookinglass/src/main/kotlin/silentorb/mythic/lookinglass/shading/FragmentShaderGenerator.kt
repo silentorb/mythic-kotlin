@@ -3,7 +3,6 @@ package silentorb.mythic.lookinglass.shading
 import silentorb.mythic.lookinglass.ShadingMode
 import silentorb.mythic.resource_loading.loadTextResource
 
-val lightingHeader = loadTextResource("shaders/lighting.glsl")
 const val maxLodLevels: Int = 10
 
 const val lightingApplication1 = "vec3 lightResult = processLights(uniformColor, fragmentNormal, scene.cameraDirection, fragmentPosition.xyz, glow);"
@@ -40,7 +39,7 @@ out vec4 output_color;""",
 in vec2 textureCoordinates;"""
       else null,
       when (config.shading) {
-        ShadingMode.forward -> lightingHeader
+        ShadingMode.forward -> lightingCode
         ShadingMode.deferred -> deferredFragmentHeader
         ShadingMode.none -> null
       },

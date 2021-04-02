@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL11.glDrawArrays
 import org.lwjgl.opengl.GL11.glDrawElements
 import org.lwjgl.opengl.GL14.glMultiDrawArrays
 import org.lwjgl.opengl.GL31.glDrawArraysInstanced
+import org.lwjgl.opengl.GL31.glDrawElementsInstanced
 import java.nio.FloatBuffer
 import java.nio.IntBuffer
 
@@ -137,8 +138,7 @@ fun drawMeshInstanced(mesh: GeneralMesh, method: DrawMethod, instanceCount: Int)
   mesh.vertexBuffer.activate()
   val drawMode = convertDrawMethod(mesh, method)
   if (mesh.indices != null) {
-    throw Error("Not implemented")
-//    glDrawElements(mappedMethod, mesh.indices)
+    glDrawElementsInstanced(drawMode, mesh.indices, instanceCount)
   } else {
     glDrawArraysInstanced(drawMode, 0, mesh.counts!!.get(0), instanceCount)
 //    glMultiDrawArrays(mappedMethod, mesh.offsets!!, mesh.counts!!)
