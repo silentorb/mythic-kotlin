@@ -54,7 +54,7 @@ fun createMultiSampler(glow: Glow, width: Int, height: Int, multisamples: Int): 
   val framebuffer = FrameBuffer()
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, texture.id, 0)
 
-  val renderbuffer = Renderbuffer()
+  val renderbuffer = RenderBuffer()
   glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisamples, GL_DEPTH24_STENCIL8, width, height);
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, renderbuffer.id);
 
@@ -66,7 +66,7 @@ fun createMultiSampler(glow: Glow, width: Int, height: Int, multisamples: Int): 
 
   return Multisampler(
       frameBuffer = framebuffer,
-      renderbuffer = renderbuffer
+      renderBuffer = renderbuffer
   )
 }
 
@@ -119,7 +119,7 @@ fun createSceneRenderer(renderer: Renderer, windowInfo: WindowInfo, scene: Scene
   val dimensions = Vector2i(viewport.z, viewport.w)
   val cameraEffectsData = createCameraEffectsData(dimensions, scene.camera)
   updateShaders(renderer, scene.lightingConfig, scene.lights, dimensions, cameraEffectsData)
-  val offscreenRendering = scene.layers.any()
+  val offscreenRendering = scene.filters.any()
   return SceneRenderer(viewport, renderer, scene.camera, cameraEffectsData, windowInfo, offscreenRendering, scene)
 }
 

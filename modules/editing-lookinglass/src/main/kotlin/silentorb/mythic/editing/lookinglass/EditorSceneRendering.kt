@@ -122,11 +122,11 @@ fun sceneFromEditorGraph(meshShapes: Map<String, Shape>, editor: Editor, lightin
   val layers = listOf(
       SceneLayer(
           elements = solidGroups,
-          useDepth = true
+          depth = DepthMode.global
       ),
       SceneLayer(
           elements = particleGroups.sortedByDescending { it.billboards.first().position.distance(camera.position) },
-          useDepth = true
+          depth = DepthMode.global
       ),
   )
   val elementLights = layers.flatMap { layer ->

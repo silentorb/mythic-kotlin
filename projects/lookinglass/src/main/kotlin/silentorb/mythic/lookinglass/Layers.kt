@@ -9,12 +9,18 @@ import silentorb.mythic.lookinglass.drawing.renderElementGroups
 import silentorb.mythic.lookinglass.drawing.renderVolumes
 import silentorb.mythic.scenery.Camera
 
+enum class DepthMode {
+  none,
+  local,
+  global
+}
+
 data class SceneLayer(
-    val elements: ElementGroups,
-    val useDepth: Boolean,
-    val resetDepth: Boolean = false,
+    val elements: ElementGroups = listOf(),
+    val depth: DepthMode? = null,
     val attributes: Set<String> = setOf(),
-    val shadingMode: ShadingMode = ShadingMode.forward,
+    val shadingMode: ShadingMode? = null,
+    val children: List<SceneLayer> = listOf(),
 )
 
 typealias SceneLayers = List<SceneLayer>
@@ -23,6 +29,9 @@ typealias SceneLayers = List<SceneLayer>
 typealias OnRenderScene = (SceneRenderer, Camera, SceneLayer) -> Unit
 
 fun layerLightingMode(options: DisplayOptions, layer: SceneLayer): ShadingMode {
+  if (getDebugBoolean("NO_SHADING"))
+    return ShadingMode.none
+
   val deferred = layer.shadingMode == ShadingMode.deferred &&
       options.shadingMode == ShadingMode.deferred
 
@@ -32,47 +41,60 @@ fun layerLightingMode(options: DisplayOptions, layer: SceneLayer): ShadingMode {
     ShadingMode.forward
 }
 
-fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer, callback: OnRenderScene? = null) {
-  val shadingMode = layerLightingMode(renderer.renderer.options, layer)
-  val previousDepthEnabled = globalState.depthEnabled
-  debugMarkPass(shadingMode == ShadingMode.deferred && getDebugBoolean("MARK_DEFERRED_RENDERING"),
-      "Deferred Rendering") {
+fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer, parent: SceneLayer? = null,
+                     callback: OnRenderScene? = null) {
+  val parentShadingMode = parent?.shadingMode
+  val shadingMode = if (layer.shadingMode == null)
+    parentShadingMode ?: ShadingMode.none
+  else
+    layerLightingMode(renderer.renderer.options, layer)
 
-    globalState.depthEnabled = layer.useDepth
+  val manageDeferred = shadingMode == ShadingMode.deferred && shadingMode != parentShadingMode
+  val previousDepthEnabled = globalState.depthEnabled
+  val depthMode = layer.depth
+  debugMarkPass(manageDeferred && getDebugBoolean("MARK_DEFERRED_RENDERING"),
+      "Deferred Rendering") {
+    if (depthMode != null)
+      globalState.depthEnabled = depthMode != DepthMode.none
+
     if (renderer.offscreenRendering) {
       activeOffscreenRendering(renderer)
     } else {
       activeDirectRendering(renderer)
     }
 
-    if (layer.resetDepth)
-      clearDepth()
-
-    if (shadingMode == ShadingMode.deferred) {
+    if (manageDeferred) {
       val deferred = renderer.renderer.deferred!!
       deferred.frameBuffer.activate()
       renderer.renderer.glow.operations.clearScreen()
+      globalState.blendEnabled = false
     }
 
-    renderElementGroups(renderer, camera, layer.elements, shadingMode)
+    if (layer.children.any()) {
+      for (child in layer.children) {
+        renderSceneLayer(renderer, camera, child, layer, callback)
+      }
+    } else {
+      renderElementGroups(renderer, camera, layer.elements, shadingMode)
+      renderVolumes(renderer, layer.elements, shadingMode)
+    }
 
     if (callback != null) {
       callback(renderer, camera, layer)
     }
-
-    renderVolumes(renderer, layer.elements, shadingMode)
-
   }
-  if (shadingMode == ShadingMode.deferred) {
+
+  if (manageDeferred) {
     val sphereMesh = renderer.meshes["sphere"]!!.primitives.first().mesh
     applyDeferredShading(renderer, sphereMesh)
   }
 
-  globalState.depthEnabled = previousDepthEnabled
+  if (depthMode != null)
+    globalState.depthEnabled = previousDepthEnabled
 }
 
 fun renderSceneLayers(renderer: SceneRenderer, camera: Camera, layers: SceneLayers, callback: OnRenderScene? = null) {
   for (layer in layers) {
-    renderSceneLayer(renderer, camera, layer, callback)
+    renderSceneLayer(renderer, camera, layer, null, callback)
   }
 }

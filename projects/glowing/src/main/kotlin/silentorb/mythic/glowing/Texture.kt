@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL13.*
 import org.lwjgl.opengl.GL30.GL_RGBA16F
 import org.lwjgl.opengl.GL30.glGenerateMipmap
 import org.lwjgl.opengl.GL45.glTextureSubImage2D
+import silentorb.mythic.spatial.Vector2i
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 
@@ -169,3 +170,10 @@ fun activateTextures(textures: List<Texture>) {
     texture.activate(GL_TEXTURE0 + index)
   }
 }
+
+fun updateTexture(attributes: TextureAttributes, dimensions: Vector2i, texture: Texture?): Texture =
+    if (texture == null || texture.width != dimensions.x || dimensions.y != texture.height) {
+      texture?.dispose()
+      Texture(dimensions.x, dimensions.y, attributes)
+    } else
+      texture

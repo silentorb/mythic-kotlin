@@ -2,7 +2,7 @@ package silentorb.mythic.glowing
 
 import org.lwjgl.opengl.GL30.*
 
-class Renderbuffer() {
+class RenderBuffer {
   val id = glGenRenderbuffers()
   private var disposed = false
 

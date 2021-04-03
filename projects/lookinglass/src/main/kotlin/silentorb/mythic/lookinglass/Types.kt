@@ -55,7 +55,7 @@ fun toPlatformDisplayConfig(display: DisplayOptions) =
 
 data class Multisampler(
     val frameBuffer: FrameBuffer,
-    val renderbuffer: Renderbuffer
+    val renderBuffer: RenderBuffer
 )
 
 typealias AnimationDurationMap = Map<ArmatureName, Map<AnimationName, Float>>
@@ -95,10 +95,9 @@ data class Renderer(
     val armatures: Map<ArmatureName, Armature>,
     val vertexSchemas: VertexSchemas,
     val fonts: List<FontSet>,
-    val offscreenBuffers: List<OffscreenBuffer>,
+    val offscreenBuffer: OffscreenBuffer,
     val textures: DynamicTextureLibrary = mutableMapOf()
 ) {
-  val buffers: RenderBuffers = RenderBuffers()
   val uniformBuffers = UniformBuffers(
       instance = UniformBuffer(instanceBufferSize),
       scene = UniformBuffer(sceneBufferSize),
@@ -136,14 +135,14 @@ data class Renderer(
 //  }
 //}
 
-fun emptyRenderer(options: DisplayOptions): Renderer =
-    Renderer(
-        glow = Glow(),
-        options = options,
-        meshes = mutableMapOf(),
-        armatures = mapOf(),
-        vertexSchemas = createVertexSchemas(),
-        fonts = listOf(),
-        multisampler = null,
-        offscreenBuffers = listOf()
-    )
+//fun emptyRenderer(options: DisplayOptions): Renderer =
+//    Renderer(
+//        glow = Glow(),
+//        options = options,
+//        meshes = mutableMapOf(),
+//        armatures = mapOf(),
+//        vertexSchemas = createVertexSchemas(),
+//        fonts = listOf(),
+//        multisampler = null,
+//        offscreenBuffers = listOf()
+//    )

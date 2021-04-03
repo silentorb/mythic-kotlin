@@ -147,5 +147,7 @@ fun renderVolumes(sceneRenderer: SceneRenderer, elements: ElementGroups, shading
     }
   }
 
-  renderBatchedVolumes(sceneRenderer, volumes, shadingMode)
+  if (volumes.any()) {
+    renderBatchedVolumes(sceneRenderer, volumes, shadingMode)
+  }
 }

@@ -50,11 +50,18 @@ class FrameBuffer() {
 data class OffscreenBuffer(
     val frameBuffer: FrameBuffer,
     val colorTexture: Texture,
-    val depthTexture: Texture?
+    val depthTexture: Texture?,
+    val depthTexture2: Texture?,
 )
 
 fun applyOffscreenBuffer(buffer: OffscreenBuffer, windowDimensions: Vector2i, smooth: Boolean) {
   buffer.frameBuffer.blitToScreen(Vector2i(buffer.colorTexture.width, buffer.colorTexture.height), windowDimensions, smooth)
+}
+
+fun newDepthTexture(textureAttributes: TextureAttributes, dimensions: Vector2i): Texture {
+  val depthTexture = Texture(dimensions.x, dimensions.y, textureAttributes.copy(format = TextureFormat.depth, storageUnit = TextureStorageUnit.float))
+  glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture.id, 0)
+  return depthTexture
 }
 
 fun prepareScreenFrameBuffer(windowWidth: Int, windowHeight: Int, withDepth: Boolean): OffscreenBuffer {
@@ -69,12 +76,10 @@ fun prepareScreenFrameBuffer(windowWidth: Int, windowHeight: Int, withDepth: Boo
   glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, colorTexture.id, 0)
   glDrawBuffers(GL_COLOR_ATTACHMENT0)
 
-  val depthTexture = if (withDepth) {
-    val depthTexture = Texture(dimensions.x, dimensions.y, textureAttributes.copy(format = TextureFormat.depth, storageUnit = TextureStorageUnit.float))
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture.id, 0)
-    depthTexture
+  val (depthTexture, depthTexture2) = if (withDepth) {
+    newDepthTexture(textureAttributes, dimensions) to newDepthTexture(textureAttributes, dimensions)
   } else
-    null
+    null to null
 
   val status = glCheckFramebufferStatus(GL_FRAMEBUFFER)
   if (status != GL_FRAMEBUFFER_COMPLETE)
@@ -84,5 +89,5 @@ fun prepareScreenFrameBuffer(windowWidth: Int, windowHeight: Int, withDepth: Boo
     clearDepth() // Initialize the depth texture (the pixels of which are undefined until this)
   }
   globalState.setFrameBuffer(0)
-  return OffscreenBuffer(framebuffer, colorTexture, depthTexture)
+  return OffscreenBuffer(framebuffer, colorTexture, depthTexture, depthTexture2)
 }

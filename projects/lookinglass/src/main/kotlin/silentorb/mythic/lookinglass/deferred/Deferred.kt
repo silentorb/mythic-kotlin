@@ -45,11 +45,17 @@ void main() {
 }
 """
 
+const val extractAlbedoAndGlow = """
+  vec4 albedoAndGlow = texture($deferredAlbedoKey, texCoords);
+  vec3 albedo = albedoAndGlow.rgb;
+  float glow = albedoAndGlow.a;
+"""
+
 const val deferredShadingFragment = """
 flat in int instanceId;
 in vec4 fragmentPosition;
 in vec2 screenDimensions;
-out vec4 output_color;
+out vec4 outputColor;
 uniform sampler2D $deferredAlbedoKey;
 uniform sampler2D $deferredPositionKey;
 uniform sampler2D $deferredNormalKey;
@@ -61,14 +67,46 @@ void main()
 {
   Light light = section.lights[instanceId];
   vec2 texCoords = gl_FragCoord.xy / screenDimensions;
-  vec3 albedo = texture($deferredAlbedoKey, texCoords).rgb;
+$extractAlbedoAndGlow
   vec3 position = texture($deferredPositionKey, texCoords).xyz;
   vec3 normal = texture($deferredNormalKey, texCoords).xyz;
-  float glow = 0.0;
+  float inverseGlow = (1.0 - glow);
   vec3 rgb = processLight(light, vec4(albedo, 1.0), normal, scene.cameraDirection, position);
-  output_color = vec4(rgb, 1.0);
+//  outputColor = vec4(rgb * inverseGlow, 1.0);
+  outputColor = vec4(rgb, 1.0);
+}
+
+"""
+const val deferredAmbientFragment = """
+in vec2 texCoords;
+out vec4 outputColor;
+uniform float ambientValue;
+uniform sampler2D $deferredAlbedoKey;
+
+void main()
+{
+$extractAlbedoAndGlow
+  outputColor = vec4(albedo * (ambientValue + glow), 1.0);
 }
 """
+
+class AmbientScreenShader(val program: ShaderProgram) {
+  private val ambientProperty = FloatProperty(program, "ambientValue")
+  private val scaleProperty = Vector2Property(program, "scale")
+
+  init {
+    routeTexture(program, deferredAlbedoKey, 0)
+  }
+
+  fun activate(scale: Vector2, ambientValue: Float) {
+    scaleProperty.setValue(scale)
+    ambientProperty.setValue(ambientValue)
+    program.activate()
+  }
+}
+
+fun newAmbientScreenShader() =
+    AmbientScreenShader(ShaderProgram(screenVertex, deferredAmbientFragment))
 
 class DeferredScreenShader(val program: ShaderProgram, uniformBuffers: UniformBuffers) {
   private val dimensionsProperty = Vector2Property(program, "dimensions")
@@ -90,18 +128,7 @@ class DeferredScreenShader(val program: ShaderProgram, uniformBuffers: UniformBu
 fun newDeferredScreenShader(uniformBuffers: UniformBuffers) =
     DeferredScreenShader(ShaderProgram(deferredScreenVertex, deferredShadingFragment), uniformBuffers)
 
-fun newFrameBufferTexture(dimensions: Vector2i, attachment: Int, format: TextureFormat,
-                          storage: TextureStorageUnit): Texture {
-  val texture = Texture(dimensions.x, dimensions.y, TextureAttributes(
-      format = format,
-      storageUnit = storage,
-      smooth = false,
-  ))
-  glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, texture.id, 0)
-  return texture
-}
-
-fun newDeferredShading(dimensions: Vector2i): DeferredShading {
+fun newDeferredShading(dimensions: Vector2i, depthTexture: Texture): DeferredShading {
   val frameBuffer = FrameBuffer()
   val albedo = newFrameBufferTexture(dimensions, GL_COLOR_ATTACHMENT0, TextureFormat.rgba, TextureStorageUnit.unsignedByte)
   val position = newFrameBufferTexture(dimensions, GL_COLOR_ATTACHMENT1, TextureFormat.rgba16f, TextureStorageUnit.float)
@@ -112,10 +139,7 @@ fun newDeferredShading(dimensions: Vector2i): DeferredShading {
   attachments.put(GL_COLOR_ATTACHMENT2)
   attachments.flip()
   glDrawBuffers(attachments)
-  val depth = glGenRenderbuffers()
-  glBindRenderbuffer(GL_RENDERBUFFER, depth)
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, dimensions.x, dimensions.y)
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth)
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture.id, 0)
   val status = glCheckFramebufferStatus(GL_FRAMEBUFFER)
   if (status != GL_FRAMEBUFFER_COMPLETE)
     throw Error("Error creating framebuffer.")
@@ -133,7 +157,7 @@ fun updateDeferredShading(renderer: Renderer, dimensions: Vector2i): DeferredSha
   val deferred = renderer.deferred
   return if (renderer.options.shadingMode == ShadingMode.deferred) {
     if (deferred == null || dimensions.x != deferred.albedo.width || dimensions.y != deferred.albedo.height)
-      newDeferredShading(dimensions)
+      newDeferredShading(dimensions, renderer.offscreenBuffer.depthTexture!!)
     else
       deferred
   } else
@@ -143,21 +167,23 @@ fun updateDeferredShading(renderer: Renderer, dimensions: Vector2i): DeferredSha
 fun applyDeferredShading(renderer: SceneRenderer, sphereMesh: GeneralMesh) {
   val deferred = renderer.renderer.deferred!!
   debugMarkPass(true, "Applied Shading") {
-    globalState.setFrameBuffer(0)
+    renderer.offscreenBuffer.frameBuffer.activate()
     deferred.albedo.activate(GL_TEXTURE0)
     deferred.position.activate(GL_TEXTURE1)
     deferred.normal.activate(GL_TEXTURE2)
+    globalState.depthEnabled = false
     val dimensions = renderer.windowInfo.dimensions.toVector2()
+    val ambient = renderer.scene.lightingConfig.ambient
+    applyFrameBufferTexture(renderer) { shaders, scale -> shaders.deferredAmbientShading.activate(scale, ambient) }
     val shader = renderer.renderer.shaders.deferredShading
     shader.activate(dimensions)
-    globalState.cullFaceSides = GL_FRONT
-    globalState.depthEnabled = false
+    globalState.cullFaces = true
     globalState.blendEnabled = true
     globalState.blendFunction = GL_ONE to GL_ONE
+    globalState.cullFaceSides = GL_FRONT
     drawMeshInstanced(sphereMesh, DrawMethod.triangleFan, renderer.scene.lights.size)
     globalState.depthEnabled = true
     globalState.blendEnabled = false
     globalState.cullFaceSides = GL_BACK
-//    applyFrameBufferTexture(renderer) { shaders, scale -> shaders.deferredShading.activate(scale) }
   }
 }

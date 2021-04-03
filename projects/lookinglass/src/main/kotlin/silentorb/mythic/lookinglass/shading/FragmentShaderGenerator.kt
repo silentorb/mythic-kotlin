@@ -22,7 +22,7 @@ layout (location = 2) out vec4 $deferredNormalKey;
 
 fun deferredFragmentApplication(color: String) = """
 deferredAlbedo = $color;
-deferredAlbedo.a = 1.0;
+deferredAlbedo.a = glow;
 deferredPosition = fragmentPosition;
 deferredNormal = vec4(fragmentNormal, 1.0);
 """

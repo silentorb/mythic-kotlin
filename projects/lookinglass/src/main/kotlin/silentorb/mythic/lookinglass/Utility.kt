@@ -1,8 +1,6 @@
 package silentorb.mythic.lookinglass
 
-import silentorb.mythic.glowing.globalState
 import silentorb.mythic.scenery.Shape
-import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector4i
 import silentorb.mythic.spatial.radiansToDegrees
 import kotlin.math.abs

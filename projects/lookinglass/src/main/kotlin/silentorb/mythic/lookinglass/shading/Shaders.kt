@@ -3,9 +3,7 @@ package silentorb.mythic.lookinglass.shading
 import silentorb.mythic.debugging.getDebugBoolean
 import silentorb.mythic.glowing.*
 import silentorb.mythic.lookinglass.ShadingMode
-import silentorb.mythic.lookinglass.deferred.DeferredScreenShader
-import silentorb.mythic.lookinglass.deferred.deferredShadingFragment
-import silentorb.mythic.lookinglass.deferred.newDeferredScreenShader
+import silentorb.mythic.lookinglass.deferred.*
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector4
@@ -31,7 +29,6 @@ fun bindUniformBuffer(id: UniformBufferId, program: ShaderProgram, buffer: Unifo
 }
 
 class LightingFeature(program: ShaderProgram, sectionBuffer: UniformBuffer) {
-  val glowProperty = FloatProperty(program, "glow")
   val sectionProperty = bindUniformBuffer(UniformBufferId.SectionUniform, program, sectionBuffer)
 }
 
@@ -109,6 +106,7 @@ class GeneralPerspectiveShader(buffers: UniformBuffers, vertexSchema: VertexSche
   val nearPlaneHeight: FloatProperty? = if (featureConfig.pointSize) FloatProperty(program, "nearPlaneHeight") else null
   val lodOpacityLevels: FloatArrayProperty? = if (featureConfig.pointSize) FloatArrayProperty(program, "lodOpacityLevels") else null
   val normalTransformProperty = if (featureConfig.shading != ShadingMode.none) MatrixProperty(program, "normalTransform") else null
+  val glowProperty = if (featureConfig.shading != ShadingMode.none) FloatProperty(program, "glow") else null
 
   // IntelliJ will flag this use of inline as a warning, but using inline here
   // causes the JVM to optimize away the ObjectShaderConfig allocation and significantly
@@ -124,14 +122,8 @@ class GeneralPerspectiveShader(buffers: UniformBuffers, vertexSchema: VertexSche
     }
 
     coloring.colorProperty.setValue(config.color ?: Vector4(1f))
-
-    if (lighting != null) {
-      lighting.glowProperty.setValue(config.glow)
-    }
-
-    if (normalTransformProperty != null) {
-      normalTransformProperty.setValue(config.normalTransform ?: Matrix.identity)
-    }
+    glowProperty?.setValue(config.glow)
+    normalTransformProperty?.setValue(config.normalTransform ?: Matrix.identity)
 
     if (config.texture != null) {
       config.texture.activate()
@@ -158,6 +150,7 @@ data class Shaders(
     val screenDesaturation: DepthScreenShader,
     val screenTexture: DepthScreenShader,
     val deferredShading: DeferredScreenShader,
+    val deferredAmbientShading: AmbientScreenShader,
 )
 
 data class UniformBuffers(
@@ -174,5 +167,6 @@ fun createShaders(uniformBuffers: UniformBuffers): Shaders {
       screenDesaturation = DepthScreenShader(ShaderProgram(screenVertex, screenDesaturation)),
       screenTexture = DepthScreenShader(ShaderProgram(screenVertex, screenTextureFragment)),
       deferredShading = newDeferredScreenShader(uniformBuffers),
+      deferredAmbientShading = newAmbientScreenShader(),
   )
 }

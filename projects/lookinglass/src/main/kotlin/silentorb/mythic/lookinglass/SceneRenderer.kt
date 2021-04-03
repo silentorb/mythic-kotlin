@@ -90,8 +90,8 @@ data class SceneRenderer(
   val meshes: ModelMeshMap
     get() = renderer.meshes
 
-  val offscreenBuffers: List<OffscreenBuffer>
-    get() = renderer.offscreenBuffers
+  val offscreenBuffer: OffscreenBuffer
+    get() = renderer.offscreenBuffer
 
   val uniformBuffers: UniformBuffers
     get() = renderer.uniformBuffers
