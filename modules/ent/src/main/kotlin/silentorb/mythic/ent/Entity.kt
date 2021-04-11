@@ -6,6 +6,12 @@ const val emptyId = 0L
 
 typealias IdSource = () -> Id
 
+data class SharedNextId(
+    var value: Id,
+) {
+  fun source(): IdSource = { value++ }
+}
+
 fun newIdSource(initialValue: Id): IdSource {
   var nextId: Id = initialValue
   return { nextId++ }
