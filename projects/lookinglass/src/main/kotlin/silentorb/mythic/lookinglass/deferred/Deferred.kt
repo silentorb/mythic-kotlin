@@ -27,7 +27,7 @@ data class DeferredShading(
 
 const val deferredScreenVertex = """
 layout(location = 0) in vec3 position;
-out int instanceId;
+flat out int instanceId;
 uniform vec2 dimensions;
 $sceneHeader
 $lightingHeader
