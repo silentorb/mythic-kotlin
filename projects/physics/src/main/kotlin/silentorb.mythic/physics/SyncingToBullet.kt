@@ -57,8 +57,7 @@ fun createCollisionShape(shape: Shape, scale: Vector3): btCollisionShape {
   }
 }
 
-fun createBulletDynamicObject(body: Body, dynamicBody: DynamicBody, shape: btCollisionShape, rotationalInertia: Boolean): btRigidBody {
-  val transform = getBodyTransform(body)
+fun createBulletDynamicObject(transform: Matrix, dynamicBody: DynamicBody, shape: btCollisionShape, rotationalInertia: Boolean): btRigidBody {
   val localInertia = com.badlogic.gdx.math.Vector3(0f, 0f, 0f)
   if (rotationalInertia)
     shape.calculateLocalInertia(dynamicBody.mass, localInertia)
@@ -68,7 +67,7 @@ fun createBulletDynamicObject(body: Body, dynamicBody: DynamicBody, shape: btCol
   val btBody = btRigidBody(rbInfo)
   btBody.activationState = CollisionConstants.DISABLE_DEACTIVATION
   btBody.friction = dynamicBody.friction
-  rbInfo.dispose()
+  rbInfo.release()
   return btBody
 }
 
@@ -146,7 +145,7 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
         val collisionObject = deck.collisionObjects[key]!!
         val shape = createCollisionShape(collisionObject.shape, body.scale)
         val hingeInfo = dynamicBody.hinge
-        val bulletBody = createBulletDynamicObject(body, dynamicBody, shape, hingeInfo != null)
+        val bulletBody = createBulletDynamicObject(getBodyTransform(body), dynamicBody, shape, hingeInfo != null)
 
         if (hingeInfo != null) {
           initializeHinge(bulletState, bulletBody, hingeInfo, body)
@@ -224,6 +223,7 @@ fun syncRemovedBodies(world: PhysicsWorld, bulletState: BulletState) {
   val removedDynamic = bulletState.dynamicBodies.filterValues { !world.deck.bodies.containsKey(it.userData as Id) }
   for (body in removedDynamic.values) {
     bulletState.dynamicsWorld.removeRigidBody(body)
+    body.release()
   }
   bulletState.dynamicBodies = bulletState.dynamicBodies.minus(removedDynamic.keys)
 
@@ -232,6 +232,7 @@ fun syncRemovedBodies(world: PhysicsWorld, bulletState: BulletState) {
 
   for (body in removedStatic.values) {
     bulletState.dynamicsWorld.removeCollisionObject(body)
+    body.release()
   }
   bulletState.staticBodies = bulletState.staticBodies.minus(removedStatic.keys)
 }
