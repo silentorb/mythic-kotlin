@@ -21,6 +21,7 @@ data class SceneRenderer(
     val windowInfo: WindowInfo,
     val offscreenRendering: Boolean,
     val scene: Scene,
+    val options: DisplayOptions,
 ) {
 
   val effects: Shaders
@@ -28,9 +29,6 @@ data class SceneRenderer(
 
   val flat: GeneralPerspectiveShader
     get() = renderer.getShader(renderer.vertexSchemas.flat, ShaderFeatureConfig())
-
-  val options: DisplayOptions
-    get() = renderer.options
 
   fun drawLine(start: Vector3, end: Vector3, color: Vector4, thickness: Float = 1f) {
     globalState.lineThickness = thickness

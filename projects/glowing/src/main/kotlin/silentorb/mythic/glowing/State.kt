@@ -273,6 +273,9 @@ class State {
       }
     }
 
+  fun getReadFrameBuffer(): Int = _readFramebuffer
+  fun getDrawFrameBuffer(): Int = _drawFramebuffer
+
   var vertexProgramPointSizeEnabled: Boolean = false
     set(value) {
       if (field != value) {

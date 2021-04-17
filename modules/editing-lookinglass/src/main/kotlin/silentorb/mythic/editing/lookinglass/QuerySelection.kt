@@ -8,7 +8,6 @@ import silentorb.mythic.editing.getActiveEditorGraph
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Key
 import silentorb.mythic.ent.getGraphKeys
-import silentorb.mythic.ent.scenery.removeNodesAndChildren
 import silentorb.mythic.glowing.*
 import silentorb.mythic.lookinglass.Material
 import silentorb.mythic.lookinglass.SceneRenderer
@@ -22,7 +21,6 @@ fun plumbPixelDepth(sceneRenderer: SceneRenderer, editor: Editor, selectionQuery
   val pixelPositionX = selectionQuery.position.x + sceneRenderer.viewport.x
   val pixelPositionY = flipY(sceneRenderer.viewport.w, selectionQuery.position.y) + sceneRenderer.viewport.y
   val crop = Vector4i(pixelPositionX, pixelPositionY, 1, 1)
-
   return withCropping(crop) {
     withoutFrontDrawing {
       val graph = getActiveEditorGraph(editor)!!
@@ -48,7 +46,7 @@ fun plumbPixelDepth(sceneRenderer: SceneRenderer, editor: Editor, selectionQuery
         val elementGroups = getSelectionMeshes(editor, childGraph, expandedGraph, node)
         if (elementGroups.any()) {
           val groups = setElementGroupMaterial(material, elementGroups)
-          renderElementGroups(sceneRenderer, groups, ShadingMode.forward)
+          renderElementGroups(sceneRenderer, groups, ShadingMode.none)
           val pixels = intArrayOf(0)
           glReadPixels(pixelPositionX, pixelPositionY, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, pixels)
           val sample = pixels.first()

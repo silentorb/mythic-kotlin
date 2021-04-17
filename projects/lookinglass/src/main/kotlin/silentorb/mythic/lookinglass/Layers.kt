@@ -47,7 +47,7 @@ fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer,
   val shadingMode = if (layer.shadingMode == null)
     parentShadingMode ?: ShadingMode.none
   else
-    layerLightingMode(renderer.renderer.options, layer)
+    layerLightingMode(renderer.options, layer)
 
   val manageDeferred = shadingMode == ShadingMode.deferred && shadingMode != parentShadingMode
   val previousDepthEnabled = globalState.depthEnabled

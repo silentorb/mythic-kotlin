@@ -40,7 +40,7 @@ fun renderEditorSelection(editor: Editor, sceneRenderer: SceneRenderer) {
       glStencilOp(GL_KEEP, GL_KEEP, GL_INCR)
       glStencilMask(0xFF)
       withoutFrontDrawing {
-        renderElementGroups(sceneRenderer, groups, ShadingMode.forward)
+        renderElementGroups(sceneRenderer, groups, ShadingMode.none)
       }
 
       glStencilMask(0x00)
@@ -50,7 +50,7 @@ fun renderEditorSelection(editor: Editor, sceneRenderer: SceneRenderer) {
       for (y in -1..1 step 2) {
         for (x in -1..1 step 2) {
           globalState.viewport = Vector4i(offset.x + x, offset.y + y, dimensions.x, dimensions.y)
-          renderElementGroups(sceneRenderer, groups, ShadingMode.forward)
+          renderElementGroups(sceneRenderer, groups, ShadingMode.none)
         }
       }
       globalState.depthEnabled = true

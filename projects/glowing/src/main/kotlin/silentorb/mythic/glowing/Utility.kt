@@ -23,7 +23,7 @@ fun checkError(message: String) {
   val error = glGetError()
   if (error != GL_NO_ERROR) {
     val info = getErrorInfo(error)
-    throw Error("OpenGL Error " + info + " while " + message)
+//    throw Error("OpenGL Error " + info + " while " + message)
   }
 }
 

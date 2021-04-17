@@ -6,6 +6,7 @@ import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.*
 import silentorb.mythic.ent.scenery.*
 import silentorb.mythic.glowing.DrawMethod
+import silentorb.mythic.glowing.globalState
 import silentorb.mythic.lookinglass.*
 import silentorb.mythic.platforming.WindowInfo
 import silentorb.mythic.scenery.*
@@ -147,10 +148,19 @@ fun renderEditor(renderer: Renderer, windowInfo: WindowInfo, editor: Editor, lig
   val selectionQuery = if (viewport != null) {
     val adjustedViewport = flipViewport(windowInfo.dimensions.y, viewport)
     val scene = sceneFromEditorGraph(getMeshShapes(renderer), editor, lightingConfig, defaultViewportId)
-    val sceneRenderer = createSceneRenderer(renderer, windowInfo, scene, adjustedViewport)
+    val sceneRenderer = createSceneRenderer(renderer, windowInfo, scene, adjustedViewport).copy(
+        options = renderer.options.copy(
+            shadingMode = ShadingMode.forward,
+        )
+    )
     val previousSelectionQuery = editor.selectionQuery
     val expandedGraph = getCachedGraph(editor)
     val filters = prepareRender(sceneRenderer, scene)
+    renderSceneLayers(sceneRenderer, sceneRenderer.camera, scene.layers)
+    applyFilters(sceneRenderer, filters)
+    finishRender(renderer, windowInfo)
+    globalState.setFrameBuffer(0)
+
     val nextSelectionQuery = if (previousSelectionQuery != null) {
       val selectedObject = plumbPixelDepth(sceneRenderer, editor, previousSelectionQuery, expandedGraph)
       previousSelectionQuery.copy(
@@ -161,14 +171,11 @@ fun renderEditor(renderer: Renderer, windowInfo: WindowInfo, editor: Editor, lig
     } else
       null
 
-    renderSceneLayers(sceneRenderer, sceneRenderer.camera, scene.layers)
     renderEditorSelection(editor, sceneRenderer)
-    applyFilters(sceneRenderer, filters)
     nextSelectionQuery
   } else
     null
 
   renderEditorGui()
-  finishRender(renderer, windowInfo)
   return selectionQuery
 }
