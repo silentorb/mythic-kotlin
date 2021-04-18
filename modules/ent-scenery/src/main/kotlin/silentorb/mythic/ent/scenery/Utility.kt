@@ -7,8 +7,8 @@ import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 
 fun getTranslationRotationMatrix(graph: Graph, node: Key): Matrix {
-  val translation = getGraphValue<Vector3>(graph, node, SceneProperties.translation) ?: Vector3.zero
-  val rotation = getGraphValue<Vector3>(graph, node, SceneProperties.rotation) ?: Vector3.zero
+  val translation = getNodeValue<Vector3>(graph, node, SceneProperties.translation) ?: Vector3.zero
+  val rotation = getNodeValue<Vector3>(graph, node, SceneProperties.rotation) ?: Vector3.zero
   return Matrix.identity
       .translate(translation)
       .rotateZ(rotation.z)
@@ -17,14 +17,14 @@ fun getTranslationRotationMatrix(graph: Graph, node: Key): Matrix {
 }
 
 fun getNodeScale(graph: Graph, node: Key): Vector3 =
-    getGraphValue<Vector3>(graph, node, SceneProperties.scale) ?: Vector3.unit
+    getNodeValue<Vector3>(graph, node, SceneProperties.scale) ?: Vector3.unit
 
 fun getNodeTransform(graph: Graph, node: Key): Matrix {
   val scale = getNodeScale(graph, node)
   val localTransform = getTranslationRotationMatrix(graph, node)
       .scale(scale)
 
-  val parent = getGraphValue<Key>(graph, node, SceneProperties.parent)
+  val parent = getNodeValue<Key>(graph, node, SceneProperties.parent)
   return if (parent != null)
     getNodeTransform(graph, parent) * localTransform
   else
@@ -35,7 +35,7 @@ fun getNodeTransform(graph: Graph, node: Key): Matrix {
 fun getNodeTransformWithoutScale(graph: Graph, node: Key): Matrix {
   val localTransform = getTranslationRotationMatrix(graph, node)
 
-  val parent = getGraphValue<Key>(graph, node, SceneProperties.parent)
+  val parent = getNodeValue<Key>(graph, node, SceneProperties.parent)
   return if (parent != null)
     getNodeTransform(graph, parent) * localTransform
   else
@@ -101,22 +101,22 @@ fun getGraphRoots(graph: Graph): Set<Key> =
         .toSet()
 
 fun getShape(meshShapeMap: Map<Key, Shape>, graph: Graph, node: Key): Shape? {
-  val shapeType = getGraphValue<Key>(graph, node, SceneProperties.collisionShape)
+  val shapeType = getNodeValue<Key>(graph, node, SceneProperties.collisionShape)
   return if (shapeType == null)
     null
   else {
-    val mesh = getGraphValue<Key>(graph, node, SceneProperties.mesh)
+    val mesh = getNodeValue<Key>(graph, node, SceneProperties.mesh)
     return when (shapeType) {
       "cylinder" -> {
-        val radius = getGraphValue<Float>(graph, node, SceneProperties.radius)
-        val height = getGraphValue<Float>(graph, node, SceneProperties.height)
+        val radius = getNodeValue<Float>(graph, node, SceneProperties.radius)
+        val height = getNodeValue<Float>(graph, node, SceneProperties.height)
         if (radius != null && height != null)
           Cylinder(radius, height)
         else
           null
       }
       "sphere" -> {
-        val radius = getGraphValue<Float>(graph, node, SceneProperties.radius)
+        val radius = getNodeValue<Float>(graph, node, SceneProperties.radius)
         if (radius != null)
           Sphere(radius)
         else
@@ -166,8 +166,8 @@ fun nodeAttributes(graph: Graph, attribute: String): List<Key> =
         .filter { it.property == SceneProperties.type && it.target == attribute }
         .map { it.source }
 
-fun hasAttribute(graph: Graph, node: Key, attribute: String): Boolean =
+fun nodeHasAttribute(graph: Graph, node: Key, attribute: String): Boolean =
     graph.any { it.source == node && it.property == SceneProperties.type && it.target == attribute }
 
-fun hasAttribute(graph: Graph, attribute: String): Boolean =
+fun nodeHasAttribute(graph: Graph, attribute: String): Boolean =
     graph.any { it.property == SceneProperties.type && it.target == attribute }

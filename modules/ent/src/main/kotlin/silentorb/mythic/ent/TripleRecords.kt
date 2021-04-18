@@ -68,7 +68,7 @@ fun <T> getPropertyValues(graph: Graph, key: String, property: Key): List<T> =
         .filter { it.source == key && it.property == property }
         .map { it.target as T }
 
-inline fun <reified T> getGraphValue(graph: Graph, key: String, property: Key): T? =
+inline fun <reified T> getNodeValue(graph: Graph, key: String, property: Key): T? =
     graph.firstOrNull { it.source == key && it.property == property }?.target as T?
 
 inline fun <reified T> getGraphValues(graph: Graph, key: String, property: Key): List<T> =

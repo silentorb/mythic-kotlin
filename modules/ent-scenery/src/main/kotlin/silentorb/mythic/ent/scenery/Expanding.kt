@@ -90,5 +90,8 @@ fun expandInstances(library: ExpansionLibrary, graph: Graph): Graph {
   return expandExpansions(library, expansions, instanced).toSet()
 }
 
+fun expandInstances(graphLibrary: GraphLibrary, graph: Graph): Graph =
+    expandInstances(ExpansionLibrary(graphLibrary), graph)
+
 fun expandInstances(library: ExpansionLibrary, name: String): Graph =
     expandInstances(library, library.graphs[name]!!)

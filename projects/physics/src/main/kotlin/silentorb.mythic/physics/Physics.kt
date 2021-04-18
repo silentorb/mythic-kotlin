@@ -119,7 +119,7 @@ data class PhysicsWorld(
     val bulletState: BulletState,
     val deck: PhysicsDeck,
     val graph: Graph,
-    val meshShapeMap: Map<String, Shape>,
+    val meshShapes: Map<String, Shape>,
 )
 
 fun updateBulletPhysics(linearForces: List<LinearImpulse>): (PhysicsWorld) -> PhysicsWorld = { world ->

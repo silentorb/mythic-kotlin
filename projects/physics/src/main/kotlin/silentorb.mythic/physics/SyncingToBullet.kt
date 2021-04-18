@@ -5,13 +5,9 @@ import com.badlogic.gdx.physics.bullet.collision.*
 import com.badlogic.gdx.physics.bullet.dynamics.btHingeConstraint
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState
-import silentorb.mythic.ent.Id
-import silentorb.mythic.ent.Table
-import silentorb.mythic.ent.getGraphValue
-import silentorb.mythic.ent.scenery.getNodeScale
+import silentorb.mythic.ent.*
 import silentorb.mythic.ent.scenery.getShape
 import silentorb.mythic.ent.scenery.getNodeTransform
-import silentorb.mythic.ent.scenery.getNodeTransformWithoutScale
 import silentorb.mythic.sculpting.ImmutableFace
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Pi
@@ -132,6 +128,21 @@ fun initializeHinge(bulletState: BulletState, bulletBody: btRigidBody, hingeInfo
 
 }
 
+fun getNodeCollisionObject(meshShapes: Map<String, Shape>, graph: Graph, node: Key): CollisionObject? {
+  val shapeDefinition = getShape(meshShapes, graph, node)
+  return if (shapeDefinition == null)
+    null
+  else {
+    val groups = getNodeValue<Int>(graph, node, SceneProperties.collisionGroups) ?: 1
+    val mask = getNodeValue<Int>(graph, node, SceneProperties.collisionMask) ?: 2 or 4
+    CollisionObject(
+        shape = shapeDefinition,
+        groups = groups,
+        mask = mask,
+    )
+  }
+}
+
 fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
   val deck = world.deck
   val graph = world.graph
@@ -168,26 +179,23 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
         !deck.dynamicBodies.containsKey(node) && !bulletState.staticBodies.containsKey(node)
       }
       .mapNotNull { (node) ->
-        val shapeDefinition = getShape(world.meshShapeMap, graph, node)
-        if (shapeDefinition == null)
+        val collisionObject = getNodeCollisionObject(world.meshShapes, graph, node)
+        if (collisionObject == null)
           null
         else {
           val fullTransform = getNodeTransform(graph, node)
           val scale = fullTransform.getScale()
           val transform = fullTransform.scale(Vector3.unit / scale)
-//          val scale = getNodeScale(graph, node)
-          val shape = createCollisionShape(shapeDefinition, scale)
-          val groups = getGraphValue<Int>(graph, node, SceneProperties.collisionGroups) ?: 1
-          val mask = getGraphValue<Int>(graph, node, SceneProperties.collisionMask) ?: 2 or 4
+          val shape = createCollisionShape(collisionObject.shape, scale)
           val isSolid = true
-          val collisionObject = if (isSolid)
+          val bulletCollisionObject = if (isSolid)
             createStaticBody(transform, shape)
           else
             createGhostBody(transform, shape)
 
-          collisionObject.userData = node
-          bulletState.dynamicsWorld.addCollisionObject(collisionObject, 17, mask)
-          Pair(node, collisionObject)
+          bulletCollisionObject.userData = node
+          bulletState.dynamicsWorld.addCollisionObject(bulletCollisionObject, 17, collisionObject.mask)
+          Pair(node, bulletCollisionObject)
         }
       }
 

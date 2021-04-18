@@ -60,9 +60,7 @@ fun getActiveEditorGraph(editor: Editor): Graph? =
 fun getExpansionLibrary(editor: Editor) =
     ExpansionLibrary(
         graphs = editor.graphLibrary,
-        expanders = editor.enumerations.expanders,
-        schema = editor.enumerations.schema,
-        meshShapes = editor.enumerations.meshShapes
+        expanders = editor.enumerations.expanders
     )
 
 fun defaultViewports() =

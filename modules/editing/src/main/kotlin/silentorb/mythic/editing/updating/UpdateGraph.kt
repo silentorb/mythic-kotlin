@@ -3,14 +3,13 @@ package silentorb.mythic.editing.updating
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.nameText
 import silentorb.mythic.ent.*
-import silentorb.mythic.ent.scenery.gatherChildren
 import silentorb.mythic.ent.scenery.getGraphRoots
 import silentorb.mythic.ent.scenery.removeNodesAndChildren
 import silentorb.mythic.happenings.handleCommands
 import silentorb.mythic.scenery.SceneProperties
 
 fun duplicateNode(graph: Graph, node: Key): Graph {
-  val parent = getGraphValue<String>(graph, node, SceneProperties.parent)
+  val parent = getNodeValue<String>(graph, node, SceneProperties.parent)
   return if (parent == null)
     graph
   else {

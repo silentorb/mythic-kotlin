@@ -3,7 +3,7 @@ package silentorb.mythic.editing.updating
 import silentorb.mythic.editing.*
 import silentorb.mythic.ent.Entry
 import silentorb.mythic.ent.Graph
-import silentorb.mythic.ent.getGraphValue
+import silentorb.mythic.ent.getNodeValue
 import silentorb.mythic.ent.replaceValues
 import silentorb.mythic.ent.scenery.getNodeTransform
 import silentorb.mythic.happenings.Commands
@@ -91,7 +91,7 @@ fun mouseTransform(property: String, handler: MouseTransformHandler): (Vector2, 
             val cameraTransform = createProjectionMatrix(camera, viewport.zw(), distance) * viewTransform
             val start = unproject(cameraTransform, viewport.toVector4(), mouseStart, 1f)
             val end = unproject(cameraTransform, viewport.toVector4(), mouseStart + mouseOffset, 1f)
-            val value = getGraphValue<Vector3>(graph, node, property) ?: Vector3.zero
+            val value = getNodeValue<Vector3>(graph, node, property) ?: Vector3.zero
             val newValue = handler(TransformOperationArguments(value, start, end, globalObjectLocation, data.axis))
             Entry(node, property, newValue)
           }
@@ -118,7 +118,7 @@ fun updateTranslation(previousMousePosition: Vector2, mouseOffset: Vector2, edit
         val viewTransform = createViewMatrix(camera.location, camera.orientation)
         val data = editor.operation!!.data as SpatialTransformState
         val newEntries = selection.mapNotNull { node ->
-          val value = getGraphValue<Vector3>(graph, node, SceneProperties.translation) ?: Vector3.zero
+          val value = getNodeValue<Vector3>(graph, node, SceneProperties.translation) ?: Vector3.zero
           val globalObjectTransform = getNodeTransform(graph, node)
           val globalObjectLocation = globalObjectTransform.translation()
           val distance = globalObjectLocation.distance(camera.location)
@@ -170,7 +170,7 @@ fun updateRotation(previousMousePosition: Vector2, mouseOffset: Vector2, editor:
           val center = transformPoint(cameraTransform, viewport.zw().toVector2(), Vector2.zero)(objectCenter)
           val angle = getAngle(mouseStart - center, mouseStart + mouseOffset - center)
 //          println(" $mouseOffset ${mouseStart - center} ${mouseStart + mouseOffset - center} $angle")
-          val value = getGraphValue<Vector3>(graph, node, SceneProperties.rotation) ?: Vector3.zero
+          val value = getNodeValue<Vector3>(graph, node, SceneProperties.rotation) ?: Vector3.zero
           val lookat = getCameraLookat(camera)
           val offsetOrientation = Quaternion().rotateAxis(angle, lookat)
 //        val orientation = Quaternion()//.rotateZYX(value.z, value.y, value.x)
@@ -220,7 +220,7 @@ fun updateScaling(previousMousePosition: Vector2, mouseOffset: Vector2, editor: 
           val cameraTransform = createProjectionMatrix(camera, viewport.zw()) * viewTransform
           val center = transformPoint(cameraTransform, viewport.zw().toVector2(), Vector2.zero)(objectCenter)
           val scalarOffset = (mouseStart + mouseOffset).distance(center) - mouseStart.distance(center)
-          val value = getGraphValue<Vector3>(graph, node, SceneProperties.scale) ?: Vector3.unit
+          val value = getNodeValue<Vector3>(graph, node, SceneProperties.scale) ?: Vector3.unit
           val mask = if (data.axis.any())
             Vector3(axisMask(data.axis))
           else

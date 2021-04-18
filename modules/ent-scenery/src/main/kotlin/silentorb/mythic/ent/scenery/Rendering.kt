@@ -31,13 +31,13 @@ fun getGraphElementMaterial(texture: String?): Material? =
 
 fun nodeToElements(meshesShapes: Map<String, Shape>, graph: Graph, node: Key): List<ElementGroup> {
   val isSelected = false
-  val mesh = getGraphValue<Key>(graph, node, SceneProperties.mesh)
-  val text3d = getGraphValue<String>(graph, node, SceneProperties.text3d)
-  val light = getGraphValue<String>(graph, node, SceneProperties.light)
+  val mesh = getNodeValue<Key>(graph, node, SceneProperties.mesh)
+  val text3d = getNodeValue<String>(graph, node, SceneProperties.text3d)
+  val light = getNodeValue<String>(graph, node, SceneProperties.light)
   val isBillboard = graph.contains(Entry(node, SceneProperties.type, SceneTypes.billboard))
-  val texture = getGraphValue<Key>(graph, node, SceneProperties.texture)
+  val texture = getNodeValue<Key>(graph, node, SceneProperties.texture)
   val collisionShape = if (isSelected)
-    getGraphValue<String>(graph, node, SceneProperties.collisionShape)
+    getNodeValue<String>(graph, node, SceneProperties.collisionShape)
   else
     null
 
@@ -88,10 +88,10 @@ fun nodeToElements(meshesShapes: Map<String, Shape>, graph: Graph, node: Key): L
       listOf(
           Light(
               type = LightType.valueOf(light),
-              range = getGraphValue<Float>(graph, node, SceneProperties.range) ?: 1f,
+              range = getNodeValue<Float>(graph, node, SceneProperties.range) ?: 1f,
               offset = transform.translation(),
               direction = Vector3.unit,
-              color = hexColorStringToVector4(getGraphValue<String>(graph, node, SceneProperties.rgba) ?: "#ffffffff"),
+              color = hexColorStringToVector4(getNodeValue<String>(graph, node, SceneProperties.rgba) ?: "#ffffffff"),
           )
       )
     else
