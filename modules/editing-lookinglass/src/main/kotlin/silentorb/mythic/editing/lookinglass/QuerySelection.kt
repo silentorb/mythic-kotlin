@@ -9,11 +9,8 @@ import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Key
 import silentorb.mythic.ent.getGraphKeys
 import silentorb.mythic.glowing.*
-import silentorb.mythic.lookinglass.Material
-import silentorb.mythic.lookinglass.SceneRenderer
-import silentorb.mythic.lookinglass.ShadingMode
+import silentorb.mythic.lookinglass.*
 import silentorb.mythic.lookinglass.drawing.renderElementGroups
-import silentorb.mythic.lookinglass.flipY
 import silentorb.mythic.scenery.SceneProperties
 import silentorb.mythic.spatial.Vector4i
 

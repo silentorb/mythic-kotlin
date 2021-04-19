@@ -26,7 +26,32 @@ private fun setEnabled(register: Int, value: Boolean) {
     glDisable(register)
 }
 
+enum class GlField {
+  depthEnabled,
+  depthTest,
+  depthWrite,
+  viewport,
+}
+
+typealias GlStateMap = Map<GlField, Any>
+
+fun setGlState(field: GlField, value: Any) {
+  when (field) {
+    GlField.depthTest -> setEnabled(GL_DEPTH_TEST, value as Boolean)
+    GlField.depthWrite -> glDepthMask(value as Boolean)
+    GlField.viewport -> {
+      value as Vector4i
+      glViewport(value.x, value.y, value.z, value.w)
+    }
+  }
+}
+
 class State {
+  val data: MutableMap<GlField, Any> = mutableMapOf(
+      GlField.depthTest to false,
+      GlField.depthWrite to false,
+      GlField.viewport to getGLBounds(GL_VIEWPORT),
+  )
 
   var clearColor: Vector4 = Vector4(0f, 0f, 0f, 1f)
     set(value) {
@@ -92,13 +117,14 @@ class State {
       }
     }
 
-  var viewport: Vector4i = getGLBounds(GL_VIEWPORT)
+  var viewport: Vector4i
     set(value) {
-      if (field != value) {
-        field = value
+      if (data[GlField.viewport] != value) {
+        data[GlField.viewport] = value
         glViewport(value.x, value.y, value.z, value.w)
       }
     }
+    get() = data[GlField.viewport] as Vector4i
 
   var cropBounds: Vector4i = getGLBounds(GL_SCISSOR_BOX)
     set(value) {
@@ -173,19 +199,22 @@ class State {
 
   var depthTest: Boolean = false
     set(value) {
-      if (field != value) {
+      if (data[GlField.depthTest] != value) {
+        data[GlField.depthTest] = value
         field = value
         setEnabled(GL_DEPTH_TEST, value)
       }
     }
+    get() = data[GlField.depthTest]!! as Boolean
 
-  var depthWrite: Boolean = false
+  var depthWrite: Boolean
     set(value) {
-      if (field != value) {
-        field = value
+      if (data[GlField.depthWrite] != value) {
+        data[GlField.depthWrite] = value
         glDepthMask(value)
       }
     }
+    get() = data[GlField.depthWrite]!! as Boolean
 
   var stencilTest: Boolean = false
     set(value) {

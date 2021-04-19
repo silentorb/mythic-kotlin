@@ -23,3 +23,14 @@ fun getMeshShapes(renderer: Renderer): Map<String, Shape> =
 
 fun flipY(height: Int, value: Int): Int =
     height - value
+
+fun setElementGroupMaterial(material: Material, elementGroups: Collection<ElementGroup>) =
+    elementGroups.map { group ->
+      group.copy(
+          meshes = group.meshes.map { mesh ->
+            mesh.copy(
+                material = material
+            )
+          }
+      )
+    }

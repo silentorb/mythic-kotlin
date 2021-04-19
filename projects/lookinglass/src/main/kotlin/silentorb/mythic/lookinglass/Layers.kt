@@ -6,8 +6,10 @@ import silentorb.mythic.glowing.debugMarkPass
 import silentorb.mythic.glowing.globalState
 import silentorb.mythic.lookinglass.deferred.applyDeferredShading
 import silentorb.mythic.lookinglass.drawing.renderElementGroups
+import silentorb.mythic.lookinglass.drawing.renderHighlight
 import silentorb.mythic.lookinglass.drawing.renderVolumes
 import silentorb.mythic.scenery.Camera
+import silentorb.mythic.spatial.Vector4
 
 enum class DepthMode {
   none,
@@ -20,6 +22,7 @@ data class SceneLayer(
     val depth: DepthMode? = null,
     val attributes: Set<String> = setOf(),
     val shadingMode: ShadingMode? = null,
+    val highlightColor: Vector4? = null,
     val children: List<SceneLayer> = listOf(),
 )
 
@@ -43,6 +46,9 @@ fun layerLightingMode(options: DisplayOptions, layer: SceneLayer): ShadingMode {
 
 fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer, parent: SceneLayer? = null,
                      callback: OnRenderScene? = null) {
+  if(layer.highlightColor!= null)
+    return
+
   val parentShadingMode = parent?.shadingMode
   val shadingMode = if (layer.shadingMode == null)
     parentShadingMode ?: ShadingMode.none
@@ -96,5 +102,13 @@ fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer,
 fun renderSceneLayers(renderer: SceneRenderer, camera: Camera, layers: SceneLayers, callback: OnRenderScene? = null) {
   for (layer in layers) {
     renderSceneLayer(renderer, camera, layer, null, callback)
+  }
+}
+
+fun renderSceneLayerHighlights(renderer: SceneRenderer, layers: SceneLayers) {
+  for (layer in layers) {
+    if (layer.highlightColor != null) {
+      renderHighlight(renderer, layer.elements, layer.highlightColor)
+    }
   }
 }

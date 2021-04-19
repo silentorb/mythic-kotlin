@@ -21,28 +21,6 @@ class Glow {
 
 }
 
-fun viewportStack(value: Vector4i, action: () -> Unit) {
-  val current = getGLBounds(GL_VIEWPORT)
-  if (current == Vector4i(0, 0, 0, 0))
-    return
-
-  globalState.viewport = value
-  checkError("Setting Viewport")
-  action()
-  globalState.viewport = current
-}
-
-fun <T> withCropping(value: Vector4i, action: () -> T): T {
-  val currentBounds = globalState.cropBounds
-  val cropEnabled = globalState.cropEnabled
-  globalState.cropBounds = value
-  globalState.cropEnabled = true
-  val result = action()
-  globalState.cropBounds = currentBounds
-  globalState.cropEnabled = cropEnabled
-  return result
-}
-
 fun debugMarkPass(enabled: Boolean, message: String, action: () -> Unit) {
   if (enabled) {
     glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, message)

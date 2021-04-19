@@ -23,14 +23,3 @@ fun renderMeshNodes(sceneRenderer: SceneRenderer, material: Material, meshNodes:
     renderMeshElement(sceneRenderer, mesh, transform, material, shadingMode)
   }
 }
-
-fun setElementGroupMaterial(material: Material, elementGroups: Collection<ElementGroup>) =
-    elementGroups.map { group ->
-      group.copy(
-          meshes = group.meshes.map { mesh ->
-            mesh.copy(
-                material = material
-            )
-          }
-      )
-    }
