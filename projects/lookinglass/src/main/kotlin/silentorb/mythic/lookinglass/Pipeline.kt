@@ -72,7 +72,7 @@ fun finishRender(renderer: Renderer, windowInfo: WindowInfo) {
   }
 }
 
-fun activeOffscreenRendering(renderer: SceneRenderer) {
+fun activateOffscreenRendering(renderer: SceneRenderer) {
   val glow = renderer.renderer.glow
   val offscreenBuffer = renderer.renderer.offscreenBuffer
   val dimensions = Vector2i(offscreenBuffer.colorTexture.width, offscreenBuffer.colorTexture.height)
@@ -80,7 +80,7 @@ fun activeOffscreenRendering(renderer: SceneRenderer) {
   glow.state.viewport = Vector4i(0, 0, renderer.viewport.z, renderer.viewport.w)
 }
 
-fun activeDirectRendering(renderer: SceneRenderer) {
+fun activateDirectRendering(renderer: SceneRenderer) {
   val glow = renderer.renderer.glow
   glow.state.viewport = renderer.viewport
 }
@@ -91,15 +91,22 @@ fun prepareRender(renderer: SceneRenderer, scene: Scene): List<ScreenFilter> {
   return filters
 }
 
+fun applyFrameBufferTexture(renderer: SceneRenderer, filter: ScreenFilter) {
+  val canvasDependencies = getStaticCanvasDependencies()
+  val scale = getScreenScale(renderer)
+  filter(renderer.renderer.shaders, scale)
+  canvasDependencies.meshes.imageGl.draw(DrawMethod.triangleFan)
+}
+
 fun applyFilters(renderer: SceneRenderer, filters: List<ScreenFilter>) {
   globalState.cullFaces = false
   globalState.viewport = renderer.viewport
+  globalState.depthEnabled = false
 
   val offscreenBuffer = renderer.renderer.offscreenBuffer
   activateTextures(listOf(offscreenBuffer.colorTexture, offscreenBuffer.depthTexture!!))
 
   for (filter in filters) {
-//      globalState.setFrameBuffer(renderer.renderer.offscreenBuffers.first().framebuffer.id)
     applyFrameBufferTexture(renderer, filter)
   }
 
@@ -109,20 +116,10 @@ fun applyFilters(renderer: SceneRenderer, filters: List<ScreenFilter>) {
     globalState.setFrameBuffer(0)
   }
 
-//  if (filters.any()) {
-//  applyFrameBufferTexture(renderer, filters.last())
   applyOffscreenBuffer(renderer.offscreenBuffer, renderer.windowInfo.dimensions, false)
-//  }
 }
 
 fun getScreenScale(renderer: SceneRenderer): Vector2 {
   val dimensions = renderer.windowInfo.dimensions
   return Vector2(dimensions.x.toFloat(), dimensions.y.toFloat()) / renderer.viewport.zw.toVector2()
-}
-
-fun applyFrameBufferTexture(renderer: SceneRenderer, filter: ScreenFilter) {
-  val canvasDependencies = getStaticCanvasDependencies()
-  val scale = getScreenScale(renderer)
-  filter(renderer.renderer.shaders, scale)
-  canvasDependencies.meshes.imageGl.draw(DrawMethod.triangleFan)
 }

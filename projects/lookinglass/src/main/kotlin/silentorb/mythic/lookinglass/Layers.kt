@@ -46,7 +46,7 @@ fun layerLightingMode(options: DisplayOptions, layer: SceneLayer): ShadingMode {
 
 fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer, parent: SceneLayer? = null,
                      callback: OnRenderScene? = null) {
-  if(layer.highlightColor!= null)
+  if (layer.highlightColor != null)
     return
 
   val parentShadingMode = parent?.shadingMode
@@ -63,17 +63,21 @@ fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer,
     if (depthMode != null)
       globalState.depthEnabled = depthMode != DepthMode.none
 
-    if (renderer.offscreenRendering) {
-      activeOffscreenRendering(renderer)
-    } else {
-      activeDirectRendering(renderer)
-    }
-
     if (manageDeferred) {
       val deferred = renderer.renderer.deferred!!
       deferred.frameBuffer.activate()
       renderer.renderer.glow.operations.clearScreen()
       globalState.blendEnabled = false
+    } else if (parent == null) {
+      if (renderer.offscreenRendering) {
+        activateOffscreenRendering(renderer)
+      } else {
+        activateDirectRendering(renderer)
+      }
+    }
+
+    if (depthMode == DepthMode.local) {
+      clearDepth()
     }
 
     if (layer.children.any()) {

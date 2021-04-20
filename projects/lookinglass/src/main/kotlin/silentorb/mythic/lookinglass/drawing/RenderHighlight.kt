@@ -24,7 +24,6 @@ fun renderHighlight(sceneRenderer: SceneRenderer, elementGroups: List<ElementGro
 
       glStencilFunc(GL_ALWAYS, 1, 0xFF)
       glStencilOp(GL_KEEP, GL_KEEP, GL_INCR)
-      glStencilMask(0xFF) // TODO: This line seems to be redundant
       withoutFrontDrawing {
         renderElementGroups(sceneRenderer, groups, ShadingMode.none)
       }

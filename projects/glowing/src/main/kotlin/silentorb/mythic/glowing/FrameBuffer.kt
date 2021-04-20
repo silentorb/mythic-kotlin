@@ -37,7 +37,6 @@ class FrameBuffer() {
     globalState.setFrameBuffer(id)
   }
 
-
   fun activateDraw() {
     globalState.drawFramebuffer = id
   }
@@ -51,7 +50,6 @@ data class OffscreenBuffer(
     val frameBuffer: FrameBuffer,
     val colorTexture: Texture,
     val depthTexture: Texture?,
-    val depthTexture2: Texture?,
 )
 
 fun applyOffscreenBuffer(buffer: OffscreenBuffer, windowDimensions: Vector2i, smooth: Boolean) {
@@ -76,10 +74,10 @@ fun prepareScreenFrameBuffer(windowWidth: Int, windowHeight: Int, withDepth: Boo
   glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, colorTexture.id, 0)
   glDrawBuffers(GL_COLOR_ATTACHMENT0)
 
-  val (depthTexture, depthTexture2) = if (withDepth) {
-    newDepthTexture(textureAttributes, dimensions) to newDepthTexture(textureAttributes, dimensions)
-  } else
-    null to null
+  val depthTexture = if (withDepth)
+    newDepthTexture(textureAttributes, dimensions)
+  else
+    null
 
   val status = glCheckFramebufferStatus(GL_FRAMEBUFFER)
   if (status != GL_FRAMEBUFFER_COMPLETE)
@@ -89,5 +87,5 @@ fun prepareScreenFrameBuffer(windowWidth: Int, windowHeight: Int, withDepth: Boo
     clearDepth() // Initialize the depth texture (the pixels of which are undefined until this)
   }
   globalState.setFrameBuffer(0)
-  return OffscreenBuffer(framebuffer, colorTexture, depthTexture, depthTexture2)
+  return OffscreenBuffer(framebuffer, colorTexture, depthTexture)
 }
