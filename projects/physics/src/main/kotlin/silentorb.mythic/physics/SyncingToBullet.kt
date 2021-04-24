@@ -143,9 +143,35 @@ fun getNodeCollisionObject(meshShapes: Map<String, Shape>, graph: Graph, node: K
   }
 }
 
+fun syncStaticGeometry(graph: Graph, meshShapes: Map<String, Shape>, bulletState: BulletState) {
+  val collisionShapes = graph.filter { it.property == SceneProperties.collisionShape }
+  val newStaticBodies = collisionShapes
+      .mapNotNull { (node) ->
+        val collisionObject = getNodeCollisionObject(meshShapes, graph, node)
+        if (collisionObject == null)
+          null
+        else {
+          val fullTransform = getNodeTransform(graph, node)
+          val scale = fullTransform.getScale()
+          val transform = fullTransform.scale(Vector3.unit / scale)
+          val shape = createCollisionShape(collisionObject.shape, scale)
+          val isSolid = true
+          val bulletCollisionObject = if (isSolid)
+            createStaticBody(transform, shape)
+          else
+            createGhostBody(transform, shape)
+
+          bulletCollisionObject.userData = node
+          bulletState.dynamicsWorld.addCollisionObject(bulletCollisionObject, 17, collisionObject.mask)
+          Pair(node, bulletCollisionObject)
+        }
+      }
+
+  bulletState.staticBodies = bulletState.staticBodies + newStaticBodies
+}
+
 fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
   val deck = world.deck
-  val graph = world.graph
 
   val newDynamicBodies = deck.dynamicBodies
       .filterKeys { key ->
@@ -173,33 +199,7 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
         Pair(key, bulletBody)
       }
 
-  val collisionShapes = graph.filter { it.property == SceneProperties.collisionShape }
-  val newStaticBodies = collisionShapes
-      .filter { (node) ->
-        !deck.dynamicBodies.containsKey(node) && !bulletState.staticBodies.containsKey(node)
-      }
-      .mapNotNull { (node) ->
-        val collisionObject = getNodeCollisionObject(world.meshShapes, graph, node)
-        if (collisionObject == null)
-          null
-        else {
-          val fullTransform = getNodeTransform(graph, node)
-          val scale = fullTransform.getScale()
-          val transform = fullTransform.scale(Vector3.unit / scale)
-          val shape = createCollisionShape(collisionObject.shape, scale)
-          val isSolid = true
-          val bulletCollisionObject = if (isSolid)
-            createStaticBody(transform, shape)
-          else
-            createGhostBody(transform, shape)
-
-          bulletCollisionObject.userData = node
-          bulletState.dynamicsWorld.addCollisionObject(bulletCollisionObject, 17, collisionObject.mask)
-          Pair(node, bulletCollisionObject)
-        }
-      }
-
-  val newStaticBodies2 = deck.collisionObjects
+  val newStaticBodies = deck.collisionObjects
       .filterKeys { key ->
         !deck.dynamicBodies.containsKey(key) && !bulletState.staticBodies.containsKey(key)
       }
@@ -219,12 +219,7 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
   bulletState.dynamicBodies = bulletState.dynamicBodies
       .plus(newDynamicBodies)
 
-  bulletState.staticBodies = bulletState.staticBodies + newStaticBodies + newStaticBodies2
-
-  if (!bulletState.isMapSynced) {
-    bulletState.isMapSynced = true
-//    syncMapGeometryAndPhysics(world, bulletState)
-  }
+  bulletState.staticBodies = bulletState.staticBodies + newStaticBodies
 }
 
 fun syncRemovedBodies(world: PhysicsWorld, bulletState: BulletState) {

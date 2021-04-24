@@ -23,7 +23,6 @@ data class BulletState(
     var dynamicsWorld: btDiscreteDynamicsWorld,
     var dynamicBodies: Map<Id, btRigidBody>,
     var staticBodies: Map<Any, btCollisionObject>,
-    var isMapSynced: Boolean = false,
 
     // The following are not directly used but are stored here to prevent premature garbage collection
     var collisionConfig: btCollisionConfiguration,
@@ -126,8 +125,13 @@ fun updateBulletPhysics(linearForces: List<LinearImpulse>): (PhysicsWorld) -> Ph
   val bulletState = world.bulletState
   syncNewBodies(world, bulletState)
   syncRemovedBodies(world, bulletState)
-//  updateCharacterRigs() used to be here and still may need to be in some fashion
   applyImpulses(bulletState, linearForces)
   bulletState.dynamicsWorld.stepSimulation(1f / 60f, 10)
   syncWorldToBullet(bulletState)(world)
+}
+
+fun newBulletStateWithGraph(graph: Graph, meshShapes: Map<String, Shape>): BulletState {
+  val bulletState = newBulletState()
+  syncStaticGeometry(graph, meshShapes, bulletState)
+  return bulletState
 }
