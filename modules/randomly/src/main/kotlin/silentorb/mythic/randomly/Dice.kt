@@ -24,21 +24,19 @@ class Dice(val seed: Long? = null) {
 
   fun get(max: Vector2) = Vector2(getFloat(max.x), getFloat(max.y))
 
-  fun <T> takeOne(list: List<T>): T {
-    assert(list.isNotEmpty())
-    return if (list.size == 1)
-      list.first()
+  fun <T> takeOne(collection: Collection<T>): T {
+    assert(collection.isNotEmpty())
+    return if (collection.size == 1)
+      collection.first()
     else
-      list[random.nextInt(list.size)]
+      collection.toList()[random.nextInt(collection.size)] // TODO: Optimize away the toList call
   }
 
-  fun <T> takeOne(set: Set<T>): T {
-    assert(set.isNotEmpty())
-    return if (set.size == 1)
-      set.first()
-    else
-      set.toList()[random.nextInt(set.size)] // TODO: Optimize away the toList call
-  }
+  fun <T> takeOneOrNull(collection: Collection<T>): T? =
+      if (collection.none())
+        null
+      else
+        takeOne(collection)
 
   fun <T> take(list: Collection<T>, count: Int): List<T> {
     assert(count <= list.size)
