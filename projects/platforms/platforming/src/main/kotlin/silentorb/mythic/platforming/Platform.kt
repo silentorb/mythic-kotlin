@@ -75,7 +75,7 @@ interface PlatformAudio {
   fun start(latency: Int)
   fun play(buffer: Int, volume: Float, position: Vector3?): Int
   fun playingSounds(): Set<Int>
-  fun update(listenerPosition: Vector3?)
+  fun update(gain: Float, listenerPosition: Vector3?)
   fun loadSound(filename: String): LoadSoundResult
   fun loadSound(buffer: ShortBuffer, channels: Int, sampleRate: Int): LoadSoundResult
   fun unloadAllSounds()

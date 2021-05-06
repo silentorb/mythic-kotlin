@@ -72,6 +72,7 @@ class DesktopAudio : PlatformAudio {
   var context: Long = 0L
   val buffers: MutableSet<Int> = mutableSetOf()
   val sources: MutableSet<Int> = mutableSetOf()
+  var gain: Float = 1f
 
   val isActive: Boolean get() = device != 0L
 
@@ -100,10 +101,16 @@ class DesktopAudio : PlatformAudio {
   override fun playingSounds(): Set<Int> =
       sources
 
-  override fun update(listenerPosition: Vector3?) {
+  override fun update(gain: Float, listenerPosition: Vector3?) {
     val finished = sources.filter { source ->
       alGetSourcei(source, AL_SOURCE_STATE) == AL_STOPPED
     }
+
+    if (gain != this.gain) {
+      this.gain = gain
+      alListenerf(AL_GAIN, gain)
+    }
+
     if (listenerPosition != null) {
       alListener3f(AL_POSITION, listenerPosition.x, listenerPosition.y, listenerPosition.z)
     }

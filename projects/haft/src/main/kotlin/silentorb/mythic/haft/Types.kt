@@ -2,6 +2,7 @@ package silentorb.mythic.haft
 
 import silentorb.mythic.debugging.getDebugString
 import silentorb.mythic.platforming.InputEvent
+import silentorb.mythic.platforming.PlatformInput
 import silentorb.mythic.spatial.Vector2
 
 val DEBUG_INPUT_COUNTS = getDebugString("DEBUG_INPUT_COUNTS") != null
@@ -28,10 +29,10 @@ typealias Bindings = List<Binding>
 
 typealias InputProfiles = List<Bindings>
 
-fun newInputDeviceState() =
+fun newInputDeviceState(input: PlatformInput) =
     InputDeviceState(
         events = listOf(),
-        mousePosition = Vector2()
+        mousePosition = input.getMousePosition(),
     )
 
 typealias BindingSourceTarget = Long

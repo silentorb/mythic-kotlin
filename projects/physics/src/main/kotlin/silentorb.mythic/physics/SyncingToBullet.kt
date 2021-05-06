@@ -53,7 +53,8 @@ fun createCollisionShape(shape: Shape, scale: Vector3): btCollisionShape {
   }
 }
 
-fun createBulletDynamicObject(transform: Matrix, dynamicBody: DynamicBody, shape: btCollisionShape, rotationalInertia: Boolean): btRigidBody {
+fun createBulletDynamicObject(transform: Matrix, dynamicBody: DynamicBody, shape: btCollisionShape, rotationalInertia: Boolean,
+                              isSolid: Boolean = true): btRigidBody {
   val localInertia = com.badlogic.gdx.math.Vector3(0f, 0f, 0f)
   if (rotationalInertia)
     shape.calculateLocalInertia(dynamicBody.mass, localInertia)
@@ -63,6 +64,9 @@ fun createBulletDynamicObject(transform: Matrix, dynamicBody: DynamicBody, shape
   val btBody = btRigidBody(rbInfo)
   btBody.activationState = CollisionConstants.DISABLE_DEACTIVATION
   btBody.friction = dynamicBody.friction
+  if (!isSolid) {
+    btBody.collisionFlags = btBody.collisionFlags or btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE
+  }
   rbInfo.release()
   return btBody
 }
@@ -182,7 +186,7 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
         val collisionObject = deck.collisionObjects[key]!!
         val shape = createCollisionShape(collisionObject.shape, body.scale)
         val hingeInfo = dynamicBody.hinge
-        val bulletBody = createBulletDynamicObject(getBodyTransform(body), dynamicBody, shape, hingeInfo != null)
+        val bulletBody = createBulletDynamicObject(getBodyTransform(body), dynamicBody, shape, hingeInfo != null, collisionObject.isSolid)
 
         if (hingeInfo != null) {
           initializeHinge(bulletState, bulletBody, hingeInfo, body)
