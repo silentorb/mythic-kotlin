@@ -15,6 +15,7 @@ import silentorb.mythic.scenery.MeshName
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Pi
 import silentorb.mythic.spatial.getRotationMatrix
+import silentorb.mythic.spatial.toVector2
 
 fun renderElement(renderer: SceneRenderer, primitive: Primitive, material: Material, transform: Matrix,
                   isAnimated: Boolean,
@@ -26,19 +27,23 @@ fun renderElement(renderer: SceneRenderer, primitive: Primitive, material: Mater
     val debugMissingTexture = 0
   }
 
+  val deferredBlending = shadingMode == ShadingMode.deferred && material.containsTransparency
+
   val config = ObjectShaderConfig(
       transform,
       color = material.color,
       glow = material.glow,
       normalTransform = orientationTransform,
-      texture = texture
+      texture = texture,
+      screenDimensions = if (deferredBlending) renderer.windowInfo.dimensions.toVector2() else null,
   )
 
   val effect = renderer.getShader(primitive.mesh.vertexSchema, ShaderFeatureConfig(
       skeleton = isAnimated,
       texture = texture != null && primitive.mesh.vertexSchema.attributes.any { it.name == "uv" },
       shading = shadingMode,
-      colored = primitive.material.coloredVertices || material.coloredVertices
+      colored = primitive.material.coloredVertices || material.coloredVertices,
+      deferredBlending = deferredBlending,
   ))
 
   effect.activate(config)

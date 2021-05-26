@@ -67,10 +67,6 @@ fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer,
   val manageDeferred = shadingMode == ShadingMode.deferred && shadingMode != parentShadingMode
   val previousDepthEnabled = globalState.depthEnabled
   val depthMode = layer.depth
-  if (layer.blending == LayerBlending.premultiplied) {
-    globalState.blendEnabled = true
-    globalState.blendFunction = Pair(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-  }
 
   debugMarkPass(manageDeferred && getDebugBoolean("MARK_DEFERRED_RENDERING"),
       "Deferred Rendering") {
@@ -88,6 +84,17 @@ fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer,
       } else {
         activateDirectRendering(renderer)
       }
+    }
+
+    if (shadingMode != ShadingMode.deferred && layer.blending == LayerBlending.premultiplied) {
+      globalState.blendFunction = Pair(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+      globalState.blendEnabled = true
+//      if (shadingMode != ShadingMode.deferred) {
+//        globalState.setBlendEnabled(0, true)
+//      }
+//      else {
+//        globalState.blendEnabled = true
+//      }
     }
 
     if (depthMode == DepthMode.local) {
@@ -116,8 +123,14 @@ fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer,
   if (depthMode != null)
     globalState.depthEnabled = previousDepthEnabled
 
-  if (layer.blending == LayerBlending.premultiplied) {
+  if (shadingMode != ShadingMode.deferred && layer.blending == LayerBlending.premultiplied) {
     globalState.blendEnabled = false
+//    if (shadingMode != ShadingMode.deferred) {
+//      globalState.setBlendEnabled(0, false)
+//    }
+//    else {
+//      globalState.blendEnabled = false
+//    }
   }
 }
 

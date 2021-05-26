@@ -50,7 +50,8 @@ data class ShaderFeatureConfig(
     val texture: Boolean = false,
     val colored: Boolean = false,
     val instanced: Boolean = false,
-    val animatedTexture: Boolean = false // Requires `texture` == true
+    val animatedTexture: Boolean = false, // Requires `texture` == true
+    val deferredBlending: Boolean = false,
 )
 
 data class ObjectShaderConfig(
@@ -62,7 +63,8 @@ data class ObjectShaderConfig(
     val boneBuffer: UniformBuffer? = null,
     val textureScale: Vector2? = null,
     val nearPlaneHeight: Float? = null, // Used for scaling point size
-    val lodOpacityLevels: List<Float>? = null
+    val lodOpacityLevels: List<Float>? = null,
+    val screenDimensions: Vector2? = null,
 )
 
 fun generateShaderProgram(vertexSchema: VertexSchema, featureConfig: ShaderFeatureConfig): ShaderProgram {
@@ -107,6 +109,13 @@ class GeneralPerspectiveShader(buffers: UniformBuffers, vertexSchema: VertexSche
   val lodOpacityLevels: FloatArrayProperty? = if (featureConfig.pointSize) FloatArrayProperty(program, "lodOpacityLevels") else null
   val normalTransformProperty = if (featureConfig.shading != ShadingMode.none) MatrixProperty(program, "normalTransform") else null
   val glowProperty = if (featureConfig.shading != ShadingMode.none) FloatProperty(program, "glow") else null
+  val dimensionsProperty = if (featureConfig.deferredBlending) Vector2Property(program, "dimensions") else null
+
+  init {
+    if (featureConfig.deferredBlending) {
+      routeDeferredBufferTextures(program)
+    }
+  }
 
   // IntelliJ will flag this use of inline as a warning, but using inline here
   // causes the JVM to optimize away the ObjectShaderConfig allocation and significantly
@@ -141,6 +150,9 @@ class GeneralPerspectiveShader(buffers: UniformBuffers, vertexSchema: VertexSche
       lodOpacityLevels.setValue(config.lodOpacityLevels)
     }
 
+    if (dimensionsProperty != null && config.screenDimensions != null) {
+      dimensionsProperty.setValue(config.screenDimensions)
+    }
   }
 }
 

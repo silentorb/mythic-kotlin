@@ -26,6 +26,13 @@ private fun setEnabled(register: Int, value: Boolean) {
     glDisable(register)
 }
 
+private fun setEnabled(register: Int, index: Int, value: Boolean) {
+  if (value)
+    glEnablei(register, index)
+  else
+    glDisablei(register, index)
+}
+
 enum class GlField {
   depthEnabled,
   depthTest,
@@ -149,6 +156,10 @@ class State {
         setEnabled(GL_BLEND, value)
       }
     }
+
+  fun setBlendEnabled(index: Int, value: Boolean) {
+    setEnabled(GL_BLEND, index, value)
+  }
 
   var multisampleEnabled: Boolean = false
     set(value) {

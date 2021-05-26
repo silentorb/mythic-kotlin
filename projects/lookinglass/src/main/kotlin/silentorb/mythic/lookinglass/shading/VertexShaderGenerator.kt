@@ -5,6 +5,12 @@ import silentorb.mythic.glowing.VertexAttribute
 import silentorb.mythic.glowing.VertexSchema
 import silentorb.mythic.lookinglass.ShadingMode
 
+const val screenDimensionsOutHeader = """out vec2 screenDimensions;
+uniform vec2 dimensions;
+"""
+
+const val screenDimensionsApplication = "screenDimensions = dimensions;"
+
 private const val weightHeader = """
 layout (std140) uniform BoneTransforms {
   mat4[128] boneTransforms;
@@ -90,6 +96,7 @@ private fun mainVertex(config: ShaderFeatureConfig): String {
       if (config.skeleton) weightHeader else null,
       if (config.pointSize) pointSizeHeader else null,
       if (config.colored) coloredHeader else null,
+      if (config.deferredBlending) screenDimensionsOutHeader else null,
       "\nvoid main() {",
       "  vec4 position4 = vec4(position, 1.0);",
       instanceOperations(config.instanced),
@@ -99,6 +106,7 @@ private fun mainVertex(config: ShaderFeatureConfig): String {
       if (config.shading != ShadingMode.none) shadingOperations else null,
       if (config.pointSize) pointSizeOutput else null,
       if (config.colored) coloredOutput else null,
+      if (config.deferredBlending) screenDimensionsApplication else null,
       textureOperations(config),
       "}\n",
   ).joinToString("\n")

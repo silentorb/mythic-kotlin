@@ -1,7 +1,10 @@
 package silentorb.mythic.lookinglass.shading
 
 import silentorb.mythic.lookinglass.ShadingMode
-import silentorb.mythic.resource_loading.loadTextResource
+import silentorb.mythic.lookinglass.deferred.deferredFragmentApplication
+import silentorb.mythic.lookinglass.deferred.deferredFragmentApplicationWithBlending
+import silentorb.mythic.lookinglass.deferred.deferredFragmentBlendingHeader
+import silentorb.mythic.lookinglass.deferred.deferredFragmentHeader
 
 const val maxLodLevels: Int = 10
 
@@ -9,23 +12,6 @@ const val lightingApplication1 = "vec3 lightResult = processLights(uniformColor,
 const val lightingApplication2 = "vec4(lightResult, uniformColor.w)"
 
 fun addIf(condition: Boolean, value: String) = if (condition) value else null
-
-const val deferredAlbedoKey = "deferredAlbedo"
-const val deferredPositionKey = "deferredPosition"
-const val deferredNormalKey = "deferredNormal"
-
-const val deferredFragmentHeader = """
-layout (location = 0) out vec4 $deferredAlbedoKey;
-layout (location = 1) out vec4 $deferredPositionKey;
-layout (location = 2) out vec4 $deferredNormalKey;
-"""
-
-fun deferredFragmentApplication(color: String) = """
-deferredAlbedo = $color;
-deferredAlbedo.a = glow;
-deferredPosition = fragmentPosition;
-deferredNormal = vec4(fragmentNormal, 1.0);
-"""
 
 fun fragmentHeader(config: ShaderFeatureConfig): String {
   return listOfNotNull(
@@ -40,8 +26,9 @@ in vec2 textureCoordinates;"""
       else null,
       when (config.shading) {
         ShadingMode.forward -> lightingCode
-        ShadingMode.deferred -> deferredFragmentHeader
-        ShadingMode.none -> null
+        ShadingMode.deferred -> deferredFragmentHeader + if (config.deferredBlending) deferredFragmentBlendingHeader else ""
+        ShadingMode.none
+        -> null
       },
   ).joinToString("\n")
 }
@@ -68,6 +55,9 @@ fun generateFragmentShader(config: ShaderFeatureConfig): String {
       textureOperations(config),
       addIf(config.shading == ShadingMode.forward, lightingApplication1),
       if (config.shading == ShadingMode.deferred)
+        if (config.deferredBlending)
+          deferredFragmentApplicationWithBlending(outColor)
+          else
         deferredFragmentApplication(outColor)
       else
         "output_color = $outColor;",
