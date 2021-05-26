@@ -69,7 +69,7 @@ fun collisionElements(editor: Editor, graph: Graph, nodes: Collection<String>) =
       listOf(
           ElementGroup(
               meshes = collisionNodes.mapNotNull {
-                val shape = getShape(editor.enumerations.meshShapes, graph, it.source)
+                val shape = getShape(editor.enumerations.resourceInfo.meshShapes, graph, it.source)
                 if (shape != null) {
                   val transform = getNodeTransform(graph, it.source)
                   shapeToMeshes(shape, transform)
@@ -83,7 +83,7 @@ fun collisionElements(editor: Editor, graph: Graph, nodes: Collection<String>) =
       listOf()
 
 fun nodesToElements(editor: Editor, graph: Graph, nodes: Collection<String>) =
-    nodesToElements(editor.enumerations.meshShapes, graph, nodes) +
+    nodesToElements(editor.enumerations.resourceInfo, graph, nodes) +
         collisionElements(editor, graph, nodes) +
         prepareDynamicDepictions(editor.enumerations.depictions, graph, nodes)
 

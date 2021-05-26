@@ -47,7 +47,7 @@ fun getPlayerViewports(playerCount: Int, dimensions: Vector2i): List<Vector4i> {
 }
 
 fun createMultiSampler(glow: Glow, width: Int, height: Int, multisamples: Int): Multisampler {
-  val texture = Texture(width, height, null, { width: Int, height: Int, buffer: FloatBuffer? ->
+  val texture = newTexture(width, height, null, { width: Int, height: Int, _ ->
     glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, multisamples, GL_RGB, width, height, true)
   }, TextureTarget.multisample)
 
@@ -72,14 +72,14 @@ fun createMultiSampler(glow: Glow, width: Int, height: Int, multisamples: Int): 
 
 fun updateTextureBuffer(dimensions: Vector2i, buffer: ByteTextureBuffer, attributes: () -> TextureAttributes) {
   if (buffer.texture == null) {
-    buffer.texture = Texture(dimensions.x, dimensions.y, attributes())
+    buffer.texture = newTexture(dimensions.x, dimensions.y, attributes())
   }
   buffer.texture!!.update(buffer.buffer!!)
 }
 
 fun updateTextureBuffer(dimensions: Vector2i, buffer: FloatTextureBuffer, attributes: () -> TextureAttributes) {
   if (buffer.texture == null) {
-    buffer.texture = Texture(dimensions.x, dimensions.y, attributes())
+    buffer.texture = newTexture(dimensions.x, dimensions.y, attributes())
   }
   buffer.texture!!.update(buffer.buffer!!)
 }

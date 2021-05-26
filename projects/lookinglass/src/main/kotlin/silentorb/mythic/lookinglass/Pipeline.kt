@@ -10,7 +10,7 @@ import silentorb.mythic.spatial.*
 
 fun newFrameBufferTexture(dimensions: Vector2i, attachment: Int, format: TextureFormat,
                           storage: TextureStorageUnit): Texture {
-  val texture = Texture(dimensions.x, dimensions.y, TextureAttributes(
+  val texture = newTexture(dimensions.x, dimensions.y, TextureAttributes(
       format = format,
       storageUnit = storage,
       smooth = false,

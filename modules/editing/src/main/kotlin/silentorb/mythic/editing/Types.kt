@@ -3,10 +3,10 @@ package silentorb.mythic.editing
 import imgui.ImDrawList
 import silentorb.mythic.ent.*
 import silentorb.mythic.ent.scenery.Expanders
+import silentorb.mythic.lookinglass.ResourceInfo
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.lookinglass.ElementGroup
-import silentorb.mythic.scenery.Shape
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector4i
 import java.nio.file.Path
@@ -138,9 +138,8 @@ data class EditorEnumerations(
     val propertiesSerialization: PropertiesSerialization,
     val schema: PropertySchema = mapOf(),
     val attributes: List<Key> = listOf(),
-    val textures: List<Key> = listOf(),
     val meshes: List<Key> = listOf(),
-    val meshShapes: Map<Key, Shape> = mapOf(),
+    val resourceInfo: ResourceInfo,
     val collisionPresets: Map<Int, String> = mapOf(),
     val expanders: Expanders = mapOf(),
     val depictions: EditorDepictionMap = mapOf(),

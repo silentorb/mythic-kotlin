@@ -78,8 +78,7 @@ fun initializeWindowed(window: Long, dimensions: Vector2i?) {
     glfwSetWindowMonitor(window, 0, 0, 0, dimensions.x, dimensions.y, videoMode.refreshRate())
     glfwSetWindowSize(window, dimensions.x, dimensions.y)
     centerWindow(window)
-  }
-  else {
+  } else {
     glfwMaximizeWindow(window)
   }
 }
@@ -109,6 +108,39 @@ fun getWindowInfo(window: Long): WindowInfo {
   }
 }
 
+val loadImageInfoFromFile: ImageInfoLoader = { filePath ->
+  var width = 0
+  var height = 0
+  var channels = 0
+  MemoryStack.stackPush().use { stack ->
+    val widthBuffer = stack.mallocInt(1)
+    val heightBuffer = stack.mallocInt(1)
+    val channelBuffer = stack.mallocInt(1)
+
+    // Load only some of the initial bytes of the image.
+    // For PNG files, this may not be enough bytes to reach the header depending on how the PNG is organized.
+    // (Particularly if the PNG file starts with lots of ancillary metadata)
+    // So far the current byte count has been sufficient for any of the files loaded by this software.
+    val imageBuffer = ioResourceToByteBuffer(filePath, 64, true)
+
+    val success = stbi_info_from_memory(imageBuffer, widthBuffer, heightBuffer, channelBuffer)
+    if (!success) {
+      val reason = stbi_failure_reason()
+      throw RuntimeException("Failed to load texture file info!" + System.lineSeparator() + reason)
+    }
+
+    width = widthBuffer.get()
+    height = heightBuffer.get()
+    channels = channelBuffer.get()
+  }
+
+  ImageInfo(
+      width = width,
+      height = height,
+      channels = channels
+  )
+}
+
 val loadImageFromFile: ImageLoader = { filePath ->
   var buffer: ByteBuffer? = null
   var width = 0
@@ -125,8 +157,7 @@ val loadImageFromFile: ImageLoader = { filePath ->
     buffer = stbi_load_from_memory(imageBuffer, widthBuffer, heightBuffer, channelBuffer, 0)
     if (buffer == null) {
       val reason = stbi_failure_reason()
-      throw RuntimeException("Failed to load a texture file!"
-          + System.lineSeparator() + reason)
+      throw RuntimeException("Failed to load a texture file!" + System.lineSeparator() + reason)
     }
 
     width = widthBuffer.get()
@@ -137,9 +168,11 @@ val loadImageFromFile: ImageLoader = { filePath ->
   if (buffer != null)
     RawImage(
         buffer = buffer!!,
-        width = width,
-        height = height,
-        channels = channels
+        info = ImageInfo(
+            width = width,
+            height = height,
+            channels = channels
+        ),
     )
   else
     null
@@ -188,4 +221,7 @@ class DesktopDisplay(val window: Long) : PlatformDisplay {
 
   override val loadImage: ImageLoader
     get() = loadImageFromFile
+
+  override val loadImageInfo: ImageInfoLoader
+    get() = loadImageInfoFromFile
 }

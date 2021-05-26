@@ -3,6 +3,7 @@ package silentorb.mythic.lookinglass.texturing
 import silentorb.mythic.glowing.Texture
 import silentorb.mythic.glowing.TextureAttributes
 import silentorb.mythic.glowing.TextureFormat
+import silentorb.mythic.glowing.newTexture
 import silentorb.mythic.lookinglass.LoadingState
 import silentorb.mythic.platforming.ImageLoader
 import silentorb.mythic.platforming.RawImage
@@ -28,13 +29,13 @@ data class LoadedTextureData(
 typealias DynamicTextureLibrary = MutableMap<String, Texture>
 
 fun rawImageToTexture(image: RawImage, attributes: TextureAttributes): Texture {
-  val modifiedAttributes = if (image.channels == 4)
+  val modifiedAttributes = if (image.info.channels == 4)
     attributes.copy(
         format = TextureFormat.rgba
     )
   else
     attributes
-  return Texture(image.width, image.height, modifiedAttributes, image.buffer)
+  return newTexture(image.info.width, image.info.height, modifiedAttributes, image.buffer)
 }
 
 fun loadTextureFromFile(loadImage: ImageLoader, path: Path, attributes: TextureAttributes): Texture {

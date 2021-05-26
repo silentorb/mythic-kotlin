@@ -95,7 +95,7 @@ fun drawCompass(transform: ScreenTransform, lookAt: Vector3, drawList: ImDrawLis
   )
   val start = transform(Vector3.zero)
   val black = ImColor.intToColor(0, 0, 0, 255)
-  val lineLength = 4f
+  val lineLength = 3f
 
   val indices = (0 until 3)
       .sortedByDescending { vectors[it].dot(lookAt) }
@@ -114,7 +114,7 @@ fun drawCompass(viewport: Vector4i, camera: CameraRig, drawList: ImDrawList) {
   val dimensions = viewport.zw()
   val viewTransform = createViewMatrix(Vector3.zero, camera.orientation)
   val orthoTransform = createOrthographicMatrix(dimensions, 30f, 0.01f, 1000f) * viewTransform
-  val compassPadding = 50
+  val compassPadding = 70
   val compassOffset = viewport.xy() + Vector2i(compassPadding, viewport.w - compassPadding) - viewport.zw() / 2
   val compassTransform = transformPoint(orthoTransform, dimensions.toVector2(), compassOffset.toVector2())
   val lookAt = getCameraLookat(camera)

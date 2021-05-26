@@ -1,5 +1,8 @@
 package silentorb.mythic.lookinglass
 
+import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA
+import org.lwjgl.opengl.GL11.GL_SRC_ALPHA
 import silentorb.mythic.debugging.getDebugBoolean
 import silentorb.mythic.glowing.clearDepth
 import silentorb.mythic.glowing.debugMarkPass
@@ -17,6 +20,11 @@ enum class DepthMode {
   global
 }
 
+enum class LayerBlending {
+  none,
+  premultiplied,
+}
+
 data class SceneLayer(
     val elements: ElementGroups = listOf(),
     val depth: DepthMode? = null,
@@ -24,6 +32,7 @@ data class SceneLayer(
     val shadingMode: ShadingMode? = null,
     val highlightColor: Vector4? = null,
     val children: List<SceneLayer> = listOf(),
+    val blending: LayerBlending = LayerBlending.none,
 )
 
 typealias SceneLayers = List<SceneLayer>
@@ -58,6 +67,11 @@ fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer,
   val manageDeferred = shadingMode == ShadingMode.deferred && shadingMode != parentShadingMode
   val previousDepthEnabled = globalState.depthEnabled
   val depthMode = layer.depth
+  if (layer.blending == LayerBlending.premultiplied) {
+    globalState.blendEnabled = true
+    globalState.blendFunction = Pair(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+  }
+
   debugMarkPass(manageDeferred && getDebugBoolean("MARK_DEFERRED_RENDERING"),
       "Deferred Rendering") {
     if (depthMode != null)
@@ -101,6 +115,10 @@ fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer,
 
   if (depthMode != null)
     globalState.depthEnabled = previousDepthEnabled
+
+  if (layer.blending == LayerBlending.premultiplied) {
+    globalState.blendEnabled = false
+  }
 }
 
 fun renderSceneLayers(renderer: SceneRenderer, camera: Camera, layers: SceneLayers, callback: OnRenderScene? = null) {

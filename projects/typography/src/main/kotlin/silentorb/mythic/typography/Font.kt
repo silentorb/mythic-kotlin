@@ -4,6 +4,7 @@ import silentorb.mythic.glowing.Texture
 import silentorb.mythic.glowing.TextureInitializer
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE
+import silentorb.mythic.glowing.newTexture
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 
@@ -24,7 +25,7 @@ val fontTextureInitializer: TextureInitializer = { width: Int, height: Int, buff
 }
 
 fun generateFontTexture(buffer: ByteBuffer, width: Int, height: Int): Texture {
-  return Texture(width, height, buffer.asFloatBuffer(), fontTextureInitializer)
+  return newTexture(width, height, buffer.asFloatBuffer(), fontTextureInitializer)
 }
 
 data class Font(

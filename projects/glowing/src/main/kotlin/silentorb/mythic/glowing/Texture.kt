@@ -22,7 +22,7 @@ enum class TextureFormat {
 
 enum class TextureStorageUnit {
   float,
-  unsignedByte
+  unsignedByte,
 }
 
 data class TextureAttributes(
@@ -32,6 +32,10 @@ data class TextureAttributes(
     val storageUnit: TextureStorageUnit,
     val mipmap: Boolean = false,
     val frames: Int = 1
+)
+
+val defaultTextureAttributes = TextureAttributes(
+    storageUnit = TextureStorageUnit.unsignedByte
 )
 
 private var _maxAnistropy: Float? = null
@@ -111,9 +115,13 @@ enum class TextureTarget {
   multisample
 }
 
-class Texture(val width: Int, val height: Int, val target: TextureTarget) {
+data class Texture(
+    val width: Int,
+    val height: Int,
+    val target: TextureTarget,
+    val attributes: TextureAttributes) {
   var id: Int = glGenTextures()
-  var format = GL_RGB
+  val format = mapTextureFormat(attributes.format)
 
   init {
     if (target == TextureTarget.multisample) {
@@ -121,15 +129,6 @@ class Texture(val width: Int, val height: Int, val target: TextureTarget) {
     }
 
     bind()
-  }
-
-  constructor(width: Int, height: Int, buffer: FloatBuffer?, initializer: TextureInitializer, target: TextureTarget = TextureTarget.general) : this(width, height, target) {
-    initializer(width, height, buffer)
-  }
-
-  constructor(width: Int, height: Int, attributes: TextureAttributes, buffer: ByteBuffer? = null, target: TextureTarget = TextureTarget.general) : this(width, height, target) {
-    initializeTexture(width, height, attributes, buffer)
-    format = mapTextureFormat(attributes.format)
   }
 
   fun dispose() {
@@ -160,6 +159,19 @@ class Texture(val width: Int, val height: Int, val target: TextureTarget) {
   }
 }
 
+
+fun newTexture(width: Int, height: Int, buffer: FloatBuffer?, initializer: TextureInitializer, target: TextureTarget = TextureTarget.general): Texture {
+  val texture = Texture(width, height, target, defaultTextureAttributes)
+  initializer(width, height, buffer)
+  return texture
+}
+
+fun newTexture(width: Int, height: Int, attributes: TextureAttributes, buffer: ByteBuffer? = null, target: TextureTarget = TextureTarget.general): Texture {
+  val texture = Texture(width, height, target, attributes)
+  initializeTexture(width, height, attributes, buffer)
+  return texture
+}
+
 fun unbindTexture() {
   globalState.bound2dTexture = 0
   globalState.bound2dMultisampleTexture = 0
@@ -174,6 +186,6 @@ fun activateTextures(textures: List<Texture>) {
 fun updateTexture(attributes: TextureAttributes, dimensions: Vector2i, texture: Texture?): Texture =
     if (texture == null || texture.width != dimensions.x || dimensions.y != texture.height) {
       texture?.dispose()
-      Texture(dimensions.x, dimensions.y, attributes)
+      newTexture(dimensions.x, dimensions.y, attributes)
     } else
       texture

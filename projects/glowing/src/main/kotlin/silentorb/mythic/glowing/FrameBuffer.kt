@@ -57,7 +57,7 @@ fun applyOffscreenBuffer(buffer: OffscreenBuffer, windowDimensions: Vector2i, sm
 }
 
 fun newDepthTexture(textureAttributes: TextureAttributes, dimensions: Vector2i): Texture {
-  val depthTexture = Texture(dimensions.x, dimensions.y, textureAttributes.copy(format = TextureFormat.depth, storageUnit = TextureStorageUnit.float))
+  val depthTexture = newTexture(dimensions.x, dimensions.y, textureAttributes.copy(format = TextureFormat.depth, storageUnit = TextureStorageUnit.float))
   glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture.id, 0)
   return depthTexture
 }
@@ -70,7 +70,7 @@ fun prepareScreenFrameBuffer(windowWidth: Int, windowHeight: Int, withDepth: Boo
       smooth = false,
       storageUnit = TextureStorageUnit.unsignedByte
   )
-  val colorTexture = Texture(dimensions.x, dimensions.y, textureAttributes)
+  val colorTexture = newTexture(dimensions.x, dimensions.y, textureAttributes)
   glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, colorTexture.id, 0)
   glDrawBuffers(GL_COLOR_ATTACHMENT0)
 

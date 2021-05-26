@@ -14,22 +14,16 @@ fun getElementNodes(graph: Graph): Set<String> {
       .plus(tree.values)
 }
 
-fun nodesToElements(meshShapes: Map<String, Shape>, graph: Graph, nodes: Collection<String>): List<ElementGroup> {
-  return nodes.flatMap { node -> nodeToElements(meshShapes, graph, node) }
+fun nodesToElements(resourceInfo: ResourceInfo, graph: Graph, nodes: Collection<String>): List<ElementGroup> {
+  return nodes.flatMap { node -> nodeToElements(resourceInfo, graph, node) }
 }
 
-fun nodesToElements(meshShapes: Map<String, Shape>, graph: Graph): List<ElementGroup> {
+fun nodesToElements(resourceInfo: ResourceInfo, graph: Graph): List<ElementGroup> {
   val nodes = getElementNodes(graph)
-  return nodesToElements(meshShapes, graph, nodes)
+  return nodesToElements(resourceInfo, graph, nodes)
 }
 
-fun getGraphElementMaterial(texture: String?): Material? =
-    if (texture != null)
-      Material(texture = texture, shading = true)
-    else
-      null
-
-fun nodeToElements(meshesShapes: Map<String, Shape>, graph: Graph, node: Key): List<ElementGroup> {
+fun nodeToElements(resourceInfo: ResourceInfo, graph: Graph, node: Key): List<ElementGroup> {
   val isSelected = false
   val mesh = getNodeValue<Key>(graph, node, SceneProperties.mesh)
   val text3d = getNodeValue<String>(graph, node, SceneProperties.text3d)
@@ -44,7 +38,15 @@ fun nodeToElements(meshesShapes: Map<String, Shape>, graph: Graph, node: Key): L
   return if (mesh != null || text3d != null || light != null || collisionShape != null || isBillboard) {
     val transform = getNodeTransform(graph, node)
     val meshElements = if (mesh != null) {
-      val material = getGraphElementMaterial(texture)
+      val material = if (texture != null)
+        Material(
+            texture = texture,
+            shading = true,
+            containsTransparency = textureContainsTransparency(resourceInfo, texture),
+            doubleSided = nodeHasAttribute(graph, node, SceneTypes.doubleSided),
+        )
+      else
+        null
 
       listOf(
           MeshElement(
@@ -57,7 +59,7 @@ fun nodeToElements(meshesShapes: Map<String, Shape>, graph: Graph, node: Key): L
       listOf()
 
     val collisionMeshes = if (collisionShape != null) {
-      val meshShape = meshesShapes[mesh]
+      val meshShape = resourceInfo.meshShapes[mesh]
       val collisionTransform = if (meshShape == null)
         transform
       else
@@ -99,12 +101,12 @@ fun nodeToElements(meshesShapes: Map<String, Shape>, graph: Graph, node: Key): L
 
     val billboards = if (isBillboard && texture != null)
       listOf(
-      TexturedBillboard(
-          texture = texture,
-          position = transform.translation(),
-          color = Vector4(1f),
-          scale = transform.getScale().x,
-      )
+          TexturedBillboard(
+              texture = texture,
+              position = transform.translation(),
+              color = Vector4(1f),
+              scale = transform.getScale().x,
+          )
       )
     else
       listOf()

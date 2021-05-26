@@ -1,5 +1,6 @@
 package silentorb.mythic.lookinglass
 
+import silentorb.mythic.glowing.TextureFormat
 import silentorb.mythic.scenery.Shape
 import silentorb.mythic.spatial.Vector4i
 import silentorb.mythic.spatial.radiansToDegrees
@@ -34,3 +35,11 @@ fun setElementGroupMaterial(material: Material, elementGroups: Collection<Elemen
           }
       )
     }
+
+fun groupContainsTransparency(group: ElementGroup): Boolean =
+    group.billboards.any() || group.meshes.any { it.material?.containsTransparency ?: false }
+
+fun textureContainsTransparency(resourceInfo: ResourceInfo, name: String): Boolean {
+  val format = resourceInfo.textures[name]?.format
+  return format == TextureFormat.rgba || format == TextureFormat.rgba16f
+}

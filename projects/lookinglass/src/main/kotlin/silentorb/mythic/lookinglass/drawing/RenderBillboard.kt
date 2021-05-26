@@ -23,8 +23,6 @@ fun renderBillboard(renderer: Renderer, camera: Camera, billboards: List<Texture
     return
 
   debugMarkPass(true, "Particles") {
-    globalState.blendEnabled = true
-    globalState.blendFunction = Pair(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     val isTextureAnimated = texture.width != texture.height
     val textureScale = Vector2(texture.height.toFloat() / texture.width.toFloat(), 1f)
 
@@ -58,6 +56,5 @@ fun renderBillboard(renderer: Renderer, camera: Camera, billboards: List<Texture
       }
     })
     drawMeshInstanced(mesh, DrawMethod.triangleFan, billboards.size)
-    globalState.blendEnabled = false
   }
 }

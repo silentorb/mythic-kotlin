@@ -33,6 +33,20 @@ fun loadIndices(buffer: ByteBuffer, info: GltfInfo, primitive: Primitive): IntBu
 
 typealias VertexConverter = (ByteBuffer, FloatBuffer, VertexAttribute, Int, Int) -> Unit
 
+val transferVertexData: VertexConverter = { buffer, vertices, attribute, _, _ ->
+  if (attribute.name == "uv") {
+    val u = buffer.float
+    val v = buffer.float
+    vertices.put(u)
+    vertices.put(1f - v)
+  } else {
+    for (x in 0 until attribute.count) {
+      val value = buffer.float
+      vertices.put(value)
+    }
+  }
+}
+
 fun createVertexConverter(info: GltfInfo, transformBuffer: ByteBuffer, boneMap: BoneMap, meshIndex: Int): VertexConverter {
   val meshNode = info.nodes.first { it.mesh == meshIndex }
   val skin = if (meshNode.skin != null) info.skins?.get(meshNode.skin) else null
@@ -66,19 +80,11 @@ fun createVertexConverter(info: GltfInfo, transformBuffer: ByteBuffer, boneMap: 
         }
       } else {
         assert(componentType == ComponentType.Float.value)
-        for (x in 0 until attribute.count) {
-          val value = buffer.float
-          vertices.put(value)
-        }
+        transferVertexData(buffer, vertices, attribute, 0, 0)
       }
     }
   } else {
-    { buffer, vertices, attribute, _, _ ->
-      for (x in 0 until attribute.count) {
-        val value = buffer.float
-        vertices.put(value)
-      }
-    }
+    transferVertexData
   }
 }
 

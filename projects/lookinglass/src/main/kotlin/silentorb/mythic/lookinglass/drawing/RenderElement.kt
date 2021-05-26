@@ -3,6 +3,7 @@ package silentorb.mythic.lookinglass.drawing
 import silentorb.mythic.breeze.MultiAnimationPart
 import silentorb.mythic.breeze.transformAnimatedSkeleton
 import silentorb.mythic.glowing.drawMesh
+import silentorb.mythic.glowing.globalState
 import silentorb.mythic.lookinglass.*
 import silentorb.mythic.lookinglass.meshes.Primitive
 import silentorb.mythic.lookinglass.ShadingMode
@@ -41,6 +42,7 @@ fun renderElement(renderer: SceneRenderer, primitive: Primitive, material: Mater
   ))
 
   effect.activate(config)
+  globalState.cullFaces = !material.doubleSided
   drawMesh(primitive.mesh, material.drawMethod)
 }
 

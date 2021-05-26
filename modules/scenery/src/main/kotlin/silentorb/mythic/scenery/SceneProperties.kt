@@ -35,4 +35,5 @@ fun scenePropertiesSchema(): PropertySchema = mapOf(
 
 object SceneTypes {
   val billboard = "billboard"
+  val doubleSided = "doubleSided"
 }

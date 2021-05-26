@@ -14,6 +14,7 @@ import silentorb.mythic.platforming.PlatformDisplayConfig
 import silentorb.mythic.platforming.WindowMode
 import silentorb.mythic.scenery.ArmatureName
 import silentorb.mythic.scenery.MeshName
+import silentorb.mythic.scenery.Shape
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.typography.FontSet
@@ -121,28 +122,9 @@ data class Renderer(
     }
 }
 
-//fun updateOffscreenBufferAllocations(renderer: Renderer, oldConfig: DisplayConfig?) {
-//  val dimensionsChanged = oldConfig == null || renderer.config.width != oldConfig.width || renderer.config.height != oldConfig.height
-//  if (renderer.config.multisamples == 0) {
-//    val multisampler = renderer.multisampler
-//    if (multisampler != null) {
-//      multisampler.framebuffer.dispose()
-//      multisampler.renderbuffer.dispose()
-//      renderer.multisampler = null
-//    }
-//  } else if (renderer.config.multisamples != oldConfig?.multisamples || dimensionsChanged) {
-//    renderer.multisampler = createMultiSampler(renderer.glow, renderer.config)
-//  }
-//}
+typealias TextureInfoMap = Map<String, TextureAttributes>
 
-//fun emptyRenderer(options: DisplayOptions): Renderer =
-//    Renderer(
-//        glow = Glow(),
-//        options = options,
-//        meshes = mutableMapOf(),
-//        armatures = mapOf(),
-//        vertexSchemas = createVertexSchemas(),
-//        fonts = listOf(),
-//        multisampler = null,
-//        offscreenBuffers = listOf()
-//    )
+data class ResourceInfo(
+    val meshShapes: Map<String, Shape>,
+    val textures: TextureInfoMap,
+)

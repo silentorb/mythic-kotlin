@@ -78,7 +78,7 @@ fun getUrlPath(path: String): Path {
     Paths.get(uri)
 }
 
-fun ioResourceToByteBuffer(resource: String, bufferSize: Int = 8 * 1024): ByteBuffer {
+fun ioResourceToByteBuffer(resource: String, bufferSize: Int = 8 * 1024, loadPartial: Boolean = false): ByteBuffer {
   val path = getUrlPath(resource)
   val buffer = if (Files.isReadable(path)) {
     Files.newByteChannel(path)
@@ -100,7 +100,12 @@ fun ioResourceToByteBuffer(resource: String, bufferSize: Int = 8 * 1024): ByteBu
                     break
                   }
                   if (buffer.remaining() == 0) {
-                    buffer = resizeBuffer(buffer, buffer.capacity() * 3 / 2) // 50%
+                    if (loadPartial) {
+                      break
+                    }
+                    else {
+                      buffer = resizeBuffer(buffer, buffer.capacity() * 3 / 2) // 50%
+                    }
                   }
                 }
                 buffer

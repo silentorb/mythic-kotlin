@@ -41,14 +41,19 @@ data class PlatformDisplayConfig(
     val multisamples: Int
 )
 
-data class RawImage(
-    val buffer: ByteBuffer,
+data class ImageInfo(
     val width: Int,
     val height: Int,
     val channels: Int
 )
 
+data class RawImage(
+    val buffer: ByteBuffer,
+    val info: ImageInfo,
+)
+
 typealias ImageLoader = (String) -> RawImage?
+typealias ImageInfoLoader = (String) -> ImageInfo
 
 data class DisplayMode(
     val resolution: Vector2i
@@ -64,6 +69,7 @@ interface PlatformDisplay {
   fun shutdown()
 
   val loadImage: ImageLoader
+  val loadImageInfo: ImageInfoLoader
 }
 
 data class LoadSoundResult(

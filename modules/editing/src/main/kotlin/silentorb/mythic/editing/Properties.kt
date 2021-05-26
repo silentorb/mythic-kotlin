@@ -53,8 +53,8 @@ fun commonPropertyDefinitions(): PropertyDefinitions = mapOf(
     ),
     SceneProperties.texture to PropertyDefinition(
         displayName = "Texture",
-        widget = dropDownWidget { it.enumerations.textures },
-        defaultValue = { editor -> editor.enumerations.textures.firstOrNull() },
+        widget = dropDownWidget { it.enumerations.resourceInfo.textures.keys.toList().sorted() },
+        defaultValue = { editor -> editor.enumerations.resourceInfo.textures.keys.firstOrNull() },
     ),
     SceneProperties.text3d to PropertyDefinition(
         displayName = "3D Text",
