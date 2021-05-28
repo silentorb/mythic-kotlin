@@ -17,7 +17,8 @@ import silentorb.mythic.spatial.Vector4
 enum class DepthMode {
   none,
   local,
-  global
+  global,
+  globalNoWrite
 }
 
 enum class LayerBlending {
@@ -70,9 +71,11 @@ fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer,
 
   debugMarkPass(manageDeferred && getDebugBoolean("MARK_DEFERRED_RENDERING"),
       "Deferred Rendering") {
-    if (depthMode != null)
+    if (depthMode != null) {
       globalState.depthEnabled = depthMode != DepthMode.none
-
+      if (depthMode == DepthMode.globalNoWrite)
+        globalState.depthWrite = false
+    }
     if (manageDeferred) {
       val deferred = renderer.renderer.deferred!!
       deferred.frameBuffer.activate()
@@ -120,8 +123,11 @@ fun renderSceneLayer(renderer: SceneRenderer, camera: Camera, layer: SceneLayer,
     applyDeferredShading(renderer, sphereMesh)
   }
 
-  if (depthMode != null)
+  if (depthMode != null) {
     globalState.depthEnabled = previousDepthEnabled
+    if (depthMode == DepthMode.globalNoWrite)
+      globalState.depthWrite = true
+  }
 
   if (shadingMode != ShadingMode.deferred && layer.blending == LayerBlending.premultiplied) {
     globalState.blendEnabled = false

@@ -9,31 +9,40 @@ import silentorb.mythic.lookinglass.meshes.VertexSchemas
 import silentorb.mythic.lookinglass.toCamelCase
 import silentorb.mythic.scenery.Light
 import silentorb.mythic.scenery.LightType
+import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.spatial.newVector4
 
 fun loadMaterial(info: GltfInfo, materialIndex: Int): Material {
-  val materialSource = info.materials!![materialIndex]
-  val details = materialSource.pbrMetallicRoughness
-  val color = details.baseColorFactor
-  val glow = if (materialSource.emissiveFactor != null && materialSource.emissiveFactor.first() != 0f)
-    materialSource.emissiveFactor.first()
-  else
-    0f
+  val materialSource = info.materials?.getOrNull(materialIndex)
+  return if (materialSource == null)
+    Material(
+        color = Vector4(1f),
+        glow = 1f,
+        shading = false,
+    )
+  else {
+    val details = materialSource.pbrMetallicRoughness
+    val color = details.baseColorFactor
+    val glow = if (materialSource.emissiveFactor != null && materialSource.emissiveFactor.first() != 0f)
+      materialSource.emissiveFactor.first()
+    else
+      0f
 
-  val texture = if (details.baseColorTexture == null) {
-    null
-  } else {
-    val gltfTexture = info.textures!![details.baseColorTexture.index]
-    val gltfImage = info.images!![gltfTexture.source]
-    toCamelCase(gltfImage.uri.substringBeforeLast(".").substringAfterLast("/").substringAfterLast("\\"))
+    val texture = if (details.baseColorTexture == null) {
+      null
+    } else {
+      val gltfTexture = info.textures!![details.baseColorTexture.index]
+      val gltfImage = info.images!![gltfTexture.source]
+      toCamelCase(gltfImage.uri.substringBeforeLast(".").substringAfterLast("/").substringAfterLast("\\"))
+    }
+
+    Material(
+        color = color,
+        glow = glow,
+        texture = texture,
+        shading = true
+    )
   }
-
-  return Material(
-      color = color,
-      glow = glow,
-      texture = texture,
-      shading = true
-  )
 }
 
 data class ModelImport(

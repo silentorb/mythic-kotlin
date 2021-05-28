@@ -68,8 +68,9 @@ float albedoAlpha = $outAlbedoKey.a;
 float alpha = albedoAlpha > 0.5 ? 1.0 : 0.0; 
 float inverseAlpha = 1.0 - alpha;
 $setScreenTextureCoordinates
-$outAlbedoKey.xyz = $outAlbedoKey.xyz * albedoAlpha + texture($inputAlbedoKey, texCoords).xyz * (1.0 - albedoAlpha);
-$outAlbedoKey.a = glow;
+vec4 previousAlbedo = texture($inputAlbedoKey, texCoords);
+$outAlbedoKey.xyz = $outAlbedoKey.xyz * albedoAlpha + previousAlbedo.xyz * (1.0 - albedoAlpha);
+$outAlbedoKey.a = glow * albedoAlpha + previousAlbedo.a * (1.0 - albedoAlpha);
 $outPositionKey = fragmentPosition * alpha + texture($inputPositionKey, texCoords) * inverseAlpha;
 $outNormalKey = vec4(fragmentNormal, 1.0) * alpha + texture($inputNormalKey, texCoords) * inverseAlpha;
 //$outPositionKey = fragmentPosition;
@@ -213,7 +214,7 @@ fun updateDeferredShading(renderer: Renderer, dimensions: Vector2i): DeferredSha
     null
 }
 
-fun activeDeferredBufferTextures(deferred: DeferredShading) {
+fun activateDeferredBufferTextures(deferred: DeferredShading) {
   deferred.albedo.activate(GL_TEXTURE10)
   deferred.position.activate(GL_TEXTURE11)
   deferred.normal.activate(GL_TEXTURE12)
@@ -222,7 +223,7 @@ fun activeDeferredBufferTextures(deferred: DeferredShading) {
 fun applyDeferredShading(renderer: SceneRenderer, sphereMesh: GeneralMesh) {
   debugMarkPass(true, "Applied Shading") {
     renderer.offscreenBuffer.frameBuffer.activate()
-    activeDeferredBufferTextures(renderer.renderer.deferred!!)
+    activateDeferredBufferTextures(renderer.renderer.deferred!!)
     globalState.depthEnabled = false
     val dimensions = renderer.windowInfo.dimensions.toVector2()
     val ambient = renderer.scene.lightingConfig.ambient

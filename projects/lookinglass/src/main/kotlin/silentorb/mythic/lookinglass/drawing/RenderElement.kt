@@ -22,12 +22,16 @@ fun renderElement(renderer: SceneRenderer, primitive: Primitive, material: Mater
                   shadingMode: ShadingMode) {
   val orientationTransform = getRotationMatrix(transform)
   val texture = renderer.textures[material.texture]
+  val mergedShadingMode = if (material.shading)
+    shadingMode
+  else
+    ShadingMode.none
 
   if (material.texture != null && texture == null) {
     val debugMissingTexture = 0
   }
 
-  val deferredBlending = shadingMode == ShadingMode.deferred && material.containsTransparency
+  val deferredBlending = mergedShadingMode == ShadingMode.deferred && material.containsTransparency
 
   val config = ObjectShaderConfig(
       transform,
@@ -41,7 +45,7 @@ fun renderElement(renderer: SceneRenderer, primitive: Primitive, material: Mater
   val effect = renderer.getShader(primitive.mesh.vertexSchema, ShaderFeatureConfig(
       skeleton = isAnimated,
       texture = texture != null && primitive.mesh.vertexSchema.attributes.any { it.name == "uv" },
-      shading = shadingMode,
+      shading = mergedShadingMode,
       colored = primitive.material.coloredVertices || material.coloredVertices,
       deferredBlending = deferredBlending,
   ))
@@ -71,9 +75,6 @@ fun armatureTransforms(armature: Armature, group: ElementGroup): List<Matrix> =
     }
 
 fun getElementTransform(elementTransform: Matrix, primitive: Primitive, transforms: List<Matrix>?): Matrix {
-  if (primitive.name == "pumpkin-head") {
-    val k = 0
-  }
   return if (primitive.transform != null)
     elementTransform * primitive.transform
   else if (primitive.parentBone != null && transforms != null)

@@ -943,3 +943,6 @@ fun toList(value: Vector4): List<Float> =
         value.z,
         value.w
     )
+
+fun grayscaleVector4(value: Float, alpha: Float) =
+    Vector4(value, value, value, alpha)

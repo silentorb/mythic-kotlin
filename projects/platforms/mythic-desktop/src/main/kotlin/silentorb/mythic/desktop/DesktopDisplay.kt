@@ -118,9 +118,8 @@ val loadImageInfoFromFile: ImageInfoLoader = { filePath ->
     val channelBuffer = stack.mallocInt(1)
 
     // Load only some of the initial bytes of the image.
-    // For PNG files, this may not be enough bytes to reach the header depending on how the PNG is organized.
-    // (Particularly if the PNG file starts with lots of ancillary metadata)
-    // So far the current byte count has been sufficient for any of the files loaded by this software.
+    // Currently only supports PNG.  Other image formats may work too, it depends on whether the amount
+    // of bytes loaded is sufficient.
     val imageBuffer = ioResourceToByteBuffer(filePath, 64, true)
 
     val success = stbi_info_from_memory(imageBuffer, widthBuffer, heightBuffer, channelBuffer)
