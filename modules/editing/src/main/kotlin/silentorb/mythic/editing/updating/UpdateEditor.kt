@@ -6,8 +6,8 @@ import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Key
 import silentorb.mythic.ent.getGraphKeys
-import silentorb.mythic.ent.scenery.gatherChildren
-import silentorb.mythic.ent.scenery.getNodeTransform
+import silentorb.mythic.ent.scenery.getNodeChildren
+import silentorb.mythic.ent.scenery.getAbsoluteNodeTransform
 import silentorb.mythic.ent.scenery.nodeAttributes
 import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.haft.getMouseOffset
@@ -28,7 +28,7 @@ val updateFileSelection = handleCommands<NodeSelection> { command, selection ->
 }
 
 fun gatherSelectionHierarchy(graph: Graph, selection: NodeSelection): Graph {
-  val selectionAndChildren = selection + gatherChildren(graph, selection)
+  val selectionAndChildren = selection + getNodeChildren(graph, selection)
   return graph
       .filter {
         selectionAndChildren.contains(it.source) &&
@@ -193,7 +193,7 @@ fun onTrySelectJoint(editor: Editor, mousePosition: Vector2, commands: Commands)
         val joints = nodeAttributes(graph, CommonEditorAttributes.joint)
         val hit = joints
             .firstOrNull { joint ->
-              val location = getNodeTransform(graph, joint).translation()
+              val location = getAbsoluteNodeTransform(graph, joint).translation()
               val point = transform(location)
               mousePosition.distance(point) < 6f
             }

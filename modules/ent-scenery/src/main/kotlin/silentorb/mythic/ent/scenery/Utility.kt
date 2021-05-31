@@ -19,14 +19,17 @@ fun getTranslationRotationMatrix(graph: Graph, node: Key): Matrix {
 fun getNodeScale(graph: Graph, node: Key): Vector3 =
     getNodeValue<Vector3>(graph, node, SceneProperties.scale) ?: Vector3.unit
 
-fun getNodeTransform(graph: Graph, node: Key): Matrix {
+fun getLocalNodeTransform(graph: Graph, node: Key): Matrix {
   val scale = getNodeScale(graph, node)
-  val localTransform = getTranslationRotationMatrix(graph, node)
+  return getTranslationRotationMatrix(graph, node)
       .scale(scale)
+}
 
+fun getAbsoluteNodeTransform(graph: Graph, node: Key): Matrix {
+  val localTransform = getLocalNodeTransform(graph, node)
   val parent = getNodeValue<Key>(graph, node, SceneProperties.parent)
   return if (parent != null)
-    getNodeTransform(graph, parent) * localTransform
+    getAbsoluteNodeTransform(graph, parent) * localTransform
   else
     localTransform
 }
@@ -37,7 +40,7 @@ fun getNodeTransformWithoutScale(graph: Graph, node: Key): Matrix {
 
   val parent = getNodeValue<Key>(graph, node, SceneProperties.parent)
   return if (parent != null)
-    getNodeTransform(graph, parent) * localTransform
+    getAbsoluteNodeTransform(graph, parent) * localTransform
   else
     localTransform
 }
@@ -53,7 +56,7 @@ fun toSpatialEntries(matrix: Matrix, node: Key): AnyGraph {
   )
 }
 
-tailrec fun gatherChildren(graph: Graph, nodes: Collection<Key>, accumulator: Set<Key> = setOf()): Collection<Key> {
+tailrec fun getNodeChildren(graph: Graph, nodes: Collection<Key>, accumulator: Set<Key> = setOf()): Collection<Key> {
   val next = nodes
       .flatMap { node ->
         graph.filter { it.property == SceneProperties.parent && it.target == node }
@@ -65,14 +68,17 @@ tailrec fun gatherChildren(graph: Graph, nodes: Collection<Key>, accumulator: Se
   return if (next.none())
     nextAccumulator
   else
-    gatherChildren(graph, next, nextAccumulator)
+    getNodeChildren(graph, next, nextAccumulator)
 }
 
-fun gatherChildren(graph: Graph, node: Key): Collection<Key> =
-    gatherChildren(graph, listOf(node))
+fun getNodeChildren(graph: Graph, node: Key): Collection<Key> =
+    getNodeChildren(graph, listOf(node)) - node
+
+fun withNodeChildren(graph: Graph, node: Key): Collection<Key> =
+    getNodeChildren(graph, listOf(node))
 
 fun removeNodesAndChildren(graph: Graph, nodes: Collection<Key>): Graph {
-  val withChildren = gatherChildren(graph, nodes)
+  val withChildren = getNodeChildren(graph, nodes)
   return graph
       .filter { !withChildren.contains(it.source) }
 }
@@ -100,7 +106,7 @@ fun getGraphRoots(graph: Graph): Set<Key> =
         .filter { key -> graph.none { it.source == key && it.property == SceneProperties.parent } }
         .toSet()
 
-fun getShape(meshShapeMap: Map<Key, Shape>, graph: Graph, node: Key): Shape? {
+fun getShape(meshShapes: Map<Key, Shape>, graph: Graph, node: Key): Shape? {
   val shapeType = getNodeValue<Key>(graph, node, SceneProperties.collisionShape)
   return if (shapeType == null)
     null
@@ -122,7 +128,24 @@ fun getShape(meshShapeMap: Map<Key, Shape>, graph: Graph, node: Key): Shape? {
         else
           null
       }
-      else -> meshShapeMap[mesh] ?: Box(Vector3.unit / 2f)
+      "composite" -> {
+        val children = getNodeChildren(graph, node)
+            .mapNotNull { child ->
+              val childShape = getShape(meshShapes, graph, child)
+              if (childShape == null)
+                null
+              else {
+                val localTransform = getLocalNodeTransform(graph, child)
+                if (localTransform != Matrix.identity)
+                  ShapeTransform(localTransform, childShape)
+                else
+                  childShape
+              }
+            }
+
+        CompositeShape(shapes = children)
+      }
+      else -> meshShapes[mesh] ?: Box(Vector3.unit / 2f)
     }
   }
 }

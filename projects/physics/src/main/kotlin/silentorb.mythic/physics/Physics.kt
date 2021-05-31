@@ -23,6 +23,7 @@ data class BulletState(
     var dynamicsWorld: btDiscreteDynamicsWorld,
     var dynamicBodies: Map<Id, btRigidBody>,
     var staticBodies: Map<Any, btCollisionObject>,
+    var kineticBodies: Map<Any, btCollisionObject>, // Can be manually moved but is not dynamically moved
 
     // The following are not directly used but are stored here to prevent premature garbage collection
     var collisionConfig: btCollisionConfiguration,
@@ -90,6 +91,7 @@ fun newBulletState(): BulletState {
       dynamicsWorld = dynamicsWorld,
       dynamicBodies = mapOf(),
       staticBodies = mapOf(),
+      kineticBodies = mapOf(),
       collisionConfig = collisionConfig,
       dispatcher = dispatcher,
       broadphase = broadphase,
@@ -124,7 +126,7 @@ data class PhysicsWorld(
 fun updateBulletPhysics(linearForces: List<LinearImpulse>): (PhysicsWorld) -> PhysicsWorld = { world ->
   val bulletState = world.bulletState
   syncNewBodies(world, bulletState)
-  syncRemovedBodies(world, bulletState)
+  syncRemovedBodies(world.deck, bulletState)
   applyImpulses(bulletState, linearForces)
   bulletState.dynamicsWorld.stepSimulation(1f / 60f, 10)
   syncWorldToBullet(bulletState)(world)

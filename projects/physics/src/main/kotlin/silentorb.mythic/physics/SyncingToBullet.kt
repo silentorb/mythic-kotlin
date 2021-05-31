@@ -7,7 +7,7 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState
 import silentorb.mythic.ent.*
 import silentorb.mythic.ent.scenery.getShape
-import silentorb.mythic.ent.scenery.getNodeTransform
+import silentorb.mythic.ent.scenery.getAbsoluteNodeTransform
 import silentorb.mythic.sculpting.ImmutableFace
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Pi
@@ -134,17 +134,16 @@ fun initializeHinge(bulletState: BulletState, bulletBody: btRigidBody, hingeInfo
 
 fun getNodeCollisionObject(meshShapes: Map<String, Shape>, graph: Graph, node: Key): CollisionObject? {
   val shapeDefinition = getShape(meshShapes, graph, node)
-  return if (shapeDefinition == null)
-    null
-  else {
-    val groups = getNodeValue<Int>(graph, node, SceneProperties.collisionGroups) ?: 1
+  val groups = getNodeValue<Int>(graph, node, SceneProperties.collisionGroups)
+  return if (shapeDefinition != null && groups != null) {
     val mask = getNodeValue<Int>(graph, node, SceneProperties.collisionMask) ?: 2 or 4
     CollisionObject(
         shape = shapeDefinition,
         groups = groups,
         mask = mask,
     )
-  }
+  } else
+    null
 }
 
 fun syncStaticGeometry(graph: Graph, meshShapes: Map<String, Shape>, bulletState: BulletState) {
@@ -155,7 +154,7 @@ fun syncStaticGeometry(graph: Graph, meshShapes: Map<String, Shape>, bulletState
         if (collisionObject == null)
           null
         else {
-          val fullTransform = getNodeTransform(graph, node)
+          val fullTransform = getAbsoluteNodeTransform(graph, node)
           val scale = fullTransform.getScale()
           val transform = fullTransform.scale(Vector3.unit / scale)
           val shape = createCollisionShape(collisionObject.shape, scale)
@@ -179,7 +178,7 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
 
   val newDynamicBodies = deck.dynamicBodies
       .filterKeys { key ->
-        !bulletState.dynamicBodies.containsKey(key) && deck.collisionObjects.contains(key)
+        !bulletState.dynamicBodies.containsKey(key) && deck.collisionObjects.contains(key) && !bulletState.kineticBodies.containsKey(key)
       }
       .map { (key, dynamicBody) ->
         val body = deck.bodies[key]!!
@@ -203,9 +202,9 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
         Pair(key, bulletBody)
       }
 
-  val newStaticBodies = deck.collisionObjects
+  val (newKineticBodies, newStaticBodies) = deck.collisionObjects
       .filterKeys { key ->
-        !deck.dynamicBodies.containsKey(key) && !bulletState.staticBodies.containsKey(key)
+        !deck.dynamicBodies.containsKey(key) && !bulletState.staticBodies.containsKey(key) && !bulletState.kineticBodies.containsKey(key)
       }
       .map { (key, shapeDefinition) ->
         val body = deck.bodies[key]!!
@@ -219,15 +218,17 @@ fun syncNewBodies(world: PhysicsWorld, bulletState: BulletState) {
         bulletState.dynamicsWorld.addCollisionObject(collisionObject, shapeDefinition.groups, shapeDefinition.mask)
         Pair(key, collisionObject)
       }
+      .partition { (id, _) -> deck.bodies[id]!!.isKinetic }
 
-  bulletState.dynamicBodies = bulletState.dynamicBodies
-      .plus(newDynamicBodies)
-
+  bulletState.dynamicBodies = bulletState.dynamicBodies + newDynamicBodies
   bulletState.staticBodies = bulletState.staticBodies + newStaticBodies
+  bulletState.kineticBodies = bulletState.kineticBodies + newKineticBodies
 }
 
-fun syncRemovedBodies(world: PhysicsWorld, bulletState: BulletState) {
-  val removedDynamic = bulletState.dynamicBodies.filterValues { !world.deck.bodies.containsKey(it.userData as Id) }
+fun syncRemovedBodies(deck: PhysicsDeck, bulletState: BulletState) {
+  val removedDynamic = bulletState.dynamicBodies
+      .filterValues { it.userData is Id && !deck.bodies.containsKey(it.userData) }
+
   for (body in removedDynamic.values) {
     bulletState.dynamicsWorld.removeRigidBody(body)
     body.release()
@@ -235,13 +236,22 @@ fun syncRemovedBodies(world: PhysicsWorld, bulletState: BulletState) {
   bulletState.dynamicBodies = bulletState.dynamicBodies.minus(removedDynamic.keys)
 
   val removedStatic = bulletState.staticBodies
-      .filterValues { it.userData is Id && !world.deck.bodies.containsKey(it.userData) }
+      .filterValues { it.userData is Id && !deck.bodies.containsKey(it.userData) }
 
   for (body in removedStatic.values) {
     bulletState.dynamicsWorld.removeCollisionObject(body)
     body.release()
   }
   bulletState.staticBodies = bulletState.staticBodies.minus(removedStatic.keys)
+
+  val removedKinetic = bulletState.kineticBodies
+      .filterValues { it.userData is Id && !deck.bodies.containsKey(it.userData) }
+
+  for (body in removedKinetic.values) {
+    bulletState.dynamicsWorld.removeCollisionObject(body)
+    body.release()
+  }
+  bulletState.kineticBodies = bulletState.kineticBodies.minus(removedKinetic.keys)
 }
 
 fun applyImpulses(bulletState: BulletState, linearForces: List<LinearImpulse>) {
@@ -261,6 +271,12 @@ fun applyBodyChanges(bulletState: BulletState, previous: Table<Body>, next: Tabl
     if (btBody != null) {
       btBody.worldTransform = toGdxMatrix4(getBodyTransform(body))
       btBody.linearVelocity = toGdxVector3(body.velocity)
+    }
+    else {
+      val btBody2 = bulletState.kineticBodies[id]
+      if (btBody2 != null) {
+        btBody2.worldTransform = toGdxMatrix4(getBodyTransform(body))
+      }
     }
   }
 }

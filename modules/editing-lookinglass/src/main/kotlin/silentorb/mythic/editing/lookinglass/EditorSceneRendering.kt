@@ -71,7 +71,7 @@ fun collisionElements(editor: Editor, graph: Graph, nodes: Collection<String>) =
               meshes = collisionNodes.mapNotNull {
                 val shape = getShape(editor.enumerations.resourceInfo.meshShapes, graph, it.source)
                 if (shape != null) {
-                  val transform = getNodeTransform(graph, it.source)
+                  val transform = getAbsoluteNodeTransform(graph, it.source)
                   shapeToMeshes(shape, transform)
                 } else
                   null

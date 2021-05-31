@@ -36,7 +36,7 @@ fun nodeToElements(resourceInfo: ResourceInfo, graph: Graph, node: Key): List<El
     null
 
   return if (mesh != null || text3d != null || light != null || collisionShape != null || isBillboard) {
-    val transform = getNodeTransform(graph, node)
+    val transform = getAbsoluteNodeTransform(graph, node)
     val meshElements = if (mesh != null) {
       val material = if (texture != null)
         Material(

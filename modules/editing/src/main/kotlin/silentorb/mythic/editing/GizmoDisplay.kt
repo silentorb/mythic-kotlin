@@ -5,7 +5,7 @@ import imgui.ImDrawList
 import imgui.ImGui
 import imgui.ImVec2
 import silentorb.mythic.ent.scenery.nodeAttributes
-import silentorb.mythic.ent.scenery.getNodeTransform
+import silentorb.mythic.ent.scenery.getAbsoluteNodeTransform
 import silentorb.mythic.spatial.*
 
 typealias ScreenTransform = (Vector3) -> Vector2
@@ -70,7 +70,7 @@ fun drawSelectedObjectAnnotations(editor: Editor, transform: ScreenTransform, dr
   val data = operation?.data
   val node = selection.firstOrNull()
   if (node != null && graph != null) {
-    val location = getNodeTransform(graph, node).translation()
+    val location = getAbsoluteNodeTransform(graph, node).translation()
 
     if (data != null && data is SpatialTransformState) {
       val axisList = data.axis
@@ -130,7 +130,7 @@ fun drawJoints(editor: Editor, transform: ScreenTransform, drawList: ImDrawList)
   val graph = getCachedGraph(editor)
   val joints = nodeAttributes(graph, CommonEditorAttributes.joint)
   for (joint in joints) {
-    val location = getNodeTransform(graph, joint).translation()
+    val location = getAbsoluteNodeTransform(graph, joint).translation()
     val point = transform(location)
     val color = if (joint == editor.selectedJoint)
       selectionColor

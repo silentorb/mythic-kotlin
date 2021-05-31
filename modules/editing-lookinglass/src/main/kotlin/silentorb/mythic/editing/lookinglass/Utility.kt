@@ -3,7 +3,7 @@ package silentorb.mythic.editing.lookinglass
 import silentorb.mythic.editing.Editor
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Key
-import silentorb.mythic.ent.scenery.gatherChildren
+import silentorb.mythic.ent.scenery.withNodeChildren
 import silentorb.mythic.lookinglass.ElementGroup
 import silentorb.mythic.lookinglass.ShadingMode
 import silentorb.mythic.lookinglass.Material
@@ -14,7 +14,7 @@ import silentorb.mythic.spatial.Matrix
 typealias MeshNodes = List<Pair<Key, Matrix>>
 
 fun getSelectionMeshes(editor: Editor, childGraph: Graph, graph: Graph, node: Key): List<ElementGroup> {
-  val nodes = gatherChildren(childGraph, node)
+  val nodes = withNodeChildren(childGraph, node)
   return nodesToElements(editor, graph, nodes)
 }
 
