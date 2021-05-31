@@ -95,6 +95,7 @@ data class EditorPersistentState(
     val renderingModes: Map<Key, RenderingMode> = mapOf(),
     val visibleGizmoTypes: Set<String> = setOf(),
     val fileSelection: Set<String> = setOf(),
+    val expandedProjectTreeNodes: Set<String> = setOf(),
 )
 
 data class MenuItem(

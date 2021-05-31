@@ -23,11 +23,17 @@ fun getDragType(type: FileItemType): String =
     else
       DraggingTypes.folder
 
-fun renderProjectTree(items: Collection<FileItem>, item: FileItem, selection: NodeSelection): Commands {
+fun renderProjectTree(persistentExpansions: Set<String>,
+                      items: Collection<FileItem>, item: FileItem, selection: NodeSelection): Commands {
   val id = item.fullPath
   val selected = selection.contains(id)
   val children = items.filter { it.parent == id }
-  val flags = newTreeFlags(selected) or
+  val persistentFlag = if (persistentExpansions.contains(item.fullPath))
+    ImGuiTreeNodeFlags.DefaultOpen
+  else
+    ImGuiTreeNodeFlags.None
+
+  val flags = newTreeFlags(selected) or persistentFlag or
       when {
         item.type == FileItemType.file -> ImGuiTreeNodeFlags.Leaf
         children.none() -> ImGuiTreeNodeFlags.Bullet
@@ -35,6 +41,11 @@ fun renderProjectTree(items: Collection<FileItem>, item: FileItem, selection: No
       }
 
   val isOpen = ImGui.treeNodeEx("File-Tree-$id", flags, item.name)
+
+  val toggleCommands = if (ImGui.isItemToggledOpen())
+    listOf(Command(EditorCommands.treeNodeExpansionToggled, value = item.fullPath))
+  else
+    listOf()
 
   if (item.parent != null) {
     dragSource(getDragType(item.type), item) {
@@ -71,12 +82,12 @@ fun renderProjectTree(items: Collection<FileItem>, item: FileItem, selection: No
   if (isOpen) {
     val sorted = children.sortedBy { getFileName(it.baseName) }
     for (child in sorted) {
-      childCommands += renderProjectTree(items, child, selection)
+      childCommands += renderProjectTree(persistentExpansions, items, child, selection)
     }
     ImGui.treePop()
   }
 
-  return selectionCommands + activateCommands + childCommands + dragCommands
+  return toggleCommands + selectionCommands + activateCommands + childCommands + dragCommands
 }
 
 fun renderProject(editor: Editor): PanelResponse =
@@ -87,7 +98,8 @@ fun renderProject(editor: Editor): PanelResponse =
           .filter { it.parent == null }
           .sortedBy { it.name }
 
+      val persistentState = editor.persistentState
       roots.fold(listOf()) { commands, root ->
-        commands + renderProjectTree(items, root, editor.persistentState.fileSelection)
+        commands + renderProjectTree(persistentState.expandedProjectTreeNodes, items, root, persistentState.fileSelection)
       }
     }

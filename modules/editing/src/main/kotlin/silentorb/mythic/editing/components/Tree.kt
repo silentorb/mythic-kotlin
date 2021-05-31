@@ -23,7 +23,6 @@ fun newTreeFlags(selected: Boolean): Int {
   return selectionFlags or
       ImGuiTreeNodeFlags.OpenOnArrow or
       ImGuiTreeNodeFlags.OpenOnDoubleClick or
-      ImGuiTreeNodeFlags.DefaultOpen or
       (1 shl 11)
 }
 

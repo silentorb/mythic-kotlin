@@ -15,6 +15,7 @@ object EditorCommands {
   val trySelectJoint = "trySelectJoint"
   val selectJoint = "selectJoint"
   val connectJoints = "connectJoints"
+  val treeNodeExpansionToggled = "treeNodeToggled"
 
   val setGraphValue = "setGraphValue"
   val replaceGraphValue = "replaceGraphValue"

@@ -116,7 +116,23 @@ fun updateSceneStates(commands: Commands, editor: Editor, graph: Graph?, mousePo
       editor.persistentState.sceneStates + (graphId to next)
     }
 
-fun updateEditorState(commands: Commands, editor: Editor, graph: Graph?, mousePosition: Vector2i, mouseOffset: Vector2): EditorPersistentState {
+fun updateExpandedProjectTreeNodes(fileItems: FileItems, state: Set<String>, commands: Commands): Set<String> {
+  val toggles = commands
+      .filter { it.type == EditorCommands.treeNodeExpansionToggled }
+      .mapNotNull { it.value as? String }
+
+  // For performance only prune when other changes are made to the expansion state
+  val pruned = if (toggles.any())
+    state.filter { nodePath -> fileItems.none { it.value.fullPath == nodePath } }
+  else
+    listOf()
+
+  val removed = state.intersect(toggles)
+  val added = toggles - removed
+  return (state + added - removed) - pruned
+}
+
+fun updateEditorState(editor: Editor, commands: Commands, graph: Graph?, mousePosition: Vector2i, mouseOffset: Vector2): EditorPersistentState {
   val state = editor.persistentState
   val renderingMode = updateRenderingMode(commands, getRenderingMode(editor))
   return state.copy(
@@ -125,6 +141,7 @@ fun updateEditorState(commands: Commands, editor: Editor, graph: Graph?, mousePo
       fileSelection = updateFileSelection(commands, state.fileSelection),
       renderingModes = state.renderingModes + (defaultViewportId to renderingMode),
       visibleGizmoTypes = updateVisibleWidgetTypes(commands, state.visibleGizmoTypes),
+      expandedProjectTreeNodes = updateExpandedProjectTreeNodes(editor.fileItems, state.expandedProjectTreeNodes, commands),
   )
 }
 
@@ -220,7 +237,7 @@ fun updateEditorFromCommands(previousMousePosition: Vector2, mouseOffset: Vector
   val nextOperation = updateOperation(commands, editor.operation)
   val nextGraph = getNextGraph(editor, nextStaging, commands)
   val mousePosition = (previousMousePosition + mouseOffset).toVector2i()
-  val nextState = updateEditorState(commands, editor, nextGraph, mousePosition, mouseOffset)
+  val nextState = updateEditorState(editor, commands, nextGraph, mousePosition, mouseOffset)
   val nextHistory = updateHistory(nextGraph, getNodeSelection(nextState), nextState.graph, commands, editor.maxHistory, editor.history)
   val mouseViewport = mouseViewport(editor, mousePosition)
   val mouseAction = updateMouseAction(mouseViewport != null, editor.mouseAction)

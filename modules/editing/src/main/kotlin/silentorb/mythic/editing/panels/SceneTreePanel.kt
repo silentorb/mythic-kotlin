@@ -1,6 +1,7 @@
 package silentorb.mythic.editing.panels
 
 import imgui.ImGui
+import imgui.flag.ImGuiTreeNodeFlags
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.*
 import silentorb.mythic.ent.*
@@ -52,7 +53,7 @@ fun sceneTreeDragSource(graph: Graph, node: Key): Commands =
 fun renderTree(graph: Graph, tree: SceneTree, node: String, selection: NodeSelection): Commands {
   val selected = selection.contains(node)
   val children = tree.filter { it.value == node }
-  val flags = newTreeFlags(selected) or leafFlags(children.any())
+  val flags = newTreeFlags(selected) or leafFlags(children.any()) or ImGuiTreeNodeFlags.DefaultOpen
 
   val isOpen = ImGui.treeNodeEx("Tree-$node", flags, node)
   val selectionCommands = getSelectionCommands(EditorCommands.setNodeSelection, selection, node)
