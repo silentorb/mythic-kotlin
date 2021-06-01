@@ -7,6 +7,7 @@ import silentorb.mythic.lookinglass.ResourceInfo
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.lookinglass.ElementGroup
+import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector4i
 import java.nio.file.Path
@@ -222,3 +223,8 @@ object Menus {
   const val edit = "edit"
   const val file = "file"
 }
+
+data class MouseState(
+    val position: Vector2i,
+    val offset: Vector2,
+)

@@ -100,14 +100,14 @@ fun mouseTransform(property: String, handler: MouseTransformHandler): (Vector2, 
       }
     }
 
-fun updateTranslation(previousMousePosition: Vector2, mouseOffset: Vector2, editor: Editor, graph: Graph): Graph =
-    if (mouseOffset == Vector2.zero)
+fun updateTranslation(mouse: MouseState, editor: Editor, graph: Graph): Graph =
+    if (mouse.offset == Vector2.zero)
       graph
     else {
       val selection = getNodeSelection(editor)
       val viewportPair = editor.viewportBoundsMap.entries
           .firstOrNull { (_, viewport) ->
-            isInBounds(previousMousePosition.toVector2i(), viewport)
+            isInBounds(mouse.position, viewport)
           }
 
       val camera = getEditorCamera(editor, viewportPair?.key)
@@ -122,10 +122,10 @@ fun updateTranslation(previousMousePosition: Vector2, mouseOffset: Vector2, edit
           val globalObjectTransform = getAbsoluteNodeTransform(graph, node)
           val globalObjectLocation = globalObjectTransform.translation()
           val distance = globalObjectLocation.distance(camera.location)
-          val mouseStart = previousMousePosition - viewport.xy().toVector2()
+          val mouseStart = mouse.position.toVector2() - viewport.xy().toVector2()
           val cameraTransform = createProjectionMatrix(camera, viewport.zw(), distance) * viewTransform
           val start = unproject(cameraTransform, viewport.toVector4(), mouseStart, 1f)
-          val end = unproject(cameraTransform, viewport.toVector4(), mouseStart + mouseOffset, 1f)
+          val end = unproject(cameraTransform, viewport.toVector4(), mouseStart + mouse.offset, 1f)
           val offset = end - start
           val finalOffset = if (data.axis.any()) {
             val vector = offset * Vector3(axisMask(data.axis))
@@ -148,13 +148,13 @@ fun updateTranslation(previousMousePosition: Vector2, mouseOffset: Vector2, edit
       }
     }
 
-fun updateRotation(previousMousePosition: Vector2, mouseOffset: Vector2, editor: Editor, graph: Graph) =
-    if (mouseOffset == Vector2.zero)
+fun updateRotation(mouse: MouseState, editor: Editor, graph: Graph) =
+    if (mouse.offset == Vector2.zero)
       graph
     else {
       val selection = getNodeSelection(editor)
       val viewportPair = editor.viewportBoundsMap.entries.firstOrNull { (_, viewport) ->
-        isInBounds(previousMousePosition.toVector2i(), viewport)
+        isInBounds(mouse.position, viewport)
       }
       val camera = getEditorCamera(editor, viewportPair?.key)
       if (viewportPair == null || camera == null)
@@ -165,10 +165,10 @@ fun updateRotation(previousMousePosition: Vector2, mouseOffset: Vector2, editor:
         val data = editor.operation!!.data as SpatialTransformState
         val newEntries = selection.map { node ->
           val objectCenter = getAbsoluteNodeTransform(graph, node).translation()
-          val mouseStart = previousMousePosition - viewport.xy().toVector2()
+          val mouseStart = mouse.position.toVector2() - viewport.xy().toVector2()
           val cameraTransform = createProjectionMatrix(camera, viewport.zw()) * viewTransform
           val center = transformPoint(cameraTransform, viewport.zw().toVector2(), Vector2.zero)(objectCenter)
-          val angle = getAngle(mouseStart - center, mouseStart + mouseOffset - center)
+          val angle = getAngle(mouseStart - center, mouseStart + mouse.offset - center)
 //          println(" $mouseOffset ${mouseStart - center} ${mouseStart + mouseOffset - center} $angle")
           val value = getNodeValue<Vector3>(graph, node, SceneProperties.rotation) ?: Vector3.zero
           val lookat = getCameraLookat(camera)
@@ -199,13 +199,13 @@ fun updateRotation(previousMousePosition: Vector2, mouseOffset: Vector2, editor:
       }
     }
 
-fun updateScaling(previousMousePosition: Vector2, mouseOffset: Vector2, editor: Editor, graph: Graph): Graph =
-    if (mouseOffset == Vector2.zero)
+fun updateScaling(mouse: MouseState, editor: Editor, graph: Graph): Graph =
+    if (mouse.offset == Vector2.zero)
       graph
     else {
       val selection = getNodeSelection(editor)
       val viewportPair = editor.viewportBoundsMap.entries.firstOrNull { (_, viewport) ->
-        isInBounds(previousMousePosition.toVector2i(), viewport)
+        isInBounds(mouse.position, viewport)
       }
       val camera = getEditorCamera(editor, viewportPair?.key)
       if (viewportPair == null || camera == null)
@@ -216,10 +216,10 @@ fun updateScaling(previousMousePosition: Vector2, mouseOffset: Vector2, editor: 
         val data = editor.operation!!.data as SpatialTransformState
         val newEntries = selection.map { node ->
           val objectCenter = getAbsoluteNodeTransform(graph, node).translation()
-          val mouseStart = previousMousePosition - viewport.xy().toVector2()
+          val mouseStart = mouse.position.toVector2() - viewport.xy().toVector2()
           val cameraTransform = createProjectionMatrix(camera, viewport.zw()) * viewTransform
           val center = transformPoint(cameraTransform, viewport.zw().toVector2(), Vector2.zero)(objectCenter)
-          val scalarOffset = (mouseStart + mouseOffset).distance(center) - mouseStart.distance(center)
+          val scalarOffset = (mouseStart + mouse.offset).distance(center) - mouseStart.distance(center)
           val value = getNodeValue<Vector3>(graph, node, SceneProperties.scale) ?: Vector3.unit
           val mask = if (data.axis.any())
             Vector3(axisMask(data.axis))
@@ -248,26 +248,26 @@ fun updateConnecting(editor: Editor, commands: Commands, graph: Graph): Graph {
     graph
 }
 
-fun updateStaging(editor: Editor, previousMousePosition: Vector2, mouseOffset: Vector2, commands: Commands): Graph? {
+fun updateStaging(editor: Editor, mouse: MouseState, commands: Commands): Graph? {
   val graph = editor.staging
   val operation = editor.operation
   return if (graph == null || operation == null)
     null
   else {
     when (operation.type) {
-      OperationType.translate -> updateTranslation(previousMousePosition, mouseOffset, editor, graph)
-      OperationType.rotate -> updateRotation(previousMousePosition, mouseOffset, editor, graph)
-      OperationType.scale -> updateScaling(previousMousePosition, mouseOffset, editor, graph)
+      OperationType.translate -> updateTranslation(mouse, editor, graph)
+      OperationType.rotate -> updateRotation(mouse, editor, graph)
+      OperationType.scale -> updateScaling(mouse, editor, graph)
       OperationType.connecting -> updateConnecting(editor, commands, graph)
       else -> graph
     }
   }
 }
 
-fun updateStaging(editor: Editor, previousMousePosition: Vector2, mouseOffset: Vector2, commands: Commands, nextOperation: Operation?): Graph? =
+fun updateStaging(editor: Editor, mouse: MouseState, commands: Commands, nextOperation: Operation?): Graph? =
     if (nextOperation == null || commands.any { it.type == EditorCommands.cancelOperation })
       null
     else if (editor.staging == null || editor.operation != nextOperation)
       getLatestGraph(editor)
     else
-      updateStaging(editor, previousMousePosition, mouseOffset, commands)
+      updateStaging(editor, mouse, commands)

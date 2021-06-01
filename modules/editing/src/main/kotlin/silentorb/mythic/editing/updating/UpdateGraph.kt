@@ -63,7 +63,7 @@ fun updateSceneGraph(editor: Editor) = handleCommands<Graph> { command, graph ->
         graph
       else {
         val selected = selection.first()
-        val key = nameText.get()
+        val key = command.value as? String ?: nameText.get()
         renameNode(graph, selected, key)
       }
     }

@@ -66,17 +66,17 @@ fun updateCameraMouseAction(mouseAction: MouseAction, mouseOffset: Vector2, came
       else -> camera
     }
 
-fun updateCamera(editor: Editor, mousePosition: Vector2i, mouseOffset: Vector2, commands: List<Command>, viewport: String, camera: CameraRig): CameraRig {
-  val isInBounds = isInViewportBounds(editor, mousePosition, viewport)
+fun updateCamera(editor: Editor, mouse: MouseState, commands: List<Command>, viewport: String, camera: CameraRig): CameraRig {
+  val isInBounds = isInViewportBounds(editor, mouse.position, viewport)
 
-  val lookOffset = if (editor.flyThrough && mouseOffset != Vector2.zero)
-    -mouseOffset * 4f / (editor.viewportBoundsMap[defaultViewportId]?.zw()?.toVector2() ?: Vector2.zero)
+  val lookOffset = if (editor.flyThrough && mouse.offset != Vector2.zero)
+    -mouse.offset * 4f / (editor.viewportBoundsMap[defaultViewportId]?.zw()?.toVector2() ?: Vector2.zero)
   else
     Vector2.zero
 
   return applyCameraPresets(editor, commands, camera)
       ?: if (editor.mouseAction != MouseAction.none && editor.mouseActionViewport == viewport)
-        updateCameraMouseAction(editor.mouseAction, mouseOffset, camera)
+        updateCameraMouseAction(editor.mouseAction, mouse.offset, camera)
       else
-        updateFlyThroughCamera(mouseOffset, commands, camera, isInBounds, lookOffset)
+        updateFlyThroughCamera(mouse.offset, commands, camera, isInBounds, lookOffset)
 }
