@@ -50,8 +50,8 @@ fun handleProjectCommands(editor: Editor) = handleCommands<FileItems> { command,
       if (selected == null)
         items
       else {
-        val parent =getParentPath(selected.fullPath)
-        val siblings = File( resolveProjectFilePath(editor, parent)).listFiles()
+        val parent = getParentPath(selected.fullPath)
+        val siblings = File(resolveProjectFilePath(editor, parent)).listFiles()
             ?.map { it.name.split(".").first() }
             ?: listOf()
 

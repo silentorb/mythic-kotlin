@@ -4,7 +4,7 @@ import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.GraphLibrary
 import silentorb.mythic.ent.newGraph
 import silentorb.mythic.ent.scenery.ExpansionLibrary
-import silentorb.mythic.ent.scenery.expandInstances
+import silentorb.mythic.ent.scenery.expandGraphInstances
 import silentorb.mythic.ent.singleValueCache
 
 fun loadImmediateDependencies(editor: Editor, library: GraphLibrary, graphId: String): GraphLibrary {
@@ -49,7 +49,7 @@ fun updateSceneCaching(editor: Editor): GraphLibrary {
 }
 
 val graphCache = singleValueCache<Pair<ExpansionLibrary, Graph>, Graph> { (library, graph) ->
-  expandInstances(library, graph)
+  expandGraphInstances(library, graph)
 }
 
 fun getCachedGraph(editor: Editor): Graph {

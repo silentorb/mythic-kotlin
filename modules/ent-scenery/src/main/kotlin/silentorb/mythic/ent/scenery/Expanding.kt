@@ -8,20 +8,20 @@ fun expandInstance(library: ExpansionLibrary, node: Key, target: Key): Graph {
   return if (definition == null)
     setOf()
   else {
-    val expanded1 = expandInstances(library, definition)
+    val expanded1 = expandGraphInstances(library, definition)
     val roots = getGraphRoots(expanded1)
     val (rootEntries, withoutRoots) = expanded1
         .partition { roots.contains(it.source) }
 
     val inheritedProperties = rootEntries.map { it.copy(source = node) }
     val transposed = transposeNamespace(withoutRoots.toSet(), node)
-    val expanded2 = expandInstances(library, transposed)
+    val expanded2 = expandGraphInstances(library, transposed)
     val newRoots = filterByPropertyValue(transposed, SceneProperties.parent, roots.first())
     inheritedProperties + expanded2 - newRoots + newRoots.map { root -> root.copy(target = node) }
   }
 }
 
-fun expandInstances(library: ExpansionLibrary, instances: Graph, accumulator: Graph): Graph =
+fun expandGraphInstances(library: ExpansionLibrary, instances: Graph, accumulator: Graph): Graph =
     if (instances.none())
       accumulator
     else {
@@ -41,7 +41,7 @@ fun expandInstances(library: ExpansionLibrary, instances: Graph, accumulator: Gr
       // so that local properties override inherited properties
       val graph = additions.toSet() + accumulator
       val nextInstances = instances - instanceTypesEntries
-      expandInstances(library, nextInstances, graph)
+      expandGraphInstances(library, nextInstances, graph)
     }
 
 fun expand(library: ExpansionLibrary, accumulator: Graph, node: Key, type: Key, expander: Expander): Graph {
@@ -78,11 +78,11 @@ fun expandExpansions(library: ExpansionLibrary, instances: Graph, accumulator: G
       expandExpansions(library, nextInstances, expanded ?: accumulator)
     }
 
-fun expandInstances(library: ExpansionLibrary, graph: Graph): Graph {
+fun expandGraphInstances(library: ExpansionLibrary, graph: Graph): Graph {
   val instances = filterByProperty(graph, SceneProperties.type)
       .filter { library.graphs.containsKey(it.target) }
 
-  val instanced = expandInstances(library, instances, graph)
+  val instanced = expandGraphInstances(library, instances, graph)
 
   val expansions = filterByProperty(instanced, SceneProperties.type)
       .filter { library.expanders.containsKey(it.target) }
@@ -90,8 +90,8 @@ fun expandInstances(library: ExpansionLibrary, graph: Graph): Graph {
   return expandExpansions(library, expansions, instanced).toSet()
 }
 
-fun expandInstances(graphLibrary: GraphLibrary, graph: Graph): Graph =
-    expandInstances(ExpansionLibrary(graphLibrary), graph)
+fun expandGraphInstances(graphLibrary: GraphLibrary, graph: Graph): Graph =
+    expandGraphInstances(ExpansionLibrary(graphLibrary), graph)
 
-fun expandInstances(library: ExpansionLibrary, name: String): Graph =
-    expandInstances(library, library.graphs[name]!!)
+fun expandGraphInstances(library: ExpansionLibrary, name: String): Graph =
+    expandGraphInstances(library, library.graphs[name]!!)
