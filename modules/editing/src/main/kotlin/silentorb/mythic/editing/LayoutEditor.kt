@@ -68,6 +68,7 @@ fun panelMenus(): ContextMenus = mapOf(
     Contexts.global to mainMenus(),
     Contexts.project to projectMenus(),
     Contexts.nodes to sceneTreeMenus(),
+    Contexts.properties to propertiesMenus(),
     Contexts.viewport to viewportMenus(),
 )
     .entries

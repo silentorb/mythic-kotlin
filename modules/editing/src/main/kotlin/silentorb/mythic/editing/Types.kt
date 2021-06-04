@@ -97,6 +97,7 @@ data class EditorPersistentState(
     val visibleGizmoTypes: Set<String> = setOf(),
     val fileSelection: Set<String> = setOf(),
     val expandedProjectTreeNodes: Set<String> = setOf(),
+    val propertySelection: Set<String> = setOf(),
 )
 
 data class MenuItem(
@@ -175,11 +176,21 @@ enum class MouseAction {
   orbit
 }
 
+object ClipboardDataTypes {
+  val scene = "scene"
+  val properties = "properties"
+}
+
+data class Clipboard(
+    val type: String,
+    val data: Any,
+)
+
 data class Editor(
     val projectPath: Path,
     val persistentState: EditorPersistentState = EditorPersistentState(),
     val staging: Graph? = null,
-    val clipboard: Graph? = null,
+    val clipboard: Clipboard? = null,
     val history: HistoryMap = mapOf(),
     val operation: Operation? = null,
     val enumerations: EditorEnumerations,

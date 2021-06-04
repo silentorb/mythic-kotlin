@@ -37,15 +37,37 @@ fun updateSceneGraph(editor: Editor) = handleCommands<Graph> { command, graph ->
 
     EditorCommands.pasteNode -> {
       val clipboard = editor.clipboard
-      if (selection.size != 1 || clipboard == null)
+      if (clipboard == null)
         graph
       else {
-        val selected = selection.first()
-        val newClipboardGraph = prepareGraphForMerging(graph, clipboard)
-        val roots = getGraphRoots(newClipboardGraph)
-        val glue = roots.map { Entry(it, SceneProperties.parent, selected) }
-        val result = graph + newClipboardGraph + glue
-        result
+        val nodeSelection = selection.first()
+        when (clipboard.type) {
+          ClipboardDataTypes.scene -> {
+            if (selection.size != 1)
+              graph
+            else {
+              val data = clipboard.data as Graph
+              val newClipboardGraph = prepareGraphForMerging(graph, data)
+              val roots = getGraphRoots(newClipboardGraph)
+              val glue = roots.map { Entry(it, SceneProperties.parent, nodeSelection) }
+              val result = graph + newClipboardGraph + glue
+              result
+            }
+          }
+          ClipboardDataTypes.properties -> {
+            val data = clipboard.data as Graph
+            val properties = data.map { it.property }.toSet()
+            val withoutProperties = graph
+                .filter { !(selection.contains(it.source) && properties.contains(it.property)) }
+
+            val newEntries = selection.flatMap { node ->
+              data.map { it.copy(source = node) }
+            }
+
+            withoutProperties + newEntries
+          }
+          else -> graph
+        }
       }
     }
 

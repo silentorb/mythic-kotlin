@@ -76,6 +76,9 @@ fun defaultEditorMenuKeystrokes(): KeystrokeBindings = mapOf(
     ContextCommand(Contexts.global, EditorCommands.playScene) to "F6",
 ) + defineMenus(
     mapOf(
+        Contexts.properties to mapOf(
+            EditorCommands.copyProperties to "Ctrl+Shift+C",
+        ),
         Contexts.viewport to mapOf(
             EditorCommands.viewFront to "$keypadKey 1",
             EditorCommands.viewBack to "Ctrl+$keypadKey 1",
@@ -100,6 +103,6 @@ fun defaultEditorMenuKeystrokes(): KeystrokeBindings = mapOf(
             EditorCommands.restrictAxisX to "X",
             EditorCommands.restrictAxisY to "Y",
             EditorCommands.restrictAxisZ to "Z",
-        )
+        ),
     )
 )

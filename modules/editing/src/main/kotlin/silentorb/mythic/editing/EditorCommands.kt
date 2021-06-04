@@ -67,4 +67,7 @@ object EditorCommands {
 
   val playGame = "playGame"
   val playScene = "playScene"
+
+  val selectProperty = "selectProperty"
+  val copyProperties = "copyProperties"
 }

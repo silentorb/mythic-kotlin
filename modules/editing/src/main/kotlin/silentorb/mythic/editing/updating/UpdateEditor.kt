@@ -37,7 +37,7 @@ fun gatherSelectionHierarchy(graph: Graph, selection: NodeSelection): Graph {
       .toSet()
 }
 
-fun updateClipboard(editor: Editor) = handleCommands<Graph?> { command, clipboard ->
+fun updateClipboard(editor: Editor) = handleCommands<Clipboard?> { command, clipboard ->
   when (command.type) {
     EditorCommands.copyNode -> {
       val selection = getNodeSelection(editor)
@@ -50,8 +50,25 @@ fun updateClipboard(editor: Editor) = handleCommands<Graph?> { command, clipboar
         val oldParentReferences = duplicated
             .filter { entry -> entry.property == SceneProperties.parent && !keys.contains(entry.target) }
 
-        duplicated - oldParentReferences
+        Clipboard(
+            type = ClipboardDataTypes.scene,
+            data = duplicated - oldParentReferences
+        )
       }
+    }
+    EditorCommands.copyProperties -> {
+      val propertySelection = editor.persistentState.propertySelection
+      val nodeSelection = getNodeSelection(editor)
+      val graph = getActiveEditorGraph(editor)
+      if (nodeSelection.size == 1 && graph != null && propertySelection.any()) {
+        val node = nodeSelection.first()
+        val result = graph.filter { it.source == node && propertySelection.contains(it.property) }
+        Clipboard(
+            type = ClipboardDataTypes.properties,
+            data = result,
+        )
+      } else
+        clipboard
     }
     else -> clipboard
   }
@@ -136,7 +153,23 @@ fun updateExpandedProjectTreeNodes(fileItems: FileItems, state: Set<String>, com
   return (state + added - removed) - pruned
 }
 
-fun updateEditorState(editor: Editor, commands: Commands, graph: Graph?, mouse: MouseState? = null): EditorPersistentState {
+val updatePropertySelection = handleCommands<Set<String>> { command, value ->
+  when (command.type) {
+    EditorCommands.setActiveGraph -> setOf()
+    EditorCommands.selectProperty -> {
+      val property = command.value as? String
+      when {
+        property == null -> value
+        value.contains(property) -> value - property
+        isShiftDown() -> value + property
+        else -> setOf(property)
+      }
+    }
+    else -> value
+  }
+}
+
+fun updateEditorPersistentState(editor: Editor, commands: Commands, graph: Graph?, mouse: MouseState? = null): EditorPersistentState {
   val state = editor.persistentState
   val renderingMode = updateRenderingMode(commands, getRenderingMode(editor))
   return state.copy(
@@ -146,6 +179,7 @@ fun updateEditorState(editor: Editor, commands: Commands, graph: Graph?, mouse: 
       renderingModes = state.renderingModes + (defaultViewportId to renderingMode),
       visibleGizmoTypes = updateVisibleWidgetTypes(commands, state.visibleGizmoTypes),
       expandedProjectTreeNodes = updateExpandedProjectTreeNodes(editor.fileItems, state.expandedProjectTreeNodes, commands),
+      propertySelection = updatePropertySelection(commands, state.propertySelection)
   )
 }
 
@@ -238,7 +272,7 @@ fun getNextSelectedJoint(commandType: Any, commands: Commands): Key? =
 
 fun updateGraphStateAndHistory(editor: Editor, commands: Commands, nextStaging: Graph? = null, mouse: MouseState? = null): Pair<EditorPersistentState, HistoryMap> {
   val nextGraph = getNextGraph(editor, nextStaging, commands)
-  val nextState = updateEditorState(editor, commands, nextGraph, mouse)
+  val nextState = updateEditorPersistentState(editor, commands, nextGraph, mouse)
   val nextHistory = updateHistory(nextGraph, getNodeSelection(nextState), nextState.graph, commands, editor.maxHistory, editor.history)
   return nextState to nextHistory
 }

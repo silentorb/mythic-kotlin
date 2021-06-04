@@ -1,6 +1,8 @@
 package silentorb.mythic.editing.panels
 
+import imgui.ImColor
 import imgui.ImGui
+import imgui.ImVec2
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.panel
 import silentorb.mythic.editing.components.panelBackground
@@ -8,6 +10,13 @@ import silentorb.mythic.ent.*
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.scenery.SceneProperties
+
+fun propertiesMenus(): List<MenuTree> =
+    listOf(
+        MenuTree("Edit", key = Menus.edit, items = listOf(
+            MenuTree("Copy Properties", EditorCommands.copyProperties),
+        ))
+    )
 
 fun getAvailableTypes(editor: Editor): List<Key> =
     getSceneFiles(editor)
@@ -122,6 +131,45 @@ data class MixedValue(
 
 val mixedValue = MixedValue()
 
+fun drawPropertyField(editor: Editor, definition: PropertyDefinition, entry: Entry, id: String, singleNode: Key, property: Key): Commands {
+  var commands: Commands = listOf()
+  ImGui.separator()
+  val nextValue = if (definition.widget != null) {
+    val text = definition.displayName
+    val isSelected = editor.persistentState.propertySelection.contains(property)
+    if (isSelected) {
+      val bounds = ImVec2()
+      ImGui.calcTextSize(bounds, text)
+      val drawList = ImGui.getWindowDrawList()
+      val backgroundColor = ImColor.intToColor(150, 128, 255, 255)
+      val cursorX = ImGui.getCursorScreenPosX()
+      val cursorY = ImGui.getCursorScreenPosY()
+      drawList.addRectFilled(cursorX, cursorY, cursorX + bounds.x, cursorY + bounds.y, backgroundColor)
+    }
+    ImGui.text(text)
+    if (ImGui.isItemClicked()) {
+      commands = commands + Command(EditorCommands.selectProperty, value = property)
+    }
+    ImGui.sameLine()
+
+    if (ImGui.smallButton("x##property-${id}")) {
+      commands = commands + Command(EditorCommands.removeGraphValue, value = entry)
+    }
+    drawFormField(editor, definition, entry, id)
+  } else
+    entry.target
+
+  if (nextValue != null && nextValue != entry.target) {
+    val command = if (isManyToMany(editor, property))
+      Command(EditorCommands.replaceGraphValue, value = entry to Entry(singleNode, property, nextValue))
+    else
+      Command(EditorCommands.setGraphValue, value = Entry(singleNode, property, nextValue))
+
+    commands = commands + command
+  }
+  return commands
+}
+
 fun drawPropertiesPanel(editor: Editor, graph: Graph?): PanelResponse =
     panel(editor, "Properties", Contexts.properties) {
       panelBackground()
@@ -165,27 +213,8 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): PanelResponse =
             for ((property, definition) in definitions) {
               val propertyEntries = managePropertyOrder(entries.filter { it.property == property })
               propertyEntries.forEachIndexed { index, entry ->
-                ImGui.separator()
-                val nextValue = if (definition.widget != null) {
-                  ImGui.text(definition.displayName)
-                  ImGui.sameLine()
-                  val id = "${entry.source}.${entry.property}.${index}"
-
-                  if (ImGui.smallButton("x##property-${id}")) {
-                    commands = commands.plus(Command(EditorCommands.removeGraphValue, value = entry))
-                  }
-                  drawFormField(editor, definition, entry, id)
-                } else
-                  entry.target
-
-                if (nextValue != null && nextValue != entry.target) {
-                  val command = if (isManyToMany(editor, property))
-                    Command(EditorCommands.replaceGraphValue, value = entry to Entry(singleNode, property, nextValue))
-                  else
-                    Command(EditorCommands.setGraphValue, value = Entry(singleNode, property, nextValue))
-
-                  commands = commands + command
-                }
+                val id = "${entry.source}.${entry.property}.${index}"
+                commands = commands + drawPropertyField(editor, definition, entry, id, singleNode, property)
               }
             }
           } else {
