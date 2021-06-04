@@ -18,6 +18,9 @@ fun plumbPixelDepth(sceneRenderer: SceneRenderer, editor: Editor, selectionQuery
   val pixelPositionX = selectionQuery.position.x + sceneRenderer.viewport.x
   val pixelPositionY = flipY(sceneRenderer.viewport.w, selectionQuery.position.y) + sceneRenderer.viewport.y
   val crop = Vector4i(pixelPositionX, pixelPositionY, 1, 1)
+  globalState.depthEnabled = true
+  clearDepth()
+
   return withCropping(crop) {
     withoutFrontDrawing {
       val graph = getActiveEditorGraph(editor)!!

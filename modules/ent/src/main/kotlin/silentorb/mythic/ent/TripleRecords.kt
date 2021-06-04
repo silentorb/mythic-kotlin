@@ -144,3 +144,6 @@ data class Serialization(
 )
 
 typealias PropertiesSerialization = Map<String, Serialization>
+
+fun nodeHasProperty(graph: Graph, node: Key, property: Key): Boolean =
+    graph.any { it.source == node && it.property == property }
