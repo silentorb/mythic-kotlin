@@ -136,6 +136,8 @@ typealias GizmoPainter = (GizmoEnvironment) -> Unit
 typealias GraphEditor = (Editor, Command, Graph) -> Graph
 typealias GraphEditors = Map<String, GraphEditor>
 
+typealias GraphTransform = (Graph) -> Graph
+
 data class EditorEnumerations(
     val propertyDefinitions: PropertyDefinitions,
     val propertiesSerialization: PropertiesSerialization,
@@ -149,6 +151,7 @@ data class EditorEnumerations(
     val menus: ContextMenus = mapOf(),
     val gizmoPainters: List<GizmoPainter>,
     val graphEditors: GraphEditors = mapOf(),
+    val graphTransform: GraphTransform = { it }
 )
 
 // Even if this only ever has one field, it's useful to wrap it to have a distinction between

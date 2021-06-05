@@ -23,13 +23,26 @@ fun nodesToElements(resourceInfo: ResourceInfo, graph: Graph): List<ElementGroup
   return nodesToElements(resourceInfo, graph, nodes)
 }
 
+tailrec fun getInheritedTexture(graph: Graph, node: Key): String? {
+  val texture = getNodeValue<Key>(graph, node, SceneProperties.texture)
+  return if (texture != null)
+    texture
+  else {
+    val parent = getNodeValue<Key>(graph, node, SceneProperties.parent)
+    if (parent == null)
+      null
+    else
+      getInheritedTexture(graph, parent)
+  }
+}
+
 fun nodeToElements(resourceInfo: ResourceInfo, graph: Graph, node: Key): List<ElementGroup> {
   val isSelected = false
   val mesh = getNodeValue<Key>(graph, node, SceneProperties.mesh)
   val text3d = getNodeValue<String>(graph, node, SceneProperties.text3d)
   val light = getNodeValue<String>(graph, node, SceneProperties.light)
   val isBillboard = graph.contains(Entry(node, SceneProperties.type, SceneTypes.billboard))
-  val texture = getNodeValue<Key>(graph, node, SceneProperties.texture)
+  val texture = getInheritedTexture(graph, node)
   val collisionShape = if (isSelected)
     getNodeValue<String>(graph, node, SceneProperties.collisionShape)
   else

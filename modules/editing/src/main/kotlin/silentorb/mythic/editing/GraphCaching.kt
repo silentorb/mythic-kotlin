@@ -48,11 +48,11 @@ fun updateSceneCaching(editor: Editor): GraphLibrary {
     library
 }
 
-val graphCache = singleValueCache<Pair<ExpansionLibrary, Graph>, Graph> { (library, graph) ->
-  expandGraphInstances(library, graph)
+val graphCache = singleValueCache<Triple<GraphTransform, ExpansionLibrary, Graph>, Graph> { (transform, library, graph) ->
+  expandGraphInstances(library, transform(graph))
 }
 
 fun getCachedGraph(editor: Editor): Graph {
   val startingGraph = getActiveEditorGraph(editor) ?: newGraph()
-  return graphCache(Pair(getExpansionLibrary(editor), startingGraph))
+  return graphCache(Triple(editor.enumerations.graphTransform, getExpansionLibrary(editor), startingGraph))
 }

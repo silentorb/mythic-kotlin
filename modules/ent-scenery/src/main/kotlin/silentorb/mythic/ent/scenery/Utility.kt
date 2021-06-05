@@ -6,8 +6,11 @@ import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 
+fun getLocalNodeTranslation(graph: Graph, node: Key): Vector3 =
+    getNodeValue<Vector3>(graph, node, SceneProperties.translation) ?: Vector3.zero
+
 fun getTranslationRotationMatrix(graph: Graph, node: Key): Matrix {
-  val translation = getNodeValue<Vector3>(graph, node, SceneProperties.translation) ?: Vector3.zero
+  val translation = getLocalNodeTranslation(graph, node)
   val rotation = getNodeValue<Vector3>(graph, node, SceneProperties.rotation) ?: Vector3.zero
   return Matrix.identity
       .translate(translation)

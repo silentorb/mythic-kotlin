@@ -57,6 +57,15 @@ fun getActiveEditorGraphKey(editor: Editor): String? =
 fun getActiveEditorGraph(editor: Editor): Graph? =
     editor.staging ?: getLatestGraph(editor) ?: editor.graphLibrary[editor.persistentState.graph]
 
+fun getTransformedActiveEditorGraph(editor: Editor): Graph? {
+  val graph = getActiveEditorGraph(editor)
+  return if (graph != null)
+    editor.enumerations.graphTransform(graph)
+  else
+    graph
+}
+
+
 fun getExpansionLibrary(editor: Editor) =
     ExpansionLibrary(
         graphs = editor.graphLibrary,
