@@ -39,7 +39,6 @@ class SkeletonFeature(program: ShaderProgram, boneBuffer: UniformBuffer) {
 fun populateBoneBuffer(boneBuffer: UniformBuffer, originalTransforms: List<Matrix>, transforms: List<Matrix>): UniformBuffer {
   val bytes = createBoneTransformBuffer(originalTransforms, transforms)
   boneBuffer.load(bytes)
-  checkError("sending bone transforms")
   return boneBuffer
 }
 

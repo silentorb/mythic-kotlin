@@ -13,7 +13,10 @@ data class TimestepState(
     val increment: Long,
     val rawDelta: Double,
     val accumulator: Double,
-    val delta: Double
+    val delta: Double,
+    val fps: Int = 0,
+    val fpsStepAccumulator: Int = 0,
+    val fpsDurationAccumulator: Long = 0L,
 )
 
 fun newTimeState(): TimeState {
@@ -40,8 +43,10 @@ fun updateTimeState(state: TimeState): TimeState =
         latest = System.nanoTime()
     )
 
+const val nanoSecondsInSecond = 1_000_000_000
+
 fun nanosecondsToDelta(value: Long): Double =
-    value.toDouble() / 1_000_000_000
+    value.toDouble() / nanoSecondsInSecond
 
 fun clipDelta(max: Double): (Double) -> Double = { value -> Math.min(value, max) }
 
@@ -60,13 +65,24 @@ fun updateTimestep(timestepState: TimestepState, step: Double): Pair<TimestepSta
 
   val finalAccumulator = accumulator - step * iterationCount
 
+  val fpsIncrement = if (iterationCount > 0) 1 else 0
+  val fpsDurationAccumulator1 = timestepState.fpsDurationAccumulator + increment
+  val nextSecond = fpsDurationAccumulator1 > nanoSecondsInSecond
+  val fpsDurationAccumulator2 = fpsDurationAccumulator1 % nanoSecondsInSecond
+  val fpsStepAccumulator1 = timestepState.fpsStepAccumulator + fpsIncrement
+  val fpsStepAccumulator2 = if (nextSecond) 0 else fpsStepAccumulator1
+  val fps = if (nextSecond) fpsStepAccumulator1 else timestepState.fps
+
   return Pair(
       TimestepState(
           time = timeState,
           rawDelta = rawDelta,
           increment = increment,
           accumulator = finalAccumulator,
-          delta = delta
+          delta = delta,
+          fpsDurationAccumulator = fpsDurationAccumulator2,
+          fpsStepAccumulator = fpsStepAccumulator2,
+          fps = fps,
       ),
       iterationCount
   )
