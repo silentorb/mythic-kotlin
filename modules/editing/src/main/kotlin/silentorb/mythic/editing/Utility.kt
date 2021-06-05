@@ -69,7 +69,7 @@ fun getTransformedActiveEditorGraph(editor: Editor): Graph? {
 fun getExpansionLibrary(editor: Editor) =
     ExpansionLibrary(
         graphs = editor.graphLibrary,
-        expanders = editor.enumerations.expanders
+        schema = editor.enumerations.schema,
     )
 
 fun defaultViewports() =

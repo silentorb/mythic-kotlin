@@ -114,7 +114,7 @@ fun uniqueNodeName(keys: Collection<Key>, name: String): String {
   }
 }
 
-fun renameNodes(duplicates: List<String>, allKeys: Set<String>, graph: Graph): Graph =
+tailrec fun renameNodes(duplicates: List<String>, allKeys: Set<String>, graph: Graph): Graph =
     if (duplicates.none())
       graph
     else {
