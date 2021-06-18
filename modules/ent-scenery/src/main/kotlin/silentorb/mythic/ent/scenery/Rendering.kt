@@ -37,18 +37,13 @@ tailrec fun getInheritedTexture(graph: Graph, node: Key): String? {
 }
 
 fun nodeToElements(resourceInfo: ResourceInfo, graph: Graph, node: Key): List<ElementGroup> {
-  val isSelected = false
   val mesh = getNodeValue<Key>(graph, node, SceneProperties.mesh)
   val text3d = getNodeValue<String>(graph, node, SceneProperties.text3d)
   val light = getNodeValue<String>(graph, node, SceneProperties.light)
   val isBillboard = graph.contains(Entry(node, SceneProperties.type, SceneTypes.billboard))
   val texture = getInheritedTexture(graph, node)
-  val collisionShape = if (isSelected)
-    getNodeValue<String>(graph, node, SceneProperties.collisionShape)
-  else
-    null
 
-  return if (mesh != null || text3d != null || light != null || collisionShape != null || isBillboard) {
+  return if (mesh != null || text3d != null || light != null || isBillboard) {
     val transform = getAbsoluteNodeTransform(graph, node)
     val meshElements = if (mesh != null) {
       val material = if (texture != null)
@@ -66,23 +61,6 @@ fun nodeToElements(resourceInfo: ResourceInfo, graph: Graph, node: Key): List<El
               mesh = mesh,
               material = material,
               transform = transform
-          )
-      )
-    } else
-      listOf()
-
-    val collisionMeshes = if (collisionShape != null) {
-      val meshShape = resourceInfo.meshShapes[mesh]
-      val collisionTransform = if (meshShape == null)
-        transform
-      else
-        transform.scale(Vector3(meshShape.x / 2f, meshShape.y / 2f, meshShape.height / 2f))
-
-      listOf(
-          MeshElement(
-              mesh = "cube",
-              material = Material(color = Vector4(1f), shading = false, drawMethod = DrawMethod.lineLoop),
-              transform = collisionTransform
           )
       )
     } else
@@ -128,7 +106,7 @@ fun nodeToElements(resourceInfo: ResourceInfo, graph: Graph, node: Key): List<El
         ElementGroup(
             billboards = billboards,
             textBillboards = textBillboards,
-            meshes = meshElements + collisionMeshes,
+            meshes = meshElements,
             lights = lights,
         )
     )

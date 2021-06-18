@@ -64,17 +64,25 @@ fun prepareDynamicDepictions(depictions: EditorDepictionMap, graph: Graph, nodes
 fun collisionElements(editor: Editor, graph: Graph, nodes: Collection<String>) =
     if (editor.persistentState.visibleGizmoTypes.contains(GizmoTypes.collision)) {
       val collisionNodes = filterByProperty(graph, SceneProperties.collisionShape)
+          .plus(filterByProperty(graph, SceneProperties.collisionGroups))
+          .distinct()
           .filter { nodes.contains(it.source) }
 
       listOf(
           ElementGroup(
-              meshes = collisionNodes.mapNotNull {
+              meshes = collisionNodes.map {
                 val shape = getShape(editor.enumerations.resourceInfo.meshShapes, graph, it.source)
+                val transform = getAbsoluteNodeTransform(graph, it.source)
                 if (shape != null) {
-                  val transform = getAbsoluteNodeTransform(graph, it.source)
                   shapeToMeshes(shape, transform)
                 } else
-                  null
+                  listOf(
+                      MeshElement(
+                          mesh = "cube",
+                          material = Material(color = Vector4(1f), shading = false, drawMethod = DrawMethod.lineLoop),
+                          transform = transform
+                      )
+                  )
               }
                   .flatten()
           )
