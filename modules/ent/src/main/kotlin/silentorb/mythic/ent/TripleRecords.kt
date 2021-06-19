@@ -132,9 +132,9 @@ fun prepareGraphForMerging(primary: Graph, secondary: Graph): Graph {
   return renameNodes(duplicates, allKeys, secondary)
 }
 
-fun mergeGraphsWithRenaming(primary: Graph, secondary: Graph): Graph {
-  val updatedSecondary = prepareGraphForMerging(primary, secondary)
-  return primary + updatedSecondary
+fun mergeGraphsWithRenaming(first: Graph, second: Graph): Graph {
+  val updatedSecondary = prepareGraphForMerging(first, second)
+  return first + updatedSecondary
 }
 typealias SerializationMethod = (Any) -> Any
 
@@ -147,3 +147,13 @@ typealias PropertiesSerialization = Map<String, Serialization>
 
 fun nodeHasProperty(graph: Graph, node: Key, property: Key): Boolean =
     graph.any { it.source == node && it.property == property }
+
+fun mergeGraphs(schema: PropertySchema, first: Graph, second: Graph, reference: Graph = second): Graph {
+  val withoutOverrides = first
+      .filter { entry ->
+        schema[entry.property]?.manyToMany == true
+            ||
+            reference.none { it.source == entry.source && it.property == entry.property }
+      }
+  return second + withoutOverrides
+}

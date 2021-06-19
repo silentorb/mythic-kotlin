@@ -1,9 +1,9 @@
 package silentorb.mythic.ent.scenery
 
 import silentorb.mythic.ent.*
-import silentorb.mythic.glowing.DrawMethod
 import silentorb.mythic.lookinglass.*
 import silentorb.mythic.scenery.*
+import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.typography.IndexedTextStyle
@@ -36,21 +36,37 @@ tailrec fun getInheritedTexture(graph: Graph, node: Key): String? {
   }
 }
 
+fun getNodeLight(graph: Graph, node: Key, transform: Matrix): Light? {
+  val light = getNodeValue<String>(graph, node, SceneProperties.light)
+  return if (light != null)
+    Light(
+        type = LightType.valueOf(light),
+        range = getNodeValue<Float>(graph, node, SceneProperties.range) ?: 1f,
+        offset = transform.translation(),
+        direction = Vector3.unit,
+        color = getNodeColor(graph, node) ?: Vector4(1f),
+    )
+  else
+    null
+}
+
 fun nodeToElements(resourceInfo: ResourceInfo, graph: Graph, node: Key): List<ElementGroup> {
   val mesh = getNodeValue<Key>(graph, node, SceneProperties.mesh)
   val text3d = getNodeValue<String>(graph, node, SceneProperties.text3d)
-  val light = getNodeValue<String>(graph, node, SceneProperties.light)
+  val transform = getAbsoluteNodeTransform(graph, node)
+  val light = getNodeLight(graph, node, transform)
   val isBillboard = graph.contains(Entry(node, SceneProperties.type, SceneTypes.billboard))
   val texture = getInheritedTexture(graph, node)
 
   return if (mesh != null || text3d != null || light != null || isBillboard) {
-    val transform = getAbsoluteNodeTransform(graph, node)
     val meshElements = if (mesh != null) {
-      val material = if (texture != null)
+      val color = getNodeColor(graph, node)
+      val material = if (texture != null || color != null)
         Material(
             texture = texture,
+            color = color,
             shading = true,
-            containsTransparency = textureContainsTransparency(resourceInfo, texture),
+            containsTransparency = if (texture != null) textureContainsTransparency(resourceInfo, texture) else false,
             doubleSided = nodeHasAttribute(graph, node, SceneTypes.doubleSided),
         )
       else
@@ -77,18 +93,7 @@ fun nodeToElements(resourceInfo: ResourceInfo, graph: Graph, node: Key): List<El
     else
       listOf()
 
-    val lights = if (light != null)
-      listOf(
-          Light(
-              type = LightType.valueOf(light),
-              range = getNodeValue<Float>(graph, node, SceneProperties.range) ?: 1f,
-              offset = transform.translation(),
-              direction = Vector3.unit,
-              color = hexColorStringToVector4(getNodeValue<String>(graph, node, SceneProperties.rgba) ?: "#ffffffff"),
-          )
-      )
-    else
-      listOf()
+    val lights = listOfNotNull(light)
 
     val billboards = if (isBillboard && texture != null)
       listOf(

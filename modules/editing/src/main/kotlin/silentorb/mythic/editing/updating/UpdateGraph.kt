@@ -56,15 +56,11 @@ fun updateSceneGraph(editor: Editor) = handleCommands<Graph> { command, graph ->
           }
           ClipboardDataTypes.properties -> {
             val data = clipboard.data as Graph
-            val properties = data.map { it.property }.toSet()
-            val withoutProperties = graph
-                .filter { !(selection.contains(it.source) && properties.contains(it.property)) }
-
-            val newEntries = selection.flatMap { node ->
-              data.map { it.copy(source = node) }
-            }
-
-            withoutProperties + newEntries
+            val newEntries = selection
+                .flatMap { node ->
+                  data.map { it.copy(source = node) }
+                }
+            mergeGraphs(editor.enumerations.schema, graph, newEntries)
           }
           else -> graph
         }

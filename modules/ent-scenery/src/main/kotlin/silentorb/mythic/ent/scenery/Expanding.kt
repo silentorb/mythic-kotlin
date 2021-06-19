@@ -35,13 +35,7 @@ fun expandGraphInstances(library: ExpansionLibrary, instances: Graph, accumulato
       val additions = instanceTypes
           .fold(initial) { a, b ->
             val addition = expandInstance(library, node, b)
-            val withoutOverrides = addition
-                .filter { entry ->
-                  library.schema[entry.property]?.manyToMany == true
-                      ||
-                    accumulator.none { it.source == entry.source && it.property == entry.property }
-                }
-            a + withoutOverrides
+            mergeGraphs(library.schema, addition, a, accumulator)
           }
 
       // Make sure accumulator is added to additions and not the other way around

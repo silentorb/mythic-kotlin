@@ -117,7 +117,12 @@ fun rgbaField(entry: Entry): String {
   if (ImGui.colorEdit3("##$owner", reference)) {
     val k = 0
   }
-  return arrayToHexColorString(reference)
+  val result = arrayToHexColorString(reference)
+  // Working around a bug with Dear ImGui where we are sometimes getting truncated color strings
+  return if (result.length == 9)
+    result
+  else
+    value
 }
 
 val propertyRgbaField: PropertyWidget = wrapSimpleWidget(::rgbaField)

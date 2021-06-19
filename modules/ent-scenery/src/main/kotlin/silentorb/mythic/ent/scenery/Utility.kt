@@ -162,6 +162,14 @@ fun hexColorStringToVector4(value: String): Vector4 {
   return Vector4(red, green, blue, alpha) / 255f
 }
 
+fun getNodeColor(graph: Graph, node: Key): Vector4? {
+  val color = getNodeValue<String>(graph, node, SceneProperties.rgba)
+  return if (color != null)
+    hexColorStringToVector4(color)
+  else
+    null
+}
+
 //fun vector4toHexColorString(value: Vector4): String {
 //  val temp = (value * 255f).toVector4i()
 //  val red = temp.x shl 32
@@ -182,15 +190,21 @@ fun arrayToHexColorString(values: FloatArray): String {
 fun getSceneTree(graph: Graph): Map<Key, Key> =
     mapByProperty(graph, SceneProperties.parent)
 
-fun nodesWithAttribute(graph: Graph, attribute: String): List<Key> =
+fun <T> groupNodesWithCertainAttributes(graph: Graph, attributes: Collection<String>): Map<String, Set<T>> =
+    graph
+        .filter { it.property == SceneProperties.type && attributes.contains(it.target) }
+        .groupBy { it.source }
+        .mapValues { (_, entries) -> entries.map { it.target as T }.toSet() }
+
+fun getNodesWithAttribute(graph: Graph, attribute: String): List<Key> =
     graph
         .filter { it.property == SceneProperties.type && it.target == attribute }
         .map { it.source }
 
-fun getNodeAttributes(graph: Graph, attribute: String): List<Key> =
+fun getNodeAttributes(graph: Graph, node: String): List<Key> =
     graph
-        .filter { it.property == SceneProperties.type && it.target == attribute }
-        .map { it.source }
+        .filter { it.property == SceneProperties.type && it.source == node }
+        .map { it.target as Key}
 
 fun nodeHasAttribute(graph: Graph, node: Key, attribute: String): Boolean =
     graph.any { it.source == node && it.property == SceneProperties.type && it.target == attribute }

@@ -8,7 +8,7 @@ import silentorb.mythic.ent.Key
 import silentorb.mythic.ent.getGraphKeys
 import silentorb.mythic.ent.scenery.getNodeChildren
 import silentorb.mythic.ent.scenery.getAbsoluteNodeTransform
-import silentorb.mythic.ent.scenery.getNodeAttributes
+import silentorb.mythic.ent.scenery.getNodesWithAttribute
 import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.haft.getMouseOffset
 import silentorb.mythic.happenings.Command
@@ -62,7 +62,13 @@ fun updateClipboard(editor: Editor) = handleCommands<Clipboard?> { command, clip
       val graph = getActiveEditorGraph(editor)
       if (nodeSelection.size == 1 && graph != null && propertySelection.any()) {
         val node = nodeSelection.first()
-        val result = graph.filter { it.source == node && propertySelection.contains(it.property) }
+        val result = graph
+            .filter { it.source == node && propertySelection.contains(it.property) } +
+            graph
+                .filter {
+                  it.source == node && it.property == SceneProperties.type && propertySelection.contains(it.target)
+                }
+
         Clipboard(
             type = ClipboardDataTypes.properties,
             data = result,
@@ -245,7 +251,7 @@ fun onTrySelectJoint(editor: Editor, mousePosition: Vector2, commands: Commands)
       if (camera != null && viewport != null) {
         val transform = getStandardPointTransform(viewport, camera)
         val graph = getCachedGraph(editor)
-        val joints = getNodeAttributes(graph, CommonEditorAttributes.joint)
+        val joints = getNodesWithAttribute(graph, CommonEditorAttributes.joint)
         val hit = joints
             .firstOrNull { joint ->
               val location = getAbsoluteNodeTransform(graph, joint).translation()

@@ -131,25 +131,30 @@ data class MixedValue(
 
 val mixedValue = MixedValue()
 
+fun drawSelectableLabel(editor: Editor, key: Key, text: String): Commands {
+  val isSelected = editor.persistentState.propertySelection.contains(key)
+  if (isSelected) {
+    val bounds = ImVec2()
+    ImGui.calcTextSize(bounds, text)
+    val drawList = ImGui.getWindowDrawList()
+    val backgroundColor = ImColor.intToColor(150, 128, 255, 255)
+    val cursorX = ImGui.getCursorScreenPosX()
+    val cursorY = ImGui.getCursorScreenPosY()
+    drawList.addRectFilled(cursorX, cursorY, cursorX + bounds.x, cursorY + bounds.y, backgroundColor)
+  }
+  ImGui.text(text)
+  return if (ImGui.isItemClicked())
+    listOf(Command(EditorCommands.selectProperty, value = key))
+  else
+    listOf()
+}
+
 fun drawPropertyField(editor: Editor, definition: PropertyDefinition, entry: Entry, id: String, singleNode: Key, property: Key): Commands {
   var commands: Commands = listOf()
   ImGui.separator()
   val nextValue = if (definition.widget != null) {
     val text = definition.displayName
-    val isSelected = editor.persistentState.propertySelection.contains(property)
-    if (isSelected) {
-      val bounds = ImVec2()
-      ImGui.calcTextSize(bounds, text)
-      val drawList = ImGui.getWindowDrawList()
-      val backgroundColor = ImColor.intToColor(150, 128, 255, 255)
-      val cursorX = ImGui.getCursorScreenPosX()
-      val cursorY = ImGui.getCursorScreenPosY()
-      drawList.addRectFilled(cursorX, cursorY, cursorX + bounds.x, cursorY + bounds.y, backgroundColor)
-    }
-    ImGui.text(text)
-    if (ImGui.isItemClicked()) {
-      commands = commands + Command(EditorCommands.selectProperty, value = property)
-    }
+    commands = commands + drawSelectableLabel(editor, property, text)
     ImGui.sameLine()
 
     if (ImGui.smallButton("x##property-${id}")) {
@@ -200,7 +205,7 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): PanelResponse =
 
           ImGui.separator()
           for (attribute in union) {
-            ImGui.text(attribute)
+            commands = commands + drawSelectableLabel(editor, attribute, attribute)
             ImGui.sameLine()
             if (ImGui.smallButton("x##attribute-$attribute")) {
               commands = commands + nodes.map {
