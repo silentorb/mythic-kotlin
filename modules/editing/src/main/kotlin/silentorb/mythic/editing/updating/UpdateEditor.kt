@@ -8,7 +8,7 @@ import silentorb.mythic.ent.Key
 import silentorb.mythic.ent.getGraphKeys
 import silentorb.mythic.ent.scenery.getNodeChildren
 import silentorb.mythic.ent.scenery.getAbsoluteNodeTransform
-import silentorb.mythic.ent.scenery.nodeAttributes
+import silentorb.mythic.ent.scenery.getNodeAttributes
 import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.haft.getMouseOffset
 import silentorb.mythic.happenings.Command
@@ -245,7 +245,7 @@ fun onTrySelectJoint(editor: Editor, mousePosition: Vector2, commands: Commands)
       if (camera != null && viewport != null) {
         val transform = getStandardPointTransform(viewport, camera)
         val graph = getCachedGraph(editor)
-        val joints = nodeAttributes(graph, CommonEditorAttributes.joint)
+        val joints = getNodeAttributes(graph, CommonEditorAttributes.joint)
         val hit = joints
             .firstOrNull { joint ->
               val location = getAbsoluteNodeTransform(graph, joint).translation()

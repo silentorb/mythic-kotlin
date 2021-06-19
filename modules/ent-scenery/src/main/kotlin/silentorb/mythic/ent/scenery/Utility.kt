@@ -187,7 +187,7 @@ fun nodesWithAttribute(graph: Graph, attribute: String): List<Key> =
         .filter { it.property == SceneProperties.type && it.target == attribute }
         .map { it.source }
 
-fun nodeAttributes(graph: Graph, attribute: String): List<Key> =
+fun getNodeAttributes(graph: Graph, attribute: String): List<Key> =
     graph
         .filter { it.property == SceneProperties.type && it.target == attribute }
         .map { it.source }
