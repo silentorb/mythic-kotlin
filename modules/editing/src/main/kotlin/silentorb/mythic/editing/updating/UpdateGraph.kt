@@ -3,10 +3,13 @@ package silentorb.mythic.editing.updating
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.nameText
 import silentorb.mythic.ent.*
+import silentorb.mythic.ent.scenery.getAbsoluteNodeTransform
 import silentorb.mythic.ent.scenery.getGraphRoots
+import silentorb.mythic.ent.scenery.getLocalNodeTransform
 import silentorb.mythic.ent.scenery.removeNodesAndChildren
 import silentorb.mythic.happenings.handleCommands
 import silentorb.mythic.scenery.SceneProperties
+import silentorb.mythic.spatial.Matrix
 
 fun duplicateNode(graph: Graph, node: Key): Graph {
   val parent = getNodeValue<String>(graph, node, SceneProperties.parent)
@@ -18,6 +21,26 @@ fun duplicateNode(graph: Graph, node: Key): Graph {
 
     mergeGraphsWithRenaming(graph, selected)
   }
+}
+
+// Only returns the needed change entries, not the whole graph
+fun transformNode(graph: Graph, node: Key, transform: Matrix): Graph {
+  val previous = getLocalNodeTransform(graph, node)
+  val next = transform * previous
+  return listOfNotNull(
+      if (next.translation() != previous.translation())
+        Entry(node, SceneProperties.translation, next.translation())
+      else
+        null,
+      if (next.rotation() != previous.rotation())
+        Entry(node, SceneProperties.rotation, next.rotation())
+      else
+        null,
+      if (next.getScale() != previous.getScale())
+        Entry(node, SceneProperties.scale, next.getScale())
+      else
+        null,
+  )
 }
 
 fun updateSceneGraph(editor: Editor) = handleCommands<Graph> { command, graph ->
@@ -83,6 +106,23 @@ fun updateSceneGraph(editor: Editor) = handleCommands<Graph> { command, graph ->
         val selected = selection.first()
         val key = command.value as? String ?: nameText.get()
         renameNode(graph, selected, key)
+      }
+    }
+
+    EditorCommands.moveNode -> {
+      val pair = command.value as? Pair<*, *>
+      val node = pair?.first as? String
+      val newParent = pair?.second as? String
+      if (node == null || newParent == null)
+        graph
+      else {
+        val oldParent = getNodeValue<String>(graph, node, SceneProperties.parent)!!
+        val oldParentTransform = getAbsoluteNodeTransform(graph, oldParent)
+        val newParentTransform = getAbsoluteNodeTransform(graph, newParent)
+        val transform = oldParentTransform * newParentTransform.invert()
+        val transformEntries = transformNode(graph, node, transform)
+        val changes = listOf(Entry(node, SceneProperties.parent, newParent)) + transformEntries
+        replaceValues(graph, changes)
       }
     }
 

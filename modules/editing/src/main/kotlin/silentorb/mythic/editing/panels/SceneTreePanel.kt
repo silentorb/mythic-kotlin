@@ -45,7 +45,7 @@ fun sceneTreeDragSource(graph: Graph, node: Key): Commands =
         }) { payload ->
           val source = payload as Key
           listOf(
-              Command(EditorCommands.setGraphValue, Entry(source, SceneProperties.parent, node)),
+              Command(EditorCommands.moveNode, source to node),
           )
         }
     ))

@@ -18,6 +18,7 @@ object EditorCommands {
   val treeNodeExpansionToggled = "treeNodeToggled"
 
   val setGraphValue = "setGraphValue"
+  val moveNode = "moveNode"
   val replaceGraphValue = "replaceGraphValue"
   val removeGraphValue = "removeGraphValue"
   val setActiveGraph = "setActiveGraph"
