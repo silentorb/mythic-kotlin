@@ -170,3 +170,6 @@ fun toList(value: Vector3): List<Float> =
         value.y,
         value.z
     )
+
+fun maxScalar(value: Vector3): Float =
+    max(max(value.x, value.y), value.z)

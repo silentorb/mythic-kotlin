@@ -71,7 +71,7 @@ fun <T> getPropertyValues(graph: Graph, key: String, property: Key): List<T> =
 inline fun <reified T> getNodeValue(graph: Graph, key: String, property: Key): T? =
     graph.firstOrNull { it.source == key && it.property == property }?.target as T?
 
-inline fun <reified T> getGraphValues(graph: Graph, key: String, property: Key): List<T> =
+inline fun <reified T> getNodeValues(graph: Graph, key: String, property: Key): List<T> =
     graph.filter { it.source == key && it.property == property }.map { it.target as T }
 
 fun replaceValues(graph: Graph, additional: Graph): Graph =

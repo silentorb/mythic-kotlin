@@ -50,28 +50,31 @@ fun getNodeLight(graph: Graph, node: Key, transform: Matrix): Light? {
     null
 }
 
+fun getNodeMaterial(resourceInfo: ResourceInfo, graph: Graph, node: Key): Material? {
+  val texture = getInheritedTexture(graph, node)
+  val color = getNodeColor(graph, node)
+  return if (texture != null || color != null)
+    Material(
+        texture = texture,
+        color = color,
+        shading = true,
+        containsTransparency = if (texture != null) textureContainsTransparency(resourceInfo, texture) else false,
+        doubleSided = nodeHasAttribute(graph, node, SceneTypes.doubleSided),
+    )
+  else
+    null
+}
+
 fun nodeToElements(resourceInfo: ResourceInfo, graph: Graph, node: Key): List<ElementGroup> {
   val mesh = getNodeValue<Key>(graph, node, SceneProperties.mesh)
   val text3d = getNodeValue<String>(graph, node, SceneProperties.text3d)
   val transform = getAbsoluteNodeTransform(graph, node)
   val light = getNodeLight(graph, node, transform)
   val isBillboard = graph.contains(Entry(node, SceneProperties.type, SceneTypes.billboard))
-  val texture = getInheritedTexture(graph, node)
+  val material = getNodeMaterial(resourceInfo, graph, node)
 
   return if (mesh != null || text3d != null || light != null || isBillboard) {
     val meshElements = if (mesh != null) {
-      val color = getNodeColor(graph, node)
-      val material = if (texture != null || color != null)
-        Material(
-            texture = texture,
-            color = color,
-            shading = true,
-            containsTransparency = if (texture != null) textureContainsTransparency(resourceInfo, texture) else false,
-            doubleSided = nodeHasAttribute(graph, node, SceneTypes.doubleSided),
-        )
-      else
-        null
-
       listOf(
           MeshElement(
               mesh = mesh,
@@ -94,6 +97,8 @@ fun nodeToElements(resourceInfo: ResourceInfo, graph: Graph, node: Key): List<El
       listOf()
 
     val lights = listOfNotNull(light)
+
+    val texture = material?.texture
 
     val billboards = if (isBillboard && texture != null)
       listOf(

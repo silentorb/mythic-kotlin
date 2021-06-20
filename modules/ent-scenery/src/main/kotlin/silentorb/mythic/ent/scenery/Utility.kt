@@ -5,6 +5,8 @@ import silentorb.mythic.scenery.*
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
+import silentorb.mythic.spatial.maxScalar
+import kotlin.math.max
 
 fun getLocalNodeTranslation(graph: Graph, node: Key): Vector3 =
     getNodeValue<Vector3>(graph, node, SceneProperties.translation) ?: Vector3.zero
@@ -121,15 +123,19 @@ fun getShape(meshShapes: Map<Key, Shape>, graph: Graph, node: Key): Shape? {
         val height = getNodeValue<Float>(graph, node, SceneProperties.height)
         if (radius != null && height != null)
           Cylinder(radius, height)
-        else
-          null
+        else {
+          val scale = getNodeScale(graph, node)
+          Cylinder(max(scale.x, scale.y), scale.z / 2f)
+        }
       }
       "sphere" -> {
         val radius = getNodeValue<Float>(graph, node, SceneProperties.radius)
         if (radius != null)
           Sphere(radius)
-        else
-          null
+        else {
+          val scale = getNodeScale(graph, node)
+          Sphere(maxScalar(scale) / 2f)
+        }
       }
       "composite" -> {
         val children = getNodeChildren(graph, node)
@@ -204,7 +210,7 @@ fun getNodesWithAttribute(graph: Graph, attribute: String): List<Key> =
 fun getNodeAttributes(graph: Graph, node: String): List<Key> =
     graph
         .filter { it.property == SceneProperties.type && it.source == node }
-        .map { it.target as Key}
+        .map { it.target as Key }
 
 fun nodeHasAttribute(graph: Graph, node: Key, attribute: String): Boolean =
     graph.any { it.source == node && it.property == SceneProperties.type && it.target == attribute }

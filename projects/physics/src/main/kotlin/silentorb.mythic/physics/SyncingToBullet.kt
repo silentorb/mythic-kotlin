@@ -14,6 +14,7 @@ import silentorb.mythic.spatial.Pi
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.getCenter
 import silentorb.mythic.scenery.*
+import com.badlogic.gdx.math.Vector3 as GdxVector3
 
 // TODO: Cache the usage of this function
 fun createBulletStaticMesh(vertices: List<Vector3>, scale: Vector3 = Vector3.unit): btBvhTriangleMeshShape {
@@ -39,6 +40,7 @@ fun createCollisionShape(shape: Shape, scale: Vector3): btCollisionShape {
     is Box -> btBoxShape(toGdxVector3(shape.halfExtents * scale))
     is Sphere -> btSphereShape(shape.radius * scale.x)
     is Capsule -> btCapsuleShapeZ(shape.radius * scale.x, (shape.height - shape.radius * 2f) * scale.z)
+    is Cylinder -> btCylinderShapeZ(GdxVector3(shape.radius * scale.x / 2f, shape.radius * scale.y / 2f, shape.height * scale.z / 2f))
     is CompositeShape -> {
       val parent = btCompoundShape()
       for (child in shape.shapes) {
@@ -271,8 +273,7 @@ fun applyBodyChanges(bulletState: BulletState, previous: Table<Body>, next: Tabl
     if (btBody != null) {
       btBody.worldTransform = toGdxMatrix4(getBodyTransform(body))
       btBody.linearVelocity = toGdxVector3(body.velocity)
-    }
-    else {
+    } else {
       val btBody2 = bulletState.kineticBodies[id]
       if (btBody2 != null) {
         btBody2.worldTransform = toGdxMatrix4(getBodyTransform(body))

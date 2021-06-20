@@ -27,7 +27,7 @@ fun shapeToMeshes(shape: Shape, transform: Matrix): List<MeshElement> {
     )
     is Cylinder -> listOf(
         MeshElement(
-            mesh = "sphere",
+            mesh = "cylinder",
             material = collisionMaterial,
             transform = transform.scale(shape.radius, shape.radius, shape.height / 2f),
         )
