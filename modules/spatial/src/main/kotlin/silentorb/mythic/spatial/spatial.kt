@@ -434,7 +434,7 @@ fun projectVector3(angle: Float, radius: Float, z: Float): Vector3 {
 }
 
 fun createArcZ(radius: Float, count: Int, sweep: Float = Pi * 2, offset: Float = 0f): List<Vector3> {
-  val increment = sweep / (count - 1)
+  val increment = sweep / count
   return (0 until count)
       .map { i ->
         val theta = increment * i + offset
@@ -443,7 +443,9 @@ fun createArcZ(radius: Float, count: Int, sweep: Float = Pi * 2, offset: Float =
         else
           cos(theta) * radius
 
-        Vector3(x, sin(theta) * radius, 0f)
+        val y = sin(theta) * radius
+
+        Vector3(x, y, 0f)
       }
 }
 

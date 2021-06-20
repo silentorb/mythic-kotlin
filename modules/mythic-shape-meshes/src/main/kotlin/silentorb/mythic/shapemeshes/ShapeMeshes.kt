@@ -1,6 +1,7 @@
 package silentorb.mythic.shapemeshes
 
 import silentorb.mythic.scenery.*
+import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.createArcZ
 
@@ -39,38 +40,57 @@ private fun box(halfExtents: Vector3) =
         ).flatten()
     )
 
-private fun cylinder(shape: Cylinder): IntermediateMesh {
+fun transformShapeVertices(transform: Matrix, mesh: IntermediateMesh): IntermediateMesh =
+    mesh.copy(
+        vertices = mesh.vertices.map { it.transform(transform) }
+    )
+
+fun transformShapeVertices(shape: ShapeTransform): IntermediateMesh {
+  val mesh = getShapeVertices(shape.shape)
+  return transformShapeVertices(shape.transform, mesh)
+}
+
+private fun cylinder(): IntermediateMesh {
   val count = 8
-  val arc = createArcZ(shape.radius, 8, offset = 1f)
+  val arc = createArcZ(0.5f, 8)
   val wrap = { i: Int -> i % count }
   val pieSlice = { middleIndex: Int, offset: Int ->
     (0 until count).flatMap { i ->
       listOf(middleIndex, i + offset, offset + wrap(i + 1)).reversed()
     }
   }
-  return IntermediateMesh(
-      vertices = listOf(
-          Vector3(0f, 0f, 1f),
-          Vector3(0f, 0f, -1f)
-      )
-          .plus(arc)
-          .plus(arc.map { it.copy(z = -1f) }),
-      triangles = pieSlice(0, 2)
+
+  val vertices = listOf(
+      Vector3(0f, 0f, 0.5f),
+      Vector3(0f, 0f, -0.5f)
+  )
+      .plus(arc.map { it.copy(z = 0.5f) })
+      .plus(arc.map { it.copy(z = -0.5f) })
+
+  val makeSide = { it: Int ->
+    val i = it + 2
+    val nextColumn = wrap(it + 1) + 2
+    square(i, i + count, nextColumn + count, nextColumn)
+  }
+
+  val triangles =
+      pieSlice(0, 2)
           .plus(pieSlice(1, 2 + count))
-          .plus((0 until count).flatMap {
-            val i = it + 2
-            val nextColumn = wrap(i + 1)
-            square(i, i + count, nextColumn + count, nextColumn)
-          })
+          .plus((0 until count).flatMap(makeSide))
+
+  return IntermediateMesh(
+      vertices = vertices,
+      triangles = triangles,
   )
 }
 
-private fun offsetShapeVertices(shape: ShapeTransform): IntermediateMesh {
-  val mesh = getShapeVertices(shape.shape)
-  return mesh.copy(
-      vertices = mesh.vertices.map { it.transform(shape.transform) }
-  )
-}
+val normalizedCylinder = cylinder()
+
+private fun cylinder(shape: Cylinder): IntermediateMesh =
+    transformShapeVertices(
+        Matrix.identity.scale(shape.radius * 2f, shape.radius * 2f, shape.height),
+        normalizedCylinder
+    )
 
 private fun compositeShapeVertices(shape: CompositeShape): IntermediateMesh {
   val meshes = shape.shapes.map(::getShapeVertices)
@@ -102,7 +122,7 @@ fun getShapeVertices(shape: Shape): IntermediateMesh =
 
       is Cylinder -> cylinder(shape)
 
-      is ShapeTransform -> offsetShapeVertices(shape)
+      is ShapeTransform -> transformShapeVertices(shape)
 
       is CompositeShape -> compositeShapeVertices(shape)
 
