@@ -12,11 +12,6 @@ data class LogicArgs(
     val bag: StateBag
 )
 
-data class BloomState(
-    val resourceBag: StateBag,
-    val input: InputState
-)
-
 data class HistoricalBloomState(
     val resourceBag: StateBag,
     val input: HistoricalInputState
@@ -85,13 +80,3 @@ fun getHoverBoxes(mousePosition: Vector2i, boxes: List<OffsetBox>): List<OffsetB
     boxes.filter { box ->
       box.attributes.any() && isInBounds(mousePosition, box)
     }
-
-fun newBloomState() =
-    BloomState(
-        resourceBag = mapOf(),
-        input = InputState(
-            mousePosition = Vector2i(),
-            mouseButtons = listOf(ButtonState.up),
-            events = listOf()
-        )
-    )

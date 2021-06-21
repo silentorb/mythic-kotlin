@@ -31,10 +31,6 @@ fun mergeDimensions(boxes: List<Box>): Vector2i =
         boxes.maxOfOrNull { it.dimensions.y } ?: 0,
     )
 
-typealias Depiction = (Bounds, Canvas) -> Unit
-typealias StateBag = Map<String, Any>
-typealias StateBagMods = StateBag?
-
 fun drawBorder(bounds: Bounds, canvas: Canvas, color: Vector4, thickness: Float = 1f) {
   canvas.drawSquare(bounds.position.toVector2(), bounds.dimensions.toVector2(), canvas.outline(color, thickness))
 }

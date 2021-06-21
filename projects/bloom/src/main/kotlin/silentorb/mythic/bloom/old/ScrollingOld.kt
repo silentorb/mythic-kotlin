@@ -4,24 +4,6 @@ import silentorb.mythic.bloom.*
 import silentorb.mythic.spatial.*
 import silentorb.mythic.spatial.Vector2i
 
-private const val scrollbarWidth = 15
-
-//fun scrollbar(offset: Int, contentLength: Int): Depiction = { b, c ->
-//  if (contentLength > b.dimensions.y) {
-//    val width = scrollbarWidth
-//    val bounds = Bounds(
-//        x = b.end.x - width - 2,
-//        y = b.top + offset * b.dimensions.y / contentLength,
-//        width = width,
-//        height = b.dimensions.y * b.dimensions.y / contentLength
-//    )
-//
-//    val viewport = bounds.toVector4i().toVector4()
-//
-//    c.drawSquare(viewport.xy(), viewport.zw, c.solid(Vector4(0.6f, 0.6f, 0.6f, 1f)))
-//  }
-//}
-
 //fun clipBox(clipBounds: Bounds): (FlatBox) -> FlatBox = { box ->
 //  val depiction = if (box.depiction != null)
 //    clipBox(clipBounds, box.depiction)
@@ -58,40 +40,40 @@ fun extractOffset(key: String, bag: StateBag): Vector2i {
   return Vector2i(0, -state.offset)
 }
 
-fun scrollingInteraction(key: String, contentBounds: Bounds): LogicModuleOld = { (bloomState, bounds) ->
-  if (contentBounds.dimensions.y <= bounds.dimensions.y) {
-    null
-  } else {
-    val state = scrollingState(bloomState.resourceBag[key])
-    val input = bloomState.input
-    val currentButton = input.current.mouseButtons[0]
-    val previousButton = input.previous.mouseButtons[0]
-    val clip = minMax(0, contentBounds.dimensions.y - bounds.dimensions.y)
-
-    val (dragOrigin, offsetOrigin) = if (currentButton == ButtonState.down && previousButton == ButtonState.up
-        && isInBounds(input.current.mousePosition, bounds))
-      Pair(input.current.mousePosition, state.offset)
-    else if (currentButton == ButtonState.up)
-      Pair(null, state.offset) // Reclip the bounds in case the layout was changed independent of this code
-    else
-      Pair(state.dragOrigin, state.offsetOrigin)
-
-    val offset = if (dragOrigin != null) {
-      val mouseOffsetY = input.current.mousePosition.y - dragOrigin.y
-      val mod = offsetOrigin + mouseOffsetY * contentBounds.dimensions.y / bounds.dimensions.y
-//    println(mod)
-      clip(mod)
-    } else
-      state.offset
-
-    val newState = ScrollingState(
-        dragOrigin = dragOrigin,
-        offsetOrigin = offsetOrigin,
-        offset = clip(offset)
-    )
-    mapOf(key to newState)
-  }
-}
+//fun scrollingInteraction(key: String, contentBounds: Bounds): LogicModuleOld = { (bloomState, bounds) ->
+//  if (contentBounds.dimensions.y <= bounds.dimensions.y) {
+//    null
+//  } else {
+//    val state = scrollingState(bloomState.resourceBag[key])
+//    val input = bloomState.input
+//    val currentButton = input.current.mouseButtons[0]
+//    val previousButton = input.previous.mouseButtons[0]
+////    val clip = minMax(0, contentBounds.dimensions.y - bounds.dimensions.y)
+//
+//    val (dragOrigin, offsetOrigin) = if (currentButton == ButtonState.down && previousButton == ButtonState.up
+//        && isInBounds(input.current.mousePosition, bounds))
+//      Pair(input.current.mousePosition, state.offset)
+//    else if (currentButton == ButtonState.up)
+//      Pair(null, state.offset) // Reclip the bounds in case the layout was changed independent of this code
+//    else
+//      Pair(state.dragOrigin, state.offsetOrigin)
+//
+//    val offset = if (dragOrigin != null) {
+//      val mouseOffsetY = input.current.mousePosition.y - dragOrigin.y
+//      val mod = offsetOrigin + mouseOffsetY * contentBounds.dimensions.y / bounds.dimensions.y
+////    println(mod)
+//      clip(mod)
+//    } else
+//      state.offset
+//
+//    val newState = ScrollingState(
+//        dragOrigin = dragOrigin,
+//        offsetOrigin = offsetOrigin,
+//        offset = clip(offset)
+//    )
+//    mapOf(key to newState)
+//  }
+//}
 
 //fun scrollBox(key: String, contentBounds: Bounds): Flower = { dimensions ->
 //  val bounds = Bounds(dimensions = dimensions)
@@ -131,11 +113,11 @@ fun scrollingInteraction(key: String, contentBounds: Bounds): LogicModuleOld = {
 
 fun scrolling(key: String): (Flower) -> Flower = { child ->
   { dimensions ->
-    val clippedDimensions = Vector2i(
-        dimensions.x - scrollbarWidth - 5,
-        dimensions.y
-    )
-    val innerSeed = clippedDimensions
+//    val clippedDimensions = Vector2i(
+//        dimensions.x - scrollbarWidth - 5,
+//        dimensions.y
+//    )
+//    val innerSeed = clippedDimensions
     throw Error("No longer supported.  Needs updating to not use Seed.bag")
 //    val offset = extractOffset(key, dimensions.bag)
 //    val box = reverseFixedOffset(top = offset.y)(child)(innerSeed)

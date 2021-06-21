@@ -73,6 +73,19 @@ fun breadthList(plane: Plane, spacing: Int = 0, fitChildren: Boolean = true): (L
   }
 }
 
+fun flowerList(plane: Plane, spacing: Int = 0): (List<Flower>) -> Flower = { children ->
+  { seed ->
+    val initialBoxes = children.map { it(seed) }
+    val boxes = arrangeListItems(plane, spacing, initialBoxes)
+    val length = getListLength(plane, boxes)
+    Box(
+        name = "list",
+        dimensions = plane(Vector2i(length, plane(seed.dimensions).y)),
+        boxes = boxes
+    )
+  }
+}
+
 fun horizontalList(spacing: Int = 0): SimpleBoxContainer =
     boxList(horizontalPlane, spacing)
 
@@ -98,7 +111,7 @@ data class LengthFlexItem(
 data class FlowerFlexItem(
     val flower: Flower
 ) : FlexItem {
-  override fun getBox(length: Int, breadth: Int): Box = flower(Vector2i(length, breadth))
+  override fun getBox(length: Int, breadth: Int): Box = flower(Seed(Vector2i(length, breadth)))
   override fun getBoxOrNull(): Box? = null
 }
 

@@ -53,19 +53,52 @@ fun boxMargin(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, 
   )
 }
 
-fun centered(box: Box): Flower = { dimensions ->
+fun flowerMargin(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): (Flower) -> Flower = { flower ->
+  val sizeOffset = Vector2i(left + right, top + bottom)
+  ;{ seed ->
+  val child = flower(seed.copy(dimensions = seed.dimensions - sizeOffset))
+  Box(
+      dimensions = child.dimensions + sizeOffset,
+      boxes = listOf(
+          OffsetBox(
+              child = child,
+              offset = Vector2i(left, top)
+          )
+      )
+  )
+}
+}
+
+fun centered(box: Box): Flower = { seed ->
   val offset = Vector2i(
-      centered(dimensions.x, box.dimensions.x),
-      centered(dimensions.y, box.dimensions.y)
+      centered(seed.dimensions.x, box.dimensions.x),
+      centered(seed.dimensions.y, box.dimensions.y)
   )
   Box(
-      dimensions = dimensions,
+      dimensions = seed.dimensions,
       boxes = listOf(OffsetBox(box, offset))
   )
 }
 
-fun alignSingle(aligner: Aligner, plane: Plane, lengthFlower: LengthFlower): Flower = { dimensions ->
-  val parent = plane(dimensions)
+fun alignSingleFlower(aligner: Aligner, plane: Plane, content: Flower): Flower = { seed ->
+  val parent = plane(seed.dimensions)
+  val box = content(seed.copy(dimensions = parent))
+  val child = plane(box.dimensions)
+  val offset = plane(
+      Vector2i(
+          aligner(parent.x, child.x),
+          0
+      )
+  )
+
+  Box(
+      dimensions = seed.dimensions,
+      boxes = listOf(OffsetBox(box, offset))
+  )
+}
+
+fun alignSingle(aligner: Aligner, plane: Plane, lengthFlower: LengthFlower): Flower = { seed ->
+  val parent = plane(seed.dimensions)
   val box = lengthFlower(parent.y)
   val child = plane(box.dimensions)
   val offset = plane(
@@ -76,7 +109,7 @@ fun alignSingle(aligner: Aligner, plane: Plane, lengthFlower: LengthFlower): Flo
   )
 
   Box(
-      dimensions = dimensions,
+      dimensions = seed.dimensions,
       boxes = listOf(OffsetBox(box, offset))
   )
 }
@@ -98,11 +131,11 @@ fun alignSingle(aligner: Aligner, plane: Plane, box: Box): LengthFlower = { leng
 }
 
 fun alignBoth(horizontal: Aligner, vertical: Aligner, flower: Flower): Flower =
-    { dimensions ->
-      val box = flower(dimensions)
+    { seed ->
+      val box = flower(seed)
       val offset = Vector2i(
-          horizontal(dimensions.x, box.dimensions.x),
-          vertical(dimensions.y, box.dimensions.y)
+          horizontal(seed.dimensions.x, box.dimensions.x),
+          vertical(seed.dimensions.y, box.dimensions.y)
       )
 
       // Currently doesn't support negative numbers

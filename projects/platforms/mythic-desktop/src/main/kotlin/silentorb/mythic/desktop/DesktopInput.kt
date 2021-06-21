@@ -85,17 +85,17 @@ private var mouseScrollYBuffer: Float = 0f
 private var mouseScrollY: Float = 0f
 
 private fun mouseInputSource(window: Long) = { key: Int ->
-  if (key < MOUSE_SKIP) {
+  if (key < MouseCommands.skip) {
     if (glfwGetMouseButton(window, key) == GLFW_PRESS)
       1f
     else
       0f
-  } else if (key == MOUSE_SCROLL_UP) {
+  } else if (key == MouseCommands.scrollUp) {
     if (mouseScrollY > 0)
       mouseScrollY
     else
       0f
-  } else if (key == MOUSE_SCROLL_DOWN) {
+  } else if (key == MouseCommands.scrollDown) {
     if (mouseScrollY < 0)
       -mouseScrollY
     else
@@ -111,8 +111,8 @@ fun getMouseEvents(window: Long): List<InputEvent> {
       GLFW_MOUSE_BUTTON_1,
       GLFW_MOUSE_BUTTON_2,
       GLFW_MOUSE_BUTTON_3,
-      MOUSE_SCROLL_DOWN,
-      MOUSE_SCROLL_UP
+      MouseCommands.scrollDown,
+      MouseCommands.scrollUp,
   )
       .mapNotNull { button ->
         val value = getValue(button)

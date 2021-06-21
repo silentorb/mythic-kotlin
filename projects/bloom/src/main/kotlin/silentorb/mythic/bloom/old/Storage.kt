@@ -26,8 +26,8 @@ fun moveBounds(offset: Vector2i, container: Vector2i): (Bounds) -> Bounds = { ch
 }
 
 fun lengthToFlower(plane: Plane): (LengthFlower) -> Flower = { lengthFlower ->
-  { dimensions ->
-    val length = plane(dimensions).x
+  { seed ->
+    val length = plane(seed.dimensions).x
     lengthFlower(length)
   }
 }

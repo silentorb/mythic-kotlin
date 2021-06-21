@@ -307,22 +307,19 @@ fun isZero(vector: Vector3m) =
 //  return result / vertices.size.toFloat()
 //}
 
-fun minMax(min: Int, max: Int): (Int) -> Int = { value ->
-  if (value < min)
-    min
-  else if (value > max)
-    max
-  else
-    value
-}
+fun minMax(min: Int, max: Int, value: Int) =
+    when {
+      value < min -> min
+      value > max -> max
+      else -> value
+    }
 
 fun minMax(value: Float, min: Float, max: Float): Float =
-    if (value < min)
-      min
-    else if (value > max)
-      max
-    else
-      value
+    when {
+      value < min -> min
+      value > max -> max
+      else -> value
+    }
 
 fun clipByRange(range: Float, value: Float): Float =
     when {
@@ -456,11 +453,11 @@ fun degreesToRadians(degrees: Float): Float =
     degrees * Pi / 180f
 
 fun radiansToDegrees(value: Vector3): Vector3 =
-   Vector3(
-       radiansToDegrees(value.x),
-       radiansToDegrees(value.y),
-       radiansToDegrees(value.z)
-   )
+    Vector3(
+        radiansToDegrees(value.x),
+        radiansToDegrees(value.y),
+        radiansToDegrees(value.z)
+    )
 
 fun degreesToRadians(value: Vector3): Vector3 =
     Vector3(
@@ -526,7 +523,7 @@ fun normalizeRadialAngles(angles: Vector3): Vector3 =
     )
 
 fun transformToScreenRaw(transform: Matrix, target: Vector3): Vector4 =
-   transform * Vector4(target.x, target.y, target.z, 1f)
+    transform * Vector4(target.x, target.y, target.z, 1f)
 
 fun transformToScreenIncludingBehind(transform: Matrix, target: Vector3): Vector2 {
   val coordinate = transformToScreenRaw(transform, target)

@@ -3,14 +3,20 @@ package silentorb.mythic.haft
 import silentorb.mythic.platforming.InputEvent
 import silentorb.mythic.spatial.Vector2
 
-val MOUSE_SKIP = 9
-val MOUSE_SCROLL_DOWN = 10
-val MOUSE_SCROLL_UP = 11
-
 const val MouseMovementLeft = 5
 const val MouseMovementRight = 6
 const val MouseMovementUp = 7
 const val MouseMovementDown = 8
+
+object MouseCommands {
+  val button1 = 0
+  val button2 = 1
+  val button3 = 2
+  val skip = 9
+  val scrollDown = 10
+  val scrollUp = 11
+
+}
 
 fun applyMouseAxis(device: Int, value: Float, firstIndex: Int, secondIndex: Int, scale: Float) =
     if (value > 0)

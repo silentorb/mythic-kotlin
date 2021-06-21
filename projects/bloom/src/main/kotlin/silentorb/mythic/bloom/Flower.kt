@@ -1,10 +1,10 @@
 package silentorb.mythic.bloom
 
-fun depict(depiction: StateDepiction): Flower = { dimensions ->
+fun depict(depiction: StateDepiction): Flower = { seed ->
   Box(
       name = "depiction",
-      dimensions = dimensions,
-      depiction = depiction(dimensions)
+      dimensions = seed.dimensions,
+      depiction = depiction(seed)
   )
 }
 

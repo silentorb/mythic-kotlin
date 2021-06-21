@@ -10,17 +10,17 @@ val emptyBox = Box(
 
 val emptyFlower: Flower = { emptyBox }
 
-fun compose(flowers: List<Flower>): Flower = { dimensions ->
+fun compose(flowers: List<Flower>): Flower = { seed ->
   Box(
-      dimensions = dimensions,
-      boxes = flowers.map { OffsetBox(it(dimensions)) }
+      dimensions = seed.dimensions,
+      boxes = flowers.map { OffsetBox(it(seed)) }
   )
 }
 
-fun compose(vararg flowers: Flower): Flower = { dimensions ->
+fun compose(vararg flowers: Flower): Flower = { seed ->
   Box(
-      dimensions = dimensions,
-      boxes = flowers.map { OffsetBox(it(dimensions)) }
+      dimensions = seed.dimensions,
+      boxes = flowers.map { OffsetBox(it(seed)) }
   )
 }
 

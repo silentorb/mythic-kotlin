@@ -39,8 +39,8 @@ fun keyboardFlyThroughBindings() =
     )
 
 fun defaultMouseBindings() = mapOf(
-    MOUSE_SCROLL_DOWN to EditorCommands.zoomOut,
-    MOUSE_SCROLL_UP to EditorCommands.zoomIn,
+    MouseCommands.scrollDown to EditorCommands.zoomOut,
+    MouseCommands.scrollUp to EditorCommands.zoomIn,
 )
 
 fun defaultEditorBindings(): Bindings =
