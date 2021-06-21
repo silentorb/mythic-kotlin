@@ -17,7 +17,7 @@ fun pruneClippedBoxes(dimensions: Vector2i, offset: Vector2i, boxes: List<Offset
       .map { box ->
         box.copy(
             child = box.child.copy(
-                boxes = pruneClippedBoxes(box.bounds.dimensions, offset + box.bounds.position, box.boxes)
+                boxes = pruneClippedBoxes(dimensions, offset + box.bounds.position, box.boxes)
             )
         )
       }
@@ -48,11 +48,11 @@ fun scrollableY(key: String, content: LengthFlower): Flower = { seed ->
   Box(
       dimensions = Vector2i(box.dimensions.x + inset, seed.dimensions.y),
       boxes = listOf(
-//          pruneClippedBoxes(seed.dimensions, Vector2i.zero,
+          pruneClippedBoxes(seed.dimensions, Vector2i(0, -clippedContentOffset),
           OffsetBox(
               child = box,
               offset = Vector2i(0, -clippedContentOffset)
-//              )
+              )
           ),
           OffsetBox(
               child = Box(

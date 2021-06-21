@@ -173,4 +173,9 @@ class DesktopInput(val window: Long) : PlatformInput {
         .plus(getMouseEvents(window))
         .plus(getGamepadEvents())
   }
+
+  override fun getKeyName(key: Int): String? {
+    val scanCode = glfwGetKeyScancode(key)
+    return glfwGetKeyName(key, scanCode)
+  }
 }

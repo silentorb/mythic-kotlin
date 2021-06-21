@@ -25,6 +25,7 @@ interface PlatformInput {
   fun getMousePosition(): Vector2
   fun setMouseVisibility(value: Boolean)
   fun getEvents(): List<InputEvent>
+  fun getKeyName(key: Int): String?
 }
 
 enum class WindowMode {
