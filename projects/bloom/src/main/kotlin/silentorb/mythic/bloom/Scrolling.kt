@@ -30,11 +30,11 @@ fun pruneClippedBoxes(dimensions: Vector2i, offset: Vector2i, box: OffsetBox): O
         )
     )
 
-fun scrollableY(key: String, content: LengthFlower): Flower = { seed ->
+fun scrollableY(key: String, content: Flower): Flower = { seed ->
   val spacing = 10
   val inset = scrollbarWidth + spacing
-  val box = content(seed.dimensions.x)
-  val c = box.dimensions.y
+  val box = content(seed)
+  val c = if (box.dimensions.y == 0) 1 else box.dimensions.y
   val v = seed.dimensions.y
   val scrollBarHeight = seed.dimensions.y * v / c
   val contentOffset = seed.state[key] as? Int ?: 0

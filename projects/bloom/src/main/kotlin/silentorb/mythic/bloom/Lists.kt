@@ -5,6 +5,20 @@ import kotlin.math.max
 
 typealias SimpleBoxContainer = (List<Box>) -> Box
 
+data class HalfBox(
+    val offset: Int,
+    val length: Int,
+)
+
+tailrec fun arrangeLengths(spacing: Int, lengths: List<Int>, totalLength: Int = 0, accumulator: List<HalfBox> = listOf()): List<HalfBox> =
+    if (lengths.none())
+      accumulator
+    else {
+      val length = lengths.first()
+      val nextLength = totalLength + length + spacing
+      arrangeLengths(spacing, lengths.drop(1), nextLength, accumulator + HalfBox(totalLength, length))
+    }
+
 tailrec fun arrangeListItems(plane: Plane, spacing: Int, boxes: List<Box>, length: Int = 0, accumulator: List<OffsetBox> = listOf()): List<OffsetBox> =
     if (boxes.none())
       accumulator
@@ -14,6 +28,9 @@ tailrec fun arrangeListItems(plane: Plane, spacing: Int, boxes: List<Box>, lengt
       val nextLength = length + childDimensions.x + spacing
       arrangeListItems(plane, spacing, boxes.drop(1), nextLength, accumulator + OffsetBox(box, plane(Vector2i(length, 0))))
     }
+
+fun getListLength(boxes: List<HalfBox>): Int =
+    boxes.maxOfOrNull { it.offset + it.length } ?: 0
 
 fun getListLength(plane: Plane, boxes: List<OffsetBox>): Int =
     boxes.maxOfOrNull { plane(it.offset + it.dimensions).x } ?: 0

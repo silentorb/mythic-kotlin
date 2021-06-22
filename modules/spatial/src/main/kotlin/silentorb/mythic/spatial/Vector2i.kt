@@ -63,18 +63,12 @@ data class Vector2i(
     return this
   }
 
-  /* (non-Javadoc)
-     * @see Vector2i#get(int)
-     */
-  @Throws(IllegalArgumentException::class)
-  fun get(component: Int): Int {
-    when (component) {
-      0 -> return x
-      1 -> return y
-      else -> throw IllegalArgumentException()
-    }
-  }
-
+  operator fun get(i: Int): Int =
+      when (i) {
+        0 -> x
+        1 -> y
+        else -> throw IllegalArgumentException()
+      }
   /**
    * Set the value of the specified component of this vector.
    *
