@@ -71,6 +71,11 @@ data class Box(
           attributes = this.attributes + attributes
       )
 
+  fun addAttributes(attributes: Map<String, Any?>): Box =
+      this.copy(
+          attributes = this.attributes + attributes
+      )
+
   infix fun handle(handler: InputHandler): Box {
     val nextHandler = if (this.handler != null)
       combineHandlers(this.handler, handler)
@@ -83,6 +88,20 @@ data class Box(
   }
 
   fun toFlower(): Flower = { this }
+}
+
+fun withAttributes(vararg attributes: Pair<String, Any?>): (Flower) -> Flower = { flower ->
+  { seed ->
+    flower(seed)
+        .addAttributes(*attributes)
+  }
+}
+
+fun withAttributes(attributes: Map<String, Any?>): (Flower) -> Flower = { flower ->
+  { seed ->
+    flower(seed)
+        .addAttributes(attributes)
+  }
 }
 
 data class OffsetBox(

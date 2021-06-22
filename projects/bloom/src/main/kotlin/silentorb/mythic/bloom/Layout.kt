@@ -75,7 +75,7 @@ fun centered(box: Box): Flower = { seed ->
       centered(seed.dimensions.y, box.dimensions.y)
   )
   Box(
-      dimensions = seed.dimensions,
+      dimensions = Vector2i(max(seed.dimensions.x, box.dimensions.x), max(seed.dimensions.y, box.dimensions.y)),
       boxes = listOf(OffsetBox(box, offset))
   )
 }
