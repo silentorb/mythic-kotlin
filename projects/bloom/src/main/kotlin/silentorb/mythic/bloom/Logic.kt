@@ -31,6 +31,10 @@ fun composeLogic(vararg logic: LogicModule): LogicModule = { input, box ->
   logic.fold(mapOf()) { a, b -> a + b(input, box) }
 }
 
+fun composeLogic(logicModules: Collection<LogicModule>): LogicModule = { input, box ->
+  logicModules.fold(mapOf()) { a, b -> a + b(input, box) }
+}
+
 fun onDrag(key: String, handler: (Vector2i?) -> BloomState): LogicModule = { input, box ->
   val isDragging = input.state.containsKey(key)
   if (isDragging) {

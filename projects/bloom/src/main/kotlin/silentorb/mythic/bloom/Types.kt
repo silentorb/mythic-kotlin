@@ -76,6 +76,14 @@ data class Box(
           attributes = this.attributes + attributes
       )
 
+  fun addLogic(logic: LogicModule): Box =
+      this.copy(
+          logic = if (this.logic != null)
+            composeLogic(this.logic, logic)
+          else
+            logic
+      )
+
   infix fun handle(handler: InputHandler): Box {
     val nextHandler = if (this.handler != null)
       combineHandlers(this.handler, handler)
@@ -136,6 +144,7 @@ typealias BloomState = StateBag
 data class Seed(
     val dimensions: Vector2i,
     val state: BloomState = mapOf(),
+    val previousState: BloomState = mapOf(),
 )
 
 typealias Flower = (Seed) -> Box
