@@ -2,6 +2,7 @@ package silentorb.mythic.bloom
 
 import silentorb.mythic.bloom.old.isInBounds
 import silentorb.mythic.drawing.Canvas
+import silentorb.mythic.haft.DeviceIndexes
 import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.platforming.Devices
@@ -44,10 +45,17 @@ data class LogicInput(
   fun isMouseOver(box: OffsetBox): Boolean =
       isInBounds(mousePosition, box)
 
+  fun isPressed(device: Int, index: Int): Boolean =
+      deviceStates.last().events.none { it.device == device && it.index == index } &&
+          deviceStates.first().events.any { it.device == device && it.index == index }
+
   val isLeftMouseDownStarted: Boolean
     get() =
       deviceStates.last().events.any(isLeftMouseDownEvent) &&
-          deviceStates.dropLast(1).lastOrNull()?.events?.none(isLeftMouseDownEvent) ?: true
+          deviceStates.first().events.none(isLeftMouseDownEvent)
+
+  val isLeftMouseClick: Boolean
+    get() = isPressed(DeviceIndexes.mouse, 0)
 
   val isLeftMouseDown: Boolean
     get() =
@@ -111,6 +119,14 @@ fun withAttributes(attributes: Map<String, Any?>): (Flower) -> Flower = { flower
         .addAttributes(attributes)
   }
 }
+
+fun withLogic(logic: LogicModule): (Flower) -> Flower = { flower ->
+  { seed ->
+    flower(seed)
+        .addLogic(logic)
+  }
+}
+
 
 data class OffsetBox(
     val child: Box,

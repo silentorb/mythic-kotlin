@@ -50,15 +50,14 @@ fun mapInputToCommands(strokes: Set<Any>, bindings: Bindings, deviceStates: List
         val binding = bindings.firstOrNull { it.device == event.device && it.trigger == event.index }
         if (binding != null) {
           val isStroke = strokes.contains(binding.command)
-          val target = binding.target
           if (!isStroke || previousEvents.none(matches(event))) {
             if (getDebugBoolean("DEBUG_INPUT")) {
-              debugLog("Haft Command: isStroke $isStroke ${binding.command} $target ${event.value}")
+              debugLog("Haft Command: isStroke $isStroke ${binding.command} ${event.value}")
             }
             Command(
                 type = binding.command,
                 value = event.value,
-                target = target,
+                target = 0L,
                 device = event.device
             )
           } else

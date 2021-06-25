@@ -22,7 +22,6 @@ data class Binding(
     val device: Int,
     val trigger: Int,
     val command: Any,
-    val target: Long = 0L
 )
 
 typealias Bindings = List<Binding>

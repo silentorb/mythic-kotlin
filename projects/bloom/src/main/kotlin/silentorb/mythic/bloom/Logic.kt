@@ -1,5 +1,6 @@
 package silentorb.mythic.bloom
 
+import silentorb.mythic.haft.DeviceIndexes
 import silentorb.mythic.platforming.InputEvent
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.toVector2i
@@ -61,6 +62,26 @@ fun onHover(logicModule: LogicModule): LogicModule = { input, box ->
   else
     mapOf()
 }
+
+fun onLeftClick(logicModule: LogicModule): LogicModule = onHover { input, box ->
+  if (input.isLeftMouseClick)
+    logicModule(input, box)
+  else
+    mapOf()
+}
+
+fun onActivate(logicModule: LogicModule): LogicModule = composeLogic(
+    onLeftClick(logicModule),
+    { input, box ->
+      val focusIndex = input.state[menuItemIndexKey] as? Int
+      val isActivatePressed = input.isPressed(DeviceIndexes.keyboard, 257) ||
+          input.isPressed(DeviceIndexes.gamepad, 100)
+      if (box.child.attributes[menuItemIndexKey] == focusIndex && isActivatePressed)
+        logicModule(input, box)
+      else
+        mapOf()
+    }
+)
 
 fun onInputEvent(device: Int, handler: (InputEvent) -> BloomState): LogicModule = { input, box ->
   input.deviceStates
