@@ -36,6 +36,9 @@ fun composeLogic(logicModules: Collection<LogicModule>): LogicModule = { input, 
   logicModules.fold(mapOf()) { a, b -> a + b(input, box) }
 }
 
+fun composeLogicNotNull(vararg logic: LogicModule?): LogicModule =
+    composeLogic(logic.filterNotNull())
+
 fun onDrag(key: String, handler: (Vector2i?) -> BloomState): LogicModule = { input, box ->
   val isDragging = input.state.containsKey(key)
   if (isDragging) {

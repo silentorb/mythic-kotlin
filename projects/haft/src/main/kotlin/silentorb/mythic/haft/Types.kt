@@ -20,7 +20,7 @@ data class InputDeviceState(
 
 data class Binding(
     val device: Int,
-    val trigger: Int,
+    val index: Int,
     val command: Any,
 )
 

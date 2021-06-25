@@ -17,8 +17,12 @@ fun textDepiction(style: IndexedTextStyle, content: String): Depiction = { b, c 
 }
 
 fun label(style: IndexedTextStyle, content: String): Box {
-  val config = TextConfiguration(content, Vector2(), resolveTextStyle(globalFonts(), style))
-  val dimensions = calculateTextDimensions(config)
+  val textStyle = resolveTextStyle(globalFonts(), style)
+  val dimensions = if (content.isEmpty())
+    calculateTextDimensions(TextConfiguration("b", Vector2.zero, textStyle))
+  else
+    calculateTextDimensions(TextConfiguration(content, Vector2.zero, textStyle))
+
   return Box(
       name = if (content.length < 32) content else content.substring(0, 32),
       dimensions = dimensions.toVector2i(),

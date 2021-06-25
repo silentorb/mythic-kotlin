@@ -47,7 +47,7 @@ fun mapInputToCommands(strokes: Set<Any>, bindings: Bindings, deviceStates: List
 
   return deviceStates.last().events
       .mapNotNull { event ->
-        val binding = bindings.firstOrNull { it.device == event.device && it.trigger == event.index }
+        val binding = bindings.firstOrNull { it.device == event.device && it.index == event.index }
         if (binding != null) {
           val isStroke = strokes.contains(binding.command)
           if (!isStroke || previousEvents.none(matches(event))) {
