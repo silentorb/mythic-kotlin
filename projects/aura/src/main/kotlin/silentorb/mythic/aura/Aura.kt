@@ -10,6 +10,7 @@ typealias SoundBuffer = Int
 typealias SoundType = String
 
 typealias SoundDurations = Map<SoundType, Float>
+
 data class SoundData(
     val type: SoundType,
     val buffer: SoundBuffer,
@@ -47,12 +48,19 @@ data class CalculatedSound(
 
 fun updateSoundPlaying(audio: PlatformAudio, newSounds: Table<Sound>, library: SoundLibrary, listenerPosition: Vector3?, gain: Float): (SoundMap) -> SoundMap = { soundMap ->
   audio.update(gain, listenerPosition)
-  val newSoundMappings = newSounds.mapValues { (_, sound) ->
-    val definition = library[sound.type]!!
-    val position = sound.position ?: Vector3.zero
-    audio.play(definition.buffer, sound.volume, position)
-  }
-  val playingSounds = audio.playingSounds()
+  val newSoundMappings = newSounds
+      .mapNotNull { (id, sound) ->
+        val definition = library[sound.type]!!
+        val position = sound.position ?: Vector3.zero
+        val source = audio.play(definition.buffer, sound.volume, position)
+        if (source == null)
+          null
+        else
+          id to source
+      }
+      .associate { it }
+
+  val playingSounds = audio.getPlayingSounds()
   soundMap
       .filterValues { playingSounds.contains(it) }
       .plus(newSoundMappings)

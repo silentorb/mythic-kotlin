@@ -68,10 +68,12 @@ fun millisecondsToBytes(milliseconds: Int): Int {
 }
 
 class DesktopAudio : PlatformAudio {
+  val sourceCount = 16
   var device: Long = 0L
   var context: Long = 0L
   val buffers: MutableSet<Int> = mutableSetOf()
-  val sources: MutableSet<Int> = mutableSetOf()
+  var sources: ArrayList<Int> = arrayListOf()
+  val sourcesBusy: BooleanArray = BooleanArray(sourceCount) { false }
   var gain: Float = 1f
 
   val isActive: Boolean get() = device != 0L
@@ -86,26 +88,31 @@ class DesktopAudio : PlatformAudio {
 
     val alcCapabilities: ALCCapabilities = ALC.createCapabilities(device)
     val alCapabilities: ALCapabilities = AL.createCapabilities(alcCapabilities)
+    val sourceBuffer = IntArray(sourceCount)
+    alGenSources(sourceBuffer)
+    sources.addAll(sourceBuffer.toTypedArray())
   }
 
-  override fun play(buffer: Int, volume: Float, position: Vector3?): Int {
-    val source = alGenSources()
-    alSourcei(source, AL_BUFFER, buffer)
-    if (position != null) {
-      alSource3f(source, AL_POSITION, position.x, position.y, position.z)
+  override fun play(buffer: Int, volume: Float, position: Vector3?): Int? {
+    val sourceIndex = sourcesBusy.indexOf(false)
+    return if (sourceIndex == -1)
+      null
+    else {
+      val source = sources[sourceIndex]
+      sourcesBusy[sourceIndex] = true
+      alSourcei(source, AL_BUFFER, buffer)
+      if (position != null) {
+        alSource3f(source, AL_POSITION, position.x, position.y, position.z)
+      }
+      alSourcePlay(source)
+      source
     }
-    alSourcePlay(source)
-    return source
   }
 
-  override fun playingSounds(): Set<Int> =
+  override fun getPlayingSounds(): Collection<Int> =
       sources
 
   override fun update(gain: Float, listenerPosition: Vector3?) {
-    val finished = sources.filter { source ->
-      alGetSourcei(source, AL_SOURCE_STATE) == AL_STOPPED
-    }
-
     if (gain != this.gain) {
       this.gain = gain
       alListenerf(AL_GAIN, gain)
@@ -115,8 +122,15 @@ class DesktopAudio : PlatformAudio {
       alListener3f(AL_POSITION, listenerPosition.x, listenerPosition.y, listenerPosition.z)
     }
 
-    finished.forEach(::alDeleteSources)
-    sources.removeAll(finished)
+    sources.forEachIndexed { index, source ->
+      if (alGetSourcei(source, AL_SOURCE_STATE) == AL_STOPPED) {
+        sourcesBusy[index] = false
+      }
+    }
+    val error = alGetError()
+    if (error != 0) {
+      val k = 0
+    }
   }
 
   override fun unloadAllSounds() {

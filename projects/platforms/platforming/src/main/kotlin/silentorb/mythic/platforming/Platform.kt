@@ -80,8 +80,8 @@ data class LoadSoundResult(
 
 interface PlatformAudio {
   fun start(latency: Int)
-  fun play(buffer: Int, volume: Float, position: Vector3?): Int
-  fun playingSounds(): Set<Int>
+  fun play(buffer: Int, volume: Float, position: Vector3?): Int?
+  fun getPlayingSounds(): Collection<Int>
   fun update(gain: Float, listenerPosition: Vector3?)
   fun loadSound(filename: String): LoadSoundResult
   fun loadSound(buffer: ShortBuffer, channels: Int, sampleRate: Int): LoadSoundResult
