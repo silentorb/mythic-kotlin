@@ -98,6 +98,17 @@ fun applyFrameBufferTexture(renderer: SceneRenderer, filter: ScreenFilter) {
   canvasDependencies.meshes.imageGl.draw(DrawMethod.triangleFan)
 }
 
+fun applyRenderedBuffers(renderer: Renderer, windowInfo: WindowInfo) {
+
+  if (renderer.multisampler != null) {
+    renderer.multisampler.frameBuffer.activateDraw()
+  } else {
+    globalState.setFrameBuffer(0)
+  }
+
+  applyOffscreenBuffer(renderer.offscreenBuffer, windowInfo.dimensions, false)
+}
+
 fun applyFilters(renderer: SceneRenderer, filters: List<ScreenFilter>) {
   globalState.cullFaces = false
   globalState.viewport = renderer.viewport
@@ -109,14 +120,7 @@ fun applyFilters(renderer: SceneRenderer, filters: List<ScreenFilter>) {
   for (filter in filters) {
     applyFrameBufferTexture(renderer, filter)
   }
-
-  if (renderer.renderer.multisampler != null) {
-    renderer.renderer.multisampler.frameBuffer.activateDraw()
-  } else {
-    globalState.setFrameBuffer(0)
-  }
-
-  applyOffscreenBuffer(renderer.offscreenBuffer, renderer.windowInfo.dimensions, false)
+  applyRenderedBuffers(renderer.renderer, renderer.windowInfo)
 }
 
 fun getScreenScale(renderer: SceneRenderer): Vector2 {
