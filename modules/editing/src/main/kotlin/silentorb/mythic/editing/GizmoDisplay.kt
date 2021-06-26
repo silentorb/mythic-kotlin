@@ -141,6 +141,11 @@ fun drawJoints(editor: Editor, transform: ScreenTransform, drawList: ImDrawList)
   }
 }
 
+fun sceneCenterPoint(transform: ScreenTransform, drawList: ImDrawList) {
+  val center = transform(Vector3.zero)
+  drawList.addCircleFilled(center.x, center.y, 3f, ImColor.intToColor(200, 255, 150, 128))
+}
+
 fun drawEditor3dElements(editor: Editor, viewport: Vector4i, camera: CameraRig) {
   val drawList = ImGui.getBackgroundDrawList()
 
@@ -151,6 +156,7 @@ fun drawEditor3dElements(editor: Editor, viewport: Vector4i, camera: CameraRig) 
   drawSelectedObjectAnnotations(editor, transform, drawList)
   drawJoints(editor, transform, drawList)
   drawCompass(viewport, camera, drawList)
+  sceneCenterPoint(transform, drawList)
 
   val environment = GizmoEnvironment(
       editor = editor,

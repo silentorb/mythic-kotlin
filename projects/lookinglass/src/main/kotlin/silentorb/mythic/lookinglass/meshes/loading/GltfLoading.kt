@@ -12,7 +12,12 @@ import silentorb.mythic.scenery.LightType
 import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.spatial.newVector4
 
-fun loadMaterial(info: GltfInfo, materialIndex: Int): Material {
+// considerFaceCulling exists to workaround how Blender (and probably other 3D content creation tools) default
+// to double sided, while Mythic needs to default to not default sided.
+// Instead of trying to remember to manually set 99% of the materials in blender to have backface culling enabled,
+// the loader is ignoring glTF's doubleSided field unless the considerFaceCulling is added to the object which
+// contains the material
+fun loadMaterial(info: GltfInfo, materialIndex: Int, considerFaceCulling: Boolean): Material {
   val materialSource = info.materials?.getOrNull(materialIndex)
   return if (materialSource == null)
     Material(
@@ -36,11 +41,14 @@ fun loadMaterial(info: GltfInfo, materialIndex: Int): Material {
       toCamelCase(gltfImage.uri.substringBeforeLast(".").substringAfterLast("/").substringAfterLast("\\"))
     }
 
+    val doubleSided = considerFaceCulling && materialSource.doubleSided
+
     Material(
         color = color,
         glow = glow,
         texture = texture,
-        shading = true
+        shading = true,
+        doubleSided = doubleSided,
     )
   }
 }

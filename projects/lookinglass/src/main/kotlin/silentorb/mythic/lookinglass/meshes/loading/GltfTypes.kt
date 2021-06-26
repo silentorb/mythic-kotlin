@@ -117,6 +117,7 @@ data class Metallic(
 )
 
 data class MaterialInfo(
+    val doubleSided: Boolean = false,
     val pbrMetallicRoughness: Metallic,
     val emissiveFactor: List<Float>?
 )

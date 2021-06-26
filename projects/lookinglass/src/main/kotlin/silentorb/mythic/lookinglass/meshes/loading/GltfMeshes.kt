@@ -208,9 +208,10 @@ fun loadMeshes(info: GltfInfo, buffer: ByteBuffer, vertexSchemas: VertexSchemas,
           null
         else {
           val name2 = mesh.name.replace(".001", "")
+          val considerFaceCulling = info.nodes[nodeIndex].extras?.containsKey("consider-face-culling") ?: false
           val parentBone = getParentBone(info, nodeIndex, boneMap)
           val primitives = mesh.primitives.map { primitiveSource ->
-            val material = loadMaterial(info, primitiveSource.material)
+            val material = loadMaterial(info, primitiveSource.material, considerFaceCulling)
             val converter = createVertexConverter(info, buffer, boneMap, meshIndex)
             val vertexSchema = getVertexSchema(vertexSchemas, primitiveSource.attributes)
             silentorb.mythic.lookinglass.meshes.Primitive(
