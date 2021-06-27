@@ -24,11 +24,15 @@ fun getResourceUrl(path: String): URL? =
 fun getResourceStream(path: String): InputStream? =
     Loading::class.java.classLoader.getResourceAsStream(sanitizeResourcePath(path))
 
-fun loadTextResource(name: String): String =
+fun loadTextResource(name: String): String? =
     getResourceStream(name).use { inputStream ->
-      val s = Scanner(inputStream!!).useDelimiter("\\A")
-      val result = if (s.hasNext()) s.next() else ""
-      result
+      if (inputStream == null)
+        null
+      else {
+        val s = Scanner(inputStream).useDelimiter("\\A")
+        val result = if (s.hasNext()) s.next() else ""
+        result
+      }
     }
 
 fun bufferStream(input: InputStream): ByteBuffer {
@@ -102,8 +106,7 @@ fun ioResourceToByteBuffer(resource: String, bufferSize: Int = 8 * 1024, loadPar
                   if (buffer.remaining() == 0) {
                     if (loadPartial) {
                       break
-                    }
-                    else {
+                    } else {
                       buffer = resizeBuffer(buffer, buffer.capacity() * 3 / 2) // 50%
                     }
                   }
@@ -144,7 +147,7 @@ fun listFilesAndFoldersRecursive(path: Path): List<Path> =
                 paths
                     .toList()
                     .filterIsInstance<Path>()
-                    .flatMap {child ->
+                    .flatMap { child ->
                       listFilesAndFoldersRecursive(child)
                     }
               }
