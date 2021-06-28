@@ -1,5 +1,14 @@
 package silentorb.mythic.bloom
 
+import silentorb.mythic.spatial.Vector2i
+
+fun depictBox(dimensions: Vector2i, depiction: Depiction): Box =
+    Box(
+        name = "depiction",
+        dimensions = dimensions,
+        depiction = depiction,
+    )
+
 fun depict(depiction: StateDepiction): Flower = { seed ->
   Box(
       name = "depiction",
