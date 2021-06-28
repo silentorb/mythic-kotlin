@@ -164,7 +164,7 @@ data class Seed(
 )
 
 typealias Flower = (Seed) -> Box
-typealias WildFlower = (Box) -> Box
+typealias WildFlower = (Box) -> Flower
 typealias LengthFlower = (Int) -> Box
 typealias BoxSource<T> = (T) -> Box
 

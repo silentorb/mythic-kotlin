@@ -80,6 +80,18 @@ fun centered(box: Box): Flower = { seed ->
   )
 }
 
+fun centeredFlower(flower: Flower): Flower = { seed ->
+  val box = flower(seed)
+  val offset = Vector2i(
+      centered(seed.dimensions.x, box.dimensions.x),
+      centered(seed.dimensions.y, box.dimensions.y)
+  )
+  Box(
+      dimensions = Vector2i(max(seed.dimensions.x, box.dimensions.x), max(seed.dimensions.y, box.dimensions.y)),
+      boxes = listOf(OffsetBox(box, offset))
+  )
+}
+
 fun alignSingleFlower(aligner: Aligner, plane: Plane, content: Flower): Flower = { seed ->
   val parent = plane(seed.dimensions)
   val box = content(seed.copy(dimensions = parent))
@@ -92,7 +104,7 @@ fun alignSingleFlower(aligner: Aligner, plane: Plane, content: Flower): Flower =
   )
 
   Box(
-      dimensions = seed.dimensions,
+      dimensions = plane(Vector2i(plane(seed.dimensions).x, plane(box.dimensions).y)),
       boxes = listOf(OffsetBox(box, offset))
   )
 }

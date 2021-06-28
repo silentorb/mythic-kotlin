@@ -41,3 +41,9 @@ fun solidBackground(backgroundColor: Vector4): Depiction = { b: Bounds, canvas: 
   drawFill(b, canvas, backgroundColor)
   drawBorder(b, canvas, Vector4(0f, 0f, 0f, 1f), 2f)
 }
+
+fun composeDepictions(vararg depictions: Depiction): Depiction = { b, c ->
+  for (depiction in depictions) {
+    depiction(b, c)
+  }
+}

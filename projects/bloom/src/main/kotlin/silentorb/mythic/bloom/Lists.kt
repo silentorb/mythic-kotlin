@@ -95,9 +95,10 @@ fun flowerList(plane: Plane, spacing: Int = 0): (List<Flower>) -> Flower = { chi
     val initialBoxes = children.map { it(seed) }
     val boxes = arrangeListItems(plane, spacing, initialBoxes)
     val length = getListLength(plane, boxes)
+    val breadth = getListBreadth2(plane, boxes)
     Box(
         name = "list",
-        dimensions = plane(Vector2i(length, plane(seed.dimensions).y)),
+        dimensions = plane(Vector2i(length, breadth)),
         boxes = boxes
     )
   }

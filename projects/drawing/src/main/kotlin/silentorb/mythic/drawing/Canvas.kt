@@ -172,9 +172,11 @@ class Canvas(
     mesh.draw(DrawMethod.triangleFan)
   }
 
-  fun drawImage(position: Vector2, dimensions: Vector2, brush: Brush) {
-    brush(transformScalar(position, dimensions), meshes.image)
-  }
+  fun drawImage(position: Vector2, dimensions: Vector2, brush: Brush) =
+      brush(transformScalar(position, dimensions), meshes.image)
+
+  fun drawImage(transform: Matrix, brush: Brush) =
+      brush(transform, meshes.image)
 
   fun drawDynamicImage(position: Vector2, dimensions: Vector2, brush: Brush, vertexData: List<Float>) {
     dynamicTexturedMesh.load(vertexData)
