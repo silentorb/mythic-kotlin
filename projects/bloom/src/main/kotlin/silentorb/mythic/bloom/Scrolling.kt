@@ -1,7 +1,6 @@
 package silentorb.mythic.bloom
 
-import silentorb.mythic.haft.DeviceIndexes
-import silentorb.mythic.haft.MouseCommands
+import silentorb.mythic.haft.*
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.spatial.minMax
@@ -56,12 +55,17 @@ fun scrollableY(key: String, content: Flower): Flower = { seed ->
   val dragKey = "${key}_drag"
   val isDragging = seed.state.containsKey(dragKey)
   val pageIncrement = seed.dimensions.y / 8
+  val keyScrollIncrement = seed.dimensions.y / 32
   val scrollMax = box.dimensions.y - seed.dimensions.y
   val constrainOffset = { offset: Int -> minMax(0, scrollMax, offset) }
   val initialContentOffset = seed.state[key] as? Int ?: 0
   val initialClippedContentOffset = constrainOffset(initialContentOffset)
 
   val focusIndex = getFocusIndex(seed.state)
+  val hasMenu = findNestedBox(OffsetBox(box)) { b ->
+    b.child.attributes.containsKey(menuItemIndexKey)
+  } != null
+
   val focusedBox = if (getFocusIndex(seed.previousState) != focusIndex)
     findNestedBox(OffsetBox(box)) { b ->
       b.child.attributes[menuItemIndexKey] == focusIndex
@@ -100,6 +104,29 @@ fun scrollableY(key: String, content: Flower): Flower = { seed ->
             null,
           if (contentOffset != initialContentOffset)
             ({ _, _ -> mapOf(key to contentOffset) })
+          else
+            null,
+          if (!hasMenu)
+            composeLogic(
+                onInputEvent(DeviceIndexes.keyboard) { event ->
+                  when (event.index) {
+                    264 -> mapOf(key to constrainOffset(contentOffset + keyScrollIncrement))
+                    265 -> mapOf(key to constrainOffset(contentOffset - keyScrollIncrement))
+                    267 -> mapOf(key to constrainOffset(contentOffset + pageIncrement))
+                    266 -> mapOf(key to constrainOffset(contentOffset - pageIncrement))
+                    else -> mapOf()
+                  }
+                },
+                onInputEvent(DeviceIndexes.gamepad) { event ->
+                  when (event.index) {
+                    GAMEPAD_AXIS_RIGHT_DOWN, GAMEPAD_AXIS_LEFT_DOWN, GAMEPAD_BUTTON_DPAD_DOWN ->
+                      mapOf(key to constrainOffset(contentOffset + keyScrollIncrement))
+                    GAMEPAD_AXIS_RIGHT_UP, GAMEPAD_AXIS_LEFT_UP, GAMEPAD_BUTTON_DPAD_UP ->
+                      mapOf(key to constrainOffset(contentOffset - keyScrollIncrement))
+                    else -> mapOf()
+                  }
+                },
+            )
           else
             null
       )
