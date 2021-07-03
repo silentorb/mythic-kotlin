@@ -145,14 +145,15 @@ fun alignSingle(aligner: Aligner, plane: Plane, box: Box): LengthFlower = { leng
 fun alignBoth(horizontal: Aligner, vertical: Aligner, flower: Flower): Flower =
     { seed ->
       val box = flower(seed)
-      val offset = Vector2i(
+      val rawOffset = Vector2i(
           horizontal(seed.dimensions.x, box.dimensions.x),
           vertical(seed.dimensions.y, box.dimensions.y)
       )
 
-      // Currently doesn't support negative numbers
-      assert(offset.x >= 0)
-      assert(offset.y >= 0)
+      val offset = Vector2i(
+          max(0, rawOffset.x),
+          max(0, rawOffset.y)
+      )
 
       Box(
           dimensions = box.dimensions + offset,

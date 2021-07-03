@@ -8,7 +8,6 @@ import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.spatial.put
 import org.lwjgl.BufferUtils
 
-private val _max_width = 0f
 val unitConversion = 24f
 private val line_height = 2f
 
@@ -20,7 +19,8 @@ data class TextStyle(
 data class TextConfiguration(
     val content: String,
     val position: Vector2,
-    val style: TextStyle
+    val style: TextStyle,
+    val maxWidth: Float = 0f,
 )
 
 data class TextPackage(
@@ -29,8 +29,8 @@ data class TextPackage(
 
 data class ArrangedCharacter(
     val glyph: Glyph,
-    val x: Float,
-    val y: Float
+    var x: Float,
+    var y: Float
 )
 
 data class TypeArrangement(
@@ -42,21 +42,17 @@ data class TypeArrangement(
 fun arrangeType(config: TextConfiguration): TypeArrangement? {
   val content = config.content
   val font = config.style.font
-  val size = font.dimensions.y
   val characters = font.characters
-  val inserted_newlines: MutableList<Int> = mutableListOf()
   var block_dimensionsX = 0f
-  var block_dimensionsY = 0f
+  val maxWidth = config.maxWidth
 
-  val characterCount = content.length - content.count { it == ' ' }
-  if (characterCount == 0) {
+  val characterCount = content.count { it != ' ' }
+  if (characterCount == 0)
     return null
-  }
 
   val arrangedCharacters = ArrayList<ArrangedCharacter>(characterCount)
 
   val letter_space = font.additionalKerning
-  val max_width = _max_width * unitConversion / size
   val line_step = font.height * line_height
   var x = 0f
   var y = font.height
@@ -69,7 +65,7 @@ fun arrangeType(config: TextConfiguration): TypeArrangement? {
     val c = content[i]
     if (c == ' ') {
       last_space_x = x
-      last_space_index = i
+      last_space_index = arrangedCharacters.size
       x += font.spaceWidth
       following_visible_character = false
       continue
@@ -101,12 +97,17 @@ fun arrangeType(config: TextConfiguration): TypeArrangement? {
     ))
     x += character.info.advanceX
 
-    if (_max_width != 0f && x > max_width && last_space_index > 0) {
+    if (maxWidth != 0f && x > maxWidth && last_space_index > 0) {
       if (last_space_x > block_dimensionsX) {
         block_dimensionsX = last_space_x
       }
 
-      inserted_newlines.add(last_space_index)
+      for (c2 in last_space_index until arrangedCharacters.size) {
+        val char = arrangedCharacters[c2]
+        char.x -= last_space_x
+        char.y += line_step
+      }
+
       y += line_step
       x -= last_space_x
       last_space_index = 0
@@ -115,12 +116,6 @@ fun arrangeType(config: TextConfiguration): TypeArrangement? {
 
     following_visible_character = true
   }
-
-  if (x > block_dimensionsX) {
-    block_dimensionsX = x
-  }
-
-  block_dimensionsY = y
 
   return TypeArrangement(
       arrangedCharacters,

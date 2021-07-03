@@ -11,23 +11,36 @@ import silentorb.mythic.typography.TextConfiguration
 import silentorb.mythic.typography.calculateTextDimensions
 import silentorb.mythic.typography.resolveTextStyle
 
-fun textDepiction(style: IndexedTextStyle, content: String): Depiction = { b, c ->
+fun textDepiction(style: IndexedTextStyle, content: String, maxWidth: Int = 0): Depiction = { b, c ->
   val position = b.position
-  c.drawText(position, style, content)
+  c.drawText(position, style, content, maxWidth.toFloat())
 }
 
-fun label(style: IndexedTextStyle, content: String): Box {
+fun label(style: IndexedTextStyle, content: String, maxWidth: Int = 0): Box {
   val textStyle = resolveTextStyle(globalFonts(), style)
-  val dimensions = if (content.isEmpty())
-    calculateTextDimensions(TextConfiguration("b", Vector2.zero, textStyle))
+  val dimensionsContent = if (content.isEmpty())
+    "b"
   else
-    calculateTextDimensions(TextConfiguration(content, Vector2.zero, textStyle))
+    content
+
+  val dimensionsConfig = TextConfiguration(
+      content = dimensionsContent,
+      position = Vector2.zero,
+      style = textStyle,
+      maxWidth = maxWidth.toFloat(),
+  )
+
+  val dimensions = calculateTextDimensions(dimensionsConfig)
 
   return Box(
       name = if (content.length < 32) content else content.substring(0, 32),
       dimensions = dimensions.toVector2i(),
-      depiction = textDepiction(style, content)
+      depiction = textDepiction(style, content, maxWidth)
   )
+}
+
+fun textBox(style: IndexedTextStyle, content: String): Flower = { seed ->
+  label(style, content, seed.dimensions.x)
 }
 
 fun clipBox(bounds: Bounds, depiction: Depiction): Depiction = { b, c ->

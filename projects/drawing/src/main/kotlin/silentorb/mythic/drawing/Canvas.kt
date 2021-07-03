@@ -197,14 +197,15 @@ class Canvas(
     drawTextRaw(config, effects.coloredImage, vertexSchemas.image, transform)
   }
 
-  fun drawText(position: Vector2, style: IndexedTextStyle, content: String) {
+  fun drawText(position: Vector2, style: IndexedTextStyle, content: String, maxWidth: Float = 0f) {
     val transform = prepareTextMatrix(pixelsToScalar, position)
     val textStyle = resolveTextStyle(fonts, style)
-    drawTextRaw(TextConfiguration(content, position, textStyle), effects.coloredImage, vertexSchemas.image, transform)
+    val config = TextConfiguration(content, position, textStyle, maxWidth)
+    drawTextRaw(config, effects.coloredImage, vertexSchemas.image, transform)
   }
 
-  fun drawText(position: Vector2i, style: IndexedTextStyle, content: String) =
-      drawText(position.toVector2(), style, content)
+  fun drawText(position: Vector2i, style: IndexedTextStyle, content: String, maxWidth: Float = 0f) =
+      drawText(position.toVector2(), style, content, maxWidth)
 
   fun crop(value: Vector4i, action: () -> Unit) = withCropping(value, action)
 
