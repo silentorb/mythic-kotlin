@@ -13,7 +13,7 @@ import silentorb.mythic.typography.resolveTextStyle
 
 fun textDepiction(style: IndexedTextStyle, content: String, maxWidth: Int = 0): Depiction = { b, c ->
   val position = b.position
-  c.drawText(position, style, content, maxWidth.toFloat())
+  c.drawText(position, style, content, maxWidth)
 }
 
 fun label(style: IndexedTextStyle, content: String, maxWidth: Int = 0): Box {
@@ -25,16 +25,15 @@ fun label(style: IndexedTextStyle, content: String, maxWidth: Int = 0): Box {
 
   val dimensionsConfig = TextConfiguration(
       content = dimensionsContent,
-      position = Vector2.zero,
       style = textStyle,
-      maxWidth = maxWidth.toFloat(),
+      maxWidth = maxWidth,
   )
 
   val dimensions = calculateTextDimensions(dimensionsConfig)
 
   return Box(
       name = if (content.length < 32) content else content.substring(0, 32),
-      dimensions = dimensions.toVector2i(),
+      dimensions = dimensions,
       depiction = textDepiction(style, content, maxWidth)
   )
 }

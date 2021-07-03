@@ -3,13 +3,12 @@ package silentorb.mythic.typography
 import silentorb.mythic.glowing.Drawable
 import silentorb.mythic.glowing.SimpleMesh
 import silentorb.mythic.glowing.VertexSchema
-import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector4
-import silentorb.mythic.spatial.put
 import org.lwjgl.BufferUtils
+import silentorb.mythic.spatial.Vector2i
+import silentorb.mythic.spatial.put
 
 val unitConversion = 24f
-private val line_height = 2f
 
 data class TextStyle(
     val font: Font,
@@ -18,9 +17,9 @@ data class TextStyle(
 
 data class TextConfiguration(
     val content: String,
-    val position: Vector2,
     val style: TextStyle,
-    val maxWidth: Float = 0f,
+    val maxWidth: Int = 0,
+    val lineHeight: Int = 2,
 )
 
 data class TextPackage(
@@ -29,21 +28,21 @@ data class TextPackage(
 
 data class ArrangedCharacter(
     val glyph: Glyph,
-    var x: Float,
-    var y: Float
+    var x: Int,
+    var y: Int
 )
 
 data class TypeArrangement(
     val characters: List<ArrangedCharacter>,
-    val width: Float,
-    val height: Float
+    val width: Int,
+    val height: Int,
 )
 
 fun arrangeType(config: TextConfiguration): TypeArrangement? {
   val content = config.content
   val font = config.style.font
   val characters = font.characters
-  var block_dimensionsX = 0f
+  var block_dimensionsX = 0
   val maxWidth = config.maxWidth
 
   val characterCount = content.count { it != ' ' }
@@ -52,19 +51,19 @@ fun arrangeType(config: TextConfiguration): TypeArrangement? {
 
   val arrangedCharacters = ArrayList<ArrangedCharacter>(characterCount)
 
-  val letter_space = font.additionalKerning
-  val line_step = font.height * line_height
-  var x = 0f
+  val letterSpace = font.additionalKerning
+  val lineStep = font.height * config.lineHeight
+  var x = 0
   var y = font.height
   var following_visible_character = false
-  block_dimensionsX = 0f
+  block_dimensionsX = 0
   var last_space_index = 0
-  var last_space_x = 0f
+  var lastSpaceX = 0
 
   for (i in 0 until content.length) {
     val c = content[i]
     if (c == ' ') {
-      last_space_x = x
+      lastSpaceX = x
       last_space_index = arrangedCharacters.size
       x += font.spaceWidth
       following_visible_character = false
@@ -76,16 +75,16 @@ fun arrangeType(config: TextConfiguration): TypeArrangement? {
         block_dimensionsX = x
       }
 
-      y += line_step
-      x = 0f
+      y += lineStep
+      x = 0
       following_visible_character = false
       last_space_index = 0
-      last_space_x = 0f
+      lastSpaceX = 0
       continue
     }
 
     if (following_visible_character) {
-      x += letter_space
+      x += letterSpace
     }
 
     val character = characters[c]!!
@@ -97,21 +96,21 @@ fun arrangeType(config: TextConfiguration): TypeArrangement? {
     ))
     x += character.info.advanceX
 
-    if (maxWidth != 0f && x > maxWidth && last_space_index > 0) {
-      if (last_space_x > block_dimensionsX) {
-        block_dimensionsX = last_space_x
+    if (maxWidth != 0 && x > maxWidth && last_space_index > 0) {
+      if (lastSpaceX > block_dimensionsX) {
+        block_dimensionsX = lastSpaceX
       }
 
       for (c2 in last_space_index until arrangedCharacters.size) {
         val char = arrangedCharacters[c2]
-        char.x -= last_space_x
-        char.y += line_step
+        char.x -= lastSpaceX
+        char.y += lineStep
       }
 
-      y += line_step
-      x -= last_space_x
+      y += lineStep
+      x -= lastSpaceX
       last_space_index = 0
-      last_space_x = 0f
+      lastSpaceX = 0
     }
 
     following_visible_character = true
@@ -123,12 +122,12 @@ fun arrangeType(config: TextConfiguration): TypeArrangement? {
   )
 }
 
-fun calculateTextDimensions(config: TextConfiguration): Vector2 {
+fun calculateTextDimensions(config: TextConfiguration): Vector2i {
   val arrangement = arrangeType(config)
   return if (arrangement != null)
-    Vector2(arrangement.width, arrangement.height)
+    Vector2i(arrangement.width, arrangement.height)
   else
-    Vector2()
+    Vector2i.zero
 }
 
 private val maxCharacters = 128
@@ -151,14 +150,14 @@ fun prepareText(config: TextConfiguration, vertexSchema: VertexSchema): TextPack
 
   for (arrangedCharacter in arrangement.characters) {
     val glyph = arrangedCharacter.glyph
-    val x = arrangedCharacter.x
-    val y = arrangedCharacter.y
-    val width = glyph.info.sizeX
+    val x = arrangedCharacter.x.toFloat()
+    val y = arrangedCharacter.y.toFloat()
+    val width = glyph.info.sizeX.toFloat()
     val height = glyph.info.sizeY.toFloat()
-    val texture_width = (width + 0).toFloat() / config.style.font.dimensions.x
+    val textureWidth = width / config.style.font.dimensions.x.toFloat()
 
-    vertexBuffer.put(x + width, y - height, texture_width, glyph.offset)
-    vertexBuffer.put(x + width, y, texture_width, glyph.offset + glyph.height)
+    vertexBuffer.put(x + width, y - height, textureWidth, glyph.offset)
+    vertexBuffer.put(x + width, y, textureWidth, glyph.offset + glyph.height)
     vertexBuffer.put(x, y, 0f, glyph.offset + glyph.height)
     vertexBuffer.put(x, y - height, 0f, glyph.offset)
 

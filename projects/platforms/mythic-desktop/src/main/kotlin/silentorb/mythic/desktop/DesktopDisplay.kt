@@ -21,7 +21,10 @@ fun createWindow(title: String, config: PlatformDisplayConfig): Long {
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE)
   }
 //  val pid = ProcessHandle.current().getPid()
-  val dimensions = config.windowedDimensions ?: Vector2i.unit
+
+  // Even if the window is maximized and not using windowedDimensions, the initial dimensions determine
+  // the dimensions used when the window is restored
+  val dimensions = config.windowedDimensions ?: Vector2i(800, 600)
 
   val window = glfwCreateWindow(dimensions.x, dimensions.y, title, MemoryUtil.NULL, MemoryUtil.NULL)
   if (window == MemoryUtil.NULL)

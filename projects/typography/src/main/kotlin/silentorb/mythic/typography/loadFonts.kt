@@ -93,7 +93,7 @@ data class FontLoadInfo(
     val filename: String,
     val pixelWidth: Int = 0,
     val pixelHeight: Int,
-    val additionalKerning: Float = 0f,
+    val additionalKerning: Int = 0,
     val loadFlags: Int = FT_LOAD_RENDER,
     val renderMode: RenderMode = RenderMode.FT_RENDER_MODE_NORMAL,
     val monospace: Int? = null

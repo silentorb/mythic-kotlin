@@ -56,7 +56,8 @@ fun boxMargin(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, 
 fun flowerMargin(all: Int = 0, left: Int = all, top: Int = all, bottom: Int = all, right: Int = all): (Flower) -> Flower = { flower ->
   val sizeOffset = Vector2i(left + right, top + bottom)
   ;{ seed ->
-  val child = flower(seed.copy(dimensions = seed.dimensions - sizeOffset))
+  val childSeed = seed.copy(dimensions = floorDimensions(seed.dimensions - sizeOffset))
+  val child = flower(childSeed)
   Box(
       dimensions = child.dimensions + sizeOffset,
       boxes = listOf(

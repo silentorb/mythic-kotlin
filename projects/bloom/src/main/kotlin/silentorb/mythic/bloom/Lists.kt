@@ -104,6 +104,33 @@ fun flowerList(plane: Plane, spacing: Int = 0): (List<Flower>) -> Flower = { chi
   }
 }
 
+fun flowerBoxList(plane: Plane, spacing: Int = 0): (List<FlowerOrBox>) -> Flower = { children ->
+  { seed ->
+    val reservedLength = children
+        .mapNotNull { it as? Box }
+        .sumBy { plane(it.dimensions).x } +
+        (children.size - 1) * spacing
+
+    val childSeed = seed.copy(
+        dimensions = seed.dimensions - plane(Vector2i(reservedLength, 0)),
+    )
+    val initialBoxes = children.map {
+      if (it is Box)
+        it
+      else (it as Flower)(childSeed)
+    }
+
+    val boxes = arrangeListItems(plane, spacing, initialBoxes)
+    val length = getListLength(plane, boxes)
+    val breadth = getListBreadth2(plane, boxes)
+    Box(
+        name = "flowerBoxList",
+        dimensions = plane(Vector2i(length, breadth)),
+        boxes = boxes
+    )
+  }
+}
+
 fun horizontalList(spacing: Int = 0): SimpleBoxContainer =
     boxList(horizontalPlane, spacing)
 

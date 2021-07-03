@@ -105,7 +105,7 @@ fun drawText(renderer: SceneRenderer, content: String, position: Vector3, style:
   val dimensions = Vector2i(renderer.viewport.z, renderer.viewport.w)
   val point = transformToScreen(renderer.cameraEffectsData.transform, position)
   if (point != null) {
-    val config = TextConfiguration(content, point, style)
+    val config = TextConfiguration(content, style)
     val pixelsToScalar = Matrix.identity.scale(1f / dimensions.x, 1f / dimensions.y, 1f)
 //    val transform = prepareTextMatrix(pixelsToScalar, pos2)
     val rawPoint = renderer.cameraEffectsData.transform * Vector4(position.x, position.y, position.z, 1f)

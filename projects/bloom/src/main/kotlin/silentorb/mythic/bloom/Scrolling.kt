@@ -46,9 +46,10 @@ fun findNestedBox(box: OffsetBox, predicate: (OffsetBox) -> Boolean): OffsetBox?
           .firstOrNull()
 
 fun scrollableY(key: String, content: Flower): Flower = { seed ->
-  val box = content(seed)
   val spacing = 10
   val inset = scrollbarWidth + spacing
+  val childSeed = seed.copy(dimensions = seed.dimensions.copy(x = seed.dimensions.x - inset))
+  val box = content(childSeed)
   val c = if (box.dimensions.y == 0) 1 else box.dimensions.y
   val v = seed.dimensions.y
   val scrollBarHeight = seed.dimensions.y * v / c

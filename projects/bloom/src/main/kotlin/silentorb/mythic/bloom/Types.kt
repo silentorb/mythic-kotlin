@@ -74,6 +74,14 @@ data class Box(
     override val attributes: Map<String, Any?> = mapOf()
 ) : DimensionBox, AttributeHolder {
 
+  init {
+    assert(dimensions.x > -1)
+    assert(dimensions.y > -1)
+    if (dimensions.x == 463) {
+      val k = 0
+    }
+  }
+
   fun addAttributes(vararg attributes: Pair<String, Any?>): Box =
       this.copy(
           attributes = this.attributes + attributes
@@ -142,26 +150,17 @@ data class OffsetBox(
 }
 
 typealias BloomState = StateBag
-//data class BloomState(
-//    val ephemeral: StateBag = mapOf(),
-//    val persistent: StateBag = mapOf(),
-//) {
-//  operator fun plus(value: BloomState): BloomState =
-//      BloomState(
-//          ephemeral = this.ephemeral + value.ephemeral,
-//          persistent = this.persistent + value.persistent,
-//      )
-//
-//  companion object {
-//    val empty = BloomState()
-//  }
-//}
 
 data class Seed(
     val dimensions: Vector2i,
     val state: BloomState = mapOf(),
     val previousState: BloomState = mapOf(),
-)
+) {
+  init {
+    assert(dimensions.x > -1)
+    assert(dimensions.y > -1)
+  }
+}
 
 typealias Flower = (Seed) -> Box
 typealias WildFlower = (Box) -> Flower
@@ -171,3 +170,4 @@ typealias BoxSource<T> = (T) -> Box
 typealias Depiction = (Bounds, Canvas) -> Unit
 typealias StateBag = Map<String, Any>
 typealias StateBagMods = StateBag?
+typealias FlowerOrBox = Any
