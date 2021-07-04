@@ -1,6 +1,5 @@
 package silentorb.mythic.lookinglass
 
-import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA
 import org.lwjgl.opengl.GL11.GL_SRC_ALPHA
 import silentorb.mythic.debugging.getDebugBoolean
@@ -11,6 +10,8 @@ import silentorb.mythic.lookinglass.deferred.applyDeferredShading
 import silentorb.mythic.lookinglass.drawing.renderElementGroups
 import silentorb.mythic.lookinglass.drawing.renderHighlight
 import silentorb.mythic.lookinglass.drawing.renderVolumes
+import silentorb.mythic.lookinglass.pipeline.activateDirectRendering
+import silentorb.mythic.lookinglass.pipeline.activateOffscreenRendering
 import silentorb.mythic.scenery.Camera
 import silentorb.mythic.spatial.Vector4
 

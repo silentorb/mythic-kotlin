@@ -3,7 +3,7 @@ package silentorb.mythic.lookinglass
 import silentorb.mythic.drawing.drawTextRaw
 import silentorb.mythic.drawing.getStaticCanvasDependencies
 import silentorb.mythic.glowing.DrawMethod
-import silentorb.mythic.glowing.OffscreenBuffer
+import silentorb.mythic.lookinglass.pipeline.OffscreenBuffer
 import silentorb.mythic.glowing.globalState
 import silentorb.mythic.lookinglass.shading.*
 import silentorb.mythic.lookinglass.texturing.DynamicTextureLibrary
@@ -87,9 +87,6 @@ data class SceneRenderer(
 
   val meshes: ModelMeshMap
     get() = renderer.meshes
-
-  val offscreenBuffer: OffscreenBuffer
-    get() = renderer.offscreenBuffer
 
   val uniformBuffers: UniformBuffers
     get() = renderer.uniformBuffers

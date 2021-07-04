@@ -127,9 +127,10 @@ data class Texture(
     if (target == TextureTarget.multisample) {
       globalState.multisampleEnabled = true
     }
-
     bind()
   }
+
+  val dimensions: Vector2i get() = Vector2i(width, height)
 
   fun dispose() {
     glDeleteTextures(id)

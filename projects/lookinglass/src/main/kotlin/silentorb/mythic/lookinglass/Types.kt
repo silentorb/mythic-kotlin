@@ -7,7 +7,7 @@ import silentorb.mythic.drawing.createDrawingEffects
 import silentorb.mythic.glowing.*
 import silentorb.mythic.lookinglass.deferred.DeferredShading
 import silentorb.mythic.lookinglass.meshes.VertexSchemas
-import silentorb.mythic.lookinglass.meshes.createVertexSchemas
+import silentorb.mythic.lookinglass.pipeline.OffscreenBuffer
 import silentorb.mythic.lookinglass.shading.*
 import silentorb.mythic.lookinglass.texturing.DynamicTextureLibrary
 import silentorb.mythic.platforming.PlatformDisplayConfig
@@ -96,7 +96,7 @@ data class Renderer(
     val armatures: Map<ArmatureName, Armature>,
     val vertexSchemas: VertexSchemas,
     val fonts: List<FontSet>,
-    val offscreenBuffer: OffscreenBuffer,
+    var offscreenBuffer: OffscreenBuffer? = null,
     val textures: DynamicTextureLibrary = mutableMapOf()
 ) {
   val uniformBuffers = UniformBuffers(

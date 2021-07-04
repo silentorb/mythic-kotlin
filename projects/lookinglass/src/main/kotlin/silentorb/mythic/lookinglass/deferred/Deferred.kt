@@ -6,6 +6,9 @@ import org.lwjgl.opengl.GL20.glDrawBuffers
 import org.lwjgl.opengl.GL30.*
 import silentorb.mythic.glowing.*
 import silentorb.mythic.lookinglass.*
+import silentorb.mythic.lookinglass.pipeline.applyFrameBufferTexture
+import silentorb.mythic.lookinglass.pipeline.getOrCreateOffscreenBuffer
+import silentorb.mythic.lookinglass.pipeline.newFrameBufferTexture
 import silentorb.mythic.lookinglass.shading.*
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector2i
@@ -205,9 +208,10 @@ fun newDeferredShading(dimensions: Vector2i, depthTexture: Texture): DeferredSha
 
 fun updateDeferredShading(renderer: Renderer, dimensions: Vector2i): DeferredShading? {
   val deferred = renderer.deferred
-  return if (renderer.options.shadingMode == ShadingMode.deferred) {
-    if (deferred == null || dimensions.x != deferred.albedo.width || dimensions.y != deferred.albedo.height)
-      newDeferredShading(dimensions, renderer.offscreenBuffer.depthTexture!!)
+  val offscreenBuffer = renderer.offscreenBuffer
+  return if (renderer.options.shadingMode == ShadingMode.deferred && offscreenBuffer?.dimensions == dimensions) {
+    if (deferred == null || deferred.albedo.dimensions != dimensions)
+      newDeferredShading(dimensions, offscreenBuffer.depthTexture!!)
     else
       deferred
   } else
@@ -222,7 +226,8 @@ fun activateDeferredBufferTextures(deferred: DeferredShading) {
 
 fun applyDeferredShading(renderer: SceneRenderer, sphereMesh: GeneralMesh) {
   debugMarkPass(true, "Applied Shading") {
-    renderer.offscreenBuffer.frameBuffer.activate()
+    val offscreenBuffer = getOrCreateOffscreenBuffer(renderer)
+    offscreenBuffer.frameBuffer.activate()
     activateDeferredBufferTextures(renderer.renderer.deferred!!)
     globalState.depthEnabled = false
     val dimensions = renderer.windowInfo.dimensions.toVector2()

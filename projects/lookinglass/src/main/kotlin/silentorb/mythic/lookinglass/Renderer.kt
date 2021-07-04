@@ -6,6 +6,8 @@ import org.lwjgl.opengl.GL32.glTexImage2DMultisample
 import silentorb.mythic.drawing.Canvas
 import silentorb.mythic.drawing.getUnitScaling
 import silentorb.mythic.glowing.*
+import silentorb.mythic.lookinglass.pipeline.finishRender
+import silentorb.mythic.lookinglass.pipeline.prepareRender
 import silentorb.mythic.lookinglass.shading.EffectsData
 import silentorb.mythic.lookinglass.shading.createSceneBuffer
 import silentorb.mythic.lookinglass.texturing.DynamicTextureLibrary
@@ -13,7 +15,6 @@ import silentorb.mythic.platforming.WindowInfo
 import silentorb.mythic.scenery.Light
 import silentorb.mythic.scenery.LightingConfig
 import silentorb.mythic.spatial.*
-import java.nio.FloatBuffer
 
 fun gatherEffectsData(dimensions: Vector2i, lights: List<Light>, cameraEffectsData: CameraEffectsData): EffectsData {
   return EffectsData(

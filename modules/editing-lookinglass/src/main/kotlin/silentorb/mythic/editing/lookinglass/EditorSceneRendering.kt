@@ -8,6 +8,9 @@ import silentorb.mythic.ent.scenery.*
 import silentorb.mythic.glowing.DrawMethod
 import silentorb.mythic.glowing.globalState
 import silentorb.mythic.lookinglass.*
+import silentorb.mythic.lookinglass.pipeline.applyFilters
+import silentorb.mythic.lookinglass.pipeline.finishRender
+import silentorb.mythic.lookinglass.pipeline.prepareRender
 import silentorb.mythic.platforming.WindowInfo
 import silentorb.mythic.scenery.*
 import silentorb.mythic.spatial.Vector3

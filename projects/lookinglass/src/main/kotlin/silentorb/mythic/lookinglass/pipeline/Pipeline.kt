@@ -1,9 +1,10 @@
-package silentorb.mythic.lookinglass
+package silentorb.mythic.lookinglass.pipeline
 
 import org.lwjgl.opengl.GL30
 import org.lwjgl.opengl.GL30.*
 import silentorb.mythic.drawing.getStaticCanvasDependencies
 import silentorb.mythic.glowing.*
+import silentorb.mythic.lookinglass.*
 import silentorb.mythic.lookinglass.deferred.updateDeferredShading
 import silentorb.mythic.platforming.WindowInfo
 import silentorb.mythic.spatial.*
@@ -25,41 +26,15 @@ fun prepareRender(renderer: Renderer, windowInfo: WindowInfo) {
     renderer.multisampler.frameBuffer.activateDraw()
   }
 
-//  renderer.buffers.color.buffer = renderer.buffers.color.buffer
-//      ?: BufferUtils.createByteBuffer(dimensions.x * dimensions.y * 3)
-//
-//  renderer.buffers.depth.buffer = renderer.buffers.depth.buffer
-//      ?: BufferUtils.createFloatBuffer(dimensions.x * dimensions.y)
+  // Deferred depth from offscreenBuffer so offscreenBuffer needs to be updated first
+  val offscreenBuffer = getOrCreateOffscreenBuffer(renderer, windowInfo.dimensions, true)
   renderer.deferred = updateDeferredShading(renderer, dimensions)
+
   renderer.glow.state.viewport = Vector4i(0, 0, dimensions.x, dimensions.y)
   renderer.glow.state.depthEnabled = true
-  renderer.offscreenBuffer.frameBuffer.activate()
+  offscreenBuffer.frameBuffer.activate()
   renderer.glow.operations.clearScreen()
 }
-
-//fun applyRenderBuffer(renderer: Renderer, dimensions: Vector2i) {
-//  updateTextureBuffer(dimensions, renderer.buffers.color) {
-//    TextureAttributes(
-//        repeating = false,
-//        smooth = false,
-//        storageUnit = TextureStorageUnit.unsignedByte
-//    )
-//  }
-//
-//  updateTextureBuffer(dimensions, renderer.buffers.depth) {
-//    TextureAttributes(
-//        repeating = false,
-//        smooth = false,
-//        storageUnit = TextureStorageUnit.float,
-//        format = TextureFormat.depth
-//    )
-//  }
-//
-//  renderer.shaders.screenTexture.activate(Vector2(1f))
-//  val canvasDependencies = getStaticCanvasDependencies()
-//  activateTextures(listOf(renderer.buffers.color.texture!!, renderer.buffers.depth.texture!!))
-//  canvasDependencies.meshes.image.draw(DrawMethod.triangleFan)
-//}
 
 fun finishRender(renderer: Renderer, windowInfo: WindowInfo) {
   if (renderer.multisampler != null) {
@@ -72,10 +47,33 @@ fun finishRender(renderer: Renderer, windowInfo: WindowInfo) {
   }
 }
 
+fun getOrCreateOffscreenBuffer(renderer: Renderer, dimensions: Vector2i, withDepth: Boolean): OffscreenBuffer {
+  val existing = renderer.offscreenBuffer
+
+  // Eventually may add checking to see if withDepth changed as well
+  return if (existing != null && existing.dimensions == dimensions)
+    existing
+  else { // Either new or dimensions changed
+    val frameBufferId = existing?.frameBuffer?.id
+    val isRead = globalState.readFramebuffer == frameBufferId
+    val isWrite = globalState.drawFramebuffer == frameBufferId
+    if (existing != null) {
+      disposeOffscreenBuffer(existing)
+    }
+    val buffer = prepareScreenFrameBuffer(dimensions.x, dimensions.y, withDepth)
+    renderer.offscreenBuffer = buffer
+    if (isRead) buffer.frameBuffer.activateRead()
+    if (isWrite) buffer.frameBuffer.activateDraw()
+    buffer
+  }
+}
+
+fun getOrCreateOffscreenBuffer(renderer: SceneRenderer): OffscreenBuffer =
+    getOrCreateOffscreenBuffer(renderer.renderer, renderer.windowInfo.dimensions, true)
+
 fun activateOffscreenRendering(renderer: SceneRenderer) {
   val glow = renderer.renderer.glow
-  val offscreenBuffer = renderer.renderer.offscreenBuffer
-  val dimensions = Vector2i(offscreenBuffer.colorTexture.width, offscreenBuffer.colorTexture.height)
+  val offscreenBuffer = getOrCreateOffscreenBuffer(renderer)
   glow.state.setFrameBuffer(offscreenBuffer.frameBuffer.id)
   glow.state.viewport = Vector4i(0, 0, renderer.viewport.z, renderer.viewport.w)
 }
@@ -99,14 +97,16 @@ fun applyFrameBufferTexture(renderer: SceneRenderer, filter: ScreenFilter) {
 }
 
 fun applyRenderedBuffers(renderer: Renderer, windowInfo: WindowInfo) {
+  val offscreenBuffer = renderer.offscreenBuffer
+  if (offscreenBuffer != null) {
+    if (renderer.multisampler != null) {
+      renderer.multisampler.frameBuffer.activateDraw()
+    } else {
+      globalState.setFrameBuffer(0)
+    }
 
-  if (renderer.multisampler != null) {
-    renderer.multisampler.frameBuffer.activateDraw()
-  } else {
-    globalState.setFrameBuffer(0)
+    applyOffscreenBuffer(offscreenBuffer, windowInfo.dimensions, false)
   }
-
-  applyOffscreenBuffer(renderer.offscreenBuffer, windowInfo.dimensions, false)
 }
 
 fun applyFilters(renderer: SceneRenderer, filters: List<ScreenFilter>) {
@@ -115,12 +115,14 @@ fun applyFilters(renderer: SceneRenderer, filters: List<ScreenFilter>) {
   globalState.depthEnabled = false
 
   val offscreenBuffer = renderer.renderer.offscreenBuffer
-  activateTextures(listOf(offscreenBuffer.colorTexture, offscreenBuffer.depthTexture!!))
+  if (offscreenBuffer != null) {
+    activateTextures(listOf(offscreenBuffer.colorTexture, offscreenBuffer.depthTexture!!))
 
-  for (filter in filters) {
-    applyFrameBufferTexture(renderer, filter)
+    for (filter in filters) {
+      applyFrameBufferTexture(renderer, filter)
+    }
+    applyRenderedBuffers(renderer.renderer, renderer.windowInfo)
   }
-  applyRenderedBuffers(renderer.renderer, renderer.windowInfo)
 }
 
 fun getScreenScale(renderer: SceneRenderer): Vector2 {
