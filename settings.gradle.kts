@@ -6,7 +6,6 @@ includeBuild("../imp")
 
 Files.list(file("modules").toPath())
     .forEach { path ->
-        println(path)
       includeBuild(path)
     }
 

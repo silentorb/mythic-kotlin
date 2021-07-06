@@ -3,9 +3,7 @@ package silentorb.mythic.bloom
 import silentorb.mythic.drawing.Canvas
 import silentorb.mythic.drawing.globalFonts
 import silentorb.mythic.glowing.withCropping
-import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector4
-import silentorb.mythic.spatial.toVector2i
 import silentorb.mythic.typography.IndexedTextStyle
 import silentorb.mythic.typography.TextConfiguration
 import silentorb.mythic.typography.calculateTextDimensions
