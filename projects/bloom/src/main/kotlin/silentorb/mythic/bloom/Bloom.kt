@@ -94,6 +94,7 @@ fun renderLayout(box: Box, canvas: Canvas, debug: Boolean = false) {
 
   debugMarkPass(debug, "Bloom GUI Pass") {
     globalState.depthEnabled = false
+    enableBloomBlending()
 
     // Bloom's faces aren't all facing the same direction.
     // Maybe that is okay because it allows for efficient H/V flipping of 2D elements
