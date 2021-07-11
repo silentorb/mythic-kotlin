@@ -1,5 +1,5 @@
 plugins {
-  kotlin("jvm") version "1.4.0"
+  kotlin("jvm") version "1.4.10"
 }
 
 group = "silentorb.mythic"
@@ -21,7 +21,7 @@ dependencies {
   runtimeOnly("org.lwjgl:lwjgl-opengl:3.2.3:natives-windows")
 
   implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9")
-  implementation(group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = "1.4.0")
+  implementation(group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = "1.4.10")
 
   api("silentorb.mythic:spatial")
   api("silentorb.mythic:ent-scenery")

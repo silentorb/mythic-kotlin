@@ -8,6 +8,7 @@ import org.lwjgl.glfw.GLFW.glfwInit
 import org.lwjgl.glfw.GLFW.glfwTerminate
 import org.lwjgl.glfw.GLFW.glfwPollEvents
 import org.lwjgl.glfw.GLFWErrorCallback
+import org.lwjgl.glfw.GLFWNativeWin32.glfwGetWin32Window
 
 fun is64Bit(): Boolean {
   if (System.getProperty("os.name").contains("Windows")) {
@@ -30,6 +31,10 @@ class DesktopProcess(val window: Long) : PlatformProcess {
 
   override fun shutdownPlatform() {
     glfwTerminate()
+  }
+
+  override fun messageBox(title: String, message: String) {
+    Native.messageBox(null, title, message)
   }
 }
 

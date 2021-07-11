@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.4.0"
+    kotlin("jvm") version "1.4.10"
 }
 
 group = "silentorb.mythic"
@@ -14,7 +14,7 @@ dependencies {
     implementation("org.lwjgl:lwjgl:3.2.3:natives-windows")
     implementation("org.lwjgl:lwjgl-opengl:3.2.3")
     implementation("org.lwjgl:lwjgl-opengl:3.2.3:natives-windows")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.0")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.10")
 //    implementation("silentorb.mythic:typography-native")
 }
 

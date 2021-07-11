@@ -12,6 +12,7 @@ dependencies {
   implementation("org.lwjgl:lwjgl-openal:${Versions.lwjgl}")
   implementation("org.lwjgl:lwjgl-openal:${Versions.lwjgl}:${Natives.lwjgl}")
   implementation("silentorb.mythic:debugging")
+  implementation("silentorb.mythic:platforming")
+  implementation("silentorb.mythic:haft")
+  implementation("silentorb.mythic:resource-loading")
 }
-
-requires(project, "platforming", "haft", "resource-loading")

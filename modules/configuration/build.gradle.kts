@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.4.0"
+    kotlin("jvm") version "1.4.10"
 }
 
 group = "silentorb.mythic"
@@ -13,7 +13,7 @@ dependencies {
     api("com.fasterxml.jackson.core:jackson-databind:2.9.9.3")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9")
-    implementation(group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = "1.4.0")
+    implementation(group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = "1.4.10")
     implementation(group = "com.fasterxml.jackson.module", name = "jackson-module-afterburner", version = "2.9.9")
 }
 

@@ -20,7 +20,7 @@ class FaceLoader {
 
   companion object {
     init {
-      System.loadLibrary("libjava_freetype")
+      System.loadLibrary("mythic")
     }
 
     @JvmStatic
