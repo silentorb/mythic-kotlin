@@ -1,7 +1,5 @@
-package silentorb.mythic.lookinglass
+package silentorb.mythic.resource_loading
 
-import silentorb.mythic.resource_loading.getResourceUrl
-import silentorb.mythic.resource_loading.getUrlPath
 import java.nio.file.*
 
 fun scanResources(rootPath: String, extensions: List<String>): List<Path> {
@@ -36,6 +34,3 @@ fun scanResources(rootPath: String, extensions: List<String>): List<Path> {
 
   return files.toList()
 }
-
-fun scanTextureResources(rootPath: String): List<Path> =
-    scanResources(rootPath, listOf(".jpg", ".png"))

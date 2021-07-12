@@ -9,7 +9,7 @@ import java.nio.file.Paths
 
 private var dotEnv: Dotenv? = null
 
-// Nullable for porentially faster access checks when not being used.
+// Nullable for potentially faster access checks when not being used.
 // (Only potentially because the JVM may already perform a similar optimization for empty MutableMaps)
 // It's only an internal implementation difference so can be easily changed later if needed.
 private var overrides: MutableMap<String, Any>? = null
@@ -33,15 +33,8 @@ fun setDebugRangeValue(value: Float) {
   debugRangeValue = value
 }
 
-tailrec fun findParentDotEnvFile(path: Path = Paths.get(System.getProperty("user.dir"))): String? =
-    when {
-      Files.exists(path.resolve(".env")) -> path.toString()
-      path.parent == null -> null
-      else -> findParentDotEnvFile(path.parent)
-    }
-
 fun getDotEnvDirectory(): String =
-    System.getenv("DOTENV_DIRECTORY") ?: findParentDotEnvFile() ?: ""
+    System.getenv("DOTENV_DIRECTORY") ?: ""
 
 fun newDotEnv() = dotenv {
   directory = getDotEnvDirectory()

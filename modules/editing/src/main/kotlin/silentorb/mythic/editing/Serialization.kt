@@ -12,6 +12,7 @@ import silentorb.mythic.ent.*
 import silentorb.mythic.resource_loading.getUrlPath
 import silentorb.mythic.resource_loading.listFilesAndFoldersRecursive
 import silentorb.mythic.resource_loading.listFilesRecursive
+import silentorb.mythic.resource_loading.scanResources
 import silentorb.mythic.spatial.serialization.loadSpatialJsonResource
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -108,14 +109,10 @@ fun saveGraph(propertyDefinitions: PropertyDefinitions, path: String, graph: Gra
     }
 
 fun loadGraphLibrary(propertiesSerialization: PropertiesSerialization, directoryPath: String): GraphLibrary {
-  val rootPath = getUrlPath(directoryPath)
-  val resourcesPath = rootPath.getRoot().resolve(rootPath.subpath(0, rootPath.nameCount - Path.of(directoryPath).nameCount))
-  val files = listFilesRecursive(rootPath)
+  val files = scanResources(directoryPath, listOf(".scene"))
   val library: GraphLibrary = files.associate { filePath ->
     val name = filePath.fileName.toString().dropLast(sceneFileExtension.length)
-    val relativePath = resourcesPath.relativize(filePath)
-    val path = relativePath.toString().replace("\\", "/")
-    val graph = loadGraphResource(propertiesSerialization, path)
+    val graph = loadGraphResource(propertiesSerialization, filePath.toString())
     name to graph
   }
   return library

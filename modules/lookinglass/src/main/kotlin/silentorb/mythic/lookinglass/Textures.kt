@@ -6,6 +6,8 @@ import silentorb.mythic.glowing.TextureFormat
 import silentorb.mythic.glowing.newTexture
 import silentorb.mythic.platforming.ImageLoader
 import silentorb.mythic.platforming.RawImage
+import silentorb.mythic.resource_loading.LoadingState
+import silentorb.mythic.resource_loading.updateAsyncLoading
 import java.nio.file.Path
 import java.nio.file.Paths
 

@@ -1,4 +1,4 @@
-package silentorb.mythic.lookinglass
+package silentorb.mythic.resource_loading
 
 import kotlin.concurrent.thread
 
