@@ -103,6 +103,7 @@ class DesktopAudio : PlatformAudio {
       alSourcei(source, AL_BUFFER, buffer)
       if (position != null) {
         alSource3f(source, AL_POSITION, position.x, position.y, position.z)
+        alSourcef(source, AL_GAIN, volume)
       }
       alSourcePlay(source)
       source

@@ -1,4 +1,4 @@
-package silentorb.mythic.editing
+package silentorb.mythic.editing.general
 
 import imgui.ImFontConfig
 import imgui.ImGui
@@ -72,9 +72,9 @@ fun ensureImGuiIsInitialized(fonts: List<Typeface>, window: Long) {
   }
 }
 
-fun defineEditorGui(editor: Editor, deviceStates: List<InputDeviceState>): Commands {
+fun prepareEditorDefinition(deviceStates: List<InputDeviceState>): Boolean {
   if (!imguiInitialized)
-    return listOf()
+    return false
 
   if (renderReady) {
     ImGui.endFrame()
@@ -86,7 +86,7 @@ fun defineEditorGui(editor: Editor, deviceStates: List<InputDeviceState>): Comma
   updateModifierKeyStates(deviceStates.lastOrNull()?.events ?: listOf())
   activeInputType = null
 
-  return drawEditor(editor, deviceStates)
+  return true
 }
 
 fun renderEditorGui() {

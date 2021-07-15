@@ -1,6 +1,7 @@
 package silentorb.mythic.editing.updating
 
 import silentorb.mythic.editing.*
+import silentorb.mythic.editing.general.MouseState
 import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.scenery.getAbsoluteNodeTransform
 import silentorb.mythic.happenings.Command

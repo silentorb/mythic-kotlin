@@ -2,6 +2,7 @@ package silentorb.mythic.editing
 
 import imgui.ImGui
 import silentorb.mythic.editing.components.*
+import silentorb.mythic.editing.general.*
 import silentorb.mythic.editing.panels.*
 import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.happenings.Commands
@@ -74,3 +75,10 @@ fun panelMenus(): ContextMenus = mapOf(
     .entries
     .flatMap { b -> b.value.mapIndexed { index, item -> mapMenu(listOf(b.key), index, item) } }
     .fold(mapOf()) { a, b -> a + b }
+
+fun defineEditorGui(editor: Editor, deviceStates: List<InputDeviceState>): Commands {
+  return if (prepareEditorDefinition(deviceStates))
+    drawEditor(editor, deviceStates)
+  else
+    listOf()
+}

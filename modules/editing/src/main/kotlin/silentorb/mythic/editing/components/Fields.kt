@@ -4,6 +4,9 @@ import imgui.ImGui
 import imgui.flag.ImGuiInputTextFlags
 import imgui.type.ImString
 import silentorb.mythic.editing.*
+import silentorb.mythic.editing.general.InputType
+import silentorb.mythic.editing.general.activeInputType
+import silentorb.mythic.editing.general.checkActiveInputType
 import silentorb.mythic.ent.Entry
 import silentorb.mythic.ent.Key
 import silentorb.mythic.ent.scenery.arrayToHexColorString

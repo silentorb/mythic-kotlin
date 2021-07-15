@@ -1,7 +1,7 @@
 package silentorb.mythic.editing.components
 
 import silentorb.mythic.editing.EditorCommands
-import silentorb.mythic.editing.MenuTree
+import silentorb.mythic.editing.general.MenuTree
 
 fun mainMenus(): List<MenuTree> =
     listOf(

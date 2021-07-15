@@ -1,13 +1,15 @@
 package silentorb.mythic.editing
 
 import imgui.ImDrawList
+import silentorb.mythic.editing.general.Clipboard
+import silentorb.mythic.editing.general.KeystrokeBindings
+import silentorb.mythic.editing.general.MenuChannel
 import silentorb.mythic.ent.*
 import silentorb.mythic.ent.scenery.Expanders
 import silentorb.mythic.lookinglass.ResourceInfo
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.lookinglass.ElementGroup
-import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector4i
 import java.nio.file.Path
@@ -18,12 +20,6 @@ typealias SceneTree = Map<Key, Key>
 typealias MenuResponse = Commands
 typealias MenuDefinition = (MenuChannel) -> MenuResponse
 typealias PanelResponse = Pair<String?, Commands>
-
-data class Typeface(
-    val name: String,
-    val path: String,
-    val size: Float
-)
 
 object DraggingTypes {
   const val file = "file"
@@ -51,23 +47,6 @@ data class Snapshot(
 )
 
 typealias GraphHistory = List<Snapshot>
-
-data class ContextCommand(
-    val context: String,
-    val command: String,
-    val menu: String? = null
-)
-
-typealias KeystrokeBindings = Map<ContextCommand, String>
-typealias CompressedKeystrokeBindings = Map<Int, List<ContextCommand>>
-
-typealias GetShortcut = (String) -> String?
-
-data class MenuChannel(
-    val getShortcut: GetShortcut,
-    val editor: Editor,
-    val menus: ContextMenus,
-)
 
 enum class RenderingMode {
   flat,
@@ -106,15 +85,6 @@ data class MenuItem(
     val command: Command? = null,
     val getState: GetMenuItemState? = null,
     val weight: Int = 1000
-)
-
-data class MenuTree(
-    val label: String,
-    val commandType: String? = null,
-    val command: Command? = null,
-    val items: List<MenuTree>? = null,
-    val key: String? = null,
-    val getState: GetMenuItemState? = null,
 )
 
 typealias PathList = List<String>
@@ -184,11 +154,6 @@ object ClipboardDataTypes {
   val properties = "properties"
 }
 
-data class Clipboard(
-    val type: String,
-    val data: Any,
-)
-
 data class Editor(
     val projectPath: Path,
     val persistentState: EditorPersistentState = EditorPersistentState(),
@@ -237,8 +202,3 @@ object Menus {
   const val edit = "edit"
   const val file = "file"
 }
-
-data class MouseState(
-    val position: Vector2i,
-    val offset: Vector2,
-)

@@ -2,6 +2,8 @@ package silentorb.mythic.editing
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import silentorb.mythic.cameraman.*
+import silentorb.mythic.editing.general.isMouseDown
+import silentorb.mythic.editing.general.isShiftDown
 import silentorb.mythic.haft.DeviceIndexes
 import silentorb.mythic.haft.InputDeviceState
 import silentorb.mythic.haft.mapInputToCommands

@@ -9,38 +9,15 @@ import silentorb.mythic.configuration.loadYamlFile
 import silentorb.mythic.configuration.saveYamlFile
 import silentorb.mythic.debugging.getDebugBoolean
 import silentorb.mythic.ent.*
-import silentorb.mythic.resource_loading.getUrlPath
 import silentorb.mythic.resource_loading.listFilesAndFoldersRecursive
-import silentorb.mythic.resource_loading.listFilesRecursive
 import silentorb.mythic.resource_loading.scanResources
 import silentorb.mythic.spatial.serialization.loadSpatialJsonResource
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.IOException
-import java.io.UncheckedIOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.*
 
 const val defaultConfigFilePath = "editor.yaml"
-
-fun loadFromResources(fileName: String): ByteArray? {
-  return try {
-    Objects.requireNonNull(Thread.currentThread().contextClassLoader.getResourceAsStream(fileName)).use { `is` ->
-      ByteArrayOutputStream().use { buffer ->
-        val data = ByteArray(16384)
-        var nRead: Int
-        while (`is`.read(data, 0, data.size).also { nRead = it } != -1) {
-          buffer.write(data, 0, nRead)
-        }
-        buffer.toByteArray()
-      }
-    }
-  } catch (e: IOException) {
-    throw UncheckedIOException(e)
-  }
-}
 
 fun serializeGraph(propertyDefinitions: PropertyDefinitions, graph: Graph) =
     graph.map {

@@ -2,6 +2,8 @@ package silentorb.mythic.editing
 
 import org.lwjgl.glfw.GLFW
 import silentorb.mythic.cameraman.CameramanCommands
+import silentorb.mythic.editing.general.ContextCommand
+import silentorb.mythic.editing.general.KeystrokeBindings
 import silentorb.mythic.haft.*
 
 fun defaultGamepadBindings() = mapOf(

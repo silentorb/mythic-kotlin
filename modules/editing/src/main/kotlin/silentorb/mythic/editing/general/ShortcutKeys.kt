@@ -1,9 +1,11 @@
-package silentorb.mythic.editing
+package silentorb.mythic.editing.general
 
 import imgui.ImGui
 import imgui.flag.ImGuiKey
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT
+import silentorb.mythic.editing.keypadKey
+import silentorb.mythic.editing.numpadPeriodKey
 import silentorb.mythic.ent.singleValueCache
 import silentorb.mythic.haft.DeviceIndexes
 import silentorb.mythic.haft.InputDeviceState

@@ -5,6 +5,7 @@ import imgui.flag.ImGuiMouseButton
 import imgui.flag.ImGuiTreeNodeFlags
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.*
+import silentorb.mythic.editing.general.MenuTree
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 

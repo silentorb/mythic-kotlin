@@ -2,8 +2,8 @@ package silentorb.mythic.editing.components
 
 import imgui.ImGui
 import imgui.flag.ImGuiTreeNodeFlags
-import silentorb.mythic.editing.isCtrlDown
-import silentorb.mythic.editing.isShiftDown
+import silentorb.mythic.editing.general.isCtrlDown
+import silentorb.mythic.editing.general.isShiftDown
 import silentorb.mythic.ent.Key
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands

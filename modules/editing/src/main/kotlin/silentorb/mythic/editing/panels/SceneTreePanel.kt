@@ -4,6 +4,7 @@ import imgui.ImGui
 import imgui.flag.ImGuiTreeNodeFlags
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.*
+import silentorb.mythic.editing.general.MenuTree
 import silentorb.mythic.ent.*
 import silentorb.mythic.ent.scenery.getSceneTree
 import silentorb.mythic.happenings.Command

@@ -2,6 +2,7 @@ package silentorb.mythic.editing.updating
 
 import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.activeFieldId
+import silentorb.mythic.editing.general.*
 import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Key
@@ -351,11 +352,6 @@ fun getQuerySelectionCommands(editor: Editor): Commands {
 }
 
 fun prepareEditorUpdate(deviceStates: List<InputDeviceState>, editor: Editor): Commands {
-//  val externalCommands = if (isCtrlDown() || isAltDown() || isShiftDown())
-//    listOf()
-//  else
-//    mapCommands(defaultEditorBindings(), deviceStates) + getQuerySelectionCommands(editor)
-
   val externalCommands = mapCommands(defaultEditorBindings(), deviceStates) + getQuerySelectionCommands(editor)
 
   val guiCommands = defineEditorGui(editor, deviceStates)
