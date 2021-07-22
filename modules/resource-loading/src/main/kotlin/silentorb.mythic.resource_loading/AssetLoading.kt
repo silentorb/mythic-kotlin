@@ -6,15 +6,11 @@ fun scanResources(rootPath: String, extensions: List<String>): List<Path> {
   val modelRootUrl = getResourceUrl(rootPath)
   val rootWalkPath = getUrlPath(rootPath)
   val modelRootPath = Paths.get(modelRootUrl!!.toURI())
-  println(modelRootUrl)
-  println(modelRootPath)
-  println(rootPath)
   val subPathNameCount = modelRootPath.nameCount - Paths.get(rootPath).nameCount
   val resourceSubPath = if (subPathNameCount > 0)
     modelRootPath.subpath(0, subPathNameCount)
   else
     null
-//  val modelRootPath = Paths.get(modelRootUrl!!.toURI())
   val walk = Files.walk(rootWalkPath, 10)
   val it = walk.iterator()
   val files = mutableListOf<Path>()
@@ -27,8 +23,6 @@ fun scanResources(rootPath: String, extensions: List<String>): List<Path> {
       else
         path
       files.add(newPath)
-//      files.add(stringPath.substring(pathPrefix).replace("\\", "/"))
-//      files.add(path)
     }
   }
 

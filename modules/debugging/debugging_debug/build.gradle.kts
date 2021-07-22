@@ -9,4 +9,5 @@ repositories {
 
 dependencies {
   implementation("io.github.cdimascio:java-dotenv:5.1.3")
+  implementation("silentorb.mythic:mythic-logging")
 }

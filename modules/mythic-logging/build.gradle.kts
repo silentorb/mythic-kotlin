@@ -22,3 +22,12 @@ tasks {
     kotlinOptions.jvmTarget = "1.8"
   }
 }
+
+configurations {
+  all {
+    // It seems like a design flaw in slf4j that I should need this line,
+    // but it's a commonly documented fix for slf4j.
+    // It seems like this module should be something opted in instead of opted out.
+    exclude(module = "slf4j-log4j12")
+  }
+}

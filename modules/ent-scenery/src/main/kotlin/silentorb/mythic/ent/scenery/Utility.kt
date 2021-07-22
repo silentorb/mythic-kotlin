@@ -7,6 +7,7 @@ import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.spatial.maxScalar
 import kotlin.math.max
+import kotlin.reflect.typeOf
 
 fun getLocalNodeTranslation(graph: Graph, node: Key): Vector3 =
     getNodeValue<Vector3>(graph, node, SceneProperties.translation) ?: Vector3.zero
@@ -24,10 +25,48 @@ fun getTranslationRotationMatrix(graph: Graph, node: Key): Matrix {
 fun getNodeScale(graph: Graph, node: Key): Vector3 =
     getNodeValue<Vector3>(graph, node, SceneProperties.scale) ?: Vector3.unit
 
+val localNodeTransformCache = mappedCache<Pair<Graph, Key>, Matrix>(1024) { key ->
+  val (graph, node) = key
+  val scale = getNodeScale(graph, node)
+  if (!(graph is HashedList<*>)) {
+    val k = 0
+  }
+  getTranslationRotationMatrix(graph, node)
+      .scale(scale)
+}
+
+//fun getLocalNodeTransform(graph: Graph, node: Key): Matrix =
+//    localNodeTransformCache(graph to node)
+
 fun getLocalNodeTransform(graph: Graph, node: Key): Matrix {
   val scale = getNodeScale(graph, node)
   return getTranslationRotationMatrix(graph, node)
       .scale(scale)
+}
+
+typealias MatrixMap = Map<Key, Matrix>
+
+fun getLocalNodeTransform(localTransforms: MatrixMap, node: Key): Matrix =
+    localTransforms[node] ?: Matrix.identity
+
+fun getLocalTransforms(graph: Graph): Map<Key, Matrix> =
+    getGraphKeys(graph)
+        .mapNotNull {
+          val transform = getLocalNodeTransform(graph, it)
+          if (transform == Matrix.identity)
+            null
+          else
+            it to transform
+        }
+        .associate { it }
+
+fun getAbsoluteNodeTransform(graph: Graph, localTransforms: MatrixMap, node: Key): Matrix {
+  val localTransform = getLocalNodeTransform(localTransforms, node)
+  val parent = getNodeValue<Key>(graph, node, SceneProperties.parent)
+  return if (parent != null)
+    getAbsoluteNodeTransform(graph, localTransforms, parent) * localTransform
+  else
+    localTransform
 }
 
 fun getAbsoluteNodeTransform(graph: Graph, node: Key): Matrix {

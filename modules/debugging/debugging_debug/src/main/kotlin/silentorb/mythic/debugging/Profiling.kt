@@ -1,5 +1,7 @@
 package silentorb.mythic.debugging
 
+import silentorb.mythic.logging.logger
+
 data class Metrics(
     var iterations: Int = 0,
     var total: Long = 0L,
@@ -53,11 +55,14 @@ fun globalProfiler(): Profiler {
   return profiler!!
 }
 
-fun <T>logExecutionTime(label: String, block: () -> T): T {
-  val start = System.currentTimeMillis()
-  val result = block()
-  val end = System.currentTimeMillis()
-  val duration = end - start
-  println("$label: $duration")
-  return result
+fun <T> logExecutionTime(label: String, condition: Boolean, block: () -> T): T {
+  return if (condition) {
+    val start = System.currentTimeMillis()
+    val result = block()
+    val end = System.currentTimeMillis()
+    val duration = end - start
+    logger.debug("Measurement in ms: $label: $duration")
+    result
+  } else
+    block()
 }

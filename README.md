@@ -11,7 +11,7 @@ Mythic is a 3D game engine.  It is:
 * Uses a table-based ECS (Entity Component System)
 * Aside for a few special cases, all of its data handling is homogeneous (No mixed lists)
 * Relies heavily on the most excellent [LWJGL](https://www.lwjgl.org/)
-* No GUI tooling (if someone ever wants to make Mythic tooling, go for it!)
+* Includes a world editor built with Dear ImGui
 * Currently only supports OpenGL
 * Currently only supports desktop and has only been tested on Windows
 
@@ -21,7 +21,7 @@ This project isn't being published with the expectation that people can grab it 
 
 Initially this version of Mythic was created in a monorepo alongside one of the innumerable iterations of a Marloth game.  Now it's in the middle of being extracted into it's own repo.  Most of the general modules were already separate from the game and in their own mythic folder.  Some of the general modules were slightly more tied the to game but could easily be disconnected and moved here.
 
-Much of Mythic as it is doesn't make sense and is incomplete without the Marloth codebase as at least a template.  The plan is to eventually release the Marloth code as open source.
+In its current state Mythic is somewhat incomplete without the Marloth codebase as at least a template.  The plan is to eventually release the Marloth code as open source.
 
 ## Dependencies
 

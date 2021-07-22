@@ -42,9 +42,16 @@ fun finishRender(renderer: Renderer, windowInfo: WindowInfo) {
     val height = windowInfo.dimensions.y
     renderer.glow.state.drawFramebuffer = 0
     renderer.multisampler.frameBuffer.activateRead()
-    glDrawBuffer(GL_BACK)                       // Set the back buffer as the draw buffer
-    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL30.GL_COLOR_BUFFER_BIT, GL30.GL_NEAREST)
+    glDrawBuffer(GL_BACK) // Set the back buffer as the draw buffer
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST)
   }
+
+  // This may not matter for normal rendering, but if the current read framebuffer
+  // is not set back to the default backbuffer and is still pointing to an offscreen buffer when swapping,
+  // screen capture applications will grab the intermiate image in the offscreen buffer
+  // instead of the final image in the back buffer.
+  // Also resetting the write buffer here for good measure.
+  globalState.setFrameBuffer(0)
 }
 
 fun getOrCreateOffscreenBuffer(renderer: Renderer, dimensions: Vector2i, withDepth: Boolean): OffscreenBuffer {

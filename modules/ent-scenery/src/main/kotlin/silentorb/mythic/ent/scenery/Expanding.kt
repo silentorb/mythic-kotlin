@@ -67,7 +67,7 @@ fun expandGraphInstances(library: ExpansionLibrary, graph: Graph): Graph {
 
   val instanced = expandGraphInstances(library, instances, graph)
   val expansions = filterByProperty(instanced, SceneProperties.type)
-  return expandExpansions(library, expansions, instanced).toSet()
+  return HashedList.from(expandExpansions(library, expansions, instanced))
 }
 
 fun expandGraphInstances(library: ExpansionLibrary, name: String): Graph =
