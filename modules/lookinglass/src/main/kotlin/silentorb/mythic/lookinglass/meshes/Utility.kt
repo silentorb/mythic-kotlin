@@ -65,4 +65,4 @@ typealias Primitives = List<Primitive>
 //}
 
 fun createModelElements(simpleMesh: GeneralMesh, color: Vector4 = Vector4(1f)) =
-    listOf(Primitive(simpleMesh, Material(color, shading = false)))
+    listOf(Primitive(simpleMesh, Material(shading = false, color = color)))
