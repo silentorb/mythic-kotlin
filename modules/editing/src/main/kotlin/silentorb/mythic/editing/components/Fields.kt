@@ -31,12 +31,12 @@ inline fun <reified T> stagingValue(key: String, default: () -> T): T =
 
 fun <T> wrapSimpleWidget(widget: (Entry) -> T): PropertyWidget = { _, entry, _ -> widget(entry) }
 
-fun dropDownWidget(options: List<Key>, id: String, value: String?): String? {
+fun <T>dropDownWidget(options: List<T>, id: String, value: T?): T? {
   var nextValue = value
   ImGui.pushID(id)
-  if (ImGui.beginCombo("", value ?: "")) {
-    for (option in options.sorted()) {
-      if (ImGui.selectable(option)) {
+  if (ImGui.beginCombo("", value?.toString() ?: "")) {
+    for (option in options.sortedBy { it.toString() }) {
+      if (ImGui.selectable(option.toString())) {
         nextValue = option
       }
     }
@@ -49,8 +49,8 @@ fun dropDownWidget(options: List<Key>, id: String, value: String?): String? {
   return nextValue
 }
 
-fun dropDownWidget(options: List<Key>, entry: Entry): String? =
-    dropDownWidget(options, entry.property, entry.target as? String)
+fun <T>dropDownWidget(options: List<T>, entry: Entry): T? =
+    dropDownWidget(options, entry.property, entry.target as? T)
 
 fun <T> labeledDropDownWidget(options: Map<T, String>, entry: Entry): T {
   val value = entry.target as T
@@ -72,11 +72,11 @@ fun <T> labeledDropDownWidget(options: Map<T, String>, entry: Entry): T {
   return nextValue
 }
 
-typealias EditorOptionsSource = (Editor) -> List<Key>
+typealias EditorOptionsSource<T> = (Editor) -> List<T>
 typealias LabeledEditorOptionsSource<T> = (Editor) -> Map<T, Key>
 
-fun dropDownWidget(options: EditorOptionsSource): PropertyWidget = { editor, entry, _ ->
-  dropDownWidget(options(editor), entry)
+fun <T>dropDownWidget(options: EditorOptionsSource<T>): PropertyWidget = { editor, entry, _ ->
+  dropDownWidget<T>(options(editor), entry)
 }
 
 fun <T> labeledDropDownWidget(options: LabeledEditorOptionsSource<T>): PropertyWidget = { editor, entry, _ ->

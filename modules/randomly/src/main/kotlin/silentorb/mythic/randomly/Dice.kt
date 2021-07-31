@@ -4,7 +4,7 @@ import silentorb.mythic.spatial.Vector2
 import java.util.*
 
 class Dice(val seed: Long? = null) {
-  private val random = Random(seed ?: System.currentTimeMillis())
+  val random = Random(seed ?: System.currentTimeMillis())
 
   fun getInt(min: Int, max: Int) =
       if (min == max)
