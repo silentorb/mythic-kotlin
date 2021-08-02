@@ -21,8 +21,12 @@ fun applyOffscreenBuffer(buffer: OffscreenBuffer, windowDimensions: Vector2i, sm
 }
 
 fun newDepthTexture(textureAttributes: TextureAttributes, dimensions: Vector2i): Texture {
-  val depthTexture = newTexture(dimensions.x, dimensions.y, textureAttributes.copy(format = TextureFormat.depth, storageUnit = TextureStorageUnit.float))
-  GL32.glFramebufferTexture(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, depthTexture.id, 0)
+  val attributes = textureAttributes.copy(
+      format = TextureFormat.depthStencil,
+      storageUnit = TextureStorageUnit.unsignedInt24_8
+  )
+  val depthTexture = newTexture(dimensions.x, dimensions.y, attributes)
+  glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, depthTexture.id, 0)
   return depthTexture
 }
 
@@ -36,7 +40,7 @@ fun prepareScreenFrameBuffer(windowWidth: Int, windowHeight: Int, withDepth: Boo
   )
   val colorTexture = newTexture(dimensions.x, dimensions.y, textureAttributes)
   glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, colorTexture.id, 0)
-  glDrawBuffers(GL30.GL_COLOR_ATTACHMENT0)
+  glDrawBuffers(GL_COLOR_ATTACHMENT0)
 
   val depthTexture = if (withDepth)
     newDepthTexture(textureAttributes, dimensions)

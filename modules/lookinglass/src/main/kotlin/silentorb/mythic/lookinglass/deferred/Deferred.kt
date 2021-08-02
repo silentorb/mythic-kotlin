@@ -192,7 +192,7 @@ fun newDeferredShading(dimensions: Vector2i, depthTexture: Texture): DeferredSha
   attachments.put(GL_COLOR_ATTACHMENT2)
   attachments.flip()
   glDrawBuffers(attachments)
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture.id, 0)
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthTexture.id, 0)
   val status = glCheckFramebufferStatus(GL_FRAMEBUFFER)
   if (status != GL_FRAMEBUFFER_COMPLETE)
     throw Error("Error creating framebuffer.")

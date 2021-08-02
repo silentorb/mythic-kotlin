@@ -1,6 +1,5 @@
 package silentorb.mythic.lookinglass.pipeline
 
-import org.lwjgl.opengl.GL30
 import org.lwjgl.opengl.GL30.*
 import silentorb.mythic.drawing.getStaticCanvasDependencies
 import silentorb.mythic.glowing.*

@@ -3,8 +3,7 @@ package silentorb.mythic.glowing
 import org.lwjgl.opengl.EXTTextureFilterAnisotropic.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT
 import org.lwjgl.opengl.EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT
 import org.lwjgl.opengl.GL13.*
-import org.lwjgl.opengl.GL30.GL_RGBA16F
-import org.lwjgl.opengl.GL30.glGenerateMipmap
+import org.lwjgl.opengl.GL30.*
 import org.lwjgl.opengl.GL45.glTextureSubImage2D
 import silentorb.mythic.spatial.Vector2i
 import java.nio.ByteBuffer
@@ -17,12 +16,14 @@ enum class TextureFormat {
   rgba,
   rgba16f,
   depth,
+  depthStencil,
   scalar,
 }
 
 enum class TextureStorageUnit {
   float,
   unsignedByte,
+  unsignedInt24_8,
 }
 
 data class TextureAttributes(
@@ -54,11 +55,13 @@ fun mapTextureFormat(format: TextureFormat) =
       TextureFormat.rgba, TextureFormat.rgba16f -> GL_RGBA
       TextureFormat.scalar -> GL_RED
       TextureFormat.depth -> GL_DEPTH_COMPONENT
+      TextureFormat.depthStencil -> GL_DEPTH_STENCIL
     }
 
 fun mapInternalTextureFormat(format: TextureFormat) =
     when (format) {
       TextureFormat.rgba16f -> GL_RGBA16F
+      TextureFormat.depthStencil -> GL_DEPTH24_STENCIL8
       else -> mapTextureFormat(format)
     }
 
@@ -96,6 +99,7 @@ fun initializeTexture(width: Int, height: Int, attributes: TextureAttributes, bu
   val storageUnit = when (attributes.storageUnit) {
     TextureStorageUnit.float -> GL_FLOAT
     TextureStorageUnit.unsignedByte -> GL_UNSIGNED_BYTE
+    TextureStorageUnit.unsignedInt24_8 -> GL_UNSIGNED_INT_24_8
   }
 
   glTexImage2D(
