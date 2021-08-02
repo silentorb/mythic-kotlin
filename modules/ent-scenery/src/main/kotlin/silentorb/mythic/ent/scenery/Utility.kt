@@ -1,6 +1,7 @@
 package silentorb.mythic.ent.scenery
 
 import silentorb.mythic.ent.*
+import silentorb.mythic.lookinglass.Scene
 import silentorb.mythic.scenery.*
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
@@ -39,9 +40,32 @@ val localNodeTransformCache = mappedCache<Pair<Graph, Key>, Matrix>(1024) { key 
 //    localNodeTransformCache(graph to node)
 
 fun getLocalNodeTransform(graph: Graph, node: Key): Matrix {
-  val scale = getNodeScale(graph, node)
-  return getTranslationRotationMatrix(graph, node)
-      .scale(scale)
+  val transform = getNodeValue<Matrix>(graph, node, SceneProperties.transform)
+  return if (transform != null)
+    transform
+  else {
+    val scale = getNodeScale(graph, node)
+    return getTranslationRotationMatrix(graph, node)
+        .scale(scale)
+  }
+}
+
+fun convertToNodeTransforms(graph: Graph): Graph {
+  val keys = getGraphKeys(graph)
+  val newTransforms = keys.mapNotNull { node ->
+    val transform = getLocalNodeTransform(graph, node)
+    if (transform == Matrix.identity || nodeHasProperty(graph, node, SceneProperties.transform))
+      null
+    else {
+      Entry(node, SceneProperties.transform, transform)
+    }
+  }
+  return graph.filter {
+    it.property != SceneProperties.translation &&
+        it.property != SceneProperties.rotation &&
+        it.property != SceneProperties.scale
+  }
+      .plus(newTransforms)
 }
 
 typealias MatrixMap = Map<Key, Matrix>

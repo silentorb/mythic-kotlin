@@ -8,6 +8,7 @@ object SceneProperties {
   const val parent = "parent"
   const val translation = "translation"
   const val rotation = "rotation"
+  const val transform = "transform"
   const val scale = "scale"
   const val mesh = "mesh"
   const val texture = "texture"

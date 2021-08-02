@@ -53,8 +53,6 @@ fun expandExpansions(library: ExpansionLibrary, instances: Graph, accumulator: G
       val instanceTypesEntries = instances
           .filter { it.source == node }
 
-      val instanceTypes = instanceTypesEntries.map { it.target as Key }
-
       val nextInstances = instances - instanceTypesEntries
 
       // Make sure expansions are added after everything else so they can override the others
