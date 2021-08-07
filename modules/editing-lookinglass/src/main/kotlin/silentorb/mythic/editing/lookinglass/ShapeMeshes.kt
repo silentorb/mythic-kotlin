@@ -41,7 +41,7 @@ fun shapeToMeshes(meshShapes: Map<String, Shape>, shape: Shape, transform: Matri
           MeshElement(
               mesh = meshShapes.filter { it.value == shape }.keys.first(),
               material = collisionMaterial,
-              transform = transform.scale(shape.radius),
+              transform = transform,
           )
       )
     else -> listOf()

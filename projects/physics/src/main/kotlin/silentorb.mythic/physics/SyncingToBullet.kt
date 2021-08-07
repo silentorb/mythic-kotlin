@@ -50,7 +50,7 @@ fun createCollisionShape(shape: Shape, scale: Vector3): btCollisionShape {
     }
     is Cylinder -> btCylinderShapeZ(toGdxVector3(Vector3(shape.radius * scale.x, shape.radius * scale.y, shape.height * scale.z * 0.5f)))
 
-    is MeshShape -> createBulletStaticMesh(shape.triangles, scale / 2f)
+    is MeshShape -> createBulletStaticMesh(shape.triangles, scale)
     else -> throw Error("Not supported")
   }
 }
