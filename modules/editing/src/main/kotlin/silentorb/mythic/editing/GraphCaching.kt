@@ -55,5 +55,7 @@ val graphCache = singleValueCache<Triple<GraphTransform, ExpansionLibrary, Graph
 
 fun getCachedGraph(editor: Editor): Graph {
   val startingGraph = getActiveEditorGraph(editor) ?: newGraph()
-  return graphCache(Triple(editor.enumerations.graphTransform, getExpansionLibrary(editor), startingGraph))
+  val scene = getActiveSceneState(editor)
+  val hiddenGraph = startingGraph.filter { !scene.hidden.contains(it.source) }
+  return graphCache(Triple(editor.enumerations.graphTransform, getExpansionLibrary(editor), hiddenGraph))
 }

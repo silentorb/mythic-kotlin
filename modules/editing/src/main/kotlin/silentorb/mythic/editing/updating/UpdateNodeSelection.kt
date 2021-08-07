@@ -6,11 +6,11 @@ import silentorb.mythic.ent.getGraphKeys
 import silentorb.mythic.happenings.handleCommands
 import silentorb.mythic.scenery.SceneProperties
 
-fun updateNodeSelection(editor: Editor, nextGraph: Graph?) = handleCommands<NodeSelection> { command, selection ->
+fun updateNodeSelection(editor: Editor, nextGraph: Graph?) = handleCommands<NodeSet> { command, selection ->
   val graph = getActiveEditorGraph(editor)
   if (graph != null && nextGraph != null) {
     when (command.type) {
-      EditorCommands.setNodeSelection -> command.value as NodeSelection
+      EditorCommands.setNodeSelection -> command.value as NodeSet
       EditorCommands.addNode, EditorCommands.renameNode, EditorCommands.duplicateNode, EditorCommands.pasteNode -> {
         val newNodes = getGraphKeys(nextGraph) - getGraphKeys(graph)
         if (newNodes.any())

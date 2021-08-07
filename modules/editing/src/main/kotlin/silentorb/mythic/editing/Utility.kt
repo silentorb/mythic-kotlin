@@ -42,10 +42,10 @@ fun getEditorViewport(editor: Editor, viewport: Key?): ViewportState? {
     null
 }
 
-fun getNodeSelection(editor: Editor): NodeSelection =
+fun getNodeSelection(editor: Editor): NodeSet =
     getSceneState(editor)?.nodeSelection ?: setOf()
 
-fun getNodeSelection(state: EditorPersistentState): NodeSelection =
+fun getNodeSelection(state: EditorPersistentState): NodeSet =
     state.sceneStates[state.graph]?.nodeSelection ?: setOf()
 
 fun getEditorCamera(editor: Editor, viewport: Key?): CameraRig? =
@@ -65,6 +65,8 @@ fun getTransformedActiveEditorGraph(editor: Editor): Graph? {
     graph
 }
 
+fun getActiveSceneState(editor: Editor): SceneState =
+    editor.persistentState.sceneStates[editor.persistentState.graph] ?: SceneState()
 
 fun getExpansionLibrary(editor: Editor) =
     ExpansionLibrary(

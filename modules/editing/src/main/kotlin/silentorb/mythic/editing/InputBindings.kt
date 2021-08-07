@@ -91,11 +91,14 @@ fun defaultEditorMenuKeystrokes(): KeystrokeBindings = mapOf(
             EditorCommands.toggleProjectionMode to "$keypadKey 5",
             EditorCommands.centerOnSelection to "F",
             EditorCommands.toggleFlythroughMode to "Shift+F",
+            EditorCommands.hide to "H",
+            EditorCommands.unhide to "Alt+H",
 
             // These will probably need modifier keys eventually
             EditorCommands.renderingModeWireframe to "1",
             EditorCommands.renderingModeFlat to "2",
             EditorCommands.renderingModeLit to "3",
+
             EditorCommands.deleteNode to "Del",
             EditorCommands.startConnecting to "Ctrl+J",
             EditorCommands.duplicateNode to "Ctrl+D",

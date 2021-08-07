@@ -21,14 +21,14 @@ import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.toVector2i
 
-val updateFileSelection = handleCommands<NodeSelection> { command, selection ->
+val updateFileSelection = handleCommands<NodeSet> { command, selection ->
   when (command.type) {
-    EditorCommands.setFileSelection -> command.value as NodeSelection
+    EditorCommands.setFileSelection -> command.value as NodeSet
     else -> selection
   }
 }
 
-fun gatherSelectionHierarchy(graph: Graph, selection: NodeSelection): Graph {
+fun gatherSelectionHierarchy(graph: Graph, selection: NodeSet): Graph {
   val selectionAndChildren = selection + getNodeChildren(graph, selection)
   return graph
       .filter {
@@ -135,11 +135,14 @@ fun updateSceneStates(commands: Commands, editor: Editor, graph: Graph?, mouse: 
               updateViewport(editor, commands, mouse, key, viewport)
             }
 
+      val previousNodeSelection = getNodeSelection(editor)
       val nextNodeSelection = updateNodeSelection(editor, graph)(commands, getNodeSelection(editor))
-      val previous = editor.persistentState.sceneStates[graphId] ?: SceneState()
+      val previous = getActiveSceneState(editor)
+      val hidden = updateHidden(editor, previousNodeSelection)(commands, previous.hidden)
       val next = previous.copy(
           viewports = viewports,
           nodeSelection = nextNodeSelection,
+          hidden = hidden,
       )
       editor.persistentState.sceneStates + (graphId to next)
     }

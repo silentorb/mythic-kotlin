@@ -29,7 +29,7 @@ fun redoEdit(history: EditHistory): EditHistory {
     )
 }
 
-fun appendHistory(graph: Graph, nodeSelection: NodeSelection, maxDepth: Int, history: EditHistory): EditHistory =
+fun appendHistory(graph: Graph, nodeSelection: NodeSet, maxDepth: Int, history: EditHistory): EditHistory =
     EditHistory(
         pastAndPresent = history.pastAndPresent
             .plus(
@@ -42,7 +42,7 @@ fun appendHistory(graph: Graph, nodeSelection: NodeSelection, maxDepth: Int, his
         future = listOf(),
     )
 
-fun shouldAppendHistory(nextGraph: Graph, nodeSelection: NodeSelection, history: EditHistory): Boolean {
+fun shouldAppendHistory(nextGraph: Graph, nodeSelection: NodeSet, history: EditHistory): Boolean {
   val pastAndPresent = history.pastAndPresent
   val last = pastAndPresent.lastOrNull()
   if (last?.graph != nextGraph)
@@ -56,7 +56,7 @@ fun shouldAppendHistory(nextGraph: Graph, nodeSelection: NodeSelection, history:
 
 fun updateHistory(
     nextGraph: Graph,
-    nodeSelection: NodeSelection,
+    nodeSelection: NodeSet,
     commands: Commands,
     maxDepth: Int,
     history: EditHistory
@@ -72,7 +72,7 @@ fun updateHistory(
 
 fun updateHistory(
     nextGraph: Graph?,
-    nodeSelection: NodeSelection,
+    nodeSelection: NodeSet,
     graphId: Key?,
     commands: Commands,
     maxDepth: Int,

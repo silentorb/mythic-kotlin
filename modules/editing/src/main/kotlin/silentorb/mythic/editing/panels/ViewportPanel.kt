@@ -31,6 +31,10 @@ fun viewportMenus(): List<MenuTree> =
             MenuTree("Toggle Projection", EditorCommands.toggleProjectionMode),
             MenuTree("Center on Selection", EditorCommands.centerOnSelection),
         )),
+        MenuTree("View", key = Menus.view, items = listOf(
+            MenuTree("Hide", EditorCommands.hide),
+            MenuTree("Unhide", EditorCommands.unhide),
+        )),
         MenuTree("Display", key = Menus.display, items = listOf(
             MenuTree("Draw Wireframe", EditorCommands.renderingModeWireframe,
                 getState = renderingModeState(RenderingMode.wireframe)

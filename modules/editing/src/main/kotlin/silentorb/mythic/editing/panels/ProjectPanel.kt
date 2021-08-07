@@ -25,7 +25,7 @@ fun getDragType(type: FileItemType): String =
       DraggingTypes.folder
 
 fun renderProjectTree(persistentExpansions: Set<String>,
-                      items: Collection<FileItem>, item: FileItem, selection: NodeSelection): Commands {
+                      items: Collection<FileItem>, item: FileItem, selection: NodeSet): Commands {
   val id = item.fullPath
   val selected = selection.contains(id)
   val children = items.filter { it.parent == id }

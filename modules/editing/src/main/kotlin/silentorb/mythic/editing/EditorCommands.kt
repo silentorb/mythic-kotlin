@@ -71,4 +71,7 @@ object EditorCommands {
 
   val selectProperty = "selectProperty"
   val copyProperties = "copyProperties"
+
+  val hide = "hide"
+  val unhide = "unhide"
 }

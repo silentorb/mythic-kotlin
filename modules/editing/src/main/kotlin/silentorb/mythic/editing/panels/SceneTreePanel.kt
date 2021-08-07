@@ -51,7 +51,7 @@ fun sceneTreeDragSource(graph: Graph, node: Key): Commands =
         }
     ))
 
-fun renderTree(graph: Graph, tree: SceneTree, node: String, selection: NodeSelection): Commands {
+fun renderTree(graph: Graph, tree: SceneTree, node: String, selection: NodeSet): Commands {
   val selected = selection.contains(node)
   val children = tree.filter { it.value == node }
   val flags = newTreeFlags(selected) or leafFlags(children.any()) or ImGuiTreeNodeFlags.DefaultOpen

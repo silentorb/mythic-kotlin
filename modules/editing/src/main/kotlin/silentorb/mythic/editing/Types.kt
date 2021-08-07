@@ -39,11 +39,11 @@ data class PropertyDefinition(
 )
 
 typealias PropertyDefinitions = Map<Key, PropertyDefinition>
-typealias NodeSelection = Set<Key>
+typealias NodeSet = Set<Key>
 
 data class Snapshot(
     val graph: Graph,
-    val nodeSelection: NodeSelection,
+    val nodeSelection: NodeSet,
 )
 
 typealias GraphHistory = List<Snapshot>
@@ -60,7 +60,8 @@ data class ViewportState(
 
 data class SceneState(
     val viewports: Map<Key, ViewportState> = defaultViewports(),
-    val nodeSelection: NodeSelection = setOf(),
+    val nodeSelection: NodeSet = setOf(),
+    val hidden: NodeSet = setOf(),
 )
 
 typealias SceneStates = Map<Key, SceneState>
@@ -198,6 +199,7 @@ object Contexts {
 
 object Menus {
   const val camera = "camera"
+  const val view = "view"
   const val display = "display"
   const val edit = "edit"
   const val file = "file"
