@@ -17,27 +17,6 @@ import silentorb.mythic.scenery.*
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 
-data class SerialElementData(
-    val parents: SceneTree,
-    val meshes: Map<Key, String>,
-    val textures: Map<Key, String>,
-    val translation: Map<Key, Vector3>,
-    val rotation: Map<Key, Vector3>,
-    val scale: Map<Key, Vector3>
-)
-
-fun newSerialElementData(graph: Graph): SerialElementData {
-  val tree = getSceneTree(graph)
-  return SerialElementData(
-      parents = tree,
-      meshes = mapByProperty(graph, SceneProperties.mesh),
-      textures = mapByProperty(graph, SceneProperties.texture),
-      translation = mapByProperty(graph, SceneProperties.translation),
-      rotation = mapByProperty(graph, SceneProperties.rotation),
-      scale = mapByProperty(graph, SceneProperties.scale),
-  )
-}
-
 fun cameraRigToCamera(camera: CameraRig): Camera =
     Camera(
         projectionType = camera.projection,
@@ -78,7 +57,7 @@ fun collisionElements(editor: Editor, graph: Graph, nodes: Collection<String>) =
                 val shape = getShape(editor.enumerations.resourceInfo.meshShapes, graph, it.source)
                 val transform = getAbsoluteNodeTransform(graph, it.source)
                 if (shape != null) {
-                  shapeToMeshes(shape, transform)
+                  shapeToMeshes(editor.enumerations.resourceInfo.meshShapes, shape, transform)
                 } else
                   listOf(
                       MeshElement(

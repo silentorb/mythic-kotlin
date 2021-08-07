@@ -21,49 +21,53 @@ fun plumbPixelDepth(sceneRenderer: SceneRenderer, editor: Editor, selectionQuery
   globalState.depthEnabled = true
   clearDepth()
 
-  return withCropping(crop) {
-    withoutFrontDrawing {
-      val graph = getActiveEditorGraph(editor)!!
-      val nodes = getGraphKeys(graph)
-      val childGraph = expandedGraph
-          .filter { !(it.property == SceneProperties.parent && nodes.contains(it.source)) }
+  val graph = getActiveEditorGraph(editor)
 
-      val material = Material(
-          shading = false,
-          color = selectionColor,
-      )
-      var hit: Key? = null
+  return if (graph == null)
+    null
+  else
+    withCropping(crop) {
+      withoutFrontDrawing {
+        val nodes = getGraphKeys(graph)
+        val childGraph = expandedGraph
+            .filter { !(it.property == SceneProperties.parent && nodes.contains(it.source)) }
 
-      glStencilMask(0xFF)
-      clearStencil()
-      globalState.stencilTest = true
-      glStencilFunc(GL_ALWAYS, 1, 0xFF)
-      glStencilOp(GL_KEEP, GL_KEEP, GL_INCR_WRAP)
+        val material = Material(
+            shading = false,
+            color = selectionColor,
+        )
+        var hit: Key? = null
 
-      var lastSample = 0
+        glStencilMask(0xFF)
+        clearStencil()
+        globalState.stencilTest = true
+        glStencilFunc(GL_ALWAYS, 1, 0xFF)
+        glStencilOp(GL_KEEP, GL_KEEP, GL_INCR_WRAP)
 
-      for (node in nodes) {
-        val elementGroups = getSelectionMeshes(editor, childGraph, expandedGraph, node)
-        if (elementGroups.any()) {
-          val groups = setElementGroupMaterial(material, elementGroups)
-          renderElementGroups(sceneRenderer, groups, ShadingMode.none)
-          val pixels = intArrayOf(0)
-          glReadPixels(pixelPositionX, pixelPositionY, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, pixels)
-          val sample = pixels.first()
-          if (sample > lastSample) {
-            hit = node
-            lastSample = sample
-            if (lastSample > 128) {
-              clearStencil()
-              lastSample = 0
+        var lastSample = 0
+
+        for (node in nodes) {
+          val elementGroups = getSelectionMeshes(editor, childGraph, expandedGraph, node)
+          if (elementGroups.any()) {
+            val groups = setElementGroupMaterial(material, elementGroups)
+            renderElementGroups(sceneRenderer, groups, ShadingMode.none)
+            val pixels = intArrayOf(0)
+            glReadPixels(pixelPositionX, pixelPositionY, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, pixels)
+            val sample = pixels.first()
+            if (sample > lastSample) {
+              hit = node
+              lastSample = sample
+              if (lastSample > 128) {
+                clearStencil()
+                lastSample = 0
+              }
             }
           }
         }
+        globalState.stencilTest = false
+        glStencilMask(0x00)
+        clearDepth()
+        hit
       }
-      globalState.stencilTest = false
-      glStencilMask(0x00)
-      clearDepth()
-      hit
     }
-  }
 }

@@ -4,6 +4,7 @@ import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.GraphLibrary
 import silentorb.mythic.ent.newGraph
 import silentorb.mythic.ent.scenery.ExpansionLibrary
+import silentorb.mythic.ent.scenery.convertToNodeTransforms
 import silentorb.mythic.ent.scenery.expandGraphInstances
 import silentorb.mythic.ent.singleValueCache
 
@@ -49,7 +50,7 @@ fun updateSceneCaching(editor: Editor): GraphLibrary {
 }
 
 val graphCache = singleValueCache<Triple<GraphTransform, ExpansionLibrary, Graph>, Graph> { (transform, library, graph) ->
-  expandGraphInstances(library, transform(graph))
+  expandGraphInstances(library, transform(convertToNodeTransforms(graph)))
 }
 
 fun getCachedGraph(editor: Editor): Graph {

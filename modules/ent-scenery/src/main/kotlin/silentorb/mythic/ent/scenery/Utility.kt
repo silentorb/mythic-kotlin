@@ -1,14 +1,12 @@
 package silentorb.mythic.ent.scenery
 
 import silentorb.mythic.ent.*
-import silentorb.mythic.lookinglass.Scene
 import silentorb.mythic.scenery.*
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector3
 import silentorb.mythic.spatial.Vector4
 import silentorb.mythic.spatial.maxScalar
 import kotlin.math.max
-import kotlin.reflect.typeOf
 
 fun getLocalNodeTranslation(graph: Graph, node: Key): Vector3 =
     getNodeValue<Vector3>(graph, node, SceneProperties.translation) ?: Vector3.zero
@@ -36,17 +34,30 @@ val localNodeTransformCache = mappedCache<Pair<Graph, Key>, Matrix>(1024) { key 
       .scale(scale)
 }
 
-//fun getLocalNodeTransform(graph: Graph, node: Key): Matrix =
-//    localNodeTransformCache(graph to node)
+fun integrateTransform(translation: Vector3, rotation: Vector3, scale: Vector3 = Vector3.unit): Matrix =
+    Matrix.identity
+        .translate(translation)
+        .rotateZ(rotation.z)
+        .rotateY(rotation.y)
+        .rotateX(rotation.x)
+        .scale(scale)
 
 fun getLocalNodeTransform(graph: Graph, node: Key): Matrix {
   val transform = getNodeValue<Matrix>(graph, node, SceneProperties.transform)
   return if (transform != null)
     transform
   else {
-    val scale = getNodeScale(graph, node)
-    return getTranslationRotationMatrix(graph, node)
-        .scale(scale)
+    val scale = getNodeValue<Vector3>(graph, node, SceneProperties.scale)
+    val translation = getNodeValue<Vector3>(graph, node, SceneProperties.translation)
+    val rotation = getNodeValue<Vector3>(graph, node, SceneProperties.rotation)
+    return if (scale == null && translation == null && rotation == null)
+      Matrix.identity
+    else
+      integrateTransform(
+          translation ?: Vector3.zero,
+          rotation ?: Vector3.zero,
+          scale ?: Vector3.unit
+      )
   }
 }
 

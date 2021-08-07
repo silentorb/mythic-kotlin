@@ -15,9 +15,8 @@ fun getElementNodes(graph: Graph): Set<String> {
 }
 
 fun nodesToElements(resourceInfo: ResourceInfo, graph: Graph, nodes: Collection<String>): List<ElementGroup> {
-  val localTransforms = getLocalTransforms(graph)
   return nodes.flatMap { node ->
-    val transform = getAbsoluteNodeTransform(graph, localTransforms, node)
+    val transform = getAbsoluteNodeTransform(graph, node)
     nodeToElements(resourceInfo, graph, transform, node)
   }
 }
@@ -75,8 +74,9 @@ fun nodeToElements(resourceInfo: ResourceInfo, graph: Graph, transform: Matrix, 
   val light = getNodeLight(graph, node, transform)
   val isBillboard = graph.contains(Entry(node, SceneProperties.type, SceneTypes.billboard))
   val material = getNodeMaterial(resourceInfo, graph, node)
+  val depiction = getNodeValue<String>(graph, node, "depiction")
 
-  return if (mesh != null || text3d != null || light != null || isBillboard) {
+  return if (depiction != "none" && (mesh != null || text3d != null || light != null || isBillboard)) {
     val meshElements = if (mesh != null) {
       listOf(
           MeshElement(
@@ -124,5 +124,5 @@ fun nodeToElements(resourceInfo: ResourceInfo, graph: Graph, transform: Matrix, 
         )
     )
   } else
-    listOf()
+     listOf()
 }

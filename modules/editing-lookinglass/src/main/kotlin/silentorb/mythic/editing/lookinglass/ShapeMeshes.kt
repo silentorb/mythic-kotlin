@@ -3,10 +3,7 @@ package silentorb.mythic.editing.lookinglass
 import silentorb.mythic.glowing.DrawMethod
 import silentorb.mythic.lookinglass.Material
 import silentorb.mythic.lookinglass.MeshElement
-import silentorb.mythic.scenery.Box
-import silentorb.mythic.scenery.Cylinder
-import silentorb.mythic.scenery.Shape
-import silentorb.mythic.scenery.Sphere
+import silentorb.mythic.scenery.*
 import silentorb.mythic.spatial.Matrix
 import silentorb.mythic.spatial.Vector4
 
@@ -16,7 +13,7 @@ val collisionMaterial = Material(
     drawMethod = DrawMethod.lineLoop,
 )
 
-fun shapeToMeshes(shape: Shape, transform: Matrix): List<MeshElement> {
+fun shapeToMeshes(meshShapes: Map<String, Shape>, shape: Shape, transform: Matrix): List<MeshElement> {
   return when (shape) {
     is Box -> listOf(
         MeshElement(
@@ -39,6 +36,14 @@ fun shapeToMeshes(shape: Shape, transform: Matrix): List<MeshElement> {
             transform = transform.scale(shape.radius),
         )
     )
+    is MeshShape ->
+      listOf(
+          MeshElement(
+              mesh = meshShapes.filter { it.value == shape }.keys.first(),
+              material = collisionMaterial,
+              transform = transform.scale(shape.radius),
+          )
+      )
     else -> listOf()
   }
 }

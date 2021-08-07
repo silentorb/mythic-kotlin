@@ -53,12 +53,6 @@ data class ElementGroup(
     val billboards: List<TexturedBillboard> = listOf(),
     val lights: List<Light> = listOf(),
     val textBillboards: List<TextBillboard> = listOf()
-) {
-  init {
-    if (meshes.size > 100) {
-      val k = 0
-    }
-  }
-}
+)
 
 typealias ElementGroups = List<ElementGroup>
