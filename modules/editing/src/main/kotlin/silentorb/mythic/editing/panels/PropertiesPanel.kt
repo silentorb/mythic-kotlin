@@ -3,12 +3,12 @@ package silentorb.mythic.editing.panels
 import imgui.ImColor
 import imgui.ImGui
 import imgui.ImVec2
-import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.panel
 import silentorb.mythic.editing.components.panelBackground
 import silentorb.mythic.editing.general.InputType
 import silentorb.mythic.editing.general.MenuTree
 import silentorb.mythic.editing.general.activeInputType
+import silentorb.mythic.editing.main.*
 import silentorb.mythic.ent.*
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands

@@ -1,6 +1,6 @@
 package silentorb.mythic.editing.updating
 
-import silentorb.mythic.editing.*
+import silentorb.mythic.editing.main.*
 import silentorb.mythic.ent.uniqueNodeName
 import silentorb.mythic.happenings.Commands
 import silentorb.mythic.happenings.handleCommands

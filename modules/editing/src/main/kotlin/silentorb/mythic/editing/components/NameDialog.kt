@@ -3,11 +3,13 @@ package silentorb.mythic.editing.components
 import imgui.ImGui
 import imgui.flag.ImGuiInputTextFlags
 import imgui.type.ImString
-import silentorb.mythic.editing.*
 import silentorb.mythic.editing.general.InputType
 import silentorb.mythic.editing.general.activeInputType
 import silentorb.mythic.editing.general.checkActiveInputType
 import silentorb.mythic.editing.general.isEscapePressed
+import silentorb.mythic.editing.main.Editor
+import silentorb.mythic.editing.main.EditorCommands
+import silentorb.mythic.editing.main.getNodeSelection
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.happenings.Commands
 

@@ -1,4 +1,4 @@
-package silentorb.mythic.editing
+package silentorb.mythic.editing.main
 
 import imgui.ImDrawList
 import silentorb.mythic.editing.general.Clipboard

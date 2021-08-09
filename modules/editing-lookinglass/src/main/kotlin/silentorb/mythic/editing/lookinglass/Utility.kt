@@ -1,6 +1,6 @@
 package silentorb.mythic.editing.lookinglass
 
-import silentorb.mythic.editing.Editor
+import silentorb.mythic.editing.main.Editor
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Key
 import silentorb.mythic.ent.scenery.withNodeChildren

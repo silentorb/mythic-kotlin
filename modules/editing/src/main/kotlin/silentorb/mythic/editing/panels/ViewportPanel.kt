@@ -4,11 +4,11 @@ import imgui.ImGui
 import imgui.ImVec2
 import imgui.flag.ImGuiMouseButton
 import imgui.flag.ImGuiWindowFlags
-import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.gizmoMenuToggleState
 import silentorb.mythic.editing.components.panel
 import silentorb.mythic.editing.general.MenuTree
 import silentorb.mythic.editing.general.isShiftDown
+import silentorb.mythic.editing.main.*
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.spatial.Vector2i
 import silentorb.mythic.spatial.Vector4i

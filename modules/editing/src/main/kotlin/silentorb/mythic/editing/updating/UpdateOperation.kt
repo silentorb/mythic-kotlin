@@ -1,7 +1,7 @@
 package silentorb.mythic.editing.updating
 
-import silentorb.mythic.editing.*
 import silentorb.mythic.editing.general.MouseState
+import silentorb.mythic.editing.main.*
 import silentorb.mythic.ent.Entry
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.getNodeValue

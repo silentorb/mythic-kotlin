@@ -1,4 +1,4 @@
-package silentorb.mythic.editing
+package silentorb.mythic.editing.main
 
 enum class OperationType {
   translate,

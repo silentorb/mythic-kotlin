@@ -1,8 +1,8 @@
 package silentorb.mythic.editing.updating
 
-import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.activeFieldId
 import silentorb.mythic.editing.general.*
+import silentorb.mythic.editing.main.*
 import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Key

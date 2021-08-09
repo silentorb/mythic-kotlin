@@ -1,7 +1,7 @@
 package silentorb.mythic.editing.updating
 
-import silentorb.mythic.editing.*
 import silentorb.mythic.editing.components.nameText
+import silentorb.mythic.editing.main.*
 import silentorb.mythic.ent.*
 import silentorb.mythic.ent.scenery.getAbsoluteNodeTransform
 import silentorb.mythic.ent.scenery.getGraphRoots

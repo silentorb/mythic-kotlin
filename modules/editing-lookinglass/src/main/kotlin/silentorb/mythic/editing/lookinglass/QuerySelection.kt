@@ -2,9 +2,9 @@ package silentorb.mythic.editing.lookinglass
 
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL14.GL_INCR_WRAP
-import silentorb.mythic.editing.Editor
-import silentorb.mythic.editing.SelectionQuery
-import silentorb.mythic.editing.getActiveEditorGraph
+import silentorb.mythic.editing.main.Editor
+import silentorb.mythic.editing.main.SelectionQuery
+import silentorb.mythic.editing.main.getActiveEditorGraph
 import silentorb.mythic.ent.Graph
 import silentorb.mythic.ent.Key
 import silentorb.mythic.ent.getGraphKeys

@@ -1,8 +1,8 @@
 package silentorb.mythic.editing.lookinglass
 
-import silentorb.mythic.editing.Editor
-import silentorb.mythic.editing.getCachedGraph
-import silentorb.mythic.editing.getNodeSelection
+import silentorb.mythic.editing.main.Editor
+import silentorb.mythic.editing.main.getCachedGraph
+import silentorb.mythic.editing.main.getNodeSelection
 import silentorb.mythic.lookinglass.SceneRenderer
 import silentorb.mythic.lookinglass.drawing.renderHighlight
 import silentorb.mythic.spatial.Vector4

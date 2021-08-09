@@ -1,4 +1,4 @@
-package silentorb.mythic.editing
+package silentorb.mythic.editing.main
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import silentorb.mythic.cameraman.*

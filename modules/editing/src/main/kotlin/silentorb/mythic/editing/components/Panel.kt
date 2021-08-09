@@ -2,8 +2,8 @@ package silentorb.mythic.editing.components
 
 import imgui.ImGui
 import imgui.flag.ImGuiWindowFlags
-import silentorb.mythic.editing.Editor
-import silentorb.mythic.editing.PanelResponse
+import silentorb.mythic.editing.main.Editor
+import silentorb.mythic.editing.main.PanelResponse
 import silentorb.mythic.happenings.Commands
 
 fun panel(

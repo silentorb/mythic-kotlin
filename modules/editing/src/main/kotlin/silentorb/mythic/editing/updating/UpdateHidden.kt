@@ -1,9 +1,9 @@
 package silentorb.mythic.editing.updating
 
-import silentorb.mythic.editing.Editor
-import silentorb.mythic.editing.EditorCommands
-import silentorb.mythic.editing.NodeSet
-import silentorb.mythic.editing.getActiveEditorGraph
+import silentorb.mythic.editing.main.Editor
+import silentorb.mythic.editing.main.EditorCommands
+import silentorb.mythic.editing.main.NodeSet
+import silentorb.mythic.editing.main.getActiveEditorGraph
 import silentorb.mythic.happenings.handleCommands
 
 fun updateHidden(editor: Editor, selection: NodeSet) = handleCommands<NodeSet> { command, hidden ->

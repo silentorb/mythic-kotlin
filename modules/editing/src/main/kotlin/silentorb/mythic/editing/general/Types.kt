@@ -1,8 +1,8 @@
 package silentorb.mythic.editing.general
 
-import silentorb.mythic.editing.ContextMenus
-import silentorb.mythic.editing.Editor
-import silentorb.mythic.editing.GetMenuItemState
+import silentorb.mythic.editing.main.ContextMenus
+import silentorb.mythic.editing.main.Editor
+import silentorb.mythic.editing.main.GetMenuItemState
 import silentorb.mythic.happenings.Command
 import silentorb.mythic.spatial.Vector2
 import silentorb.mythic.spatial.Vector2i

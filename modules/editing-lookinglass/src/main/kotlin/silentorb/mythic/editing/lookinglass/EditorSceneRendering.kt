@@ -1,8 +1,8 @@
 package silentorb.mythic.editing.lookinglass
 
 import silentorb.mythic.drawing.flipViewport
-import silentorb.mythic.editing.*
 import silentorb.mythic.editing.general.renderEditorGui
+import silentorb.mythic.editing.main.*
 import silentorb.mythic.editing.panels.defaultViewportId
 import silentorb.mythic.ent.*
 import silentorb.mythic.ent.scenery.*
