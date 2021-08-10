@@ -135,12 +135,14 @@ fun initializeHinge(bulletState: BulletState, bulletBody: btRigidBody, hingeInfo
 }
 
 fun getNodeCollisionObject(meshShapes: Map<String, Shape>, graph: Graph, node: Key): CollisionObject? {
-  val shapeDefinition = getShape(meshShapes, graph, node)
   val groups = getNodeValue<Int>(graph, node, SceneProperties.collisionGroups)
-  return if (shapeDefinition != null && groups != null) {
+  return if (groups != null) {
+    val shape = getShape(meshShapes, graph, node)
+        ?: Box(Vector3(0.5f))
+
     val mask = getNodeValue<Int>(graph, node, SceneProperties.collisionMask) ?: 2 or 4
     CollisionObject(
-        shape = shapeDefinition,
+        shape = shape,
         groups = groups,
         mask = mask,
     )
@@ -149,7 +151,8 @@ fun getNodeCollisionObject(meshShapes: Map<String, Shape>, graph: Graph, node: K
 }
 
 fun syncStaticGeometry(graph: Graph, meshShapes: Map<String, Shape>, bulletState: BulletState) {
-  val collisionShapes = graph.filter { it.property == SceneProperties.collisionShape }
+  val collisionShapes = graph
+      .filter { it.property == SceneProperties.collisionGroups }
   val newStaticBodies = collisionShapes
       .mapNotNull { (node) ->
         val collisionObject = getNodeCollisionObject(meshShapes, graph, node)

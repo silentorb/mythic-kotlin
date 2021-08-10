@@ -46,8 +46,7 @@ fun prepareDynamicDepictions(depictions: EditorDepictionMap, graph: Graph, nodes
 
 fun collisionElements(editor: Editor, graph: Graph, nodes: Collection<String>) =
     if (editor.persistentState.visibleGizmoTypes.contains(GizmoTypes.collision)) {
-      val collisionNodes = filterByProperty(graph, SceneProperties.collisionShape)
-          .plus(filterByProperty(graph, SceneProperties.collisionGroups))
+      val collisionNodes = filterByProperty(graph, SceneProperties.collisionGroups)
           .distinct()
           .filter { nodes.contains(it.source) }
 
