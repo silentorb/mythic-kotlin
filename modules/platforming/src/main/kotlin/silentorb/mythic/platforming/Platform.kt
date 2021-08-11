@@ -79,6 +79,7 @@ data class LoadSoundResult(
 )
 
 interface PlatformAudio {
+  val isActive: Boolean
   fun start(latency: Int)
   fun play(buffer: Int, volume: Float, position: Vector3?): Int?
   fun getPlayingSounds(): Collection<Int>

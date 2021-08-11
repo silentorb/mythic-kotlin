@@ -76,21 +76,23 @@ class DesktopAudio : PlatformAudio {
   val sourcesBusy: BooleanArray = BooleanArray(sourceCount) { false }
   var gain: Float = 1f
 
-  val isActive: Boolean get() = device != 0L
+  override val isActive: Boolean get() = device != 0L
 
   override fun start(latency: Int) {
     val defaultDeviceName: String = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER)!!
     device = alcOpenDevice(defaultDeviceName)
 
-    val attributes = intArrayOf(0)
-    context = alcCreateContext(device, attributes)
-    alcMakeContextCurrent(context)
+    if (device != 0L) {
+      val attributes = intArrayOf(0)
+      context = alcCreateContext(device, attributes)
+      alcMakeContextCurrent(context)
 
-    val alcCapabilities: ALCCapabilities = ALC.createCapabilities(device)
-    val alCapabilities: ALCapabilities = AL.createCapabilities(alcCapabilities)
-    val sourceBuffer = IntArray(sourceCount)
-    alGenSources(sourceBuffer)
-    sources.addAll(sourceBuffer.toTypedArray())
+      val alcCapabilities: ALCCapabilities = ALC.createCapabilities(device)
+      val alCapabilities: ALCapabilities = AL.createCapabilities(alcCapabilities)
+      val sourceBuffer = IntArray(sourceCount)
+      alGenSources(sourceBuffer)
+      sources.addAll(sourceBuffer.toTypedArray())
+    }
   }
 
   override fun play(buffer: Int, volume: Float, position: Vector3?): Int? {
