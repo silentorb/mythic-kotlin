@@ -144,10 +144,12 @@ class DesktopAudio : PlatformAudio {
   }
 
   override fun stop() {
-    unloadAllSounds()
-    alcDestroyContext(context)
-    alcCloseDevice(device)
-    device = 0
+    if (isActive) {
+      unloadAllSounds()
+      alcDestroyContext(context)
+      alcCloseDevice(device)
+      device = 0
+    }
   }
 
   override fun loadSound(filename: String): LoadSoundResult {

@@ -74,6 +74,6 @@ fun updateSound(delta: Float): (Sound) -> Sound = { sound ->
 
 fun finishedSounds(soundDurations: SoundDurations): (Table<Sound>) -> Set<Id> = { sounds ->
   sounds
-      .filterValues { it.progress >= soundDurations[it.type]!! }
+      .filterValues { it.progress >= soundDurations[it.type] ?: 0f }
       .keys
 }

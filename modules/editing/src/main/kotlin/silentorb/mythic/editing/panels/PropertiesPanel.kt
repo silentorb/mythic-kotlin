@@ -251,7 +251,11 @@ fun drawPropertiesPanel(editor: Editor, graph: Graph?): PanelResponse =
                     mixedValue
 
                   val entry = Entry(compositeId, property, previousValue)
-                  drawFormField(editor, definition, entry, id)
+                  val result = drawFormField(editor, definition, entry, id)
+                  if (result == mixedValue)
+                    null
+                  else
+                    result
                 } else
                   null
 
