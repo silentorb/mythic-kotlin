@@ -18,7 +18,10 @@ data class AnimationChannel(
 typealias Keyframes = List<Keyframe>
 
 inline fun getCurrentKeys(keys: List<Keyframe>, timePassed: Float): Pair<Keyframe, Keyframe?> {
-  for (i in 0 until keys.size) {
+  if (keys.size == 1)
+    return Pair(keys.last(), null)
+
+  for (i in keys.indices) {
     val key = keys[i]
     if (key.time > timePassed) {
       return Pair(keys[i - 1], key)

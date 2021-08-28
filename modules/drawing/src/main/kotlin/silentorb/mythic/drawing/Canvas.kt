@@ -8,7 +8,7 @@ import silentorb.mythic.spatial.Vector4i
 import kotlin.math.cos
 import kotlin.math.sin
 
-data class Meshes(
+data class CanvasMeshes(
     val square: Drawable,
     val image: Drawable,
     val imageGl: Drawable,
@@ -71,7 +71,7 @@ fun createSolidCircleMesh(vertexSchema: VertexSchema, radius: Float, count: Int)
 
 const val circleResolution = 32
 
-fun createDrawingMeshes(vertexSchemas: DrawingVertexSchemas) = Meshes(
+fun createDrawingMeshes(vertexSchemas: DrawingVertexSchemas) = CanvasMeshes(
     square = createSquareMesh(vertexSchemas.simple),
     image = createImageMesh(vertexSchemas.image),
     imageGl = createImageMeshGl(vertexSchemas.image),
@@ -86,7 +86,7 @@ enum class FillType {
 
 data class CanvasDependencies(
     val vertexSchemas: DrawingVertexSchemas,
-    val meshes: Meshes,
+    val meshes: CanvasMeshes,
     val dynamicMesh: MutableSimpleMesh,
     val dynamicTexturedMesh: MutableSimpleMesh
 )

@@ -55,10 +55,14 @@ fun renderElement(renderer: SceneRenderer, primitive: Primitive, material: Mater
   drawMesh(primitive.mesh, material.drawMethod)
 }
 
-fun armatureTransforms(armature: Armature, group: ElementGroup): List<Matrix> =
+fun armatureTransforms(armature: Armature, group: ElementGroup): List<Matrix>? =
     if (group.animations.size == 1) {
-      val animation = group.animations.first()
-      transformAnimatedSkeleton(armature.bones, armature.animations[animation.animationId]!!, animation.timeOffset)
+      val elementAnimation = group.animations.first()
+      val animation = armature.animations[elementAnimation.animationId] ?: armature.animations.values.firstOrNull()
+      if (animation != null)
+        transformAnimatedSkeleton(armature.bones, animation, elementAnimation.timeOffset)
+      else
+        null
     } else {
       val animations = group.animations.mapNotNull { animation ->
         val definition = armature.animations[animation.animationId]
@@ -71,7 +75,10 @@ fun armatureTransforms(armature: Armature, group: ElementGroup): List<Matrix> =
         else
           null
       }
-      transformAnimatedSkeleton(armature.bones, animations)
+      if (animations.any())
+        transformAnimatedSkeleton(armature.bones, animations)
+      else
+        null
     }
 
 fun getElementTransform(elementTransform: Matrix, primitive: Primitive, transforms: List<Matrix>?): Matrix {

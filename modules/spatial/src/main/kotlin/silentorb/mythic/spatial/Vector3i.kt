@@ -33,6 +33,10 @@ data class Vector3i(
         2 -> z
         else -> throw Error("Invalid index $i")
       }
+
+  override fun toString(): String {
+    return "Vector3i($x, $y, $z)"
+  }
 }
 
 fun toVector3iRounded(value: Vector3): Vector3i =
